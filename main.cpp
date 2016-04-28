@@ -63,7 +63,7 @@ int main(){
                 } else {
                     status = libusb_set_auto_detach_kernel_driver(handle, 1);
                     if(status == LIBUSB_SUCCESS){
-                        LOG("Enabled auto kernel detach");
+                        LOG("Enabled auto kernel detach: " << libusb_error_name(status));
                     } else {
                         usb_detach(handle, 0);
                         usb_detach(handle, 1);
@@ -72,7 +72,7 @@ int main(){
 
                     status = libusb_claim_interface(handle, 0);
                     if(status != 0){
-                        ELOG("Failed to claim interface");
+                        ELOG("Failed to claim interface: " << libusb_error_name(status));
                     } else {
                         zu8 opcode = 0;
                         zu32 addr = 0x2800;
@@ -93,7 +93,7 @@ int main(){
 
                     status = libusb_release_interface(handle, 0);
                     if(status != 0){
-                        ELOG("Failed to release interface");
+                        ELOG("Failed to release interface: " << libusb_error_name(status));
                     }
 
                     libusb_close(handle);
