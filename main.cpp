@@ -63,7 +63,7 @@ int main(){
                 } else {
                     status = libusb_set_auto_detach_kernel_driver(handle, 1);
                     if(status == LIBUSB_SUCCESS){
-                        LOG("Enabled auto kernel detach: " << libusb_error_name(status));
+                        LOG("Enabled auto kernel detach");
                     } else {
                         usb_detach(handle, 0);
                         usb_detach(handle, 1);
@@ -79,13 +79,20 @@ int main(){
                         zu16 len = 64;
                         ZBinary data(len);
                         status = libusb_control_transfer(handle,
-                                                         LIBUSB_ENDPOINT_IN | LIBUSB_REQUEST_TYPE_VENDOR | LIBUSB_RECIPIENT_DEVICE,
+                                                         LIBUSB_ENDPOINT_IN,
                                                          opcode,
-                                                         addr & 0xFFFF,
+                                                         addr & 0xFF,
                                                          addr >> 16,
                                                          data.raw(),
                                                          len,
                                                          1000);
+
+                        status = libusb_bulk_transfer(handle,
+                                                      LIBUSB_ENDPOINT_IN,
+                                                      addr,
+                                                      data.raw(),
+                                                      len,
+                                                      1000);
                         if(status != len){
                             ELOG("Failed to read: " << libusb_error_name(status));
                         }
@@ -109,3 +116,4 @@ int main(){
     libusb_exit(NULL);
     return 0;
 }
+
