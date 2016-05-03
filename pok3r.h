@@ -11,10 +11,10 @@ using namespace LibChaos;
 #define VORTEX_POK3R_PID    0x0141
 
 #define SEND_EP             0x04
-#define RECV_EP             0x83
+#define RECV_EP             0x03
+#define TIMEOUT             1000
 
 #define INTERFACE           1
-#define TIMEOUT             1000
 
 class Pok3r {
 public:

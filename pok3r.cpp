@@ -138,6 +138,7 @@ void Pok3r::close(){
 }
 
 zu32 Pok3r::read(zu32 addr, ZBinary &bin){
+    int status;
     const zu8 cmd = 1;
     const zu8 scmd = 2;
     const zu16 len = 64;
@@ -154,14 +155,14 @@ zu32 Pok3r::read(zu32 addr, ZBinary &bin){
     fixcrc(data.raw(), len); // CRC
 
     // Send command
-    int status = libusb_interrupt_transfer(handle, SEND_EP, data.raw(), len, &olen, TIMEOUT);
+    status = libusb_interrupt_transfer(handle, LIBUSB_ENDPOINT_OUT | SEND_EP, data.raw(), len, &olen, TIMEOUT);
     if(status != 0){
         ELOG("Failed to send: " << libusb_error_name(status) << " " << olen);
         return 0;
     }
 
     // Recv data
-    status = libusb_interrupt_transfer(handle, RECV_EP, data.raw(), len, &olen, TIMEOUT);
+    status = libusb_interrupt_transfer(handle, LIBUSB_ENDPOINT_IN | RECV_EP, data.raw(), len, &olen, TIMEOUT);
     if(status != 0){
         ELOG("Failed to recv: " << libusb_error_name(status) << " " << olen);
         return 0;
