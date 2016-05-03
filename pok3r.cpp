@@ -33,7 +33,7 @@ void fixcrc(unsigned char *buff, int len) {
     setword(&buff[2], c);
 }
 
-Pok3r::Pok3r() : context(nullptr), device(nullptr), handle(nullptr), interface(-1){
+Pok3r::Pok3r() : context(nullptr), device(nullptr), handle(nullptr), claimed{0}, kernel{0}{
     int status = libusb_init(&context);
     if(status != 0){
         ELOG("Failed to init libusb: " << libusb_error_name(status));
@@ -93,36 +93,37 @@ bool Pok3r::open(){
         ELOG("Auto kernel detach not supported");
     }
 
+    //detachKernel(0);
+    //detachKernel(1);
+    //detachKernel(2);
+
     // Set configuration
     status = libusb_set_configuration(handle, 1);
-    if(status != 0){
+    if(status == LIBUSB_ERROR_BUSY){
+        // Ignore busy error
+    } else if(status != 0){
         ELOG("Failed to set configuration: " << libusb_error_name(status));
-        //close();
-        //return false;
-    }
-
-    // Claim interface
-    status = libusb_claim_interface(handle, INTERFACE);
-    if(status != 0){
-        ELOG("Failed to claim interface: " << libusb_error_name(status));
         close();
         return false;
     }
-    interface = INTERFACE;
+
+    // Claim interface
+    //claimInterface(0);
+    claimInterface(1);
+    //claimInterface(2);
 
     return true;
 }
 
 void Pok3r::close(){
     if(handle){
-        if(interface >= 0){
-            // Release interface
-            int status = libusb_release_interface(handle, interface);
-            if(status != 0){
-                ELOG("Failed to release interface: " << libusb_error_name(status));
-            }
-            interface = -1;
-        }
+        releaseInterface(0);
+        releaseInterface(1);
+        releaseInterface(2);
+
+        if(kernel[0]) attachKernel(0);
+        if(kernel[1]) attachKernel(1);
+        if(kernel[2]) attachKernel(2);
 
         // Close handle
         libusb_close(handle);
@@ -183,4 +184,59 @@ ZString Pok3r::getVersion(){
         return ZString(bin.raw() + 4);
     }
     return "NONE";
+}
+
+bool Pok3r::claimInterface(int interface){
+    int status = libusb_claim_interface(handle, interface);
+    if(status != 0){
+        ELOG("Failed to claim interface: " << libusb_error_name(status));
+        claimed[interface] = false;
+        return false;
+    }
+    claimed[interface] = true;
+    return true;
+}
+
+bool Pok3r::releaseInterface(int interface){
+    if(claimed[interface]){
+        // Release interface
+        int status = libusb_release_interface(handle, interface);
+        if(status != 0){
+            ELOG("Failed to release interface: " << libusb_error_name(status));
+            return false;
+        }
+        claimed[interface] = false;
+    }
+    return true;
+}
+
+bool Pok3r::detachKernel(int interface){
+    int status = libusb_kernel_driver_active(handle, interface);
+    if(status < 0){
+        ELOG("Failed to query kernel driver on interface " << interface << ": " << libusb_error_name(status));
+        return false;
+    } else if(status){
+        kernel[interface] = true;
+        status = libusb_detach_kernel_driver(handle, interface);
+        if(status != 0){
+            ELOG("Failed to detach kernel on interface " << interface << ": " << libusb_error_name(status));
+            return false;
+        } else {
+            LOG("Detached kernel on interface " << interface);
+        }
+    } else {
+        kernel[interface] = false;
+    }
+    return true;
+}
+
+bool Pok3r::attachKernel(int interface){
+    int status = libusb_attach_kernel_driver(handle, interface);
+    if(status != 0){
+        ELOG("Failed to attach kernel on interface " << interface << ": " << libusb_error_name(status));
+        return false;
+    } else {
+        LOG("Attached kernel on interface " << interface);
+    }
+    return true;
 }

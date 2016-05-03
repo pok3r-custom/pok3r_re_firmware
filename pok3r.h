@@ -31,10 +31,17 @@ public:
     ZString getVersion();
 
 private:
+    bool claimInterface(int interface);
+    bool releaseInterface(int interface);
+    bool detachKernel(int interface);
+    bool attachKernel(int interface);
+
+private:
     libusb_context *context;
     libusb_device *device;
     libusb_device_handle *handle;
-    int interface;
+    bool claimed[3];
+    bool kernel[3];
 };
 
 #endif // POK3R_H
