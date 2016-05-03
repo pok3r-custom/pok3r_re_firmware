@@ -21,6 +21,8 @@ FIND_PACKAGE(LibUSB-1.0 REQUIRED)
 
 SET(SOURCES
     main.cpp
+    pok3r.h
+    pok3r.cpp
 )
 
 ### =================== CONFIG ==================== ###
