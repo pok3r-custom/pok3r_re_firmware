@@ -1,5 +1,6 @@
-#include "zlog.h"
 #include "pok3r.h"
+#include "zlog.h"
+#include "zfile.h"
 
 int readver(){
     LOG("Looking for Vortex Pok3r...");
@@ -18,7 +19,25 @@ int readver(){
     }
 }
 
+#define FW_START    0x1A3800
+#define FW_LEN      85 * 4
+
 int decfw(ZPath exe){
+    LOG("Extract from " << exe);
+    ZFile file(exe, ZFile::READ);
+    if(file.seek(FW_START) != FW_START){
+        LOG("File too short");
+        return -1;
+    }
+    ZBinary bin;
+    if(file.read(bin, FW_LEN) != FW_LEN){
+        LOG("File too short");
+        return -1;
+    }
+    for(zu64 i = 0; i < bin.size(); ++i){
+        bin[i] = ((bin[i] - 7) << 4) + (bin[i] >> 4);
+    }
+    RLOG(bin.strWords(4));
 
     return 0;
 }
@@ -32,7 +51,13 @@ int main(int argc, char **argv){
         if(cmd == "readver"){
             return readver();
         } else if(cmd == "decfw"){
-            return decfw();
+            if(argc > 2){
+                ZPath fw = ZString(argv[2]);
+                return decfw(fw);
+            } else {
+                LOG("Usage: pok3rtest decfw <path to updater>");
+                return 2;
+            }
         } else {
             LOG("Unknown Command \"" << cmd << "\"");
             return 1;
