@@ -20,7 +20,7 @@ int readver(){
 }
 
 #define FW_START    0x1A3800
-#define FW_LEN      85 * 4
+#define FW_LEN      0x5E28
 
 int decfw(ZPath exe){
     LOG("Extract from " << exe);
@@ -37,7 +37,19 @@ int decfw(ZPath exe){
     for(zu64 i = 0; i < bin.size(); ++i){
         bin[i] = ((bin[i] - 7) << 4) + (bin[i] >> 4);
     }
-    RLOG(bin.strWords(4));
+    for(zu64 i = 0; i < bin.size(); i+=2){
+        zbyte b = bin[i];
+        bin[i] = bin[i+1];
+        bin[i+1] = b;
+    }
+//    zs8 s = 1;
+//    for(zu64 i = 0; i < bin.size() - 4; i+=4){
+//        zbyte b = bin[i+s];
+//        bin[i+s] = bin[i+s+4];
+//        bin[i+s+4] = b;
+//        s = s - 1 % 2;
+//    }
+    RLOG(bin.strWords(4) << ZLog::NEWLN);
 
     return 0;
 }
