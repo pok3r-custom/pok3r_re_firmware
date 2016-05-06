@@ -7,30 +7,19 @@ void setword(unsigned char *b, int i){
 }
 
 // From http://mdfs.net/Info/Comp/Comms/CRC16.htm
+// CRC-CCITT
 #define poly 0x1021
-int crc16(unsigned char *addr, int num) {
-    int i;
-    int crc=0;
-    for (; num>0; num--)               /* Step through bytes in memory */
-    {
-        crc = crc ^ (*addr++ << 8);      /* Fetch byte from memory, XOR into CRC top byte*/
-        for (i=0; i<8; i++)              /* Prepare to rotate 8 bits */
-        {
-            crc = crc << 1;                /* rotate */
-            if (crc & 0x10000)             /* bit 15 was set (now bit 16)... */
-            crc = (crc ^ poly) & 0xFFFF; /* XOR with XMODEM polynomic */
-                                   /* and ensure CRC remains 16-bit value */
-        }                              /* Loop for 8 bits */
-     }                                /* Loop until num=0 */
-    return(crc);                     /* Return updated CRC */
-}
-
-//Fix crc of a packet
-void fixcrc(unsigned char *buff, int len) {
-    int c;
-    setword(&buff[2], 0);
-    c=crc16(buff, len);
-    setword(&buff[2], c);
+zu16 crc16(unsigned char *addr, zu64 size) {
+    zu32 crc = 0;
+    for(zu64 i = 0; i < size; ++i){             /* Step through bytes in memory */
+        crc ^= (zu16)(addr[i] << 8);                  /* Fetch byte from memory, XOR into CRC top byte*/
+        for(int j = 0; j < 8; j++){             /* Prepare to rotate 8 bits */
+            crc = crc << 1;                     /* rotate */
+            if(crc & 0x10000)                   /* bit 15 was set (now bit 16)... */
+                crc = (crc ^ poly) & 0xFFFF;    /* XOR with XMODEM polynomic and ensure CRC remains 16-bit value */
+        }
+    }
+    return (zu16)crc;
 }
 
 Pok3r::Pok3r() : context(nullptr), device(nullptr), handle(nullptr), claimed{0}, kernel{0}{
@@ -87,11 +76,8 @@ bool Pok3r::open(){
         return false;
     }
 
-    // Set auto detach
-    status = libusb_set_auto_detach_kernel_driver(handle, 1);
-    if(status == LIBUSB_ERROR_NOT_SUPPORTED){
-        ELOG("Auto kernel detach not supported");
-    }
+    // Set auto detach (if supported, otherwise silently ignore)
+    libusb_set_auto_detach_kernel_driver(handle, 1);
 
     //detachKernel(0);
     //detachKernel(1);
@@ -152,7 +138,8 @@ zu32 Pok3r::read(zu32 addr, ZBinary &bin){
     data.writeleu16(0); // CRC
     data.writeleu32(addr); // Address
     data.writeleu32(eaddr); // End address
-    fixcrc(data.raw(), len); // CRC
+    data.seek(2);
+    data.writeleu16(crc16(data.raw(), len)); // CRC
 
     // Send command
     status = libusb_interrupt_transfer(handle, LIBUSB_ENDPOINT_OUT | SEND_EP, data.raw(), len, &olen, TIMEOUT);
