@@ -19,44 +19,102 @@ int readver(){
     }
 }
 
-#define FW_START    0x1A3800
-#define FW_LEN      0x5E28
+void fwDecode(ZBinary &bin){
+    // Swap bytes 4 apart, skip 5
+    for(zu64 i = 4; i < bin.size(); i+=5){
+        zbyte a = bin[i-4];
+        zbyte b = bin[i];
+        bin[i-4] = b;
+        bin[i] = a;
+    }
 
-int decfw(ZPath exe){
-    LOG("Extract from " << exe);
-    ZFile file(exe, ZFile::READ);
-    if(file.seek(FW_START) != FW_START){
-        LOG("File too short");
-        return -1;
+    // Swap bytes in each set of two bytes
+    for(zu64 i = 1; i < bin.size(); i+=2){
+        zbyte d = bin[i-1];
+        zbyte b = bin[i];
+        bin[i-1] = b;
+        bin[i] = d;
     }
-    ZBinary bin;
-    if(file.read(bin, FW_LEN) != FW_LEN){
-        LOG("File too short");
-        return -1;
-    }
+
+    // x = (x - 7 << 4) + (x >> 4)
     for(zu64 i = 0; i < bin.size(); ++i){
         bin[i] = ((bin[i] - 7) << 4) + (bin[i] >> 4);
     }
-    for(zu64 i = 0; i < bin.size(); i+=2){
-        zbyte b = bin[i];
-        bin[i] = bin[i+1];
-        bin[i+1] = b;
+}
+
+#define FW_START        0x1A3800
+#define FW_LEN          0x64D4
+//#define FW_LEN          0x5E28
+#define STRINGS_START   0x1A9CD4
+#define STRINGS_LEN     0x4B8
+
+int decfw(ZPath exe){
+    LOG("Extract from " << exe);
+    ZFile file;
+    if(!file.open(exe, ZFile::READ)){
+        ELOG("Failed to open file");
+        return -1;
     }
-//    zs8 s = 1;
-//    for(zu64 i = 0; i < bin.size() - 4; i+=4){
-//        zbyte b = bin[i+s];
-//        bin[i+s] = bin[i+s+4];
-//        bin[i+s+4] = b;
-//        s = s - 1 % 2;
-//    }
-    RLOG(bin.strWords(4) << ZLog::NEWLN);
+
+    // Read strings
+    ZBinary strs;
+    if(file.seek(STRINGS_START) != STRINGS_START){
+        LOG("File too short");
+        return -4;
+    }
+    if(file.read(strs, STRINGS_LEN) != STRINGS_LEN){
+        LOG("File too short");
+        return -5;
+    }
+    // Decrypt strings
+    fwDecode(strs);
+
+    ZString company;
+    ZString product;
+    ZString version;
+
+    // Company name
+    company.parseUTF16((const wchar_t *)(strs.raw() + 0x10), 0xFF);
+    // Product name
+    product.parseUTF16((const wchar_t *)(strs.raw() + 0x218), 0xFF);
+    // Version
+    version = ZString(strs.raw() + 0x460, 0xFF);
+
+    LOG("Company: " << company);
+    LOG("Product: " << product);
+    LOG("Version: " << version);
+
+    RLOG(strs.dumpBytes(4, 8, true) << ZLog::NEWLN);
+
+    // Read firmware
+    ZBinary fw;
+    if(file.seek(FW_START) != FW_START){
+        LOG("File too short");
+        return -2;
+    }
+    if(file.read(fw, FW_LEN) != FW_LEN){
+        LOG("File too short");
+        return -3;
+    }
+    // Decrypt firmware
+    fwDecode(fw);
+    // Write firmware
+    ZFile fwout("dump_" + version, ZFile::WRITE);
+    fwout.write(fw);
+
+//    ZFile spout("main_" + version, ZFile::WRITE);
+//    zu32 spaddr = fw.readleu32();
+//    ZBinary spdata(fw.raw() + spaddr, fw.size() - spaddr);
+//    spout.write(spdata);
+
+    RLOG(fw.dumpBytes(4, 8, true) << ZLog::NEWLN);
 
     return 0;
 }
 
 int main(int argc, char **argv){
     ZLog::logLevelStdOut(ZLog::INFO, "%time% %thread% N %log%");
-    ZLog::logLevelStdErr(ZLog::ERROR, "\x1b[31m%time% %thread% E [%file%:%line%] %log%\x1b[m");
+    ZLog::logLevelStdErr(ZLog::ERRORS, "\x1b[31m%time% %thread% E [%file%:%line%] %log%\x1b[m");
 
     if(argc > 1){
         ZString cmd = argv[1];

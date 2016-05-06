@@ -62,7 +62,9 @@ else (LIBUSB_1_LIBRARIES AND LIBUSB_1_INCLUDE_DIRS)
 
     find_library(LIBUSB_1_LIBRARY
         NAMES
-        usb-1.0 usb
+        libusb-1.0.a
+        usb-1.0
+        usb
         PATHS
         /usr/lib
         /usr/local/lib

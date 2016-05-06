@@ -1,7 +1,7 @@
 #ifndef POK3R_H
 #define POK3R_H
 
-#include "libusb-1.0/libusb.h"
+#include "libusb.h"
 
 #include "zstring.h"
 #include "zbinary.h"
@@ -13,8 +13,6 @@ using namespace LibChaos;
 #define SEND_EP             0x04
 #define RECV_EP             0x03
 #define TIMEOUT             1000
-
-#define INTERFACE           1
 
 class Pok3r {
 public:
