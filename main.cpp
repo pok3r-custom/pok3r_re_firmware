@@ -36,9 +36,32 @@ void fwDecode(ZBinary &bin){
         bin[i] = d;
     }
 
-    // x = (x - 7 << 4) + (x >> 4)
+    // y = (x - 7 << 4) + (x >> 4)
     for(zu64 i = 0; i < bin.size(); ++i){
         bin[i] = ((bin[i] - 7) << 4) + (bin[i] >> 4);
+    }
+}
+
+void fwEncode(ZBinary &bin){
+    // x = ((y + 112) * 16) / 257
+    for(zu64 i = 0; i < bin.size(); ++i){
+        bin[i] = (((zu16)bin[i] + 112) << 4) / 257;
+    }
+
+    // Swap bytes in each set of two bytes
+    for(zu64 i = 1; i < bin.size(); i+=2){
+        zbyte d = bin[i-1];
+        zbyte b = bin[i];
+        bin[i-1] = b;
+        bin[i] = d;
+    }
+
+    // Swap bytes 4 apart, skip 5
+    for(zu64 i = 4; i < bin.size(); i+=5){
+        zbyte a = bin[i-4];
+        zbyte b = bin[i];
+        bin[i-4] = b;
+        bin[i] = a;
     }
 }
 
@@ -84,7 +107,7 @@ int decfw(ZPath exe){
     LOG("Product: " << product);
     LOG("Version: " << version);
 
-    RLOG(strs.dumpBytes(4, 8, true) << ZLog::NEWLN);
+    //RLOG(strs.dumpBytes(4, 8, true) << ZLog::NEWLN);
 
     // Read firmware
     ZBinary fw;
@@ -102,12 +125,14 @@ int decfw(ZPath exe){
     ZFile fwout("dump_" + version, ZFile::WRITE);
     fwout.write(fw);
 
+    ZHash<ZBinary> hsh;
+
 //    ZFile spout("main_" + version, ZFile::WRITE);
 //    zu32 spaddr = fw.readleu32();
 //    ZBinary spdata(fw.raw() + spaddr, fw.size() - spaddr);
 //    spout.write(spdata);
 
-    RLOG(fw.dumpBytes(4, 8, true) << ZLog::NEWLN);
+    //RLOG(fw.dumpBytes(4, 8, true) << ZLog::NEWLN);
 
     return 0;
 }
