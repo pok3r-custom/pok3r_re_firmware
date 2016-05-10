@@ -23,6 +23,7 @@ SET(SOURCES
     main.cpp
     pok3r.h
     pok3r.cpp
+    README.md
 )
 
 ### =================== CONFIG ==================== ###
