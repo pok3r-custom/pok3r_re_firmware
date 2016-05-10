@@ -1,0 +1,4 @@
+[submodule "libchaos"]
+	path = libchaos
+	url = ssh://znnxs.com:89/git/libchaos.git
+	branch = pok3r-patches
