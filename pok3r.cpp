@@ -167,7 +167,7 @@ zu32 Pok3r::write(zu32 addr, ZBinary bin){
 
 ZString Pok3r::getVersion(){
     ZBinary bin;
-    zu32 len = read(0x2800, bin);
+    zu32 len = read(VER_ADDR, bin);
     if(len == 64 && bin[0] == 0x05){
         return ZString(bin.raw() + 4);
     }

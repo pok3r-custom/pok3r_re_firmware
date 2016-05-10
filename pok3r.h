@@ -14,18 +14,28 @@ using namespace LibChaos;
 #define RECV_EP             0x03
 #define TIMEOUT             1000
 
+#define VER_ADDR            0x2800
+#define FW_ADDR             0x2c00
+#define FW_LEN              0xcc00
+
 class Pok3r {
 public:
     Pok3r();
     ~Pok3r();
 
+    //! Find a Pok3r keyboard.
     bool findPok3r();
+    //! Open USB device.
     bool open();
+    //! Close USB device.
     void close();
 
+    //! Read 64 bytes at address fron the keyboard.
     zu32 read(zu32 addr, ZBinary &bin);
+    //! Write 64 bytes at address fron the keyboard.
     zu32 write(zu32 addr, ZBinary bin);
 
+    //! Read the firmware version from the keyboard.
     ZString getVersion();
 
 private:
