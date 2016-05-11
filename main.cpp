@@ -19,6 +19,32 @@ int readver(){
     }
 }
 
+int readfw(){
+    LOG("Looking for Vortex Pok3r...");
+    Pok3r pok3r;
+    if(pok3r.findPok3r()){
+        if(pok3r.open()){
+            LOG("Reading...");
+            ZBinary data;
+            for(zu64 a = FW_ADDR; a < FW_ADDR + FW_LEN; a += 64){
+                if(pok3r.read(a, data) != 64){
+                    LOG("Failed to read");
+                    return -3;
+                }
+            }
+            LOG("Size: " << data.size());
+            RLOG(data.dumpBytes(4, 8, true, FW_ADDR));
+            return 0;
+        } else {
+            LOG("Failed to Open");
+            return -2;
+        }
+    } else {
+        LOG("Not Found");
+        return -1;
+    }
+}
+
 void fwDecode(ZBinary &bin){
     // Swap bytes 4 apart, skip 5
     for(zu64 i = 4; i < bin.size(); i+=5){
@@ -65,9 +91,8 @@ void fwEncode(ZBinary &bin){
     }
 }
 
-#define FW_START        0x1A3800
-#define FW_LEN          0x64D4
-//#define FW_LEN          0x5E28
+#define FWU_START        0x1A3800
+#define FWU_LEN          0x64D4
 #define STRINGS_START   0x1A9CD4
 #define STRINGS_LEN     0x4B8
 
@@ -111,21 +136,41 @@ int decfw(ZPath exe){
 
     // Read firmware
     ZBinary fw;
-    if(file.seek(FW_START) != FW_START){
+    if(file.seek(FWU_START) != FWU_START){
         LOG("File too short");
         return -2;
     }
-    if(file.read(fw, FW_LEN) != FW_LEN){
+    if(file.read(fw, FWU_LEN) != FWU_LEN){
         LOG("File too short");
         return -3;
     }
+
+    LOG(ZHash<ZBinary>(fw).hash());
+    ZString rdump = fw.dumpBytes(4, 4, true);
+
     // Decrypt firmware
     fwDecode(fw);
     // Write firmware
     ZFile fwout("dump_" + version, ZFile::WRITE);
     fwout.write(fw);
 
-    ZHash<ZBinary> hsh;
+    // Encrypt firmware
+    fwEncode(fw);
+    LOG(ZHash<ZBinary>(fw).hash());
+    ZString edump = fw.dumpBytes(4, 4, true);
+
+    ArZ ra = rdump.explode('\n');
+    ArZ ea = edump.explode('\n');
+
+    ZString cdump;
+    for(zu64 i = 0; i < ra.size(); ++i){
+        cdump += ra[i];
+        cdump += "  ";
+        cdump += ea[i];
+        cdump += "\n";
+    }
+
+    RLOG(cdump);
 
 //    ZFile spout("main_" + version, ZFile::WRITE);
 //    zu32 spaddr = fw.readleu32();
@@ -145,6 +190,8 @@ int main(int argc, char **argv){
         ZString cmd = argv[1];
         if(cmd == "readver"){
             return readver();
+        } else if(cmd == "readfw"){
+            return readfw();
         } else if(cmd == "decfw"){
             if(argc > 2){
                 ZPath fw = ZString(argv[2]);

@@ -1,5 +1,5 @@
 ## YAPTLYTOTI CMakeLists.txt
-CMAKE_MINIMUM_REQUIRED(VERSION 3.0)
+CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 
 PROJECT(Pok3r)
 
@@ -23,6 +23,7 @@ SET(SOURCES
     main.cpp
     pok3r.h
     pok3r.cpp
+    README.md
 )
 
 ### =================== CONFIG ==================== ###
