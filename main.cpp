@@ -122,9 +122,9 @@ int decfw(ZPath exe){
     ZString version;
 
     // Company name
-    company.parseUTF16((const wchar_t *)(strs.raw() + 0x10), 0xFF);
+    company.parseUTF16((const zu16 *)(strs.raw() + 0x10), 0xFF);
     // Product name
-    product.parseUTF16((const wchar_t *)(strs.raw() + 0x218), 0xFF);
+    product.parseUTF16((const zu16 *)(strs.raw() + 0x218), 0xFF);
     // Version
     version = ZString(strs.raw() + 0x460, 0xFF);
 
@@ -165,7 +165,7 @@ int decfw(ZPath exe){
     ZString cdump;
     for(zu64 i = 0; i < ra.size(); ++i){
         cdump += ra[i];
-        cdump += "  ";
+        cdump += "   ";
         cdump += ea[i];
         cdump += "\n";
     }
