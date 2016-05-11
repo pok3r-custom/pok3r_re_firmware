@@ -47,10 +47,10 @@ Disassembly of section .data:
      1a0:    4410       add r0, r2
      1a2:    6008       str r0, [r1, #0]
      1a4:    0840       lsrs r0, r0, #1
-     1a6:    4770       bx r14
+     1a6:    4770       bx r14                      ; return
      1a8:    4901       ldr r1, [pc, #4]    ; (0x1b0)
      1aa:    6008       str r0, [r1, #0]
-     1ac:    4770       bx r14
+     1ac:    4770       bx r14                      ; return
      1ae:    0000       movs r0, r0
      1b0:    0230       lsls r0, r6, #8
      1b2:    2000       movs r0, #0
@@ -70,7 +70,7 @@ Disassembly of section .data:
      1d2:    f800 3b01  strb.w r3, [r0], #1
      1d6:    1e52       subs r2, r2, #1
      1d8:    d2f9       bcs.n 0x1ce
-     1da:    4770       bx r14
+     1da:    4770       bx r14                      ; return
      1dc:    4c06       ldr r4, [pc, #24]    ; (0x1f8)
      1de:    4d07       ldr r5, [pc, #28]    ; (0x1fc)
      1e0:    e006       b.n 0x1f0
@@ -882,6 +882,8 @@ function_6:
      916:    0ff0       lsrs r0, r6, #31
      918:    aaa2       add r2, sp, #648    ; 0x288
      91a:    aaea       add r2, sp, #936    ; 0x3a8
+
+function_22:
      91c:    7f57       ldrb r7, [r2, #29]
      91e:    553d       strb r5, [r7, r4]
      920:    d00a       beq.n 0x938
@@ -911,6 +913,8 @@ function_6:
      956:    43e0       mvns r0, r4
      958:    25ed       movs r5, #237    ; 0xed
      95a:    34a8       adds r4, #168    ; 0xa8
+
+function_25:
      95c:    ab7f       add r3, sp, #508    ; 0x1fc
      95e:    1b17       subs r7, r2, r4
      960:    8297       strh r7, [r2, #20]
@@ -925,7 +929,7 @@ function_6:
      972:    6882       ldr r2, [r0, #8]
      974:    3d97       subs r5, #151    ; 0x97
      976:    1808       adds r0, r1, r0
-     978:    cd6f       ldmia r5, {r0, r1, r2, r3, r5, r6}
+   0x978:    cd6f       ldmia r5, {r0, r1, r2, r3, r5, r6}
      97a:    4c05       ldr r4, [pc, #20]    ; (0x990)
      97c:    7ab3       ldrb r3, [r6, #10]
      97e:    9872       ldr r0, [sp, #456]    ; 0x1c8
@@ -2709,17 +2713,17 @@ function_7:
     1a12:    0000       movs r0, r0
     1a14:    0058       lsls r0, r3, #1
     1a16:    2000       movs r0, #0
-    1a18:    4770       bx r14
-    1a1a:    4770       bx r14
+    1a18:    4770       bx r14                      ; return
+    1a1a:    4770       bx r14                      ; return
 
 function_8:
   0x1a1c:    e92d 41f0  stmdb r13!, {r4, r5, r6, r7, r8, r14}
     1a20:    4604       mov r4, r0
-    1a22:    f7ff f8db  bl 0xbdc
+    1a22:    f7ff f8db  bl 0xbdc                    ; call function_17
     1a26:    4620       mov r0, r4
-    1a28:    f000 fe6e  bl 0x2708
+    1a28:    f000 fe6e  bl 0x2708                   ; call function_18
     1a2c:    4620       mov r0, r4
-    1a2e:    f001 fe8f  bl 0x3750
+    1a2e:    f001 fe8f  bl 0x3750                   ; call function_19
     1a32:    f44f 7180  mov.w r1, #256    ; 0x100
     1a36:    4821       ldr r0, [pc, #132]    ; (0x1abc)
     1a38:    010d       lsls r5, r1, #4
@@ -2729,52 +2733,53 @@ function_8:
     1a40:    2200       movs r2, #0
     1a42:    4688       mov r8, r1
     1a44:    4604       mov r4, r0
-    1a46:    f7fe ff81  bl 0x94c
+    1a46:    f7fe ff81  bl 0x94c                    ; call function_20
     1a4a:    2201       movs r2, #1
     1a4c:    4641       mov r1, r8
     1a4e:    4620       mov r0, r4
-    1a50:    f7fe ff6c  bl 0x92c
+    1a50:    f7fe ff6c  bl 0x92c                    ; call function_21
     1a54:    2201       movs r2, #1
     1a56:    4641       mov r1, r8
     1a58:    4620       mov r0, r4
-    1a5a:    f7fe ff5f  bl 0x91c
+    1a5a:    f7fe ff5f  bl 0x91c                    ; call function_22
     1a5e:    2201       movs r2, #1
     1a60:    4641       mov r1, r8
     1a62:    4620       mov r0, r4
-    1a64:    f7fe ff90  bl 0x988
+    1a64:    f7fe ff90  bl 0x988                    ; call function_23
     1a68:    2200       movs r2, #0
     1a6a:    4629       mov r1, r5
     1a6c:    4630       mov r0, r6
-    1a6e:    f7fe ff65  bl 0x93c
+    1a6e:    f7fe ff65  bl 0x93c                    ; call function_24
     1a72:    2200       movs r2, #0
     1a74:    4639       mov r1, r7
     1a76:    4630       mov r0, r6
-    1a78:    f7fe ff60  bl 0x93c
+    1a78:    f7fe ff60  bl 0x93c                    ; call function_24
     1a7c:    2202       movs r2, #2
     1a7e:    4629       mov r1, r5
     1a80:    4630       mov r0, r6
-    1a82:    f7fe ff6b  bl 0x95c
+    1a82:    f7fe ff6b  bl 0x95c                    ; call function_25
     1a86:    2202       movs r2, #2
     1a88:    e012       b.n 0x1ab0
     1a8a:    2201       movs r2, #1
-    1a8c:    f7fe ff5e  bl 0x94c
+    1a8c:    f7fe ff5e  bl 0x94c                    ; call function_20
     1a90:    2201       movs r2, #1
     1a92:    4629       mov r1, r5
     1a94:    4630       mov r0, r6
-    1a96:    f7fe ff51  bl 0x93c
+    1a96:    f7fe ff51  bl 0x93c                    ; call function_24
     1a9a:    2201       movs r2, #1
     1a9c:    4639       mov r1, r7
     1a9e:    4630       mov r0, r6
-    1aa0:    f7fe ff4c  bl 0x93c
+    1aa0:    f7fe ff4c  bl 0x93c                    ; call function_24
     1aa4:    2200       movs r2, #0
     1aa6:    4629       mov r1, r5
     1aa8:    4630       mov r0, r6
-    1aaa:    f7fe ff57  bl 0x95c
+    1aaa:    f7fe ff57  bl 0x95c                    ; call function_25
     1aae:    2200       movs r2, #0
     1ab0:    4639       mov r1, r7
     1ab2:    4630       mov r0, r6
     1ab4:    e8bd 41f0  ldmia.w r13!, {r4, r5, r6, r7, r8, r14}
-    1ab8:    f7fe bf50  b.w 0x95c
+    1ab8:    f7fe bf50  b.w 0x95c                   ; branch function_25
+
     1abc:    4000       ands r0, r0
     1abe:    400b       ands r3, r1
     1ac0:    0000       movs r0, r0
@@ -3558,7 +3563,7 @@ function_8:
     2246:    0294       lsls r4, r2, #10
     2248:    4621       mov r1, r4
     224a:    4628       mov r0, r5
-    224c:    f7fe fb66  bl 0x91c
+    224c:    f7fe fb66  bl 0x91c                    ; call function_22
     2250:    2202       movs r2, #2
     2252:    4621       mov r1, r4
     2254:    4628       mov r0, r5
@@ -3590,7 +3595,7 @@ function_8:
     229a:    2200       movs r2, #0
     229c:    4621       mov r1, r4
     229e:    4628       mov r0, r5
-    22a0:    f7fe fb3c  bl 0x91c
+    22a0:    f7fe fb3c  bl 0x91c                    ; call function_22
     22a4:    2200       movs r2, #0
     22a6:    2107       movs r1, #7
     22a8:    2001       movs r0, #1
@@ -5629,7 +5634,7 @@ function_10:
     36a8:    b2b1       uxth r1, r6
     36aa:    2201       movs r2, #1
     36ac:    4628       mov r0, r5
-    36ae:    f7fd f935  bl 0x91c
+    36ae:    f7fd f935  bl 0x91c                    ; call function_22
     36b2:    1c64       adds r4, r4, #1
     36b4:    b2e4       uxtb r4, r4
     36b6:    2c09       cmp r4, #9
@@ -5647,20 +5652,20 @@ function_10:
     36d2:    4611       mov r1, r2
     36d4:    4644       mov r4, r8
     36d6:    4640       mov r0, r8
-    36d8:    f7fd f920  bl 0x91c
+    36d8:    f7fd f920  bl 0x91c                    ; call function_22
     36dc:    2201       movs r2, #1
     36de:    2102       movs r1, #2
     36e0:    4620       mov r0, r4
-    36e2:    f7fd f91b  bl 0x91c
+    36e2:    f7fd f91b  bl 0x91c                    ; call function_22
     36e6:    2201       movs r2, #1
     36e8:    4629       mov r1, r5
     36ea:    4638       mov r0, r7
-    36ec:    f7fd f916  bl 0x91c
+    36ec:    f7fd f916  bl 0x91c                    ; call function_22
     36f0:    f7ff fc66  bl 0x2fc0                   ; call function_10
     36f4:    2201       movs r2, #1
     36f6:    2104       movs r1, #4
     36f8:    4620       mov r0, r4
-    36fa:    f7fd f90f  bl 0x91c
+    36fa:    f7fd f90f  bl 0x91c                    ; call function_22
     36fe:    2202       movs r2, #2
     3700:    0214       lsls r4, r2, #8
     3702:    4621       mov r1, r4
@@ -5680,7 +5685,7 @@ function_10:
     3726:    2201       movs r2, #1
     3728:    4621       mov r1, r4
     372a:    4638       mov r0, r7
-    372c:    f7fd f8f6  bl 0x91c
+    372c:    f7fd f8f6  bl 0x91c                    ; call function_22
     3730:    2101       movs r1, #1
     3732:    f889 1000  strb.w r1, [r9]
     3736:    2001       movs r0, #1
@@ -7192,7 +7197,7 @@ function_12:
   0x4544:    4902       ldr r1, [pc, #8]            ; (0x4550)
     4546:    4801       ldr r0, [pc, #4]            ; (0x454c)
     4548:    6008       str r0, [r1, #0]            ; store 0x454c to 0x4550
-    454a:    4770       bx r14                      ; branch to ARM at r14
+    454a:    4770       bx r14                      ; return
 
     454c:    0001       movs r1, r0
     454e:    5fa0       ldrsh r0, [r4, r6]
@@ -7955,19 +7960,19 @@ function_16:
   0x4c7e:    77ef       strb r7, [r5, #31]          ; store byte in r7 to address r5 + 31
     4c80:    e005       b.n 0x4c8e                  ; branch to 0x4c8e
   0x4c82:    b111       cbz r1, 0x4c8a              ; branch to 0x4c8a if r1 == 0
-    4c84:    f885 6020  strb.w r6, [r5, #32]        l store byte in r6 to address r5 + 32
+    4c84:    f885 6020  strb.w r6, [r5, #32]        ; store byte in r6 to address r5 + 32
     4c88:    e001       b.n 0x4c8e                  ; branch to 0x4c8e
   0x4c8a:    f885 7020  strb.w r7, [r5, #32]        ; store byte in r7 to address r5 + 32
 
-  0x4c8e:    f895 0030  ldrb.w r0, [r5, #48]    ; 0x30
+  0x4c8e:    f895 0030  ldrb.w r0, [r5, #48]        ; 0x30
     4c92:    2800       cmp r0, #0
-    4c94:    d119       bne.n 0x4cca
+    4c94:    d119       bne.n 0x4cca                ; branch to 0x4cca if r0 != 0
     4c96:    7f69       ldrb r1, [r5, #29]
     4c98:    7fa8       ldrb r0, [r5, #30]
     4c9a:    ea51 0200  orrs.w r2, r1, r0
-    4c9e:    d002       beq.n 0x4ca6
+    4c9e:    d002       beq.n 0x4ca6                ; branch to 0x4ca6 if r1 == r0
     4ca0:    2901       cmp r1, #1
-    4ca2:    d002       beq.n 0x4caa
+    4ca2:    d002       beq.n 0x4caa                ; branch to 0x4cca if r1 == 1
     4ca4:    e004       b.n 0x4cb0                  ; branch to 0x4cb0
   0x4ca6:    2400       movs r4, #0
     4ca8:    e003       b.n 0x4cb2
@@ -8162,7 +8167,8 @@ function_16:
     4e88:    f7ff bfe2  b.w 0x4e50
     4e8c:    f000 b804  b.w 0x4e98
     4e90:    f000 b818  b.w 0x4ec4
-    4e94:    4770       bx r14
+    4e94:    4770       bx r14                      ; return
+
     4e96:    0000       movs r0, r0
     4e98:    b510       push {r4, r14}
     4e9a:    4c09       ldr r4, [pc, #36]    ; (0x4ec0)
@@ -8283,7 +8289,7 @@ function_4:
     4fdc:    4649       mov r1, r9
     4fde:    4655       mov r5, r10
     4fe0:    4650       mov r0, r10
-    4fe2:    f7fb fc9b  bl 0x91c
+    4fe2:    f7fb fc9b  bl 0x91c                    ; call function_22
     4fe6:    2200       movs r2, #0
     4fe8:    4621       mov r1, r4
     4fea:    4628       mov r0, r5
@@ -8971,7 +8977,8 @@ function_4:
     56aa:    f100 0001  add.w r0, r0, #1
     56ae:    f04f 0200  mov.w r2, #0
     56b2:    f000 bb3f  b.w 0x5d34
-    56b6:    4770       bx r14
+    56b6:    4770       bx r14                      ; return
+
     56b8:    0058       lsls r0, r3, #1
     56ba:    2000       movs r0, #0
     56bc:    1cba       adds r2, r7, #2
@@ -8999,7 +9006,8 @@ function_4:
     56f6:    f100 0003  add.w r0, r0, #3
     56fa:    f04f 0200  mov.w r2, #0
     56fe:    f000 bb19  b.w 0x5d34
-    5702:    4770       bx r14
+    5702:    4770       bx r14                      ; return
+
     5704:    0058       lsls r0, r3, #1
     5706:    2000       movs r0, #0
     5708:    1cba       adds r2, r7, #2
@@ -9031,29 +9039,35 @@ function_4:
     5740:    2864       cmp r0, #100    ; 0x64
     5742:    d801       bhi.n 0x5748
     5744:    2032       movs r0, #50    ; 0x32
-    5746:    4770       bx r14
+    5746:    4770       bx r14                      ; return
+
     5748:    28c8       cmp r0, #200    ; 0xc8
     574a:    d801       bhi.n 0x5750
     574c:    2064       movs r0, #100    ; 0x64
-    574e:    4770       bx r14
+    574e:    4770       bx r14                      ; return
+
     5750:    f44f 7296  mov.w r2, #300    ; 0x12c
     5754:    4290       cmp r0, r2
     5756:    d801       bhi.n 0x575c
     5758:    20c8       movs r0, #200    ; 0xc8
-    575a:    4770       bx r14
+    575a:    4770       bx r14                      ; return
+
     575c:    f44f 71fa  mov.w r1, #500    ; 0x1f4
     5760:    4288       cmp r0, r1
     5762:    d801       bhi.n 0x5768
     5764:    4610       mov r0, r2
-    5766:    4770       bx r14
+    5766:    4770       bx r14                      ; return
+
     5768:    f44f 722f  mov.w r2, #700    ; 0x2bc
     576c:    4290       cmp r0, r2
     576e:    d801       bhi.n 0x5774
     5770:    4608       mov r0, r1
-    5772:    4770       bx r14
+    5772:    4770       bx r14                      ; return
+
     5774:    f5b0 7f7a  cmp.w r0, #1000    ; 0x3e8
     5778:    d9f4       bls.n 0x5764
-    577a:    4770       bx r14
+    577a:    4770       bx r14                      ; return
+
     577c:    f44f 727a  mov.w r2, #1000    ; 0x3e8
     5780:    4290       cmp r0, r2
     5782:    d004       beq.n 0x578e
@@ -9061,12 +9075,14 @@ function_4:
     5788:    4288       cmp r0, r1
     578a:    d301       bcc.n 0x5790
     578c:    4610       mov r0, r2
-    578e:    4770       bx r14
+    578e:    4770       bx r14                      ; return
+
     5790:    f44f 72fa  mov.w r2, #500    ; 0x1f4
     5794:    4290       cmp r0, r2
     5796:    d301       bcc.n 0x579c
     5798:    4608       mov r0, r1
-    579a:    4770       bx r14
+    579a:    4770       bx r14                      ; return
+
     579c:    f44f 7196  mov.w r1, #300    ; 0x12c
     57a0:    4288       cmp r0, r1
     57a2:    d2f3       bcs.n 0x578c
@@ -9075,13 +9091,16 @@ function_4:
     57a8:    2864       cmp r0, #100    ; 0x64
     57aa:    d301       bcc.n 0x57b0
     57ac:    20c8       movs r0, #200    ; 0xc8
-    57ae:    4770       bx r14
+    57ae:    4770       bx r14                      ; return
+
     57b0:    2832       cmp r0, #50    ; 0x32
     57b2:    d301       bcc.n 0x57b8
     57b4:    2064       movs r0, #100    ; 0x64
-    57b6:    4770       bx r14
-    57b8:    2000       movs r0, #0
-    57ba:    4770       bx r14
+    57b6:    4770       bx r14                      ; return
+
+  0x57b8:    2000       movs r0, #0
+    57ba:    4770       bx r14                      ; return
+
     57bc:    e92d 5ff0  stmdb r13!, {r4, r5, r6, r7, r8, r9, r10, r11, r12, r14}
     57c0:    f8df 81b0  ldr.w r8, [r15, #432]    ; 0x5974
     57c4:    f04f 0a00  mov.w r10, #0
@@ -9569,30 +9588,31 @@ function_4:
     5cb2:    2001       movs r0, #1
     5cb4:    bd00       pop {r15}
     5cb6:    0000       movs r0, r0
-    5cb8:    2de4       cmp r5, #228    ; 0xe4
+    5cb8:    2de4       cmp r5, #228                ; 0xe4
     5cba:    2000       movs r0, #0
-    5cbc:    4a0a       ldr r2, [pc, #40]    ; (0x5ce8)
+    5cbc:    4a0a       ldr r2, [pc, #40]           ; (0x5ce8)
     5cbe:    2000       movs r0, #0
-    5cc0:    21b8       movs r1, #184    ; 0xb8
+    5cc0:    21b8       movs r1, #184               ; 0xb8
     5cc2:    7a93       ldrb r3, [r2, #10]
     5cc4:    4399       bics r1, r3
-    5cc6:    e001       b.n 0x5ccc
-    5cc8:    2808       cmp r0, #8
-    5cca:    d005       beq.n 0x5cd8
-    5ccc:    1813       adds r3, r2, r0
+    5cc6:    e001       b.n 0x5ccc                  ; branch 0x5ccc
+  0x5cc8:    2808       cmp r0, #8
+    5cca:    d005       beq.n 0x5cd8                ; branch 0x5cd8 if r0 == 8
+  0x5ccc:    1813       adds r3, r2, r0
     5cce:    789b       ldrb r3, [r3, #2]
-    5cd0:    2bff       cmp r3, #255    ; 0xff
-    5cd2:    d003       beq.n 0x5cdc
-    5cd4:    2000       movs r0, #0
-    5cd6:    4770       bx r14
-    5cd8:    2900       cmp r1, #0
-    5cda:    d1fb       bne.n 0x5cd4
-    5cdc:    1c40       adds r0, r0, #1
+    5cd0:    2bff       cmp r3, #255                ; 0xff
+    5cd2:    d003       beq.n 0x5cdc                ; branch 0x5cdc if r3 == 255
+  0x5cd4:    2000       movs r0, #0                 ; r0 = 0
+    5cd6:    4770       bx r14                      ; return
+  0x5cd8:    2900       cmp r1, #0
+    5cda:    d1fb       bne.n 0x5cd4                ; branch 0x5cd4 if r1 != 0
+  0x5cdc:    1c40       adds r0, r0, #1
     5cde:    b2c0       uxtb r0, r0
     5ce0:    2809       cmp r0, #9
-    5ce2:    d3f1       bcc.n 0x5cc8
-    5ce4:    2001       movs r0, #1
-    5ce6:    4770       bx r14
+    5ce2:    d3f1       bcc.n 0x5cc8                ; branch 0x5cc8 if C=0
+    5ce4:    2001       movs r0, #1                 ; r0 = 1
+    5ce6:    4770       bx r14                      ; return
+
     5ce8:    2de4       cmp r5, #228    ; 0xe4
     5cea:    2000       movs r0, #0
     5cec:    4910       ldr r1, [pc, #64]    ; (0x5d30)

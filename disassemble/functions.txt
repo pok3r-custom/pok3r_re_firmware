@@ -1,5 +1,6 @@
 
 Functions:
+
 entry @ 0x2d54
 exception @ 0x2d72
 
@@ -18,4 +19,15 @@ function_12 @ 0x4544
 function_13 @ 0x23c8
 function_14 @ 0x24a0
 function_15 @ 0x24f0
-fynction_16 @ 0x4b80
+function_16 @ 0x4b80
+
+function_17 @ 0xbdc
+function_18 @ 0x2708
+function_19 @ 0x3750
+function_20 @ 0x94c
+function_21 @ 0x92c
+function_22 @ 0x91c
+function_23 @ 0x988
+function_24 @ 0x93c
+function_25 @ 0x95c
+
