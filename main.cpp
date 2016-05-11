@@ -69,9 +69,9 @@ void fwDecode(ZBinary &bin){
 }
 
 void fwEncode(ZBinary &bin){
-    // x = ((y + 112) * 16) / 257
+    // x = (y >> 4 + 7 & 0xF) | (x << 4)
     for(zu64 i = 0; i < bin.size(); ++i){
-        bin[i] = (((zu16)bin[i] + 112) << 4) / 257;
+        bin[i] = ((bin[i] >> 4) + 7 & 0xF) | (bin[i] << 4);
     }
 
     // Swap bytes in each set of two bytes
