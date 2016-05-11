@@ -71,7 +71,7 @@ void fwDecode(ZBinary &bin){
 void fwEncode(ZBinary &bin){
     // x = (y >> 4 + 7 & 0xF) | (x << 4)
     for(zu64 i = 0; i < bin.size(); ++i){
-        bin[i] = ((bin[i] >> 4) + 7 & 0xF) | (bin[i] << 4);
+        bin[i] = (((bin[i] >> 4) + 7) & 0xF) | (bin[i] << 4);
     }
 
     // Swap bytes in each set of two bytes
@@ -91,8 +91,8 @@ void fwEncode(ZBinary &bin){
     }
 }
 
-#define FWU_START        0x1A3800
-#define FWU_LEN          0x64D4
+#define FWU_START       0x1A3800
+#define FWU_LEN         0x64D4
 #define STRINGS_START   0x1A9CD4
 #define STRINGS_LEN     0x4B8
 
@@ -132,7 +132,7 @@ int decfw(ZPath exe){
     LOG("Product: " << product);
     LOG("Version: " << version);
 
-    //RLOG(strs.dumpBytes(4, 8, true) << ZLog::NEWLN);
+    //RLOG(strs.dumpBytes(4, 8, true));
 
     // Read firmware
     ZBinary fw;
@@ -145,8 +145,7 @@ int decfw(ZPath exe){
         return -3;
     }
 
-    LOG(ZHash<ZBinary>(fw).hash());
-    ZString rdump = fw.dumpBytes(4, 4, true);
+    //RLOG(fw.dumpBytes(4, 8, true));
 
     // Decrypt firmware
     fwDecode(fw);
@@ -154,30 +153,7 @@ int decfw(ZPath exe){
     ZFile fwout("dump_" + version, ZFile::WRITE);
     fwout.write(fw);
 
-    // Encrypt firmware
-    fwEncode(fw);
-    LOG(ZHash<ZBinary>(fw).hash());
-    ZString edump = fw.dumpBytes(4, 4, true);
-
-    ArZ ra = rdump.explode('\n');
-    ArZ ea = edump.explode('\n');
-
-    ZString cdump;
-    for(zu64 i = 0; i < ra.size(); ++i){
-        cdump += ra[i];
-        cdump += "   ";
-        cdump += ea[i];
-        cdump += "\n";
-    }
-
-    RLOG(cdump);
-
-//    ZFile spout("main_" + version, ZFile::WRITE);
-//    zu32 spaddr = fw.readleu32();
-//    ZBinary spdata(fw.raw() + spaddr, fw.size() - spaddr);
-//    spout.write(spdata);
-
-    //RLOG(fw.dumpBytes(4, 8, true) << ZLog::NEWLN);
+    RLOG(fw.dumpBytes(4, 8, true));
 
     return 0;
 }
