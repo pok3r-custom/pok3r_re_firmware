@@ -24,6 +24,8 @@ SET(SOURCES
     pok3r.h
     pok3r.cpp
     README.md
+    disassemble/fw117.txt
+    disassemble/functions.txt
 )
 
 ### =================== CONFIG ==================== ###
