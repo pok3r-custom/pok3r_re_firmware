@@ -41,5 +41,5 @@ ADD_DEFINITIONS(-DBUILDING)
 ### =================== BUILD =================== ###
 
 ADD_EXECUTABLE(pok3rtest ${SOURCES})
-TARGET_LINK_LIBRARIES(pok3rtest chaos ${LIBUSB_1_LIBRARIES})
-
+LibChaos_Configure_Target(pok3rtest)
+TARGET_LINK_LIBRARIES(pok3rtest ${LIBUSB_1_LIBRARIES})
