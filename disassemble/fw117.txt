@@ -3361,36 +3361,37 @@ function_8:
     2064:    f021 0101  bic.w r1, r1, #1
     2068:    6101       str r1, [r0, #16]
     206a:    4770       bx r14
-    206c:    b5f0       push {r4, r5, r6, r7, r14}
+function_26:
+  0x206c:    b5f0       push {r4, r5, r6, r7, r14}  ; push registers
     206e:    780b       ldrb r3, [r1, #0]
-    2070:    2403       movs r4, #3
+    2070:    2403       movs r4, #3                 ; r4 = 3
     2072:    eb00 0e83  add.w r14, r0, r3, lsl #2
     2076:    005b       lsls r3, r3, #1
     2078:    409c       lsls r4, r3
-    207a:    6d05       ldr r5, [r0, #80]    ; 0x50
-    207c:    f10e 0240  add.w r2, r14, #64    ; 0x40
-    2080:    f10e 0c90  add.w r12, r14, #144    ; 0x90
+    207a:    6d05       ldr r5, [r0, #80]           ; 0x50
+    207c:    f10e 0240  add.w r2, r14, #64          ; 0x40
+    2080:    f10e 0c90  add.w r12, r14, #144        ; 0x90
     2084:    43e4       mvns r4, r4
     2086:    4025       ands r5, r4
-    2088:    6505       str r5, [r0, #80]    ; 0x50
-    208a:    6d45       ldr r5, [r0, #84]    ; 0x54
+    2088:    6505       str r5, [r0, #80]           ; 0x50
+    208a:    6d45       ldr r5, [r0, #84]           ; 0x54
     208c:    7a8e       ldrb r6, [r1, #10]
     208e:    7acf       ldrb r7, [r1, #11]
     2090:    4025       ands r5, r4
     2092:    ea46 0647  orr.w r6, r6, r7, lsl #1
     2096:    409e       lsls r6, r3
     2098:    432e       orrs r6, r5
-    209a:    6546       str r6, [r0, #84]    ; 0x54
-    209c:    6ec5       ldr r5, [r0, #108]    ; 0x6c
+    209a:    6546       str r6, [r0, #84]           ; 0x54
+    209c:    6ec5       ldr r5, [r0, #108]          ; 0x6c
     209e:    7b4e       ldrb r6, [r1, #13]
     20a0:    4025       ands r5, r4
     20a2:    7b0c       ldrb r4, [r1, #12]
     20a4:    ea44 0446  orr.w r4, r4, r6, lsl #1
     20a8:    409c       lsls r4, r3
     20aa:    432c       orrs r4, r5
-    20ac:    66c4       str r4, [r0, #108]    ; 0x6c
+    20ac:    66c4       str r4, [r0, #108]          ; 0x6c
     20ae:    6814       ldr r4, [r2, #0]
-    20b0:    f240 1507  movw r5, #263    ; 0x107
+    20b0:    f240 1507  movw r5, #263               ; 0x107
     20b4:    43ac       bics r4, r5
     20b6:    6014       str r4, [r2, #0]
     20b8:    6814       ldr r4, [r2, #0]
@@ -3400,15 +3401,15 @@ function_8:
     20c0:    89ca       ldrh r2, [r1, #14]
     20c2:    f8cc 2000  str.w r2, [r12]
     20c6:    8a0a       ldrh r2, [r1, #16]
-    20c8:    f8ce 20a0  str.w r2, [r14, #160]    ; 0xa0
+    20c8:    f8ce 20a0  str.w r2, [r14, #160]       ; 0xa0
     20cc:    7a0a       ldrb r2, [r1, #8]
     20ce:    7a49       ldrb r1, [r1, #9]
     20d0:    ea42 0141  orr.w r1, r2, r1, lsl #1
-    20d4:    6d02       ldr r2, [r0, #80]    ; 0x50
+    20d4:    6d02       ldr r2, [r0, #80]           ; 0x50
     20d6:    4099       lsls r1, r3
     20d8:    4311       orrs r1, r2
-    20da:    6501       str r1, [r0, #80]    ; 0x50
-    20dc:    bdf0       pop {r4, r5, r6, r7, r15}
+    20da:    6501       str r1, [r0, #80]           ; 0x50
+    20dc:    bdf0       pop {r4, r5, r6, r7, r15}   ; pop registers
     20de:    2100       movs r1, #0
     20e0:    7001       strb r1, [r0, #0]
     20e2:    6041       str r1, [r0, #4]
@@ -3420,7 +3421,8 @@ function_8:
     20ee:    7341       strb r1, [r0, #13]
     20f0:    81c1       strh r1, [r0, #14]
     20f2:    8201       strh r1, [r0, #16]
-    20f4:    4770       bx r14
+    20f4:    4770       bx r14                      ; return
+
     20f6:    880a       ldrh r2, [r1, #0]
     20f8:    f8c0 2088  str.w r2, [r0, #136]    ; 0x88
     20fc:    884a       ldrh r2, [r1, #2]
@@ -4682,22 +4684,22 @@ function_5:
     2d2c:    f884 0032  strb.w r0, [r4, #50]        ; 0x32
     2d30:    f002 ffc4  bl 0x5cbc
     2d34:    2801       cmp r0, #1
-    2d36:    d10d       bne.n 0x2d54
+    2d36:    d10d       bne.n 0x2d54                ; Branch to entry
     2d38:    7820       ldrb r0, [r4, #0]
     2d3a:    2814       cmp r0, #20
-    2d3c:    d10a       bne.n 0x2d54
+    2d3c:    d10a       bne.n 0x2d54                ; Branch to entry
     2d3e:    2500       movs r5, #0
     2d40:    75a5       strb r5, [r4, #22]
     2d42:    f001 ff1d  bl 0x4b80                   ; call function_16
-    2d46:    65e5       str r5, [r4, #92]            ; 0x5c
+    2d46:    65e5       str r5, [r4, #92]           ; 0x5c
     2d48:    7025       strb r5, [r4, #0]
-    2d4a:    4808       ldr r0, [pc, #32]            ; (0x2d6c)
-    2d4c:    6245       str r5, [r0, #36]            ; 0x24
-    2d4e:    3078       adds r0, #120                ; 0x78
+    2d4a:    4808       ldr r0, [pc, #32]           ; (0x2d6c)
+    2d4c:    6245       str r5, [r0, #36]           ; 0x24
+    2d4e:    3078       adds r0, #120               ; 0x78
     2d50:    6005       str r5, [r0, #0]
     2d52:    6045       str r5, [r0, #4]
 
-entry:                                              ; Entry point from reset value
+entry:                                              ; Entry point from vector table PC reset value
   0x2d54:    e8bd 9ffc  ldmia.w r13!, {r2, r3, r4, r5, r6, r7, r8, r9, r10, r11, r12, r15}  ; load r2-r15 from the stack
     2d58:    e7ff       b.n 0x2d5a                  ; branch to 0x2d5a
   0x2d5a:    f1a0 0010  sub.w r0, r0, #16
@@ -4707,7 +4709,7 @@ entry:                                              ; Entry point from reset val
     2d62:    2000       movs r0, #0
     2d64:    080c       lsrs r4, r1, #32
     2d66:    2000       movs r0, #0
-    2d68:    8d50       ldrh r0, [r2, #42]        ; 0x2a
+    2d68:    8d50       ldrh r0, [r2, #42]          ; 0x2a
     2d6a:    0000       movs r0, r0
   0x2d6c:    00d8       lsls r0, r3, #3
     2d6e:    2000       movs r0, #0
@@ -4847,22 +4849,22 @@ exception:                                          ; Various exception handlers
     2ed0:    4669       mov r1, r13
     2ed2:    4658       mov r0, r11
     2ed4:    9701       str r7, [sp, #4]
-    2ed6:    f7ff f8c9  bl 0x206c
+    2ed6:    f7ff f8c9  bl 0x206c                   ; call function_26
     2eda:    f88d 5000  strb.w r5, [r13]
     2ede:    4669       mov r1, r13
     2ee0:    4658       mov r0, r11
     2ee2:    9701       str r7, [sp, #4]
-    2ee4:    f7ff f8c2  bl 0x206c
+    2ee4:    f7ff f8c2  bl 0x206c                   ; call function_26
     2ee8:    f88d 8000  strb.w r8, [r13]
     2eec:    4669       mov r1, r13
     2eee:    4658       mov r0, r11
     2ef0:    9701       str r7, [sp, #4]
-    2ef2:    f7ff f8bb  bl 0x206c
+    2ef2:    f7ff f8bb  bl 0x206c                   ; call function_26
     2ef6:    f88d a000  strb.w r10, [r13]
     2efa:    4669       mov r1, r13
     2efc:    4658       mov r0, r11
     2efe:    9701       str r7, [sp, #4]
-    2f00:    f7ff f8b4  bl 0x206c
+    2f00:    f7ff f8b4  bl 0x206c                   ; call function_26
     2f04:    4658       mov r0, r11
     2f06:    f8cb 407c  str.w r4, [r11, #124]       ; 0x7c
     2f0a:    2101       movs r1, #1
@@ -4882,22 +4884,22 @@ exception:                                          ; Various exception handlers
     2f38:    4669       mov r1, r13
     2f3a:    4648       mov r0, r9
     2f3c:    9601       str r6, [sp, #4]
-    2f3e:    f7ff f895  bl 0x206c
+    2f3e:    f7ff f895  bl 0x206c                   ; call function_26
     2f42:    f88d 5000  strb.w r5, [r13]
     2f46:    4669       mov r1, r13
     2f48:    4648       mov r0, r9
     2f4a:    9701       str r7, [sp, #4]
-    2f4c:    f7ff f88e  bl 0x206c
+    2f4c:    f7ff f88e  bl 0x206c                   ; call function_26
     2f50:    f88d 8000  strb.w r8, [r13]
     2f54:    4669       mov r1, r13
     2f56:    4648       mov r0, r9
     2f58:    9701       str r7, [sp, #4]
-    2f5a:    f7ff f887  bl 0x206c
+    2f5a:    f7ff f887  bl 0x206c                   ; call function_26
     2f5e:    f88d a000  strb.w r10, [r13]
     2f62:    4669       mov r1, r13
     2f64:    4648       mov r0, r9
     2f66:    9701       str r7, [sp, #4]
-    2f68:    f7ff f880  bl 0x206c
+    2f68:    f7ff f880  bl 0x206c                   ; call function_26
     2f6c:    4648       mov r0, r9
     2f6e:    f8c9 407c  str.w r4, [r9, #124]        ; 0x7c
     2f72:    2101       movs r1, #1
