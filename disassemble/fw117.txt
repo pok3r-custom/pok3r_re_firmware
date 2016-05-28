@@ -26,17 +26,17 @@ Disassembly of section .data:
      170:    e7fe       b.n 0x170
      172:    e7fe       b.n 0x172
      174:    70e9       strb r1, [r5, #3]
-     176:    0000       movs r0, r0
+     176:    0000       movs r0, r0                 ; nop
      178:    66b9       str r1, [r7, #104]    ; 0x68
-     17a:    0000       movs r0, r0
+     17a:    0000       movs r0, r0                 ; nop
      17c:    2d81       cmp r5, #129    ; 0x81
-     17e:    0000       movs r0, r0
+     17e:    0000       movs r0, r0                 ; nop
      180:    f8df d00c  ldr.w r13, [r15, #12]    ; 0x190
      184:    f000 f82a  bl 0x1dc
      188:    4800       ldr r0, [pc, #0]    ; (0x18c)
      18a:    4700       bx r0
      18c:    7b95       ldrb r5, [r2, #14]
-     18e:    0000       movs r0, r0
+     18e:    0000       movs r0, r0                 ; nop
      190:    3760       adds r7, #96    ; 0x60
      192:    2000       movs r0, #0
      194:    4906       ldr r1, [pc, #24]    ; (0x1b0)
@@ -51,7 +51,7 @@ Disassembly of section .data:
      1a8:    4901       ldr r1, [pc, #4]    ; (0x1b0)
      1aa:    6008       str r0, [r1, #0]
      1ac:    4770       bx r14                      ; return
-     1ae:    0000       movs r0, r0
+     1ae:    0000       movs r0, r0                 ; nop
      1b0:    0230       lsls r0, r6, #8
      1b2:    2000       movs r0, #0
      1b4:    4e6d       ldr r6, [pc, #436]    ; (0x36c)
@@ -83,9 +83,9 @@ Disassembly of section .data:
      1f2:    d3f6       bcc.n 0x1e2
      1f4:    f7ff ffc8  bl 0x188
      1f8:    8ff0       ldrh r0, [r6, #62]    ; 0x3e
-     1fa:    0000       movs r0, r0
+     1fa:    0000       movs r0, r0                 ; nop
      1fc:    9010       str r0, [sp, #64]    ; 0x40
-     1fe:    0000       movs r0, r0
+     1fe:    0000       movs r0, r0                 ; nop
      200:    b570       push {r4, r5, r6, r14}
      202:    eb01 0402  add.w r4, r1, r2
      206:    f810 0e5a  ldrbt r0, [r0, #90]
@@ -298,7 +298,7 @@ Disassembly of section .data:
      3e6:    0548       lsls r0, r1, #21
      3e8:    05b9       lsls r1, r7, #22
      3ea:    00f0       lsls r0, r6, #3
-     3ec:    0000       movs r0, r0
+     3ec:    0000       movs r0, r0                 ; nop
      3ee:    7042       strb r2, [r0, #1]
      3f0:    0020       movs r0, r4
      3f2:    d700       bvc.n 0x3f6
@@ -528,7 +528,7 @@ Disassembly of section .data:
      5ec:    70ff       strb r7, [r7, #3]
      5ee:    00bd       lsls r5, r7, #2
      5f0:    ff07 4060  vhadd.u8 q2, <illegal reg q3.5>, q8
-     5f4:    0000       movs r0, r0
+     5f4:    0000       movs r0, r0                 ; nop
      5f6:    20fe       movs r0, #254    ; 0xfe
      5f8:    9000       str r0, [sp, #0]
      5fa:    df00       svc 0
@@ -852,7 +852,7 @@ function_6:
      8ce:    14df       asrs r7, r3, #19
      8d0:    12b8       asrs r0, r7, #10
      8d2:    fff0 0840  vtbx.8 d16, {d0}, d0
-     8d6:    0000       movs r0, r0
+     8d6:    0000       movs r0, r0                 ; nop
      8d8:    ff94 feb7       ; <UNDEFINED> instruction: 0xff94feb7
      8dc:    0f0f       lsrs r7, r1, #28
      8de:    7f48       ldrb r0, [r1, #29]
@@ -898,6 +898,8 @@ function_22:
      936:    431f       orrs r7, r3
      938:    4270       negs r0, r6
      93a:    b861            ; <UNDEFINED> instruction: 0xb861
+
+function_24:
      93c:    0042       lsls r2, r0, #1
      93e:    682a       ldr r2, [r5, #0]
      940:    fef5 bc2f  cdp2 12, 15, cr11, cr5, cr15, {1}
@@ -937,6 +939,8 @@ function_25:
      982:    ca28       ldmia r2!, {r3, r5}
      984:    2512       movs r5, #18
      986:    3714       adds r7, #20
+
+function_23:
      988:    4162       adcs r2, r4
      98a:    b10a       cbz r2, 0x990
      98c:    d4da       bmi.n 0x944
@@ -1361,7 +1365,7 @@ function_7:
      d36:    251a       movs r5, #26
      d38:    ee55 aad8  mrc 10, 2, r10, cr5, cr8, {6}
      d3c:    58df       ldr r7, [r3, r3]
-     d3e:    0000       movs r0, r0
+     d3e:    0000       movs r0, r0                 ; nop
      d40:    4520       cmp r0, r4
      d42:    001c       movs r4, r3
      d44:    a800       add r0, sp, #0
@@ -2074,7 +2078,7 @@ function_7:
     1384:    aa69       add r2, sp, #420    ; 0x1a4
     1386:    8a55       ldrh r5, [r2, #18]
     1388:    8b4d       ldrh r5, [r1, #26]
-    138a:    0000       movs r0, r0
+    138a:    0000       movs r0, r0                 ; nop
     138c:    d12c       bne.n 0x13e8
     138e:    2000       movs r0, #0
     1390:    e92d 5f0f  stmdb r13!, {r0, r1, r2, r3, r8, r9, r10, r11, r12, r14}
@@ -2333,7 +2337,7 @@ function_7:
     1636:    f001 f869  bl 0x270c
     163a:    e8bd 5ff0  ldmia.w r13!, {r4, r5, r6, r7, r8, r9, r10, r11, r12, r14}
     163e:    f004 b99f  b.w 0x5980
-    1642:    0000       movs r0, r0
+    1642:    0000       movs r0, r0                 ; nop
     1644:    00d8       lsls r0, r3, #3
     1646:    2000       movs r0, #0
     1648:    2e2c       cmp r6, #44    ; 0x2c
@@ -2694,7 +2698,7 @@ function_7:
     19e8:    0b9a       lsrs r2, r3, #14
     19ea:    2000       movs r0, #0
     19ec:    8e80       ldrh r0, [r0, #52]    ; 0x34
-    19ee:    0000       movs r0, r0
+    19ee:    0000       movs r0, r0                 ; nop
     19f0:    2ebc       cmp r6, #188    ; 0xbc
     19f2:    2000       movs r0, #0
     19f4:    b510       push {r4, r14}
@@ -2710,7 +2714,7 @@ function_7:
     1a0a:    f003 ffb9  bl 0x5980
     1a0e:    2000       movs r0, #0
     1a10:    bd10       pop {r4, r15}
-    1a12:    0000       movs r0, r0
+    1a12:    0000       movs r0, r0                 ; nop
     1a14:    0058       lsls r0, r3, #1
     1a16:    2000       movs r0, #0
     1a18:    4770       bx r14                      ; return
@@ -2782,7 +2786,7 @@ function_8:
 
     1abc:    4000       ands r0, r0
     1abe:    400b       ands r3, r1
-    1ac0:    0000       movs r0, r0
+    1ac0:    0000       movs r0, r0                 ; nop
     1ac2:    400b       ands r3, r1
     1ac4:    b570       push {r4, r5, r6, r14}
     1ac6:    4c33       ldr r4, [pc, #204]    ; (0x1b94)
@@ -2861,7 +2865,7 @@ function_8:
     1b88:    f7ff fd68  bl 0x165c
     1b8c:    f884 5038  strb.w r5, [r4, #56]    ; 0x38
     1b90:    bd70       pop {r4, r5, r6, r15}
-    1b92:    0000       movs r0, r0
+    1b92:    0000       movs r0, r0                 ; nop
     1b94:    0058       lsls r0, r3, #1
     1b96:    2000       movs r0, #0
     1b98:    4907       ldr r1, [pc, #28]    ; (0x1bb8)
@@ -2878,7 +2882,7 @@ function_8:
     1bb0:    4390       bics r0, r2
     1bb2:    6508       str r0, [r1, #80]    ; 0x50
     1bb4:    4770       bx r14
-    1bb6:    0000       movs r0, r0
+    1bb6:    0000       movs r0, r0                 ; nop
     1bb8:    4000       ands r0, r0
     1bba:    4002       ands r2, r0
     1bbc:    b510       push {r4, r14}
@@ -2948,7 +2952,7 @@ function_8:
     1c4a:    e8bd 4010  ldmia.w r13!, {r4, r14}
     1c4e:    f04f 0101  mov.w r1, #1
     1c52:    f7fe bd0e  b.w 0x672
-    1c56:    0000       movs r0, r0
+    1c56:    0000       movs r0, r0                 ; nop
     1c58:    6000       str r0, [r0, #0]
     1c5a:    4007       ands r7, r0
     1c5c:    e104       b.n 0x1e68
@@ -3039,7 +3043,7 @@ function_8:
     1d42:    d3d5       bcc.n 0x1cf0
     1d44:    e8bd 81f0  ldmia.w r13!, {r4, r5, r6, r7, r8, r15}
     1d48:    8de0       ldrh r0, [r4, #46]    ; 0x2e
-    1d4a:    0000       movs r0, r0
+    1d4a:    0000       movs r0, r0                 ; nop
     1d4c:    0078       lsls r0, r7, #1
     1d4e:    2000       movs r0, #0
     1d50:    1cba       adds r2, r7, #2
@@ -3336,7 +3340,7 @@ function_8:
     202c:    2de4       cmp r5, #228    ; 0xe4
     202e:    2000       movs r0, #0
     2030:    8ec8       ldrh r0, [r1, #54]    ; 0x36
-    2032:    0000       movs r0, r0
+    2032:    0000       movs r0, r0                 ; nop
     2034:    0a3e       lsrs r6, r7, #8
     2036:    2000       movs r0, #0
     2038:    0160       lsls r0, r4, #5
@@ -3361,66 +3365,71 @@ function_8:
     2064:    f021 0101  bic.w r1, r1, #1
     2068:    6101       str r1, [r0, #16]
     206a:    4770       bx r14
+
 function_26:
+                        ; r0
+                        ; r1
+                        ; r2
+                        ; r3
   0x206c:    b5f0       push {r4, r5, r6, r7, r14}  ; push registers
-    206e:    780b       ldrb r3, [r1, #0]
+    206e:    780b       ldrb r3, [r1, #0]           ; r3 = [r1]
     2070:    2403       movs r4, #3                 ; r4 = 3
-    2072:    eb00 0e83  add.w r14, r0, r3, lsl #2
-    2076:    005b       lsls r3, r3, #1
-    2078:    409c       lsls r4, r3
-    207a:    6d05       ldr r5, [r0, #80]           ; 0x50
-    207c:    f10e 0240  add.w r2, r14, #64          ; 0x40
-    2080:    f10e 0c90  add.w r12, r14, #144        ; 0x90
-    2084:    43e4       mvns r4, r4
-    2086:    4025       ands r5, r4
-    2088:    6505       str r5, [r0, #80]           ; 0x50
-    208a:    6d45       ldr r5, [r0, #84]           ; 0x54
-    208c:    7a8e       ldrb r6, [r1, #10]
-    208e:    7acf       ldrb r7, [r1, #11]
-    2090:    4025       ands r5, r4
-    2092:    ea46 0647  orr.w r6, r6, r7, lsl #1
-    2096:    409e       lsls r6, r3
-    2098:    432e       orrs r6, r5
-    209a:    6546       str r6, [r0, #84]           ; 0x54
-    209c:    6ec5       ldr r5, [r0, #108]          ; 0x6c
-    209e:    7b4e       ldrb r6, [r1, #13]
-    20a0:    4025       ands r5, r4
-    20a2:    7b0c       ldrb r4, [r1, #12]
-    20a4:    ea44 0446  orr.w r4, r4, r6, lsl #1
-    20a8:    409c       lsls r4, r3
-    20aa:    432c       orrs r4, r5
-    20ac:    66c4       str r4, [r0, #108]          ; 0x6c
-    20ae:    6814       ldr r4, [r2, #0]
-    20b0:    f240 1507  movw r5, #263               ; 0x107
-    20b4:    43ac       bics r4, r5
-    20b6:    6014       str r4, [r2, #0]
-    20b8:    6814       ldr r4, [r2, #0]
-    20ba:    684d       ldr r5, [r1, #4]
-    20bc:    432c       orrs r4, r5
-    20be:    6014       str r4, [r2, #0]
-    20c0:    89ca       ldrh r2, [r1, #14]
-    20c2:    f8cc 2000  str.w r2, [r12]
-    20c6:    8a0a       ldrh r2, [r1, #16]
-    20c8:    f8ce 20a0  str.w r2, [r14, #160]       ; 0xa0
-    20cc:    7a0a       ldrb r2, [r1, #8]
-    20ce:    7a49       ldrb r1, [r1, #9]
-    20d0:    ea42 0141  orr.w r1, r2, r1, lsl #1
-    20d4:    6d02       ldr r2, [r0, #80]           ; 0x50
-    20d6:    4099       lsls r1, r3
-    20d8:    4311       orrs r1, r2
-    20da:    6501       str r1, [r0, #80]           ; 0x50
+    2072:    eb00 0e83  add.w r14, r0, r3, lsl #2   ; r14 = r0 + (r3 << 2)
+    2076:    005b       lsls r3, r3, #1             ; r3 = r3 << 1
+    2078:    409c       lsls r4, r3                 ; r4 = r4 << r3
+    207a:    6d05       ldr r5, [r0, #80]           ; r5 = [r0 + 0x50]
+    207c:    f10e 0240  add.w r2, r14, #64          ; r2 = r14 + 0x40
+    2080:    f10e 0c90  add.w r12, r14, #144        ; r12 = r14 + 0x90 ?
+    2084:    43e4       mvns r4, r4                 ; r4 = ~r4
+    2086:    4025       ands r5, r4                 ; r5 = r5 & r4
+    2088:    6505       str r5, [r0, #80]           ; [r0 + 0x50] = r5
+    208a:    6d45       ldr r5, [r0, #84]           ; [r0 + 0x54] = r5
+    208c:    7a8e       ldrb r6, [r1, #10]          ; r6 = [r1 + 10]
+    208e:    7acf       ldrb r7, [r1, #11]          ; r7 = [r1 + 11]
+    2090:    4025       ands r5, r4                 ; r5 = r5 & r4
+    2092:    ea46 0647  orr.w r6, r6, r7, lsl #1    ; r6 = r6 | (r7 << 1)
+    2096:    409e       lsls r6, r3                 ; r6 = r6 << r3
+    2098:    432e       orrs r6, r5                 ; r6 = r6 | r5
+    209a:    6546       str r6, [r0, #84]           ; [r0 + 0x54] = r6
+    209c:    6ec5       ldr r5, [r0, #108]          ; r5 = [r0 + 0x6c]
+    209e:    7b4e       ldrb r6, [r1, #13]          ; r6 = [r1 + 13]
+    20a0:    4025       ands r5, r4                 ; r5 = r5 & r4
+    20a2:    7b0c       ldrb r4, [r1, #12]          ; r4 = [r1 + 12]
+    20a4:    ea44 0446  orr.w r4, r4, r6, lsl #1    ; r4 = r4 + (r6 << 1)
+    20a8:    409c       lsls r4, r3                 ; r4 = r4 << r3
+    20aa:    432c       orrs r4, r5                 ; r4 = r4 | r5
+    20ac:    66c4       str r4, [r0, #108]          ; [r0 + 0x6c] = r4
+    20ae:    6814       ldr r4, [r2, #0]            ; r4 = [r2]
+    20b0:    f240 1507  movw r5, #263               ; r5 = 0x107
+    20b4:    43ac       bics r4, r5                 ; r4 = r4 & ~r5
+    20b6:    6014       str r4, [r2, #0]            ; [r2] = r4
+    20b8:    6814       ldr r4, [r2, #0]            ; r4 = [r2]
+    20ba:    684d       ldr r5, [r1, #4]            ; r5 = [r1 + 4]
+    20bc:    432c       orrs r4, r5                 ; r4 = r4 | r5
+    20be:    6014       str r4, [r2, #0]            ; [r2] = r4
+    20c0:    89ca       ldrh r2, [r1, #14]          ; r2 = [r1 + 14]
+    20c2:    f8cc 2000  str.w r2, [r12]             ; [r12] = r2
+    20c6:    8a0a       ldrh r2, [r1, #16]          ; r2 = [r1 + 16]
+    20c8:    f8ce 20a0  str.w r2, [r14, #160]       ; [r14 + 0xa0] = r2
+    20cc:    7a0a       ldrb r2, [r1, #8]           ; r2 = [r1 + 8]
+    20ce:    7a49       ldrb r1, [r1, #9]           ; r1 = [r1 = 9]
+    20d0:    ea42 0141  orr.w r1, r2, r1, lsl #1    ; r1 = r2 | (r1 << 1)
+    20d4:    6d02       ldr r2, [r0, #80]           ; r2 = [r0 + 0x50]
+    20d6:    4099       lsls r1, r3                 ; r1 = r1 << r3
+    20d8:    4311       orrs r1, r2                 ; r1 = r1 | r2
+    20da:    6501       str r1, [r0, #80]           ; [r0 + 0x50] = r1
     20dc:    bdf0       pop {r4, r5, r6, r7, r15}   ; pop registers
-    20de:    2100       movs r1, #0
-    20e0:    7001       strb r1, [r0, #0]
-    20e2:    6041       str r1, [r0, #4]
-    20e4:    7201       strb r1, [r0, #8]
-    20e6:    7241       strb r1, [r0, #9]
-    20e8:    7281       strb r1, [r0, #10]
-    20ea:    72c1       strb r1, [r0, #11]
-    20ec:    7301       strb r1, [r0, #12]
-    20ee:    7341       strb r1, [r0, #13]
-    20f0:    81c1       strh r1, [r0, #14]
-    20f2:    8201       strh r1, [r0, #16]
+    20de:    2100       movs r1, #0                 ; r1 = 0
+    20e0:    7001       strb r1, [r0, #0]           ; [r0] = r1
+    20e2:    6041       str r1, [r0, #4]            ; [r0 + 4] = r1
+    20e4:    7201       strb r1, [r0, #8]           ; [r0 + 8] = r1
+    20e6:    7241       strb r1, [r0, #9]           ; [r0 + 9] = r1
+    20e8:    7281       strb r1, [r0, #10]          ; [r0 + 10] = r1
+    20ea:    72c1       strb r1, [r0, #11]          ; [r0 + 11] = r1
+    20ec:    7301       strb r1, [r0, #12]          ; [r0 + 12] = r1
+    20ee:    7341       strb r1, [r0, #13]          ; [r0 + 13] = r1
+    20f0:    81c1       strh r1, [r0, #14]          ; [r0 + 14] = r1
+    20f2:    8201       strh r1, [r0, #16]          ; [r0 + 16] = r1
     20f4:    4770       bx r14                      ; return
 
     20f6:    880a       ldrh r2, [r1, #0]
@@ -3464,7 +3473,7 @@ function_26:
     2156:    6265       str r5, [r4, #36]    ; 0x24
     2158:    f89d 0005  ldrb.w r0, [r13, #5]
     215c:    bd7c       pop {r2, r3, r4, r5, r6, r15}
-    215e:    0000       movs r0, r0
+    215e:    0000       movs r0, r0                 ; nop
     2160:    2000       movs r0, #0
     2162:    400b       ands r3, r1
     2164:    b570       push {r4, r5, r6, r14}
@@ -3510,7 +3519,7 @@ function_26:
     21c4:    b00c       add sp, #48    ; 0x30
     21c6:    2001       movs r0, #1
     21c8:    bd70       pop {r4, r5, r6, r15}
-    21ca:    0000       movs r0, r0
+    21ca:    0000       movs r0, r0                 ; nop
     21cc:    0220       lsls r0, r4, #8
     21ce:    2000       movs r0, #0
     21d0:    4000       ands r0, r0
@@ -3550,7 +3559,7 @@ function_26:
     2224:    7020       strb r0, [r4, #0]
     2226:    2001       movs r0, #1
     2228:    bd70       pop {r4, r5, r6, r15}
-    222a:    0000       movs r0, r0
+    222a:    0000       movs r0, r0                 ; nop
     222c:    0220       lsls r0, r4, #8
     222e:    2000       movs r0, #0
     2230:    2000       movs r0, #0
@@ -3558,7 +3567,7 @@ function_26:
     2234:    b108       cbz r0, 0x223a
     2236:    f000 b825  b.w 0x2284
     223a:    f000 b801  b.w 0x2240
-    223e:    0000       movs r0, r0
+    223e:    0000       movs r0, r0                 ; nop
     2240:    b570       push {r4, r5, r6, r14}
     2242:    2201       movs r2, #1
     2244:    4d0e       ldr r5, [pc, #56]    ; (0x2280)
@@ -3611,7 +3620,7 @@ function_26:
     22be:    2109       movs r1, #9
     22c0:    2001       movs r0, #1
     22c2:    f7fe b9ef  b.w 0x6a4
-    22c6:    0000       movs r0, r0
+    22c6:    0000       movs r0, r0                 ; nop
     22c8:    2000       movs r0, #0
     22ca:    400b       ands r3, r1
     22cc:    e92d 43f8  stmdb r13!, {r3, r4, r5, r6, r7, r8, r9, r14}
@@ -3639,7 +3648,7 @@ function_26:
     2308:    f000 f87e  bl 0x2408
     230c:    6275       str r5, [r6, #36]    ; 0x24
     230e:    e8bd 83f8  ldmia.w r13!, {r3, r4, r5, r6, r7, r8, r9, r15}
-    2312:    0000       movs r0, r0
+    2312:    0000       movs r0, r0                 ; nop
     2314:    2000       movs r0, #0
     2316:    400b       ands r3, r1
     2318:    b5f8       push {r3, r4, r5, r6, r7, r14}
@@ -3694,7 +3703,7 @@ function_26:
     2398:    bd10       pop {r4, r15}
     239a:    2001       movs r0, #1
     239c:    bd10       pop {r4, r15}
-    239e:    0000       movs r0, r0
+    239e:    0000       movs r0, r0                 ; nop
     23a0:    b538       push {r3, r4, r5, r14}
     23a2:    4c08       ldr r4, [pc, #32]    ; (0x23c4)
     23a4:    20b9       movs r0, #185    ; 0xb9
@@ -3799,7 +3808,7 @@ function_13:
     248e:    42bc       cmp r4, r7
     2490:    d3f4       bcc.n 0x247c
     2492:    e8bd 81f0  ldmia.w r13!, {r4, r5, r6, r7, r8, r15}
-    2496:    0000       movs r0, r0
+    2496:    0000       movs r0, r0                 ; nop
     2498:    0220       lsls r0, r4, #8
     249a:    2000       movs r0, #0
     249c:    4000       ands r0, r0
@@ -3905,7 +3914,7 @@ function_15:
     257e:    f7ff ff43  bl 0x2408
     2582:    6265       str r5, [r4, #36]    ; 0x24
     2584:    bd38       pop {r3, r4, r5, r15}
-    2586:    0000       movs r0, r0
+    2586:    0000       movs r0, r0                 ; nop
     2588:    2000       movs r0, #0
     258a:    400b       ands r3, r1
     258c:    b510       push {r4, r14}
@@ -3972,9 +3981,9 @@ function_5:
     262c:    e8bd 4010  ldmia.w r13!, {r4, r14}
     2630:    2035       movs r0, #53    ; 0x35
     2632:    f000 b81e  b.w 0x2672
-    2636:    0000       movs r0, r0
+    2636:    0000       movs r0, r0                 ; nop
     2638:    ed0c e000  stc 0, cr14, [r12, #-0]
-    263c:    0000       movs r0, r0
+    263c:    0000       movs r0, r0                 ; nop
     263e:    05fa       lsls r2, r7, #23
     2640:    b530       push {r4, r5, r14}
     2642:    f000 0307  and.w r3, r0, #7
@@ -4010,7 +4019,7 @@ function_5:
     268a:    4410       add r0, r2
     268c:    f880 1400  strb.w r1, [r0, #1024]    ; 0x400
     2690:    4770       bx r14
-    2692:    0000       movs r0, r0
+    2692:    0000       movs r0, r0                 ; nop
     2694:    4a02       ldr r2, [pc, #8]    ; (0x26a0)
     2696:    4011       ands r1, r2
     2698:    4301       orrs r1, r0
@@ -4046,7 +4055,7 @@ function_5:
     26e4:    7020       strb r0, [r4, #0]
     26e6:    2001       movs r0, #1
     26e8:    bd10       pop {r4, r15}
-    26ea:    0000       movs r0, r0
+    26ea:    0000       movs r0, r0                 ; nop
     26ec:    0228       lsls r0, r5, #8
     26ee:    2000       movs r0, #0
     26f0:    b510       push {r4, r14}
@@ -4539,13 +4548,13 @@ function_5:
     2bca:    2804       cmp r0, #4
     2bcc:    d11e       bne.n 0x2c0c
     2bce:    e00f       b.n 0x2bf0
-    2bd0:    f003 f874  bl 0x5cbc
+    2bd0:    f003 f874  bl 0x5cbc                   ; call function_27
     2bd4:    2801       cmp r0, #1
     2bd6:    d119       bne.n 0x2c0c
     2bd8:    2002       movs r0, #2
     2bda:    f888 0000  strb.w r0, [r8]
     2bde:    e015       b.n 0x2c0c
-    2be0:    f003 f86c  bl 0x5cbc
+    2be0:    f003 f86c  bl 0x5cbc                   ; call function_27
     2be4:    2801       cmp r0, #1
     2be6:    d111       bne.n 0x2c0c
     2be8:    2104       movs r1, #4
@@ -4576,16 +4585,16 @@ function_5:
     2c24:    090c       lsrs r4, r1, #4
     2c26:    2000       movs r0, #0
     2c28:    8ec8       ldrh r0, [r1, #54]    ; 0x36
-    2c2a:    0000       movs r0, r0
+    2c2a:    0000       movs r0, r0                 ; nop
     2c2c:    8c36       ldrh r6, [r6, #32]
-    2c2e:    0000       movs r0, r0
+    2c2e:    0000       movs r0, r0                 ; nop
     2c30:    8f10       ldrh r0, [r2, #56]    ; 0x38
-    2c32:    0000       movs r0, r0
+    2c32:    0000       movs r0, r0                 ; nop
     2c34:    8f58       ldrh r0, [r3, #58]    ; 0x3a
-    2c36:    0000       movs r0, r0
+    2c36:    0000       movs r0, r0                 ; nop
     2c38:    080c       lsrs r4, r1, #32
     2c3a:    2000       movs r0, #0
-    2c3c:    f003 f83e  bl 0x5cbc
+    2c3c:    f003 f83e  bl 0x5cbc                   ; call function_27
     2c40:    2801       cmp r0, #1
     2c42:    d101       bne.n 0x2c48
     2c44:    2000       movs r0, #0
@@ -4610,7 +4619,7 @@ function_5:
     2c76:    4644       mov r4, r8
     2c78:    2805       cmp r0, #5
     2c7a:    d159       bne.n 0x2d30
-    2c7c:    f003 f81e  bl 0x5cbc
+    2c7c:    f003 f81e  bl 0x5cbc                   ; call function_27
     2c80:    2801       cmp r0, #1
     2c82:    d155       bne.n 0x2d30
     2c84:    f894 2035  ldrb.w r2, [r4, #53]        ; 0x35
@@ -4663,61 +4672,61 @@ function_5:
     2cf0:    b392       cbz r2, 0x2d58
     2cf2:    f1a0 000c  sub.w r0, r0, #12
 
-  0x2cf6:    7f22       ldrb r2, [r4, #28]
-    2cf8:    7ee3       ldrb r3, [r4, #27]
-    2cfa:    6881       ldr r1, [r0, #8]
-    2cfc:    eb02 02c3  add.w r2, r2, r3, lsl #3
-    2d00:    6800       ldr r0, [r0, #0]
-    2d02:    eb01 2502  add.w r5, r1, r2, lsl #8
-    2d06:    4410       add r0, r2
-    2d08:    f1a4 0418  sub.w r4, r4, #24
-    2d0c:    f04f 0200  mov.w r2, #0
-    2d10:    4601       mov r1, r0
+  0x2cf6:    7f22       ldrb r2, [r4, #28]          ; r2 = [r4 + 28]
+    2cf8:    7ee3       ldrb r3, [r4, #27]          ; r3 = [r4 + 27]
+    2cfa:    6881       ldr r1, [r0, #8]            ; r1 = [r0 + 8]
+    2cfc:    eb02 02c3  add.w r2, r2, r3, lsl #3    ; r2 = r2 + (r3 << 3)
+    2d00:    6800       ldr r0, [r0, #0]            ; r0 = [r0]
+    2d02:    eb01 2502  add.w r5, r1, r2, lsl #8    ; r5 = r1 + (r2 << 8)
+    2d06:    4410       add r0, r2                  ; r0 = r0 + r2
+    2d08:    f1a4 0418  sub.w r4, r4, #24           ; r4 = r4 + 24
+    2d0c:    f04f 0200  mov.w r2, #0                ; r2 = 0
+    2d10:    4601       mov r1, r0                  ; r1 = r0
     2d12:    f003 f80f  bl 0x5d34                   ; call function_11
-    2d16:    2201       movs r2, #1
-    2d18:    f105 01ff  add.w r1, r5, #255          ; 0xff
-    2d1c:    4628       mov r0, r5
+    2d16:    2201       movs r2, #1                 ; r2 = 1
+    2d18:    f105 01ff  add.w r1, r5, #255          ; r1 = r5 + 0xff
+    2d1c:    4628       mov r0, r5                  ; r0 = r5
     2d1e:    f003 f809  bl 0x5d34                   ; call function_11
     2d22:    f001 ff2d  bl 0x4b80                   ; call function_16
-    2d26:    f884 9000  strb.w r9, [r4]
-    2d2a:    2000       movs r0, #0
-    2d2c:    f884 0032  strb.w r0, [r4, #50]        ; 0x32
-    2d30:    f002 ffc4  bl 0x5cbc
+    2d26:    f884 9000  strb.w r9, [r4]             ; [r4] = r9
+    2d2a:    2000       movs r0, #0                 ; r0 = 0
+    2d2c:    f884 0032  strb.w r0, [r4, #50]        ; [r4 + 0x32] = r0
+    2d30:    f002 ffc4  bl 0x5cbc                   ; call function_27
     2d34:    2801       cmp r0, #1
-    2d36:    d10d       bne.n 0x2d54                ; Branch to entry
-    2d38:    7820       ldrb r0, [r4, #0]
+    2d36:    d10d       bne.n 0x2d54                ; Branch to entry if r0 != 1
+    2d38:    7820       ldrb r0, [r4, #0]           ; r0 = [r4]
     2d3a:    2814       cmp r0, #20
-    2d3c:    d10a       bne.n 0x2d54                ; Branch to entry
-    2d3e:    2500       movs r5, #0
-    2d40:    75a5       strb r5, [r4, #22]
+    2d3c:    d10a       bne.n 0x2d54                ; Branch to entry if r0 != 20
+    2d3e:    2500       movs r5, #0                 ; r5 = 0
+    2d40:    75a5       strb r5, [r4, #22]          ; [r4 + 22] = r5
     2d42:    f001 ff1d  bl 0x4b80                   ; call function_16
-    2d46:    65e5       str r5, [r4, #92]           ; 0x5c
-    2d48:    7025       strb r5, [r4, #0]
-    2d4a:    4808       ldr r0, [pc, #32]           ; (0x2d6c)
-    2d4c:    6245       str r5, [r0, #36]           ; 0x24
-    2d4e:    3078       adds r0, #120               ; 0x78
-    2d50:    6005       str r5, [r0, #0]
-    2d52:    6045       str r5, [r0, #4]
+    2d46:    65e5       str r5, [r4, #92]           ; [r4 + 0x5c] = r5
+    2d48:    7025       strb r5, [r4, #0]           ; [r4] = r5
+    2d4a:    4808       ldr r0, [pc, #32]           ; r0 = [(0x2d6c)]
+    2d4c:    6245       str r5, [r0, #36]           ; [r0 + 0x24] = r5
+    2d4e:    3078       adds r0, #120               ; r0 = r0 + 0x78
+    2d50:    6005       str r5, [r0, #0]            ; [r0] = r5
+    2d52:    6045       str r5, [r0, #4]            ; [r0 + 4] = r5
 
-entry:                                              ; Entry point from vector table PC reset value
+entry:                  ; Entry point from vector table PC reset value
   0x2d54:    e8bd 9ffc  ldmia.w r13!, {r2, r3, r4, r5, r6, r7, r8, r9, r10, r11, r12, r15}  ; load r2-r15 from the stack
     2d58:    e7ff       b.n 0x2d5a                  ; branch to 0x2d5a
-  0x2d5a:    f1a0 0010  sub.w r0, r0, #16
+  0x2d5a:    f1a0 0010  sub.w r0, r0, #16           ; r0 = r0 - 16
     2d5e:    e7ca       b.n 0x2cf6                  ; branch to 0x2cf6
 
-    2d60:    1cba       adds r2, r7, #2
-    2d62:    2000       movs r0, #0
-    2d64:    080c       lsrs r4, r1, #32
-    2d66:    2000       movs r0, #0
-    2d68:    8d50       ldrh r0, [r2, #42]          ; 0x2a
-    2d6a:    0000       movs r0, r0
-  0x2d6c:    00d8       lsls r0, r3, #3
-    2d6e:    2000       movs r0, #0
-    2d70:    b508       push {r3, r14}
+    2d60:    1cba       adds r2, r7, #2             ; r2 = r7 + 2
+    2d62:    2000       movs r0, #0                 ; r0 = 0
+    2d64:    080c       lsrs r4, r1, #32            ; r4 = r1 - 32
+    2d66:    2000       movs r0, #0                 ; r0 = 0
+    2d68:    8d50       ldrh r0, [r2, #42]          ; r0 = [r2 + 0x2a]
+    2d6a:    0000       movs r0, r0                 ; nop
+  0x2d6c:    00d8       lsls r0, r3, #3             ; r0 = r3 << 3
+    2d6e:    2000       movs r0, #0                 ; r0 = 0
+    2d70:    b508       push {r3, r14}              ; push r3, r14
 
-exception:                                          ; Various exception handlers
-  0x2d72:    490e       ldr r1, [pc, #56]           ; (0x2dac)
-    2d74:    4a0e       ldr r2, [pc, #56]           ; (0x2db0)
+exception:              ; Various exception handlers
+  0x2d72:    490e       ldr r1, [pc, #56]           ; r1 = [(0x2dac)]
+    2d74:    4a0e       ldr r2, [pc, #56]           ; r2 = [(0x2db0)]
     2d76:    2806       cmp r0, #6
     2d78:    d216       bcs.n 0x2da8
     2d7a:    e8df f000  tbb [r15, r0]
@@ -4728,6 +4737,7 @@ exception:                                          ; Various exception handlers
     2d86:    7010       strb r0, [r2, #0]
     2d88:    2000       movs r0, #0
     2d8a:    e000       b.n 0x2d8e                  ; branch to 0x2d8e
+
     2d8c:    2001       movs r0, #1
   0x2d8e:    7008       strb r0, [r1, #0]
     2d90:    e00a       b.n 0x2da8                  ; branch to 0x2da8
@@ -4922,7 +4932,7 @@ exception:                                          ; Various exception handlers
     2fa2:    b009       add sp, #36                 ; 0x24
     2fa4:    2001       movs r0, #1
     2fa6:    e8bd 8ff0  ldmia.w r13!, {r4, r5, r6, r7, r8, r9, r10, r11, r15}
-    2faa:    0000       movs r0, r0
+    2faa:    0000       movs r0, r0                 ; nop
   0x2fac:    021d       lsls r5, r3, #8
     2fae:    2000       movs r0, #0
   0x2fb0:    e000       b.n 0x2fb4
@@ -5019,14 +5029,14 @@ function_10:
     308e:    2000       movs r0, #0
   0x3090:    4000       ands r0, r0
     3092:    400b       ands r3, r1
-  0x3094:    0000       movs r0, r0
+  0x3094:    0000       movs r0, r0                 ; nop
     3096:    400b       ands r3, r1
     3098:    2000       movs r0, #0
     309a:    400b       ands r3, r1
     309c:    b108       cbz r0, 0x30a2
     309e:    f000 b887  b.w 0x31b0
     30a2:    f000 b801  b.w 0x30a8
-    30a6:    0000       movs r0, r0
+    30a6:    0000       movs r0, r0                 ; nop
     30a8:    b510       push {r4, r14}
     30aa:    4c3e       ldr r4, [pc, #248]          ; (0x31a4)
     30ac:    2202       movs r2, #2
@@ -5127,10 +5137,10 @@ function_10:
     3198:    e8bd 4010  ldmia.w r13!, {r4, r14}
     319c:    2002       movs r0, #2
     319e:    f7fd ba81  b.w 0x6a4
-    31a2:    0000       movs r0, r0
+    31a2:    0000       movs r0, r0                 ; nop
   0x31a4:    4000       ands r0, r0
     31a6:    400b       ands r3, r1
-  0x31a8:    0000       movs r0, r0
+  0x31a8:    0000       movs r0, r0                 ; nop
     31aa:    400b       ands r3, r1
     31ac:    2000       movs r0, #0
     31ae:    400b       ands r3, r1
@@ -5234,10 +5244,10 @@ function_10:
     32a0:    e8bd 4010  ldmia.w r13!, {r4, r14}
     32a4:    2002       movs r0, #2
     32a6:    f7fd b9fd  b.w 0x6a4
-    32aa:    0000       movs r0, r0
+    32aa:    0000       movs r0, r0                 ; nop
     32ac:    4000       ands r0, r0
     32ae:    400b       ands r3, r1
-    32b0:    0000       movs r0, r0
+    32b0:    0000       movs r0, r0                 ; nop
     32b2:    400b       ands r3, r1
     32b4:    2000       movs r0, #0
     32b6:    400b       ands r3, r1
@@ -5278,7 +5288,7 @@ function_10:
     330c:    4770       bx r14
     330e:    4301       orrs r1, r0
     3310:    e7fa       b.n 0x3308
-    3312:    0000       movs r0, r0
+    3312:    0000       movs r0, r0                 ; nop
     3314:    8000       strh r0, [r0, #0]
     3316:    4008       ands r0, r1
     3318:    e92d 5ff0  stmdb r13!, {r4, r5, r6, r7, r8, r9, r10, r11, r12, r14}
@@ -5335,7 +5345,7 @@ function_10:
     339c:    eb00 00c4  add.w r0, r0, r4, lsl #3
     33a0:    f8d0 8000  ldr.w r8, [r0]
     33a4:    6847       ldr r7, [r0, #4]
-    33a6:    f8b9 0000  ldrh.w r0, [r9]
+    33a6:    f8b9 0000  ldrh.w r0, [r9]             ; nop
     33aa:    b120       cbz r0, 0x33b6
     33ac:    f8b9 1000  ldrh.w r1, [r9]
     33b0:    1e49       subs r1, r1, #1
@@ -5432,12 +5442,12 @@ function_10:
     3498:    2e0c       cmp r6, #12
     349a:    2000       movs r0, #0
     349c:    8fa8       ldrh r0, [r5, #60]    ; 0x3c
-    349e:    0000       movs r0, r0
+    349e:    0000       movs r0, r0                 ; nop
     34a0:    01dc       lsls r4, r3, #7
     34a2:    2000       movs r0, #0
     34a4:    4000       ands r0, r0
     34a6:    400b       ands r3, r1
-    34a8:    0000       movs r0, r0
+    34a8:    0000       movs r0, r0                 ; nop
     34aa:    400b       ands r3, r1
     34ac:    2cc4       cmp r4, #196    ; 0xc4
     34ae:    2000       movs r0, #0
@@ -5694,14 +5704,14 @@ function_10:
     3738:    e8bd 9ff0  ldmia.w r13!, {r4, r5, r6, r7, r8, r9, r10, r11, r12, r15}
     373c:    01d8       lsls r0, r3, #7
     373e:    2000       movs r0, #0
-    3740:    0000       movs r0, r0
+    3740:    0000       movs r0, r0                 ; nop
     3742:    400b       ands r3, r1
     3744:    2000       movs r0, #0
     3746:    400b       ands r3, r1
     3748:    4000       ands r0, r0
     374a:    400b       ands r3, r1
     374c:    8fa8       ldrh r0, [r5, #60]    ; 0x3c
-    374e:    0000       movs r0, r0
+    374e:    0000       movs r0, r0                 ; nop
     3750:    e92d 47f0  stmdb r13!, {r4, r5, r6, r7, r8, r9, r10, r14}
     3754:    4c2a       ldr r4, [pc, #168]    ; (0x3800)
     3756:    4e2b       ldr r6, [pc, #172]    ; (0x3804)
@@ -5766,8 +5776,8 @@ function_10:
     37f4:    4648       mov r0, r9
     37f6:    e8bd 47f0  ldmia.w r13!, {r4, r5, r6, r7, r8, r9, r10, r14}
     37fa:    f7ff bc4f  b.w 0x309c
-    37fe:    0000       movs r0, r0
-    3800:    0000       movs r0, r0
+    37fe:    0000       movs r0, r0                 ; nop
+    3800:    0000       movs r0, r0                 ; nop
     3802:    400b       ands r3, r1
     3804:    7000       strb r0, [r0, #0]
     3806:    4007       ands r7, r0
@@ -5814,7 +5824,7 @@ function_10:
     3864:    d501       bpl.n 0x386a
     3866:    f040 0080  orr.w r0, r0, #128    ; 0x80
     386a:    4770       bx r14
-    386c:    0000       movs r0, r0
+    386c:    0000       movs r0, r0                 ; nop
     386e:    400b       ands r3, r1
     3870:    2000       movs r0, #0
     3872:    400b       ands r3, r1
@@ -5852,13 +5862,13 @@ function_10:
     38b8:    d2f4       bcs.n 0x38a4
     38ba:    6294       str r4, [r2, #40]    ; 0x28
     38bc:    bd30       pop {r4, r5, r15}
-    38be:    0000       movs r0, r0
+    38be:    0000       movs r0, r0                 ; nop
     38c0:    4000       ands r0, r0
     38c2:    400b       ands r3, r1
-    38c4:    0000       movs r0, r0
+    38c4:    0000       movs r0, r0                 ; nop
     38c6:    400b       ands r3, r1
     38c8:    8fa0       ldrh r0, [r4, #60]    ; 0x3c
-    38ca:    0000       movs r0, r0
+    38ca:    0000       movs r0, r0                 ; nop
 
 function_9:
   0x38cc:    b510       push {r4, r14}
@@ -5898,7 +5908,7 @@ function_9:
     3918:    d1eb       bne.n 0x38f2
     391a:    bd10       pop {r4, r15}
     391c:    8fa8       ldrh r0, [r5, #60]    ; 0x3c
-    391e:    0000       movs r0, r0
+    391e:    0000       movs r0, r0                 ; nop
     3920:    e92d 41f0  stmdb r13!, {r4, r5, r6, r7, r8, r14}
     3924:    4e12       ldr r6, [pc, #72]    ; (0x3970)
     3926:    4c11       ldr r4, [pc, #68]    ; (0x396c)
@@ -5926,7 +5936,7 @@ function_9:
     396c:    0160       lsls r0, r4, #5
     396e:    2000       movs r0, #0
     3970:    8d34       ldrh r4, [r6, #40]    ; 0x28
-    3972:    0000       movs r0, r0
+    3972:    0000       movs r0, r0                 ; nop
     3974:    2e2c       cmp r6, #44    ; 0x2c
     3976:    2000       movs r0, #0
     3978:    2900       cmp r1, #0
@@ -6049,8 +6059,8 @@ function_9:
     3aa0:    f000 fb31  bl 0x4106
     3aa4:    e7ee       b.n 0x3a84
     3aa6:    e8bd 81f0  ldmia.w r13!, {r4, r5, r6, r7, r8, r15}
-    3aaa:    0000       movs r0, r0
-    3aac:    0000       movs r0, r0
+    3aaa:    0000       movs r0, r0                 ; nop
+    3aac:    0000       movs r0, r0                 ; nop
     3aae:    2000       movs r0, #0
     3ab0:    0234       lsls r4, r6, #8
     3ab2:    2000       movs r0, #0
@@ -6086,10 +6096,10 @@ function_9:
     3b02:    ebb1 7f92  cmp.w r1, r2, lsr #30
     3b06:    d1fb       bne.n 0x3b00
     3b08:    4770       bx r14
-    3b0a:    0000       movs r0, r0
+    3b0a:    0000       movs r0, r0                 ; nop
     3b0c:    8000       strh r0, [r0, #0]
     3b0e:    4008       ands r0, r1
-    3b10:    0000       movs r0, r0
+    3b10:    0000       movs r0, r0                 ; nop
     3b12:    4310       orrs r0, r2
     3b14:    0200       lsls r0, r0, #8
     3b16:    4008       ands r0, r1
@@ -6191,7 +6201,7 @@ function_9:
     3be6:    f000 fbad  bl 0x4344
     3bea:    702c       strb r4, [r5, #0]
     3bec:    bd70       pop {r4, r5, r6, r15}
-    3bee:    0000       movs r0, r0
+    3bee:    0000       movs r0, r0                 ; nop
     3bf0:    00f0       lsls r0, r6, #3
     3bf2:    2000       movs r0, #0
     3bf4:    0014       movs r4, r2
@@ -6232,7 +6242,7 @@ function_9:
     3c40:    6148       str r0, [r1, #20]
     3c42:    e8bd 4010  ldmia.w r13!, {r4, r14}
     3c46:    f7fc bb97  b.w 0x378
-    3c4a:    0000       movs r0, r0
+    3c4a:    0000       movs r0, r0                 ; nop
     3c4c:    0368       lsls r0, r5, #13
     3c4e:    2000       movs r0, #0
     3c50:    0014       movs r4, r2
@@ -6293,7 +6303,7 @@ function_9:
     3cc4:    4802       ldr r0, [pc, #8]    ; (0x3cd0)
     3cc6:    3808       subs r0, #8
     3cc8:    e7f3       b.n 0x3cb2
-    3cca:    0000       movs r0, r0
+    3cca:    0000       movs r0, r0                 ; nop
     3ccc:    032c       lsls r4, r5, #12
     3cce:    2000       movs r0, #0
     3cd0:    003c       movs r4, r7
@@ -6316,21 +6326,21 @@ function_9:
     3cf2:    6381       str r1, [r0, #56]    ; 0x38
     3cf4:    2000       movs r0, #0
     3cf6:    f000 b88b  b.w 0x3e10
-    3cfa:    0000       movs r0, r0
+    3cfa:    0000       movs r0, r0                 ; nop
     3cfc:    6919       ldr r1, [r3, #16]
-    3cfe:    0000       movs r0, r0
+    3cfe:    0000       movs r0, r0                 ; nop
     3d00:    6a11       ldr r1, [r2, #32]
-    3d02:    0000       movs r0, r0
+    3d02:    0000       movs r0, r0                 ; nop
     3d04:    6a85       ldr r5, [r0, #40]    ; 0x28
-    3d06:    0000       movs r0, r0
+    3d06:    0000       movs r0, r0                 ; nop
     3d08:    695d       ldr r5, [r3, #20]
-    3d0a:    0000       movs r0, r0
+    3d0a:    0000       movs r0, r0                 ; nop
     3d0c:    6809       ldr r1, [r1, #0]
-    3d0e:    0000       movs r0, r0
+    3d0e:    0000       movs r0, r0                 ; nop
     3d10:    6815       ldr r5, [r2, #0]
-    3d12:    0000       movs r0, r0
+    3d12:    0000       movs r0, r0                 ; nop
     3d14:    6821       ldr r1, [r4, #0]
-    3d16:    0000       movs r0, r0
+    3d16:    0000       movs r0, r0                 ; nop
     3d18:    480e       ldr r0, [pc, #56]    ; (0x3d54)
     3d1a:    b510       push {r4, r14}
     3d1c:    6801       ldr r1, [r0, #0]
@@ -6351,7 +6361,7 @@ function_9:
     3d46:    f7ff fee7  bl 0x3b18
     3d4a:    e8bd 4010  ldmia.w r13!, {r4, r14}
     3d4e:    f7ff bf17  b.w 0x3b80
-    3d52:    0000       movs r0, r0
+    3d52:    0000       movs r0, r0                 ; nop
     3d54:    0320       lsls r0, r4, #12
     3d56:    2000       movs r0, #0
     3d58:    0014       movs r4, r2
@@ -6433,7 +6443,7 @@ function_9:
     3e08:    001c       movs r4, r3
     3e0a:    2000       movs r0, #0
     3e0c:    6a75       ldr r5, [r6, #36]    ; 0x24
-    3e0e:    0000       movs r0, r0
+    3e0e:    0000       movs r0, r0                 ; nop
     3e10:    4815       ldr r0, [pc, #84]    ; (0x3e68)
     3e12:    b510       push {r4, r14}
     3e14:    2301       movs r3, #1
@@ -6484,7 +6494,7 @@ function_9:
     3e76:    2101       movs r1, #1
     3e78:    f842 1020  str.w r1, [r2, r0, lsl #2]
     3e7c:    4770       bx r14
-    3e7e:    0000       movs r0, r0
+    3e7e:    0000       movs r0, r0                 ; nop
     3e80:    0320       lsls r0, r4, #12
     3e82:    2000       movs r0, #0
     3e84:    78c2       ldrb r2, [r0, #3]
@@ -6533,9 +6543,9 @@ function_9:
     3edc:    61c1       str r1, [r0, #28]
     3ede:    21c6       movs r1, #198    ; 0xc6
     3ee0:    e7f6       b.n 0x3ed0
-    3ee2:    0000       movs r0, r0
+    3ee2:    0000       movs r0, r0                 ; nop
     3ee4:    8998       ldrh r0, [r3, #12]
-    3ee6:    0000       movs r0, r0
+    3ee6:    0000       movs r0, r0                 ; nop
     3ee8:    f890 0034  ldrb.w r0, [r0, #52]    ; 0x34
     3eec:    f3c0 0040  ubfx r0, r0, #1, #1
     3ef0:    4770       bx r14
@@ -6756,15 +6766,15 @@ function_9:
     4120:    2104       movs r1, #4
     4122:    60c1       str r1, [r0, #12]
     4124:    4770       bx r14
-    4126:    0000       movs r0, r0
+    4126:    0000       movs r0, r0                 ; nop
     4128:    8ac4       ldrh r4, [r0, #22]
-    412a:    0000       movs r0, r0
+    412a:    0000       movs r0, r0                 ; nop
     412c:    0044       lsls r4, r0, #1
     412e:    2000       movs r0, #0
     4130:    4901       ldr r1, [pc, #4]    ; (0x4138)
     4132:    6088       str r0, [r1, #8]
     4134:    4770       bx r14
-    4136:    0000       movs r0, r0
+    4136:    0000       movs r0, r0                 ; nop
     4138:    8000       strh r0, [r0, #0]
     413a:    400a       ands r2, r1
     413c:    b510       push {r4, r14}
@@ -6797,7 +6807,7 @@ function_9:
     4188:    02c4       lsls r4, r0, #11
     418a:    2000       movs r0, #0
     418c:    6625       str r5, [r4, #96]    ; 0x60
-    418e:    0000       movs r0, r0
+    418e:    0000       movs r0, r0                 ; nop
     4190:    e004       b.n 0x419c
     4192:    e000       b.n 0x4196
     4194:    4905       ldr r1, [pc, #20]    ; (0x41ac)
@@ -6809,7 +6819,7 @@ function_9:
     41a2:    4770       bx r14
     41a4:    f440 6000  orr.w r0, r0, #2048    ; 0x800
     41a8:    e7fa       b.n 0x41a0
-    41aa:    0000       movs r0, r0
+    41aa:    0000       movs r0, r0                 ; nop
     41ac:    8000       strh r0, [r0, #0]
     41ae:    400a       ands r2, r1
     41b0:    4905       ldr r1, [pc, #20]    ; (0x41c8)
@@ -6821,7 +6831,7 @@ function_9:
     41be:    4770       bx r14
     41c0:    f440 6080  orr.w r0, r0, #1024    ; 0x400
     41c4:    e7fa       b.n 0x41bc
-    41c6:    0000       movs r0, r0
+    41c6:    0000       movs r0, r0                 ; nop
     41c8:    8000       strh r0, [r0, #0]
     41ca:    400a       ands r2, r1
     41cc:    2101       movs r1, #1
@@ -6853,7 +6863,7 @@ function_2:
     420a:    f3c0 0009  ubfx r0, r0, #0, #10
     420e:    4408       add r0, r1
     4210:    bd10       pop {r4, r15}
-    4212:    0000       movs r0, r0
+    4212:    0000       movs r0, r0                 ; nop
     4214:    a000       add r0, pc, #0    ; (adr r0, 0x4218)
     4216:    400a       ands r2, r1
     4218:    b570       push {r4, r5, r6, r14}
@@ -6868,7 +6878,7 @@ function_2:
     4230:    4901       ldr r1, [pc, #4]    ; (0x4238)
     4232:    4408       add r0, r1
     4234:    bd70       pop {r4, r5, r6, r15}
-    4236:    0000       movs r0, r0
+    4236:    0000       movs r0, r0                 ; nop
     4238:    a000       add r0, pc, #0    ; (adr r0, 0x423c)
     423a:    400a       ands r2, r1
     423c:    b510       push {r4, r14}
@@ -7011,7 +7021,7 @@ function_1:
     4390:    4302       orrs r2, r0
     4392:    604a       str r2, [r1, #4]
     4394:    4770       bx r14
-    4396:    0000       movs r0, r0
+    4396:    0000       movs r0, r0                 ; nop
     4398:    8000       strh r0, [r0, #0]
     439a:    400a       ands r2, r1
     439c:    4603       mov r3, r0
@@ -7032,7 +7042,7 @@ function_1:
     43c0:    6880       ldr r0, [r0, #8]
     43c2:    4008       ands r0, r1
     43c4:    4770       bx r14
-    43c6:    0000       movs r0, r0
+    43c6:    0000       movs r0, r0                 ; nop
     43c8:    8000       strh r0, [r0, #0]
     43ca:    400a       ands r2, r1
     43cc:    f000 b84a  b.w 0x4464
@@ -7148,12 +7158,12 @@ function_1:
     44d0:    600a       str r2, [r1, #0]
     44d2:    6108       str r0, [r1, #16]
     44d4:    4770       bx r14
-    44d6:    0000       movs r0, r0
+    44d6:    0000       movs r0, r0                 ; nop
     44d8:    8000       strh r0, [r0, #0]
     44da:    400a       ands r2, r1
     44dc:    4801       ldr r0, [pc, #4]            ; (0x44e4)
     44de:    f7ff bd08  b.w 0x3ef2
-    44e2:    0000       movs r0, r0
+    44e2:    0000       movs r0, r0                 ; nop
     44e4:    0234       lsls r4, r6, #8
     44e6:    2000       movs r0, #0
     44e8:    4913       ldr r1, [pc, #76]            ; (0x4538)
@@ -7185,7 +7195,7 @@ function_1:
     452a:    f64c 2035  movw r0, #51765            ; 0xca35
     452e:    6108       str r0, [r1, #16]
     4530:    4770       bx r14
-    4532:    0000       movs r0, r0
+    4532:    0000       movs r0, r0                 ; nop
     4534:    dd00       ble.n 0x4538
     4536:    006d       lsls r5, r5, #1
     4538:    8000       strh r0, [r0, #0]
@@ -7329,7 +7339,7 @@ function_12:
     4680:    d9c9       bls.n 0x4616
     4682:    204f       movs r0, #79    ; 0x4f
     4684:    e7da       b.n 0x463c
-    4686:    0000       movs r0, r0
+    4686:    0000       movs r0, r0                 ; nop
     4688:    07d8       lsls r0, r3, #31
     468a:    2000       movs r0, #0
     468c:    a0d0       add r0, pc, #832    ; (adr r0, 0x49d0)
@@ -7586,8 +7596,8 @@ function_3:
     48ca:    d1fb       bne.n 0x48c4              ; loop if r2 != 0
 ; loop end
 
-    48cc:    4770       bx r14                     ; branch to ARM at r14
-    48ce:    0000       movs r0, r0
+    48cc:    4770       bx r14                      ; branch to ARM at r14
+    48ce:    0000       movs r0, r0                 ; nop
     48d0:    e92d 4ffe  stmdb r13!, {r1, r2, r3, r4, r5, r6, r7, r8, r9, r10, r11, r14}
     48d4:    f8df 928c  ldr.w r9, [r15, #652]        ; 0x4b64
     48d8:    4690       mov r8, r2
@@ -7825,13 +7835,13 @@ function_3:
     4b64:    0058       lsls r0, r3, #1
     4b66:    2000       movs r0, #0
     4b68:    8d50       ldrh r0, [r2, #42]    ; 0x2a
-    4b6a:    0000       movs r0, r0
+    4b6a:    0000       movs r0, r0                 ; nop
     4b6c:    8f10       ldrh r0, [r2, #56]    ; 0x38
-    4b6e:    0000       movs r0, r0
+    4b6e:    0000       movs r0, r0                 ; nop
     4b70:    8f58       ldrh r0, [r3, #58]    ; 0x3a
-    4b72:    0000       movs r0, r0
+    4b72:    0000       movs r0, r0                 ; nop
     4b74:    8ec8       ldrh r0, [r1, #54]    ; 0x36
-    4b76:    0000       movs r0, r0
+    4b76:    0000       movs r0, r0                 ; nop
     4b78:    0915       lsrs r5, r2, #4
     4b7a:    2000       movs r0, #0
     4b7c:    080c       lsrs r4, r1, #32
@@ -7858,7 +7868,7 @@ function_16:
     4ba4:    4803       ldr r0, [pc, #12]    ; (0x4bb4)
     4ba6:    7081       strb r1, [r0, #2]
     4ba8:    bd00       pop {r15}
-    4baa:    0000       movs r0, r0
+    4baa:    0000       movs r0, r0                 ; nop
     4bac:    2cba       cmp r4, #186    ; 0xba
     4bae:    2000       movs r0, #0
     4bb0:    0915       lsrs r5, r2, #4
@@ -8016,7 +8026,7 @@ function_16:
     4d0c:    0058       lsls r0, r3, #1
     4d0e:    2000       movs r0, #0
     4d10:    8d44       ldrh r4, [r0, #42]    ; 0x2a
-    4d12:    0000       movs r0, r0
+    4d12:    0000       movs r0, r0                 ; nop
     4d14:    1cba       adds r2, r7, #2
     4d16:    2000       movs r0, #0
     4d18:    e92d 41f0  stmdb r13!, {r4, r5, r6, r7, r8, r14}
@@ -8088,7 +8098,7 @@ function_16:
     4dc2:    4630       mov r0, r6
     4dc4:    f7fb ff0c  bl 0xbe0
     4dc8:    e7f3       b.n 0x4db2
-    4dca:    0000       movs r0, r0
+    4dca:    0000       movs r0, r0                 ; nop
     4dcc:    0058       lsls r0, r3, #1
     4dce:    2000       movs r0, #0
     4dd0:    080c       lsrs r4, r1, #32
@@ -8171,7 +8181,7 @@ function_16:
     4e90:    f000 b818  b.w 0x4ec4
     4e94:    4770       bx r14                      ; return
 
-    4e96:    0000       movs r0, r0
+    4e96:    0000       movs r0, r0                 ; nop
     4e98:    b510       push {r4, r14}
     4e9a:    4c09       ldr r4, [pc, #36]    ; (0x4ec0)
     4e9c:    f894 0039  ldrb.w r0, [r4, #57]    ; 0x39
@@ -8237,7 +8247,7 @@ function_16:
     4f48:    1cba       adds r2, r7, #2
     4f4a:    2000       movs r0, #0
     4f4c:    8de0       ldrh r0, [r4, #46]    ; 0x2e
-    4f4e:    0000       movs r0, r0
+    4f4e:    0000       movs r0, r0                 ; nop
 
 function_4:
   0x4f50:    b510       push {r4, r14}
@@ -8263,7 +8273,7 @@ function_4:
     4f88:    0058       lsls r0, r3, #1
     4f8a:    2000       movs r0, #0
     4f8c:    8d50       ldrh r0, [r2, #42]          ; 0x2a
-    4f8e:    0000       movs r0, r0
+    4f8e:    0000       movs r0, r0                 ; nop
     4f90:    1cba       adds r2, r7, #2
     4f92:    2000       movs r0, #0
     4f94:    f7fd fb0c  bl 0x25b0                   ; call function_5
@@ -8383,11 +8393,11 @@ function_4:
     50be:    0006       movs r6, r0
     50c0:    86a0       strh r0, [r4, #52]    ; 0x34
     50c2:    0001       movs r1, r0
-    50c4:    0000       movs r0, r0
+    50c4:    0000       movs r0, r0                 ; nop
     50c6:    400b       ands r3, r1
     50c8:    4000       ands r0, r0
     50ca:    400b       ands r3, r1
-    50cc:    0000       movs r0, r0
+    50cc:    0000       movs r0, r0                 ; nop
     50ce:    2000       movs r0, #0
     50d0:    007e       lsls r6, r7, #1
     50d2:    2000       movs r0, #0
@@ -8489,7 +8499,7 @@ function_4:
     51b6:    e8bd 83f0  ldmia.w r13!, {r4, r5, r6, r7, r8, r9, r15}
     51ba:    2000       movs r0, #0
     51bc:    e7fb       b.n 0x51b6
-    51be:    0000       movs r0, r0
+    51be:    0000       movs r0, r0                 ; nop
     51c0:    0058       lsls r0, r3, #1
     51c2:    2000       movs r0, #0
     51c4:    0034       movs r4, r6
@@ -8516,7 +8526,7 @@ function_4:
     51f8:    2909       cmp r1, #9
     51fa:    d3ed       bcc.n 0x51d8
     51fc:    bdf0       pop {r4, r5, r6, r7, r15}
-    51fe:    0000       movs r0, r0
+    51fe:    0000       movs r0, r0                 ; nop
     5200:    017c       lsls r4, r7, #5
     5202:    2000       movs r0, #0
     5204:    2e2c       cmp r6, #44    ; 0x2c
@@ -8566,7 +8576,7 @@ function_4:
     5274:    2caa       cmp r4, #170    ; 0xaa
     5276:    2000       movs r0, #0
     5278:    8d44       ldrh r4, [r0, #42]    ; 0x2a
-    527a:    0000       movs r0, r0
+    527a:    0000       movs r0, r0                 ; nop
     527c:    e92d 5ff0  stmdb r13!, {r4, r5, r6, r7, r8, r9, r10, r11, r12, r14}
     5280:    2400       movs r4, #0
     5282:    4d22       ldr r5, [pc, #136]    ; (0x530c)
@@ -8612,13 +8622,13 @@ function_4:
     5300:    7b68       ldrb r0, [r5, #13]
     5302:    e8bd 5ff0  ldmia.w r13!, {r4, r5, r6, r7, r8, r9, r10, r11, r12, r14}
     5306:    f7fc b843  b.w 0x1390
-    530a:    0000       movs r0, r0
+    530a:    0000       movs r0, r0                 ; nop
     530c:    0058       lsls r0, r3, #1
     530e:    2000       movs r0, #0
     5310:    1cba       adds r2, r7, #2
     5312:    2000       movs r0, #0
     5314:    8d44       ldrh r4, [r0, #42]    ; 0x2a
-    5316:    0000       movs r0, r0
+    5316:    0000       movs r0, r0                 ; nop
     5318:    e92d 5ff0  stmdb r13!, {r4, r5, r6, r7, r8, r9, r10, r11, r12, r14}
     531c:    4c5d       ldr r4, [pc, #372]    ; (0x5494)
     531e:    4681       mov r9, r0
@@ -8763,7 +8773,7 @@ function_4:
     5494:    0058       lsls r0, r3, #1
     5496:    2000       movs r0, #0
     5498:    8de0       ldrh r0, [r4, #46]    ; 0x2e
-    549a:    0000       movs r0, r0
+    549a:    0000       movs r0, r0                 ; nop
     549c:    1cba       adds r2, r7, #2
     549e:    2000       movs r0, #0
     54a0:    091e       lsrs r6, r3, #4
@@ -8953,7 +8963,7 @@ function_4:
     5668:    091e       lsrs r6, r3, #4
     566a:    2000       movs r0, #0
     566c:    8de0       ldrh r0, [r4, #46]    ; 0x2e
-    566e:    0000       movs r0, r0
+    566e:    0000       movs r0, r0                 ; nop
     5670:    0058       lsls r0, r3, #1
     5672:    2000       movs r0, #0
     5674:    1cba       adds r2, r7, #2
@@ -8986,7 +8996,7 @@ function_4:
     56bc:    1cba       adds r2, r7, #2
     56be:    2000       movs r0, #0
     56c0:    8de0       ldrh r0, [r4, #46]    ; 0x2e
-    56c2:    0000       movs r0, r0
+    56c2:    0000       movs r0, r0                 ; nop
     56c4:    490f       ldr r1, [pc, #60]    ; (0x5704)
     56c6:    f891 0039  ldrb.w r0, [r1, #57]    ; 0x39
     56ca:    2801       cmp r0, #1
@@ -9015,7 +9025,7 @@ function_4:
     5708:    1cba       adds r2, r7, #2
     570a:    2000       movs r0, #0
     570c:    8de0       ldrh r0, [r4, #46]    ; 0x2e
-    570e:    0000       movs r0, r0
+    570e:    0000       movs r0, r0                 ; nop
     5710:    b510       push {r4, r14}
     5712:    4b09       ldr r3, [pc, #36]    ; (0x5738)
     5714:    4c07       ldr r4, [pc, #28]    ; (0x5734)
@@ -9031,7 +9041,7 @@ function_4:
     572c:    1c52       adds r2, r2, #1
     572e:    709a       strb r2, [r3, #2]
     5730:    bd10       pop {r4, r15}
-    5732:    0000       movs r0, r0
+    5732:    0000       movs r0, r0                 ; nop
     5734:    080c       lsrs r4, r1, #32
     5736:    2000       movs r0, #0
     5738:    0088       lsls r0, r1, #2
@@ -9406,7 +9416,7 @@ function_4:
     5af8:    f8cc 2024  str.w r2, [r12, #36]    ; 0x24
     5afc:    f886 2025  strb.w r2, [r6, #37]    ; 0x25
     5b00:    e7a3       b.n 0x5a4a
-    5b02:    0000       movs r0, r0
+    5b02:    0000       movs r0, r0                 ; nop
     5b04:    0058       lsls r0, r3, #1
     5b06:    2000       movs r0, #0
     5b08:    2e2c       cmp r6, #44    ; 0x2c
@@ -9464,11 +9474,11 @@ function_4:
     5b7c:    2904       cmp r1, #4
     5b7e:    d3d7       bcc.n 0x5b30
     5b80:    bd10       pop {r4, r15}
-    5b82:    0000       movs r0, r0
+    5b82:    0000       movs r0, r0                 ; nop
     5b84:    0058       lsls r0, r3, #1
     5b86:    2000       movs r0, #0
     5b88:    8b70       ldrh r0, [r6, #26]
-    5b8a:    0000       movs r0, r0
+    5b8a:    0000       movs r0, r0                 ; nop
     5b8c:    b510       push {r4, r14}
     5b8e:    eb02 02c1  add.w r2, r2, r1, lsl #3
     5b92:    4b18       ldr r3, [pc, #96]    ; (0x5bf4)
@@ -9519,7 +9529,7 @@ function_4:
     5bf4:    0058       lsls r0, r3, #1
     5bf6:    2000       movs r0, #0
     5bf8:    8b70       ldrh r0, [r6, #26]
-    5bfa:    0000       movs r0, r0
+    5bfa:    0000       movs r0, r0                 ; nop
     5bfc:    e92d 41f0  stmdb r13!, {r4, r5, r6, r7, r8, r14}
     5c00:    4d21       ldr r5, [pc, #132]    ; (0x5c88)
     5c02:    2001       movs r0, #1
@@ -9589,29 +9599,32 @@ function_4:
     5cae:    f7fe ff67  bl 0x4b80                   ; call function_16
     5cb2:    2001       movs r0, #1
     5cb4:    bd00       pop {r15}
-    5cb6:    0000       movs r0, r0
+    5cb6:    0000       movs r0, r0                 ; nop
     5cb8:    2de4       cmp r5, #228                ; 0xe4
     5cba:    2000       movs r0, #0
-    5cbc:    4a0a       ldr r2, [pc, #40]           ; (0x5ce8)
-    5cbe:    2000       movs r0, #0
-    5cc0:    21b8       movs r1, #184               ; 0xb8
+
+function_27:
+  0x5cbc:    4a0a       ldr r2, [pc, #40]           ; r2 = (0x5ce8)
+    5cbe:    2000       movs r0, #0                 ; r0 = 0
+    5cc0:    21b8       movs r1, #184               ; r1 = 0xb8
     5cc2:    7a93       ldrb r3, [r2, #10]
     5cc4:    4399       bics r1, r3
-    5cc6:    e001       b.n 0x5ccc                  ; branch 0x5ccc
+    5cc6:    e001       b.n 0x5ccc                  ; loop start
   0x5cc8:    2808       cmp r0, #8
     5cca:    d005       beq.n 0x5cd8                ; branch 0x5cd8 if r0 == 8
-  0x5ccc:    1813       adds r3, r2, r0
-    5cce:    789b       ldrb r3, [r3, #2]
+  0x5ccc:    1813       adds r3, r2, r0             ; r3 = r2 + r0
+    5cce:    789b       ldrb r3, [r3, #2]           ; r3 = [r3 + 2]
     5cd0:    2bff       cmp r3, #255                ; 0xff
     5cd2:    d003       beq.n 0x5cdc                ; branch 0x5cdc if r3 == 255
   0x5cd4:    2000       movs r0, #0                 ; r0 = 0
     5cd6:    4770       bx r14                      ; return
   0x5cd8:    2900       cmp r1, #0
     5cda:    d1fb       bne.n 0x5cd4                ; branch 0x5cd4 if r1 != 0
-  0x5cdc:    1c40       adds r0, r0, #1
+  0x5cdc:    1c40       adds r0, r0, #1             ; r0 = r0 + 1
     5cde:    b2c0       uxtb r0, r0
     5ce0:    2809       cmp r0, #9
-    5ce2:    d3f1       bcc.n 0x5cc8                ; branch 0x5cc8 if C=0
+    5ce2:    d3f1       bcc.n 0x5cc8                ; loop if r0 == 9
+
     5ce4:    2001       movs r0, #1                 ; r0 = 1
     5ce6:    4770       bx r14                      ; return
 
@@ -9644,7 +9657,7 @@ function_4:
     5d24:    d3ec       bcc.n 0x5d00
     5d26:    2001       movs r0, #1
     5d28:    bd10       pop {r4, r15}
-    5d2a:    0000       movs r0, r0
+    5d2a:    0000       movs r0, r0                 ; nop
     5d2c:    2de4       cmp r5, #228    ; 0xe4
     5d2e:    2000       movs r0, #0
     5d30:    0058       lsls r0, r3, #1
@@ -9691,7 +9704,7 @@ function_11:
     5d8a:    e8bd 47f0  ldmia.w r13!, {r4, r5, r6, r7, r8, r9, r10, r14}
     5d8e:    f7fe bbd9  b.w 0x4544                  ; branch to function_12
 
-    5d92:    0000       movs r0, r0
+    5d92:    0000       movs r0, r0                 ; nop
     5d94:    0cba       lsrs r2, r7, #18
     5d96:    2000       movs r0, #0
     5d98:    0105       lsls r5, r0, #4
@@ -9742,7 +9755,7 @@ function_11:
     5df4:    9508       str r5, [sp, #32]
     5df6:    9140       str r1, [sp, #256]    ; 0x100
     5df8:    c002       stmia r0!, {r1}
-    5dfa:    0000       movs r0, r0
+    5dfa:    0000       movs r0, r0                 ; nop
     5dfc:    0105       lsls r5, r0, #4
     5dfe:    8009       strh r1, [r1, #0]
     5e00:    01a1       lsls r1, r4, #6
@@ -9842,17 +9855,17 @@ function_11:
     5ebc:    2900       cmp r1, #0
     5ebe:    81e7       strh r7, [r4, #14]
     5ec0:    c000       stmia r0!, {}
-    5ec2:    0000       movs r0, r0
+    5ec2:    0000       movs r0, r0                 ; nop
     5ec4:    0112       lsls r2, r2, #4
     5ec6:    0110       lsls r0, r2, #4
-    5ec8:    0000       movs r0, r0
+    5ec8:    0000       movs r0, r0                 ; nop
     5eca:    4000       ands r0, r0
     5ecc:    04d9       lsls r1, r3, #19
     5ece:    0141       lsls r1, r0, #5
     5ed0:    0117       lsls r7, r2, #4
     5ed2:    0200       lsls r0, r0, #8
     5ed4:    0100       lsls r0, r0, #4
-    5ed6:    0000       movs r0, r0
+    5ed6:    0000       movs r0, r0                 ; nop
     5ed8:    0209       lsls r1, r1, #8
     5eda:    005b       lsls r3, r3, #1
     5edc:    0103       lsls r3, r0, #4
@@ -9873,7 +9886,7 @@ function_11:
     5efa:    0409       lsls r1, r1, #16
     5efc:    0001       movs r1, r0
     5efe:    0302       lsls r2, r0, #12
-    5f00:    0000       movs r0, r0
+    5f00:    0000       movs r0, r0                 ; nop
     5f02:    0900       lsrs r0, r0, #4
     5f04:    1121       asrs r1, r4, #4
     5f06:    0001       movs r1, r0
@@ -9889,7 +9902,7 @@ function_11:
     5f1a:    0409       lsls r1, r1, #16
     5f1c:    0002       movs r2, r0
     5f1e:    0301       lsls r1, r0, #12
-    5f20:    0000       movs r0, r0
+    5f20:    0000       movs r0, r0                 ; nop
     5f22:    0900       lsrs r0, r0, #4
     5f24:    1121       asrs r1, r4, #4
     5f26:    0001       movs r1, r0
@@ -9914,36 +9927,36 @@ function_11:
     5f4c:    0061       lsls r1, r4, #1
     5f4e:    0072       lsls r2, r6, #1
     5f50:    0064       lsls r4, r4, #1
-    5f52:    0000       movs r0, r0
+    5f52:    0000       movs r0, r0                 ; nop
     5f54:    7179       strb r1, [r7, #5]
-    5f56:    0000       movs r0, r0
+    5f56:    0000       movs r0, r0                 ; nop
     5f58:    71b9       strb r1, [r7, #6]
-    5f5a:    0000       movs r0, r0
+    5f5a:    0000       movs r0, r0                 ; nop
     5f5c:    7159       strb r1, [r3, #5]
-    5f5e:    0000       movs r0, r0
+    5f5e:    0000       movs r0, r0                 ; nop
     5f60:    729d       strb r5, [r3, #10]
-    5f62:    0000       movs r0, r0
+    5f62:    0000       movs r0, r0                 ; nop
     5f64:    3069       adds r0, #105    ; 0x69
-    5f66:    0000       movs r0, r0
+    5f66:    0000       movs r0, r0                 ; nop
     5f68:    7155       strb r5, [r2, #5]
-    5f6a:    0000       movs r0, r0
+    5f6a:    0000       movs r0, r0                 ; nop
     5f6c:    5971       ldr r1, [r6, r5]
-    5f6e:    0000       movs r0, r0
+    5f6e:    0000       movs r0, r0                 ; nop
     5f70:    473e       bx r7
     5f72:    4445       add r5, r8
     5f74:    4f52       ldr r7, [pc, #328]    ; (0x60c0)
     5f76:    5051       str r1, [r2, r1]
-    5f78:    0000       movs r0, r0
-    5f7a:    0000       movs r0, r0
-    5f7c:    0000       movs r0, r0
+    5f78:    0000       movs r0, r0                 ; nop
+    5f7a:    0000       movs r0, r0                 ; nop
+    5f7c:    0000       movs r0, r0                 ; nop
     5f7e:    0100       lsls r0, r0, #4
     5f80:    0302       lsls r2, r0, #12
     5f82:    0504       lsls r4, r0, #20
     5f84:    0706       lsls r6, r0, #28
     5f86:    0007       movs r7, r0
-    5f88:    0000       movs r0, r0
-    5f8a:    0000       movs r0, r0
-    5f8c:    0000       movs r0, r0
+    5f88:    0000       movs r0, r0                 ; nop
+    5f8a:    0000       movs r0, r0                 ; nop
+    5f8c:    0000       movs r0, r0                 ; nop
     5f8e:    0404       lsls r4, r0, #16
     5f90:    0404       lsls r4, r0, #16
     5f92:    0405       lsls r5, r0, #16

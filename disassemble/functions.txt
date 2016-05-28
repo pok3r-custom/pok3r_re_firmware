@@ -31,3 +31,5 @@ function_23 @ 0x988
 function_24 @ 0x93c
 function_25 @ 0x95c
 function_26 @ 0x206c
+
+function_27 @ 0x5cbc
