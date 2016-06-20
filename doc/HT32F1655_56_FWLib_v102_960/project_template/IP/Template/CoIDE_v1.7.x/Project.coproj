@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Project version="2G - 1.7.7" name="HT32">
+  <Target name="HT32" isCurrent="1">
+    <Device manufacturerId="5" manufacturerName="Holtek" chipId="100" chipName="HT32F1765" boardId="" boardName=""/>
+    <BuildOption>
+      <Compile>
+        <Option name="OptimizationLevel" value="2"/>
+        <Option name="UseFPU" value="0"/>
+        <Option name="UserEditCompiler" value=""/>
+        <Option name="SupportCPlusplus" value="0"/>
+        <Includepaths>
+          <Includepath path="."/>
+          <Includepath path=".."/>
+          <Includepath path="../../../../library/cmsis/include"/>
+          <Includepath path="../../../../library/device/holtek/ht32f1655_56/include"/>
+          <Includepath path="../../../../library/ht32_usbd_library/inc"/>
+          <Includepath path="../../../../library/ht32f1655_56_driver/inc"/>
+          <Includepath path="../../../../utilities"/>
+        </Includepaths>
+        <DefinedSymbols>
+          <Define name="USE_HT32F1656_DVB"/>
+          <Define name="USE_HT32_DRIVER"/>
+        </DefinedSymbols>
+      </Compile>
+      <Link useDefault="0">
+        <Option name="DiscardUnusedSection" value="0"/>
+        <Option name="UserEditLinkder" value=""/>
+        <Option name="UseMemoryLayout" value="1"/>
+        <Option name="nostartfiles" value="1"/>
+        <Option name="DiscardUnusedSections" value="1"/>
+        <Option name="Library" value="Not use C Library"/>
+        <LinkedLibraries/>
+        <MemoryAreas debugInFlashNotRAM="1">
+          <Memory name="IROM1" type="ReadOnly" size="0x0003FC00" startValue="0x00000000"/>
+          <Memory name="IRAM1" type="ReadWrite" size="0x00008000" startValue="0x20000000"/>
+          <Memory name="IROM2" type="ReadOnly" size="" startValue=""/>
+          <Memory name="IRAM2" type="ReadWrite" size="" startValue=""/>
+        </MemoryAreas>
+        <LocateLinkFile path="c:/coocox/coide/configuration/programdata/ht32/arm-gcc-link.ld" type="0"/>
+      </Link>
+      <Output>
+        <Option name="OutputFileType" value="0"/>
+        <Option name="Path" value="./"/>
+        <Option name="Name" value="HT32"/>
+        <Option name="HEX" value="1"/>
+        <Option name="BIN" value="1"/>
+      </Output>
+      <User>
+        <UserRun name="Run#1" type="Before" checked="0" value=""/>
+        <UserRun name="Run#1" type="After" checked="0" value=""/>
+      </User>
+    </BuildOption>
+    <DebugOption>
+      <Option name="org.coocox.codebugger.gdbjtag.core.adapter" value="e-Link32"/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.debugMode" value="SWD"/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.clockDiv" value="1M"/>
+      <Option name="org.coocox.codebugger.gdbjtag.corerunToMain" value="1"/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.jlinkgdbserver" value=""/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.userDefineGDBScript" value=""/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.targetEndianess" value="0"/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.jlinkResetMode" value="Type 0: Normal"/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.resetMode" value="SYSRESETREQ"/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.ifSemihost" value="0"/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.ifCacheRom" value="1"/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.ipAddress" value="127.0.0.1"/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.portNumber" value="2009"/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.autoDownload" value="1"/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.verify" value="1"/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.downloadFuction" value="Erase Effected"/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.defaultAlgorithm" value="C:/CooCox/CoIDE/flash/HT32F_127.elf"/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.jflashtool" value=""/>
+      <Option name="org.coocox.codebugger.gdbjtag.coredebugInRam" value="0"/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.jflashscript" value=""/>
+    </DebugOption>
+    <ExcludeFile/>
+  </Target>
+  <Components path="./"/>
+  <Files>
+    <File name="CMSIS" path="" type="2"/>
+      <File name="CMSIS/system_ht32f165x.c" path="../system_ht32f165x.c" type="1"/>
+
+    <File name="CoIDE" path="" type="2"/>
+      <File name="CoIDE/startup_ht32f165x.c" path="startup_ht32f165x.c" type="1"/>
+
+    <File name="Config" path="" type="2"/>
+      <File name="Config/ht32f165x_usbdconf.h" path="../ht32f165x_usbdconf.h" type="1"/>
+      <File name="Config/ht32f1655_56_conf.h" path="../ht32f1655_56_conf.h" type="1"/>
+
+    <File name="Debug" path="" type="2"/>
+      <File name="Debug/HT32.map" path="HT32/Debug/bin/HT32.map" type="1"/>
+
+    <File name="Doc" path="" type="2"/>
+      <File name="Doc/readme.txt" path="../readme.txt" type="1"/>
+
+    <File name="Library" path="" type="2"/>
+      <File name="Library/ht32_cm3_misc.c" path="../../../../library/HT32F1655_56_Driver/src/ht32_cm3_misc.c" type="1"/>
+      <File name="Library/ht32f1655_56_adc.c" path="../../../../library/HT32F1655_56_Driver/src/ht32f1655_56_adc.c" type="1"/>
+      <File name="Library/ht32f1655_56_bftm.c" path="../../../../library/HT32F1655_56_Driver/src/ht32f1655_56_bftm.c" type="1"/>
+      <File name="Library/ht32f1655_56_ckcu.c" path="../../../../library/HT32F1655_56_Driver/src/ht32f1655_56_ckcu.c" type="1"/>
+      <File name="Library/ht32f1655_56_cmp_op.c" path="../../../../library/HT32F1655_56_Driver/src/ht32f1655_56_cmp_op.c" type="1"/>
+      <File name="Library/ht32f1655_56_crc.c" path="../../../../library/HT32F1655_56_Driver/src/ht32f1655_56_crc.c" type="1"/>
+      <File name="Library/ht32f1655_56_ebi.c" path="../../../../library/HT32F1655_56_Driver/src/ht32f1655_56_ebi.c" type="1"/>
+      <File name="Library/ht32f1655_56_exti.c" path="../../../../library/HT32F1655_56_Driver/src/ht32f1655_56_exti.c" type="1"/>
+      <File name="Library/ht32f1655_56_flash.c" path="../../../../library/HT32F1655_56_Driver/src/ht32f1655_56_flash.c" type="1"/>
+      <File name="Library/ht32f1655_56_gpio.c" path="../../../../library/HT32F1655_56_Driver/src/ht32f1655_56_gpio.c" type="1"/>
+      <File name="Library/ht32f1655_56_gptm.c" path="../../../../library/HT32F1655_56_Driver/src/ht32f1655_56_gptm.c" type="1"/>
+      <File name="Library/ht32f1655_56_i2c.c" path="../../../../library/HT32F1655_56_Driver/src/ht32f1655_56_i2c.c" type="1"/>
+      <File name="Library/ht32f1655_56_i2s.c" path="../../../../library/HT32F1655_56_Driver/src/ht32f1655_56_i2s.c" type="1"/>
+      <File name="Library/ht32f1655_56_mctm.c" path="../../../../library/HT32F1655_56_Driver/src/ht32f1655_56_mctm.c" type="1"/>
+      <File name="Library/ht32f1655_56_pdma.c" path="../../../../library/HT32F1655_56_Driver/src/ht32f1655_56_pdma.c" type="1"/>
+      <File name="Library/ht32f1655_56_pwrcu.c" path="../../../../library/HT32F1655_56_Driver/src/ht32f1655_56_pwrcu.c" type="1"/>
+      <File name="Library/ht32f1655_56_rstcu.c" path="../../../../library/HT32F1655_56_Driver/src/ht32f1655_56_rstcu.c" type="1"/>
+      <File name="Library/ht32f1655_56_rtc.c" path="../../../../library/HT32F1655_56_Driver/src/ht32f1655_56_rtc.c" type="1"/>
+      <File name="Library/ht32f1655_56_sci.c" path="../../../../library/HT32F1655_56_Driver/src/ht32f1655_56_sci.c" type="1"/>
+      <File name="Library/ht32f1655_56_spi.c" path="../../../../library/HT32F1655_56_Driver/src/ht32f1655_56_spi.c" type="1"/>
+      <File name="Library/ht32f1655_56_usbd.c" path="../../../../library/HT32F1655_56_Driver/src/ht32f1655_56_usbd.c" type="1"/>
+      <File name="Library/ht32f1655_56_usart.c" path="../../../../library/HT32F1655_56_Driver/src/ht32f1655_56_usart.c" type="1"/>
+      <File name="Library/ht32f1655_56_wdt.c" path="../../../../library/HT32F1655_56_Driver/src/ht32f1655_56_wdt.c" type="1"/>
+
+    <File name="Retarget" path="" type="2"/>
+      <File name="Retarget/ht32_retarget.c" path="../../../../library/HT32F1655_56_Driver/src/ht32_retarget.c" type="1"/>
+      <File name="Retarget/ht32_serial.c" path="../../../../library/HT32F1655_56_Driver/src/ht32_serial.c" type="1"/>
+      <File name="Retarget/printf.c" path="../../../../library/HT32F1655_56_Driver/src/printf.c" type="1"/>
+      <File name="Retarget/syscalls.c" path="../../../../library/HT32F1655_56_Driver/src/syscalls.c" type="1"/>
+
+    <File name="USBD_Library" path="" type="2"/>
+      <File name="USBD_Library/ht32_usbd_core.c" path="../../../../library/HT32_USBD_Library/src/ht32_usbd_core.c" type="1"/>
+
+    <File name="User" path="" type="2"/>
+      <File name="User/ht32f165x_it.c" path="../ht32f165x_it.c" type="1"/>
+      <File name="User/main.c" path="../main.c" type="1"/>
+
+    <File name="Utilities" path="" type="2"/>
+      <File name="Utilities/ebi_lcd.c" path="../../../../utilities/common/ebi_lcd.c" type="1"/>
+      <File name="Utilities/ht32_board.c" path="../../../../utilities/ht32_board.c" type="1"/>
+      <File name="Utilities/i2c_eeprom.c" path="../../../../utilities/common/i2c_eeprom.c" type="1"/>
+      <File name="Utilities/spi_flash.c" path="../../../../utilities/common/spi_flash.c" type="1"/>
+  </Files>
+</Project>

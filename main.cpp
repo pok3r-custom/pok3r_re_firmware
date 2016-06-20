@@ -150,7 +150,7 @@ int decfw(ZPath exe){
     // Decrypt firmware
     fwDecode(fw);
     // Write firmware
-    ZFile fwout("dump_" + version, ZFile::WRITE);
+    ZFile fwout("dump_" + version + ".bin", ZFile::WRITE);
     fwout.write(fw);
 
     RLOG(fw.dumpBytes(4, 8, true));

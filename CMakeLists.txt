@@ -24,6 +24,7 @@ SET(SOURCES
     pok3r.h
     pok3r.cpp
     README.md
+    disassemble/build.sh
     disassemble/fw117.txt
     disassemble/functions.txt
 )

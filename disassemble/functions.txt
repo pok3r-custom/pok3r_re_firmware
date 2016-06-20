@@ -1,35 +1,34 @@
 
 Functions:
 
-entry @ 0x2d54
-exception @ 0x2d72
-
-function_1  @ 0x4344
-function_2  @ 0x4200
-function_3  @ 0x4890
-function_4  @ 0x4f50
-function_5  @ 0x25b0
-function_6  @ 0x6d8
-function_7  @ 0xc84
+function_6  @ 0x06d8
+function_22 @ 0x091c
+function_21 @ 0x092c
+function_24 @ 0x093c
+function_20 @ 0x094c
+function_25 @ 0x095c
+function_23 @ 0x0988
+function_17 @ 0x0bdc
+function_7  @ 0x0c84
 function_8  @ 0x1a1c
-function_9  @ 0x38cc
-function_10 @ 0x2fc0
-function_11 @ 0x5d34
-function_12 @ 0x4544
+function_26 @ 0x206c
 function_13 @ 0x23c8
 function_14 @ 0x24a0
 function_15 @ 0x24f0
-function_16 @ 0x4b80
-
-function_17 @ 0xbdc
+function_5  @ 0x25b0
 function_18 @ 0x2708
-function_19 @ 0x3750
-function_20 @ 0x94c
-function_21 @ 0x92c
-function_22 @ 0x91c
-function_23 @ 0x988
-function_24 @ 0x93c
-function_25 @ 0x95c
-function_26 @ 0x206c
 
+entry       @ 0x2d54
+exception   @ 0x2d72
+
+function_10 @ 0x2fc0
+function_19 @ 0x3750
+function_9  @ 0x38cc
+function_2  @ 0x4200
+function_1  @ 0x4344
+function_12 @ 0x4544
+function_3  @ 0x4890
+function_16 @ 0x4b80
+function_4  @ 0x4f50
 function_27 @ 0x5cbc
+function_11 @ 0x5d34
