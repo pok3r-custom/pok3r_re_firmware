@@ -11,3 +11,11 @@ ARM Cortex M3
 - POK3R_V117.exe
 
 
+## PCB Notes
+
+# Header CN2
+- Pin 1: 3.3V?
+- Pin 2: SWDIO
+- Pin 3: SWCLK
+- Pin 4: nRST
+- Pin 5: GND

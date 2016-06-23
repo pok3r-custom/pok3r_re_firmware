@@ -29,6 +29,19 @@ SET(SOURCES
     disassemble/functions.txt
 )
 
+SET(FILES
+    firmware/Makefile
+    firmware/linker.ld
+    firmware/startup_ht32f165x.s
+    firmware/main.c
+    firmware/ht32_usbd_class.h
+    firmware/ht32_usbd_class.c
+    firmware/ht32_usbd_descriptor.h
+    firmware/ht32_usbd_descriptor.c
+    firmware/ht32f165x_it.c
+    firmware/ht32f165x_usbdconf.h
+)
+
 ### =================== CONFIG ==================== ###
 
 INCLUDE_DIRECTORIES(
@@ -41,6 +54,7 @@ ADD_DEFINITIONS(-DBUILDING)
 
 ### =================== BUILD =================== ###
 
+ADD_CUSTOM_TARGET(dummy SOURCES ${FILES})
 ADD_EXECUTABLE(pok3rtest ${SOURCES})
 LibChaos_Configure_Target(pok3rtest)
 TARGET_LINK_LIBRARIES(pok3rtest ${LIBUSB_1_LIBRARIES})
