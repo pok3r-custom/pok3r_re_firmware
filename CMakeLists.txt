@@ -30,6 +30,8 @@ SET(SOURCES
 )
 
 SET(FILES
+    firmware/openocd.cfg
+    firmware/ht32f1655.cfg
     firmware/Makefile
     firmware/linker.ld
     firmware/startup_ht32f165x.s
