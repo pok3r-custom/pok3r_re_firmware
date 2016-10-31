@@ -7389,18 +7389,26 @@ function_12:
     4636:    1c40       adds r0, r0, #1
     4638:    d020       beq.n 0x467c
     463a:    2046       movs r0, #70    ; 0x46
-    463c:    e8bd 9ff0  ldmia.w r13!, {r4, r5, r6, r7, r8, r9, r10, r11, r12, r15}
-    4640:    f5a4 5120  sub.w r1, r4, #10240    ; 0x2800
-    4644:    f5b1 6f80  cmp.w r1, #1024    ; 0x400
-    4648:    d308       bcc.n 0x465c
-    464a:    f5b4 4f78  cmp.w r4, #63488    ; 0xf800
-    464e:    d205       bcs.n 0x465c
-    4650:    4a10       ldr r2, [pc, #64]    ; (0x4694)
-    4652:    f5a4 4178  sub.w r1, r4, #63488    ; 0xf800
-    4656:    4291       cmp r1, r2
-    4658:    d300       bcc.n 0x465c
-    465a:    2000       movs r0, #0
-    465c:    f84b 0025  str.w r0, [r11, r5, lsl #2]
+
+function_28:
+  0x463c:    e8bd 9ff0  ldmia.w r13!, {r4, r5, r6, r7, r8, r9, r10, r11, r12, r15}
+                                                ; r0 = data byte
+                                                ; r4 = addr
+    4640:    f5a4 5120  sub.w r1, r4, #10240    ; r1 = r4 - 0x2800
+                                            ; allow read if addr < 0x2c00
+    4644:    f5b1 6f80  cmp.w r1, #1024         ; compare r1 and 0x400
+    4648:    d308       bcc.n 0x465c            ; done if r1 < 0x400
+                                            ; allow read if addr >= 0xf800
+    464a:    f5b4 4f78  cmp.w r4, #63488        ; compare r4 and 0xf800
+    464e:    d205       bcs.n 0x465c            ; done if r4 >= 0xf800
+                                            ; ?? other condition to allow read
+    4650:    4a10       ldr r2, [pc, #64]       ; load r2 from (0x4694)
+    4652:    f5a4 4178  sub.w r1, r4, #63488    ; r1 = r4 - 0xf800
+    4656:    4291       cmp r1, r2              ; compare r1 and r2
+    4658:    d300       bcc.n 0x465c            ; done if r1 < r2
+                                            ; otherwise, replace byte with 0
+    465a:    2000       movs r0, #0             ; r0 = 0
+  0x465c:    f84b 0025  str.w r0, [r11, r5, lsl #2]
     4660:    1c6d       adds r5, r5, #1
     4662:    2d10       cmp r5, #16
     4664:    d10a       bne.n 0x467c

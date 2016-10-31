@@ -158,6 +158,52 @@ int decfw(ZPath exe){
     return 0;
 }
 
+int encfw(ZPath exe, ZPath fw){
+    LOG("Updater: " << exe);
+    LOG("Decoded Firmware: " << fw);
+
+    ZBinary exebin;
+    if(!ZFile::readBinary(exe, exebin)){
+        ELOG("Failed to read file");
+        return -1;
+    }
+
+    ZFile fwfile;
+    if(!fwfile.open(fw, ZFile::READ)){
+        ELOG("Failed to open file");
+        return -1;
+    }
+    // Read firmware
+    ZBinary fwbin;
+    if(fwfile.read(fwbin, FWU_LEN) != FWU_LEN){
+        LOG("File too short");
+        return -3;
+    }
+
+    // Encode firmware
+    fwEncode(fwbin);
+
+    // Write encoded firmware onto exe
+    exebin.seek(FWU_START);
+    exebin.write(fwbin);
+
+    ZPath exeout = "patched.exe";
+    ZFile exefile;
+    if(!exefile.open(exeout, ZFile::WRITE)){
+        ELOG("Failed to open file");
+        return -3;
+    }
+    // Write updated exe
+    if(!exefile.write(exebin)){
+        LOG("Write error");
+        return -4;
+    }
+
+    LOG("Updated Updater: " << exeout);
+
+    return 0;
+}
+
 int main(int argc, char **argv){
     ZLog::logLevelStdOut(ZLog::INFO, "%time% %thread% N %log%");
     ZLog::logLevelStdErr(ZLog::ERRORS, "\x1b[31m%time% %thread% E [%file%:%line%] %log%\x1b[m");
@@ -170,10 +216,16 @@ int main(int argc, char **argv){
             return readfw();
         } else if(cmd == "decfw"){
             if(argc > 2){
-                ZPath fw = ZString(argv[2]);
-                return decfw(fw);
+                return decfw(ZString(argv[2]));
             } else {
                 LOG("Usage: pok3rtest decfw <path to updater>");
+                return 2;
+            }
+        } else if(cmd == "encfw"){
+            if(argc > 3){
+                return encfw(ZString(argv[2]), ZString(argv[3]));
+            } else {
+                LOG("Usage: pok3rtest encfw <path to updater> <path to firmware>");
                 return 2;
             }
         } else {

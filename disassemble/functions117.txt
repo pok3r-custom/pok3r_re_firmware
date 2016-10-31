@@ -32,3 +32,4 @@ function_16 @ 0x4b80
 function_4  @ 0x4f50
 function_27 @ 0x5cbc
 function_11 @ 0x5d34
+function_28 @ 0x463c (write protection)

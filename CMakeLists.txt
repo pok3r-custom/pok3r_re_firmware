@@ -25,8 +25,8 @@ SET(SOURCES
     pok3r.cpp
     README.md
     disassemble/build.sh
-    disassemble/fw117.txt
-    disassemble/functions.txt
+    disassemble/firmware117.txt
+    disassemble/functions117.txt
 )
 
 SET(FILES
@@ -56,7 +56,7 @@ ADD_DEFINITIONS(-DBUILDING)
 
 ### =================== BUILD =================== ###
 
-ADD_CUSTOM_TARGET(dummy SOURCES ${FILES})
+ADD_CUSTOM_TARGET(poker-dummy SOURCES ${FILES})
 ADD_EXECUTABLE(pok3rtest ${SOURCES})
 LibChaos_Configure_Target(pok3rtest)
 TARGET_LINK_LIBRARIES(pok3rtest ${LIBUSB_1_LIBRARIES})

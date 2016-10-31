@@ -52,7 +52,7 @@ bool Pok3r::findPok3r(){
             libusb_get_device_descriptor(devices[i], &desc);
             // Check vid and pid
             if(desc.idVendor == HOLTEK_VID && desc.idProduct == VORTEX_POK3R_PID){
-                //LOG("Matched ID " << ZString::ItoS((zu64)desc.idVendor, 16, 4) << ":" << ZString::ItoS((zu64)desc.idProduct, 16, 4));
+                LOG("Found Holtek ID " << ZString::ItoS((zu64)desc.idVendor, 16, 4) << ":" << ZString::ItoS((zu64)desc.idProduct, 16, 4));
                 device = devices[i];
                 // Reference device so it is not freed by libusb
                 libusb_ref_device(device);
@@ -94,9 +94,9 @@ bool Pok3r::open(){
     }
 
     // Claim interface
-    //claimInterface(0);
+    claimInterface(0);
     claimInterface(1);
-    //claimInterface(2);
+    claimInterface(2);
 
     return true;
 }
@@ -130,6 +130,8 @@ zu32 Pok3r::read(zu32 addr, ZBinary &bin){
     const zu16 len = 64;
     const zu32 eaddr = addr + len;
     int olen;
+
+    LOG("Read 0x" << ZString::ItoS((zu64)addr, 16));
 
     ZBinary data(len);
     data.fill(0, len);
