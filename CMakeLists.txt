@@ -25,8 +25,10 @@ SET(SOURCES
     pok3r.cpp
     README.md
     disassemble/build.sh
+    disassemble/unas.sh
     disassemble/firmware117.txt
     disassemble/functions117.txt
+    disassemble/descriptors.h
 )
 
 SET(FILES

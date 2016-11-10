@@ -19,3 +19,12 @@ ARM Cortex M3
 - Pin 3: SWCLK
 - Pin 4: nRST
 - Pin 5: GND
+
+# Boot Mode
+- BOOT_0: 0
+- BOOT_1: 0
+
+# JTAG to SWD
+- SWDCK: TCK
+- SWDIO: TMS
+- nRST

@@ -131,7 +131,7 @@ zu32 Pok3r::read(zu32 addr, ZBinary &bin){
     const zu32 eaddr = addr + len;
     int olen;
 
-    LOG("Read 0x" << ZString::ItoS((zu64)addr, 16));
+    //LOG("Read 0x" << ZString::ItoS((zu64)addr, 16));
 
     ZBinary data(len);
     data.fill(0, len);

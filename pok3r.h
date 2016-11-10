@@ -30,9 +30,9 @@ public:
     //! Close USB device.
     void close();
 
-    //! Read 64 bytes at address fron the keyboard.
+    //! Read 64 bytes at address from the keyboard, and write into bin.
     zu32 read(zu32 addr, ZBinary &bin);
-    //! Write 64 bytes at address fron the keyboard.
+    //! Write 64 bytes at address from the keyboard.
     zu32 write(zu32 addr, ZBinary bin);
 
     //! Read the firmware version from the keyboard.
