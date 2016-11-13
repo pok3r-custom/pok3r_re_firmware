@@ -18,6 +18,12 @@ reset_end           @ 0x2d80
 
 function_4          @ 0x2d94
 function_5          @ 0x2ddc
+function_9          @ 0x32cc
+exti_set_wakup      @ 0x3860
+exti_check_wakup    @ 0x3870
+function_11         @ 0x4d3c
+function_10         @ 0x4dd8
+function_12         @ 0x52a8
 
 function_3          @ 0x5eb8
 
@@ -32,7 +38,10 @@ usb_set_adrset      @ 0x70c8
 
 reset_main          @ 0x66b8
 usb_get_descriptor  @ 0x6a84
+function_6          @ 0x6ae8
 usb_entry           @ 0x6af2
+function_7          @ 0x6d06
+function_8          @ 0x6d3c
 reset_init          @ 0x70e8
 
 function_1          @ 0x833c
