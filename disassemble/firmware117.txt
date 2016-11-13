@@ -6438,6 +6438,7 @@ reset_main:
 
   0x6a80:   0x20000320
 
+usb_get_descriptor:
   0x6a84:   78c2        ldrb r2, [r0, #3]       ; r2 = [r0 + 3]
     6a86:   8881        ldrh r1, [r0, #4]       ; r1 = [r0 + 4]
     6a88:   2301        movs r3, #1             ; r3 = 1

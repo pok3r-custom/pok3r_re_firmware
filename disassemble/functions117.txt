@@ -31,6 +31,8 @@ usb_set_genrsm      @ 0x70b8
 usb_set_adrset      @ 0x70c8
 
 reset_main          @ 0x66b8
+usb_get_descriptor  @ 0x6a84
+usb_entry           @ 0x6af2
 reset_init          @ 0x70e8
 
 function_1          @ 0x833c
