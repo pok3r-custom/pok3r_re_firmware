@@ -1,35 +1,36 @@
 
 Functions:
 
-function_6  @ 0x06d8
-function_22 @ 0x091c
-function_21 @ 0x092c
-function_24 @ 0x093c
-function_20 @ 0x094c
-function_25 @ 0x095c
-function_23 @ 0x0988
-function_17 @ 0x0bdc
-function_7  @ 0x0c84
-function_8  @ 0x1a1c
-function_26 @ 0x206c
-function_13 @ 0x23c8
-function_14 @ 0x24a0
-function_15 @ 0x24f0
-function_5  @ 0x25b0
-function_18 @ 0x2708
+reset               @ 0x2d54
 
-entry       @ 0x2d54
-exception   @ 0x2d72
+nmi                 @ 0x2d60
+hard_fault          @ 0x2d62
+mcu_fault           @ 0x2d64
+bus_fault           @ 0x2d66
+usage_fault         @ 0x2d68
+svccall_intr        @ 0x2d6a
+debug_intr          @ 0x2d6c
+pendsv_intr         @ 0x2d6e
+systick_intr        @ 0x2d70
+generic_intr        @ 0x2d72
 
-function_10 @ 0x2fc0
-function_19 @ 0x3750
-function_9  @ 0x38cc
-function_2  @ 0x4200
-function_1  @ 0x4344
-function_12 @ 0x4544
-function_3  @ 0x4890
-function_16 @ 0x4b80
-function_4  @ 0x4f50
-function_27 @ 0x5cbc
-function_11 @ 0x5d34
-function_28 @ 0x463c (write protection)
+reset_end           @ 0x2d80
+
+function_4          @ 0x2d94
+function_5          @ 0x2ddc
+
+function_3          @ 0x5eb8
+
+usb_set_lpmode_pdwn @ 0x6fd0
+usb_set_dppuen      @ 0x6fe0
+
+function_2          @ 0x7064
+
+usb_copy_ep_setup   @ 0x70a8
+usb_set_genrsm      @ 0x70b8
+usb_set_adrset      @ 0x70c8
+
+reset_main          @ 0x66b8
+reset_init          @ 0x70e8
+
+function_1          @ 0x833c
