@@ -1,0 +1,142 @@
+
+Functions:
+
+reset                       @ 0x2d54
+
+nmi                         @ 0x2d60
+hard_fault                  @ 0x2d62
+mcu_fault                   @ 0x2d64
+bus_fault                   @ 0x2d66
+usage_fault                 @ 0x2d68
+svccall_intr                @ 0x2d6a
+debug_intr                  @ 0x2d6c
+pendsv_intr                 @ 0x2d6e
+systick_intr                @ 0x2d70
+generic_intr                @ 0x2d72
+
+reset_end                   @ 0x2d80
+    function_5
+
+function_4                  @ 0x2d94
+function_5                  @ 0x2ddc
+function_35                 @ 0x32a4
+function_9                  @ 0x32cc
+function_32                 @ 0x32d8
+    function_15
+    gpio_set_input_enable
+    gpio_set_pin_mode
+    function_35
+function_14                 @ 0x33e0
+function_15                 @ 0x3424
+function_19                 @ 0x3454
+function_20                 @ 0x346c
+function_21                 @ 0x3480
+flash_page_erase            @ 0x34c4
+
+flash_get_protection_status @ 0x34d8
+flash_write                 @ 0x34e4
+
+gpio_set_input_output       @ 0x351c
+gpio_set_output_current     @ 0x352c
+gpio_set_input_enable       @ 0x353c
+gpio_set_open_drain         @ 0x354c
+gpio_set_pin_mode           @ 0x355c
+gpio_set_pin                @ 0x3584
+gpio_set_reset_pin          @ 0x3588
+gptm_enable_disable         @ 0x3592
+
+function_13                 @ 0x37e0
+
+exti_set_wakup              @ 0x3860
+exti_check_wakup            @ 0x3870
+
+function_37                 @ 0x461c
+    gpio_set_open_drain
+    gpio_set_input_output
+    gpio_set_output_current
+    gpio_set_pin_mode
+
+function_11                 @ 0x4d3c
+function_29                 @ 0x4d64
+function_10                 @ 0x4dd8
+    function_11
+    function_15
+function_25                 @ 0x4fc8
+function_27                 @ 0x50f0
+function_28                 @ 0x518c
+    function_9
+    function_10
+function_12                 @ 0x52a8
+    function_29
+    function_11
+    function_28
+function_36                 @ 0x5c9c
+    gpio_set_pin_mode
+    function_35
+function_3                  @ 0x5eb8
+function_17                 @ 0x6624
+    function_6
+    watchdog_reload_timer
+    exti_check_wakup
+    function_3
+
+reset_main                  @ 0x66b8
+
+function_22                 @ 0x68d8
+usb_get_descriptor          @ 0x6a84
+function_6                  @ 0x6ae8
+usb_entry                   @ 0x6af2
+function_23                 @ 0x6ca8
+    jump_1
+
+function_7                  @ 0x6d06
+function_18                 @ 0x6d14
+usb_set_intr_reg            @ 0x6d30
+function_8                  @ 0x6d3c
+    function_19
+    function_15
+    function_20
+    function_22
+    function_23
+function_31                 @ 0x6db0
+function_30                 @ 0x6f8c
+jump_1                      @ 0x6fcc
+    function_2
+
+usb_set_lpmode_pdwn         @ 0x6fd0
+usb_set_dppuen              @ 0x6fe0
+
+function_28                 @ 0x6ff0
+    function_3
+    function_29
+    function_30
+    function_31
+function_2                  @ 0x7064
+
+usb_copy_ep_setup           @ 0x70a8
+usb_set_genrsm              @ 0x70b8
+usb_set_adrset              @ 0x70c8
+usb_intr                    @ 0x70dc
+
+watchdog_init               @ 0x70e8
+watchdog_reload_timer       @ 0x7144
+
+usb_write                   @ 0x71b8
+    flash_get_protection_status
+usb_read_allow              @ 0x723c
+
+function_24                 @ 0x7b50
+    function_25
+
+function_1                  @ 0x833c
+function_26                 @ 0x88ec
+    watchdog_reload_timer
+    function_25
+    function_27
+
+
+Data:
+
+descriptor_1                @ 0x8998
+descriptor_2                @ 0x89d8
+descriptor_3                @ 0x89fc
