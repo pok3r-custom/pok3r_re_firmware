@@ -464,15 +464,15 @@ function_5:
 
     30c8:   b570        push {r4, r5, r6, lr}
     30ca:   f7ff fe63   bl 0x2d94
-    30ce:   4848        ldr r0, [pc, #288]   ; (0x31f0)
+    30ce:   4848        ldr r0, [pc, #288]      ; r0 = (0x31f0)
     30d0:   f000 f8c8   bl 0x3264
-    30d4:   4847        ldr r0, [pc, #284]   ; (0x31f4)
+    30d4:   4847        ldr r0, [pc, #284]      ; r0 = (0x31f4)
     30d6:   2201        movs r2, #1
-    30d8:   4b47        ldr r3, [pc, #284]   ; (0x31f8)
+    30d8:   4b47        ldr r3, [pc, #284]      ; r3 = (0x31f8)
     30da:   8800        ldrh r0, [r0, #0]
     30dc:   2801        cmp r0, #1
     30de:   d90a        bls.n 0x30f6
-    30e0:   4c46        ldr r4, [pc, #280]   ; (0x31fc)
+    30e0:   4c46        ldr r4, [pc, #280]      ; r4 = (0x31fc)
     30e2:   8821        ldrh r1, [r4, #0]
     30e4:   1c49        adds r1, r1, #1
     30e6:   fbb1 f5f0   udiv r5, r1, r0
@@ -481,8 +481,8 @@ function_5:
     30f0:   0c00        lsrs r0, r0, #16
     30f2:   8020        strh r0, [r4, #0]
     30f4:   d100        bne.n 0x30f8
-    30f6:   701a        strb r2, [r3, #0]
-    30f8:   4841        ldr r0, [pc, #260]   ; (0x3200)
+  0x30f6:   701a        strb r2, [r3, #0]
+  0x30f8:   4841        ldr r0, [pc, #260]   ; (0x3200)
     30fa:   7801        ldrb r1, [r0, #0]
     30fc:   1c49        adds r1, r1, #1
     30fe:   7001        strb r1, [r0, #0]
@@ -500,173 +500,155 @@ function_5:
     3116:   6801        ldr r1, [r0, #0]
     3118:   1e49        subs r1, r1, #1
     311a:   6001        str r1, [r0, #0]
-    311c:   6841        ldr r1, [r0, #4]
+  0x311c:   6841        ldr r1, [r0, #4]
     311e:   b111        cbz r1, 0x3126
     3120:   6841        ldr r1, [r0, #4]
     3122:   1e49        subs r1, r1, #1
     3124:   6041        str r1, [r0, #4]
-    3126:   483a        ldr r0, [pc, #232]   ; (0x3210)
+  0x3126:   483a        ldr r0, [pc, #232]   ; (0x3210)
     3128:   6801        ldr r1, [r0, #0]
     312a:   2901        cmp r1, #1
     312c:   d902        bls.n 0x3134
     312e:   6801        ldr r1, [r0, #0]
     3130:   1e49        subs r1, r1, #1
     3132:   6001        str r1, [r0, #0]
-    3134:   4837        ldr r0, [pc, #220]   ; (0x3214)
+  0x3134:   4837        ldr r0, [pc, #220]   ; (0x3214)
     3136:   6801        ldr r1, [r0, #0]
     3138:   2901        cmp r1, #1
     313a:   d902        bls.n 0x3142
     313c:   6801        ldr r1, [r0, #0]
     313e:   1e49        subs r1, r1, #1
     3140:   6001        str r1, [r0, #0]
-    3142:   4835        ldr r0, [pc, #212]   ; (0x3218)
+  0x3142:   4835        ldr r0, [pc, #212]   ; (0x3218)
     3144:   6801        ldr r1, [r0, #0]
     3146:   b111        cbz r1, 0x314e
     3148:   6801        ldr r1, [r0, #0]
     314a:   1c49        adds r1, r1, #1
     314c:   6001        str r1, [r0, #0]
-    314e:   4833        ldr r0, [pc, #204]   ; (0x321c)
+  0x314e:   4833        ldr r0, [pc, #204]   ; (0x321c)
     3150:   6801        ldr r1, [r0, #0]
     3152:   b111        cbz r1, 0x315a
     3154:   6801        ldr r1, [r0, #0]
     3156:   1c49        adds r1, r1, #1
     3158:   6001        str r1, [r0, #0]
-    315a:   4831        ldr r0, [pc, #196]   ; (0x3220)
+  0x315a:   4831        ldr r0, [pc, #196]   ; (0x3220)
     315c:   6801        ldr r1, [r0, #0]
     315e:   b111        cbz r1, 0x3166
     3160:   6801        ldr r1, [r0, #0]
     3162:   1c49        adds r1, r1, #1
     3164:   6001        str r1, [r0, #0]
-    3166:   482f        ldr r0, [pc, #188]   ; (0x3224)
+  0x3166:   482f        ldr r0, [pc, #188]   ; (0x3224)
     3168:   6801        ldr r1, [r0, #0]
     316a:   b111        cbz r1, 0x3172
     316c:   6801        ldr r1, [r0, #0]
     316e:   1c49        adds r1, r1, #1
     3170:   6001        str r1, [r0, #0]
-    3172:   482d        ldr r0, [pc, #180]   ; (0x3228)
+  0x3172:   482d        ldr r0, [pc, #180]   ; (0x3228)
     3174:   6801        ldr r1, [r0, #0]
     3176:   b111        cbz r1, 0x317e
     3178:   6801        ldr r1, [r0, #0]
     317a:   1c49        adds r1, r1, #1
     317c:   6001        str r1, [r0, #0]
-    317e:   482b        ldr r0, [pc, #172]   ; (0x322c)
+  0x317e:   482b        ldr r0, [pc, #172]   ; (0x322c)
     3180:   6801        ldr r1, [r0, #0]
     3182:   b111        cbz r1, 0x318a
     3184:   6801        ldr r1, [r0, #0]
     3186:   1c49        adds r1, r1, #1
     3188:   6001        str r1, [r0, #0]
-    318a:   4829        ldr r0, [pc, #164]   ; (0x3230)
+  0x318a:   4829        ldr r0, [pc, #164]   ; (0x3230)
     318c:   6801        ldr r1, [r0, #0]
     318e:   b111        cbz r1, 0x3196
     3190:   6801        ldr r1, [r0, #0]
     3192:   1c49        adds r1, r1, #1
     3194:   6001        str r1, [r0, #0]
-    3196:   4827        ldr r0, [pc, #156]   ; (0x3234)
+  0x3196:   4827        ldr r0, [pc, #156]   ; (0x3234)
     3198:   6801        ldr r1, [r0, #0]
     319a:   b111        cbz r1, 0x31a2
     319c:   6801        ldr r1, [r0, #0]
     319e:   1c49        adds r1, r1, #1
     31a0:   6001        str r1, [r0, #0]
-    31a2:   4825        ldr r0, [pc, #148]   ; (0x3238)
+  0x31a2:   4825        ldr r0, [pc, #148]   ; (0x3238)
     31a4:   6801        ldr r1, [r0, #0]
     31a6:   b111        cbz r1, 0x31ae
     31a8:   6801        ldr r1, [r0, #0]
     31aa:   1c49        adds r1, r1, #1
     31ac:   6001        str r1, [r0, #0]
-    31ae:   4823        ldr r0, [pc, #140]   ; (0x323c)
+  0x31ae:   4823        ldr r0, [pc, #140]   ; (0x323c)
     31b0:   6801        ldr r1, [r0, #0]
     31b2:   b111        cbz r1, 0x31ba
     31b4:   6801        ldr r1, [r0, #0]
     31b6:   1c49        adds r1, r1, #1
     31b8:   6001        str r1, [r0, #0]
-    31ba:   4821        ldr r0, [pc, #132]   ; (0x3240)
+  0x31ba:   4821        ldr r0, [pc, #132]   ; (0x3240)
     31bc:   8801        ldrh r1, [r0, #0]
     31be:   b111        cbz r1, 0x31c6
     31c0:   8801        ldrh r1, [r0, #0]
     31c2:   1e49        subs r1, r1, #1
     31c4:   8001        strh r1, [r0, #0]
-    31c6:   481f        ldr r0, [pc, #124]   ; (0x3244)
+  0x31c6:   481f        ldr r0, [pc, #124]   ; (0x3244)
     31c8:   6801        ldr r1, [r0, #0]
     31ca:   b111        cbz r1, 0x31d2
     31cc:   6801        ldr r1, [r0, #0]
     31ce:   1c49        adds r1, r1, #1
     31d0:   6001        str r1, [r0, #0]
-    31d2:   481d        ldr r0, [pc, #116]   ; (0x3248)
+  0x31d2:   481d        ldr r0, [pc, #116]   ; (0x3248)
     31d4:   6801        ldr r1, [r0, #0]
     31d6:   b111        cbz r1, 0x31de
     31d8:   6801        ldr r1, [r0, #0]
     31da:   1c49        adds r1, r1, #1
     31dc:   6001        str r1, [r0, #0]
-    31de:   481b        ldr r0, [pc, #108]   ; (0x324c)
+  0x31de:   481b        ldr r0, [pc, #108]   ; (0x324c)
     31e0:   6801        ldr r1, [r0, #0]
     31e2:   2900        cmp r1, #0
     31e4:   d002        beq.n 0x31ec
     31e6:   6801        ldr r1, [r0, #0]
     31e8:   1c49        adds r1, r1, #1
     31ea:   6001        str r1, [r0, #0]
-    31ec:   bd70        pop {r4, r5, r6, pc}
-    31ee:   0000        movs r0, r0
-    31f0:   6000        str r0, [r0, #0]
-    31f2:   4007        ands r7, r0
-    31f4:   0100        lsls r0, r0, #4
-    31f6:   2000        movs r0, #0
-    31f8:   0090        lsls r0, r2, #2
-    31fa:   2000        movs r0, #0
-    31fc:   0104        lsls r4, r0, #4
-    31fe:   2000        movs r0, #0
-    3200:   006b        lsls r3, r5, #1
-    3202:   2000        movs r0, #0
-    3204:   006c        lsls r4, r5, #1
-    3206:   2000        movs r0, #0
-    3208:   006d        lsls r5, r5, #1
-    320a:   2000        movs r0, #0
-    320c:   0308        lsls r0, r1, #12
-    320e:   2000        movs r0, #0
-    3210:   00c0        lsls r0, r0, #3
-    3212:   2000        movs r0, #0
-    3214:   00c4        lsls r4, r0, #3
-    3216:   2000        movs r0, #0
-    3218:   00d8        lsls r0, r3, #3
-    321a:   2000        movs r0, #0
-    321c:   00d4        lsls r4, r2, #3
-    321e:   2000        movs r0, #0
-    3220:   00e4        lsls r4, r4, #3
-    3222:   2000        movs r0, #0
-    3224:   0108        lsls r0, r1, #4
-    3226:   2000        movs r0, #0
-    3228:   010c        lsls r4, r1, #4
-    322a:   2000        movs r0, #0
-    322c:   00dc        lsls r4, r3, #3
-    322e:   2000        movs r0, #0
-    3230:   00c8        lsls r0, r1, #3
-    3232:   2000        movs r0, #0
-    3234:   00cc        lsls r4, r1, #3
-    3236:   2000        movs r0, #0
-    3238:   00d0        lsls r0, r2, #3
-    323a:   2000        movs r0, #0
-    323c:   00b4        lsls r4, r6, #2
-    323e:   2000        movs r0, #0
-    3240:   009a        lsls r2, r3, #2
-    3242:   2000        movs r0, #0
-    3244:   00fc        lsls r4, r7, #3
-    3246:   2000        movs r0, #0
-    3248:   01d0        lsls r0, r2, #7
-    324a:   2000        movs r0, #0
-    324c:   00e0        lsls r0, r4, #3
-    324e:   2000        movs r0, #0
-    3250:   b510        push {r4, lr}
+  0x31ec:   bd70        pop {r4, r5, r6, pc}
+    31ee:   0000
+
+  0x31f0:   0x40076000  ; BFTM0 registers
+  0x31f4:   0x20000100
+  0x31f8:   0x20000090
+  0x31fc:   0x20000104
+  0x3200:   0x2000006b
+  0x3204:   0x2000006c
+  0x3208:   0x2000006d
+  0x320c:   0x20000308
+  0x3210:   0x200000c0
+  0x3214:   0x200000c4
+  0x3218:   0x200000d8
+  0x321c:   0x200000d4
+  0x3220:   0x200000e4
+  0x3224:   0x20000108
+  0x3228:   0x2000010c
+  0x322c:   0x200000dc
+  0x3230:   0x200000c8
+  0x3234:   0x200000cc
+  0x3238:   0x200000d0
+  0x323c:   0x200000b4
+  0x3240:   0x2000009a
+  0x3244:   0x200000fc
+  0x3248:   0x200001d0
+  0x324c:   0x200000e0
+
+  0x3250:   b510        push {r4, lr}
     3252:   4803        ldr r0, [pc, #12]   ; (0x3260)
     3254:   f000 f806   bl 0x3264
     3258:   e8bd 4010   ldmia.w sp!, {r4, lr}
     325c:   f002 be94   b.w 0x5f88
-    3260:   7000        strb r0, [r0, #0]
-    3262:   4007        ands r7, r0
-    3264:   6841        ldr r1, [r0, #4]
+
+  0x3260:   0x40077000
+
+function_44:
+  0x3264:   6841        ldr r1, [r0, #4]
     3266:   f021 0101   bic.w r1, r1, #1
     326a:   6041        str r1, [r0, #4]
     326c:   f3bf 8f4f   dsb sy
     3270:   4770        bx lr
-    3272:   2900        cmp r1, #0
+
+function_45:
+  0x3272:   2900        cmp r1, #0
     3274:   6801        ldr r1, [r0, #0]
     3276:   d002        beq.n 0x327e
     3278:   f041 0104   orr.w r1, r1, #4
@@ -674,40 +656,50 @@ function_5:
     327e:   f021 0104   bic.w r1, r1, #4
     3282:   6001        str r1, [r0, #0]
     3284:   4770        bx lr
-    3286:   2900        cmp r1, #0
+
+function_46:
+  0x3286:   2900        cmp r1, #0
     3288:   6801        ldr r1, [r0, #0]
     328a:   d002        beq.n 0x3292
     328c:   f041 0101   orr.w r1, r1, #1
     3290:   e001        b.n 0x3296
-    3292:   f021 0101   bic.w r1, r1, #1
-    3296:   6001        str r1, [r0, #0]
+  0x3292:   f021 0101   bic.w r1, r1, #1
+  0x3296:   6001        str r1, [r0, #0]
     3298:   4770        bx lr
-    329a:   60c1        str r1, [r0, #12]
-    329c:   4770        bx lr
-    329e:   6081        str r1, [r0, #8]
-    32a0:   4770        bx lr
-    32a2:   0000        movs r0, r0
 
-function_35:
-  0x32a4:   00c0        lsls r0, r0, #3
-    32a6:   08cb        lsrs r3, r1, #3
-    32a8:   eb00 0083   add.w r0, r0, r3, lsl #2
-    32ac:   4b06        ldr r3, [pc, #24]   ; (0x32c8)
+function_47:
+  0x329a:   60c1        str r1, [r0, #12]
+    329c:   4770        bx lr
+
+function_48:
+  0x329e:   6081        str r1, [r0, #8]
+    32a0:   4770        bx lr
+    32a2:   0000
+
+afio_pin_config:
+    ; r0 = GPIO # 0/1/2/3/4 A/B/C/D/E
+    ; r1 = Pin #
+    ; r2 = Alternate function #
+  0x32a4:   00c0        lsls r0, r0, #3             ; r0 = r0 << 3          0
+    32a6:   08cb        lsrs r3, r1, #3             ; r3 = r1 >> 3          1
+    32a8:   eb00 0083   add.w r0, r0, r3, lsl #2    ; r0 = r0 + r3 << 2     4
+    32ac:   4b06        ldr r3, [pc, #24]           ; r3 = (0x32c8)
     32ae:   b510        push {r4, lr}
-    32b0:   4418        add r0, r3
-    32b2:   0749        lsls r1, r1, #29
-    32b4:   6803        ldr r3, [r0, #0]
-    32b6:   0ec9        lsrs r1, r1, #27
-    32b8:   240f        movs r4, #15
-    32ba:   408c        lsls r4, r1
-    32bc:   43a3        bics r3, r4
-    32be:   408a        lsls r2, r1
-    32c0:   4313        orrs r3, r2
-    32c2:   6003        str r3, [r0, #0]
+    32b0:   4418        add r0, r3                  ; r0 = r0 + r3          0x40022024 GPIO A Reg 1
+    32b2:   0749        lsls r1, r1, #29            ; r1 = r1 << 0x1d
+    32b4:   6803        ldr r3, [r0, #0]            ; r3 = [r0]
+    32b6:   0ec9        lsrs r1, r1, #27            ; r1 = r1 >> 0x1b       0xc
+    32b8:   240f        movs r4, #15                ; r4 = 0xf
+    32ba:   408c        lsls r4, r1                 ; r4 = r4 << r1         0xf000
+    32bc:   43a3        bics r3, r4                 ; r3 = r3 & ~r4
+    32be:   408a        lsls r2, r1                 ; r2 = r2 << r1
+
+    32c0:   4313        orrs r3, r2                 ; r3 = r3 | r2
+    32c2:   6003        str r3, [r0, #0]            ; [r0] = r3
     32c4:   bd10        pop {r4, pc}
     32c6:   0000
 
-  0x32c8:   0x40022020
+  0x32c8:   0x40022020  ; AFIO.GPACFGLR GPIO Port A Configuration 0
 
 function_9:
   0x32cc:   eb00 0080   add.w r0, r0, r0, lsl #2    ; r0 = r0 + (r0 << 2)
@@ -753,22 +745,22 @@ function_32:
     332a:   4629        mov r1, r5
     332c:   4630        mov r0, r6
     332e:   f000 f915   bl 0x355c               ; call gpio_set_pin_mode
-    3332:   2201        movs r2, #1
-    3334:   210b        movs r1, #11
-    3336:   2000        movs r0, #0
-    3338:   f7ff ffb4   bl 0x32a4               ; call function_35
+    3332:   2201        movs r2, #1             ; r2 = 1
+    3334:   210b        movs r1, #11            ; r1 = 0xb
+    3336:   2000        movs r0, #0             ; r0 = 0
+    3338:   f7ff ffb4   bl 0x32a4               ; call afio_pin_config
     333c:   2201        movs r2, #1
     333e:   210d        movs r1, #13
     3340:   2002        movs r0, #2
-    3342:   f7ff ffaf   bl 0x32a4               ; call function_35
+    3342:   f7ff ffaf   bl 0x32a4               ; call afio_pin_config
     3346:   2201        movs r2, #1
     3348:   210e        movs r1, #14
     334a:   2002        movs r0, #2
-    334c:   f7ff ffaa   bl 0x32a4               ; call function_35
+    334c:   f7ff ffaa   bl 0x32a4               ; call afio_pin_config
     3350:   2201        movs r2, #1
     3352:   210f        movs r1, #15
     3354:   2002        movs r0, #2
-    3356:   f7ff ffa5   bl 0x32a4               ; call function_35
+    3356:   f7ff ffa5   bl 0x32a4               ; call afio_pin_config
     335a:   480b        ldr r0, [pc, #44]       ; (0x3388)
     335c:   6840        ldr r0, [r0, #4]
     335e:   0540        lsls r0, r0, #21
@@ -776,11 +768,11 @@ function_32:
     3362:   2201        movs r2, #1
     3364:   210e        movs r1, #14
     3366:   4610        mov r0, r2
-    3368:   f7ff ff9c   bl 0x32a4               ; call function_35
+    3368:   f7ff ff9c   bl 0x32a4               ; call afio_pin_config
     336c:   2201        movs r2, #1
     336e:   210f        movs r1, #15
     3370:   4610        mov r0, r2
-    3372:   f7ff ff97   bl 0x32a4               ; call function_35
+    3372:   f7ff ff97   bl 0x32a4               ; call afio_pin_config
     3376:   2100        movs r1, #0
     3378:   4620        mov r0, r4
     337a:   f000 f853   bl 0x3424               ; call function_15
@@ -874,7 +866,8 @@ function_15:
 
   0x3438:   0x40088000  ; CKCU Registers
 
-    343c:   4a04        ldr r2, [pc, #16]   ; (0x3450)
+function_49:
+  0x343c:   4a04        ldr r2, [pc, #16]   ; (0x3450)
     343e:   2901        cmp r1, #1
     3440:   6ad1        ldr r1, [r2, #44]   ; 0x2c
     3442:   d002        beq.n 0x344a
@@ -1340,8 +1333,10 @@ gptm_enable_disable:
     37be:   2001        movs r0, #1
     37c0:   bd00        pop {pc}
     37c2:   0000        movs r0, r0
+
     37c4:   021c        lsls r4, r3, #8
     37c6:   2000        movs r0, #0
+
     37c8:   4803        ldr r0, [pc, #12]   ; (0x37d8)
     37ca:   7801        ldrb r1, [r0, #0]
     37cc:   b909        cbnz r1, 0x37d2
@@ -1353,7 +1348,9 @@ gptm_enable_disable:
 
     37d8:   021c        lsls r4, r3, #8
     37da:   2000        movs r0, #0
-    37dc:   4770        bx lr
+
+function_38_nop:
+  0x37dc:   4770        bx lr
     37de:   0000
 
 function_13:
@@ -2774,12 +2771,13 @@ exti_check_wakup:
 
 function_37:
   0x461c:   e92d 41f0   stmdb sp!, {r4, r5, r6, r7, r8, lr}
-    4620:   4604        mov r4, r0
-    4622:   f7ff f8db   bl 0x37dc
-    4626:   4620        mov r0, r4
-    4628:   f000 fe6e   bl 0x5308
-    462c:   4620        mov r0, r4
-    462e:   f001 fe8f   bl 0x6350
+    4620:   4604        mov r4, r0              ; r4 = r0
+    4622:   f7ff f8db   bl 0x37dc               ; call function_38_nop
+    4626:   4620        mov r0, r4              ; r0 = r4
+    4628:   f000 fe6e   bl 0x5308               ; call jump_2
+    462c:   4620        mov r0, r4              ; r0 = r4
+    462e:   f001 fe8f   bl 0x6350               ; call
+
     4632:   f44f 7180   mov.w r1, #256          ; r2 = 0x100
     4636:   4821        ldr r0, [pc, #132]      ; r0 = (0x46bc) GPIO C
     4638:   010d        lsls r5, r1, #4         ; r5 = r1 << 4 (0x10)
@@ -3628,14 +3626,18 @@ function_10:
     4e2e:   2000        movs r0, #0
     4e30:   2000        movs r0, #0
     4e32:   400b        ands r3, r1
-    4e34:   b108        cbz r0, 0x4e3a
+
+function_39:
+  0x4e34:   b108        cbz r0, 0x4e3a
     4e36:   f000 b825   b.w 0x4e84
-    4e3a:   f000 b801   b.w 0x4e40
-    4e3e:   0000        movs r0, r0
-    4e40:   b570        push {r4, r5, r6, lr}
-    4e42:   2201        movs r2, #1
-    4e44:   4d0e        ldr r5, [pc, #56]       ; (0x4e80)
-    4e46:   0294        lsls r4, r2, #10
+    4e3a:   f000 b801   b.w 0x4e40              ;
+    4e3e:   0000
+
+function_40:
+  0x4e40:   b570        push {r4, r5, r6, lr}
+    4e42:   2201        movs r2, #1             ; r2 = 1
+    4e44:   4d0e        ldr r5, [pc, #56]       ; r5 = (0x4e80)
+    4e46:   0294        lsls r4, r2, #10        ; r4 = r2 << 10
     4e48:   4621        mov r1, r4
     4e4a:   4628        mov r0, r5
     4e4c:   f7fe fb66   bl 0x351c               ; call gpio_set_input_output
@@ -3646,23 +3648,25 @@ function_10:
     4e5a:   2205        movs r2, #5
     4e5c:   2107        movs r1, #7
     4e5e:   2001        movs r0, #1
-    4e60:   f7fe fa20   bl 0x32a4               ; call function_35
+    4e60:   f7fe fa20   bl 0x32a4               ; call afio_pin_config
     4e64:   2205        movs r2, #5
     4e66:   2108        movs r1, #8
     4e68:   2001        movs r0, #1
-    4e6a:   f7fe fa1b   bl 0x32a4               ; call function_35
+    4e6a:   f7fe fa1b   bl 0x32a4               ; call afio_pin_config
     4e6e:   2205        movs r2, #5
     4e70:   2109        movs r1, #9
     4e72:   2001        movs r0, #1
-    4e74:   f7fe fa16   bl 0x32a4               ; call function_35
+    4e74:   f7fe fa16   bl 0x32a4               ; call afio_pin_config
     4e78:   e8bd 4070   ldmia.w sp!, {r4, r5, r6, lr}
     4e7c:   f000 b924   b.w 0x50c8
-    4e80:   2000        movs r0, #0
-    4e82:   400b        ands r3, r1
-    4e84:   b570        push {r4, r5, r6, lr}
-    4e86:   f000 f88b   bl 0x4fa0
-    4e8a:   4d0f        ldr r5, [pc, #60]   ; (0x4ec8)
-    4e8c:   f44f 6480   mov.w r4, #1024   ; 0x400
+
+  0x4e80:   0x400b2000
+
+function_41:
+  0x4e84:   b570        push {r4, r5, r6, lr}
+    4e86:   f000 f88b   bl 0x4fa0               ; call function_42
+    4e8a:   4d0f        ldr r5, [pc, #60]       ; r5 = (0x4ec8)
+    4e8c:   f44f 6480   mov.w r4, #1024         ; r4 = 0x400
     4e90:   2200        movs r2, #0
     4e92:   4621        mov r1, r4
     4e94:   4628        mov r0, r5
@@ -3674,19 +3678,20 @@ function_10:
     4ea4:   2200        movs r2, #0
     4ea6:   2107        movs r1, #7
     4ea8:   2001        movs r0, #1
-    4eaa:   f7fe f9fb   bl 0x32a4               ; call function_35
+    4eaa:   f7fe f9fb   bl 0x32a4               ; call afio_pin_config
     4eae:   2200        movs r2, #0
     4eb0:   2108        movs r1, #8
     4eb2:   2001        movs r0, #1
-    4eb4:   f7fe f9f6   bl 0x32a4               ; call function_35
+    4eb4:   f7fe f9f6   bl 0x32a4               ; call afio_pin_config
     4eb8:   e8bd 4070   ldmia.w sp!, {r4, r5, r6, lr}
     4ebc:   2200        movs r2, #0
     4ebe:   2109        movs r1, #9
     4ec0:   2001        movs r0, #1
-    4ec2:   f7fe b9ef   b.w 0x32a4               ; call function_35
-    4ec6:   0000        movs r0, r0
-    4ec8:   2000        movs r0, #0
-    4eca:   400b        ands r3, r1
+    4ec2:   f7fe b9ef   b.w 0x32a4              ; call afio_pin_config
+    4ec6:   0000
+
+  0x4ec8:   0x400b2000
+
     4ecc:   e92d 43f8   stmdb sp!, {r3, r4, r5, r6, r7, r8, r9, lr}
     4ed0:   4607        mov r7, r0
     4ed2:   460c        mov r4, r1
@@ -3705,16 +3710,18 @@ function_10:
     4ef8:   2204        movs r2, #4
     4efa:   2100        movs r1, #0
     4efc:   4668        mov r0, sp
-    4efe:   f000 f883   bl 0x5008
+    4efe:   f000 f883   bl 0x5008               ; call function_43
     4f02:   4642        mov r2, r8
     4f04:   2100        movs r1, #0
     4f06:   4638        mov r0, r7
-    4f08:   f000 f87e   bl 0x5008
+    4f08:   f000 f87e   bl 0x5008               ; call function_43
     4f0c:   6275        str r5, [r6, #36]   ; 0x24
     4f0e:   e8bd 83f8   ldmia.w sp!, {r3, r4, r5, r6, r7, r8, r9, pc}
-    4f12:   0000        movs r0, r0
+    4f12:   0000
+
     4f14:   2000        movs r0, #0
     4f16:   400b        ands r3, r1
+
     4f18:   b5f8        push {r3, r4, r5, r6, r7, lr}
     4f1a:   4604        mov r4, r0
     4f1c:   f000 f924   bl 0x5168
@@ -3731,7 +3738,7 @@ function_10:
     4f3e:   2204        movs r2, #4
     4f40:   2100        movs r1, #0
     4f42:   4668        mov r0, sp
-    4f44:   f000 f860   bl 0x5008
+    4f44:   f000 f860   bl 0x5008               ; call function_43
     4f48:   6275        str r5, [r6, #36]   ; 0x24
     4f4a:   bdf8        pop {r3, r4, r5, r6, r7, pc}
     4f4c:   2000        movs r0, #0
@@ -3748,7 +3755,7 @@ function_10:
     4f6a:   2202        movs r2, #2
     4f6c:   2100        movs r1, #0
     4f6e:   4668        mov r0, sp
-    4f70:   f000 f84a   bl 0x5008
+    4f70:   f000 f84a   bl 0x5008               ; call function_43
     4f74:   6265        str r5, [r4, #36]   ; 0x24
     4f76:   bdf8        pop {r3, r4, r5, r6, r7, pc}
     4f78:   2000        movs r0, #0
@@ -3758,8 +3765,8 @@ function_10:
     4f80:   f7ff ffa4   bl 0x4ecc
     4f84:   e005        b.n 0x4f92
     4f86:   2064        movs r0, #100   ; 0x64
-    4f88:   f7fe f9a0   bl 0x32cc               ; function_9
-    4f8c:   f7ff ff24   bl 0x4dd8               ; function_10
+    4f88:   f7fe f9a0   bl 0x32cc               ; call function_9
+    4f8c:   f7ff ff24   bl 0x4dd8               ; call function_10
     4f90:   b118        cbz r0, 0x4f9a
     4f92:   1e64        subs r4, r4, #1
     4f94:   1c60        adds r0, r4, #1
@@ -3767,23 +3774,25 @@ function_10:
     4f98:   bd10        pop {r4, pc}
     4f9a:   2001        movs r0, #1
     4f9c:   bd10        pop {r4, pc}
-    4f9e:   0000        movs r0, r0
-    4fa0:   b538        push {r3, r4, r5, lr}
-    4fa2:   4c08        ldr r4, [pc, #32]   ; (0x4fc4)
-    4fa4:   20b9        movs r0, #185   ; 0xb9
+    4f9e:   0000
+
+function_42:
+  0x4fa0:   b538        push {r3, r4, r5, lr}
+    4fa2:   4c08        ldr r4, [pc, #32]       ; (0x4fc4)
+    4fa4:   20b9        movs r0, #185           ; 0xb9
     4fa6:   f88d 0000   strb.w r0, [sp]
-    4faa:   f44f 6580   mov.w r5, #1024   ; 0x400
-    4fae:   62a5        str r5, [r4, #40]   ; 0x28
+    4faa:   f44f 6580   mov.w r5, #1024         ; 0x400
+    4fae:   62a5        str r5, [r4, #40]       ; 0x28
     4fb0:   2201        movs r2, #1
     4fb2:   2100        movs r1, #0
     4fb4:   4668        mov r0, sp
-    4fb6:   f000 f827   bl 0x5008
-    4fba:   6265        str r5, [r4, #36]   ; 0x24
+    4fb6:   f000 f827   bl 0x5008               ; call function_43
+    4fba:   6265        str r5, [r4, #36]       ; 0x24
     4fbc:   200a        movs r0, #10
-    4fbe:   f7fe f985   bl 0x32cc               ; function_9
+    4fbe:   f7fe f985   bl 0x32cc               ; call function_9
     4fc2:   bd38        pop {r3, r4, r5, pc}
-    4fc4:   2000        movs r0, #0
-    4fc6:   400b        ands r3, r1
+
+  0x4fc4:   0x400b2000
 
 function_25:
   0x4fc8:   b5f8        push {r3, r4, r5, r6, r7, lr}
@@ -3802,81 +3811,83 @@ function_25:
     4fec:   2204        movs r2, #4
     4fee:   2100        movs r1, #0
     4ff0:   4668        mov r0, sp
-    4ff2:   f000 f809   bl 0x5008
+    4ff2:   f000 f809   bl 0x5008               ; call function_43
     4ff6:   4632        mov r2, r6
     4ff8:   4639        mov r1, r7
     4ffa:   2000        movs r0, #0
-    4ffc:   f000 f804   bl 0x5008
+    4ffc:   f000 f804   bl 0x5008               ; call function_43
     5000:   626c        str r4, [r5, #36]   ; 0x24
     5002:   bdf8        pop {r3, r4, r5, r6, r7, pc}
     5004:   2000        movs r0, #0
     5006:   400b        ands r3, r1
-    5008:   e92d 41f0   stmdb sp!, {r4, r5, r6, r7, r8, lr}
-    500c:   460e        mov r6, r1
-    500e:   4922        ldr r1, [pc, #136]   ; (0x5098)
-    5010:   4605        mov r5, r0
-    5012:   2400        movs r4, #0
-    5014:   6848        ldr r0, [r1, #4]
-    5016:   4617        mov r7, r2
-    5018:   2800        cmp r0, #0
+
+function_43:
+  0x5008:   e92d 41f0   stmdb sp!, {r4, r5, r6, r7, r8, lr}
+    500c:   460e        mov r6, r1              ; r6 = r1
+    500e:   4922        ldr r1, [pc, #136]      ; r1 = (0x5098)
+    5010:   4605        mov r5, r0              ; r5 = r0
+    5012:   2400        movs r4, #0             ; r4 = 0
+    5014:   6848        ldr r0, [r1, #4]        ; r0 = [r1 + 4]
+    5016:   4617        mov r7, r2              ; r7 = r2
+    5018:   2800        cmp r0, #0              ; r0 = 0
     501a:   dd02        ble.n 0x5022
-    501c:   1bc0        subs r0, r0, r7
-    501e:   6048        str r0, [r1, #4]
+    501c:   1bc0        subs r0, r0, r7         ; r0 = r0 + r7
+    501e:   6048        str r0, [r1, #4]        ; [r1 + 4] = r0
     5020:   e004        b.n 0x502c
-    5022:   f44f 607a   mov.w r0, #4000   ; 0xfa0
-    5026:   6048        str r0, [r1, #4]
+  0x5022:   f44f 607a   mov.w r0, #4000         ; r0 = 0xfa0
+    5026:   6048        str r0, [r1, #4]        ; [r1 + 4] = r0
     5028:   f002 f88c   bl 0x7144               ; call watchdog_reload_timer
-    502c:   2f08        cmp r7, #8
-    502e:   d901        bls.n 0x5034
-    5030:   2008        movs r0, #8
+  0x502c:   2f08        cmp r7, #8
+    502e:   d901        bls.n 0x5034            ; branch if r7 < 8
+    5030:   2008        movs r0, #8             ; r0 = 8
     5032:   e000        b.n 0x5036
-    5034:   4638        mov r0, r7
-    5036:   2200        movs r2, #0
-    5038:   4613        mov r3, r2
-    503a:   4918        ldr r1, [pc, #96]   ; (0x509c)
+  0x5034:   4638        mov r0, r7              ; r0 = r7
+  0x5036:   2200        movs r2, #0             ; r2 = 0
+    5038:   4613        mov r3, r2              ; r3 = r2
+    503a:   4918        ldr r1, [pc, #96]       ; r1 = (0x509c)
     503c:   e005        b.n 0x504a
-    503e:   b13d        cbz r5, 0x5050
-    5040:   f815 c002   ldrb.w ip, [r5, r2]
-    5044:   f8c1 c010   str.w ip, [r1, #16]
-    5048:   1c52        adds r2, r2, #1
-    504a:   4282        cmp r2, r0
+  0x503e:   b13d        cbz r5, 0x5050
+    5040:   f815 c002   ldrb.w ip, [r5, r2]     ; ip = [r5 + r2]
+    5044:   f8c1 c010   str.w ip, [r1, #16]     ; [r1 + 0x10] = ip
+    5048:   1c52        adds r2, r2, #1         ; r2 = r2 + 1
+  0x504a:   4282        cmp r2, r0
     504c:   d3f7        bcc.n 0x503e
     504e:   e010        b.n 0x5072
-    5050:   610b        str r3, [r1, #16]
+  0x5050:   610b        str r3, [r1, #16]       ; [r1 + 0x10] = r3
     5052:   e7f9        b.n 0x5048
-    5054:   69ca        ldr r2, [r1, #28]
-    5056:   f012 0ff0   tst.w r2, #240   ; 0xf0
+  0x5054:   69ca        ldr r2, [r1, #28]       ; r2 = [r1 + 0x1c]
+    5056:   f012 0ff0   tst.w r2, #240          ; 0xf0
     505a:   d0fb        beq.n 0x5054
-    505c:   690a        ldr r2, [r1, #16]
+    505c:   690a        ldr r2, [r1, #16]       ; r2 = [r1 + 0x10]
     505e:   b2d2        uxtb r2, r2
     5060:   b155        cbz r5, 0x5078
-    5062:   f815 c000   ldrb.w ip, [r5, r0]
-    5066:   f8c1 c010   str.w ip, [r1, #16]
-    506a:   1c40        adds r0, r0, #1
+    5062:   f815 c000   ldrb.w ip, [r5, r0]     ; ip = [r5 + r0]
+    5066:   f8c1 c010   str.w ip, [r1, #16]     ; [r1 + 0x10] = ip
+  0x506a:   1c40        adds r0, r0, #1         ; r0 = r0 + 1
     506c:   b106        cbz r6, 0x5070
-    506e:   5532        strb r2, [r6, r4]
-    5070:   1c64        adds r4, r4, #1
+    506e:   5532        strb r2, [r6, r4]       ; [r6 + r4] = r2
+  0x5070:   1c64        adds r4, r4, #1         ; r4 = r4 + 1
     5072:   42b8        cmp r0, r7
     5074:   d3ee        bcc.n 0x5054
     5076:   e00a        b.n 0x508e
-    5078:   610b        str r3, [r1, #16]
+  0x5078:   610b        str r3, [r1, #16]       ; [r1 + 0x10] = r3
     507a:   e7f6        b.n 0x506a
-    507c:   69c8        ldr r0, [r1, #28]
-    507e:   f010 0ff0   tst.w r0, #240   ; 0xf0
+  0x507c:   69c8        ldr r0, [r1, #28]       ; r0 = [r1 + 0x1c]
+    507e:   f010 0ff0   tst.w r0, #240          ; 0xf0
     5082:   d0fb        beq.n 0x507c
-    5084:   6908        ldr r0, [r1, #16]
+    5084:   6908        ldr r0, [r1, #16]       ; r0 = [r1 + 0x10]
     5086:   b2c0        uxtb r0, r0
     5088:   b106        cbz r6, 0x508c
-    508a:   5530        strb r0, [r6, r4]
-    508c:   1c64        adds r4, r4, #1
-    508e:   42bc        cmp r4, r7
+    508a:   5530        strb r0, [r6, r4]       ; [r6 + r4] = r0
+  0x508c:   1c64        adds r4, r4, #1         ; r4 = r4 + 1
+  0x508e:   42bc        cmp r4, r7
     5090:   d3f4        bcc.n 0x507c
     5092:   e8bd 81f0   ldmia.w sp!, {r4, r5, r6, r7, r8, pc}
-    5096:   0000        movs r0, r0
-    5098:   0220        lsls r0, r4, #8
-    509a:   2000        movs r0, #0
-    509c:   4000        ands r0, r0
-    509e:   4004        ands r4, r0
+    5096:   0000
+
+  0x5098:   0x20000220  ; Stack position
+  0x509c:   0x40044000  ; SPI1 registers
+
     50a0:   b570        push {r4, r5, r6, lr}
     50a2:   f240 142d   movw r4, #301   ; 0x12d
     50a6:   f7ff ff37   bl 0x4f18
@@ -3901,7 +3912,7 @@ function_25:
     50d8:   2201        movs r2, #1
     50da:   2100        movs r1, #0
     50dc:   4668        mov r0, sp
-    50de:   f7ff ff93   bl 0x5008
+    50de:   f7ff ff93   bl 0x5008               ; call function_43
     50e2:   6265        str r5, [r4, #36]   ; 0x24
     50e4:   200a        movs r0, #10
     50e6:   f7fe f8f1   bl 0x32cc               ; function_9
@@ -3969,7 +3980,7 @@ function_27:
     5178:   2201        movs r2, #1
     517a:   2100        movs r1, #0
     517c:   4668        mov r0, sp
-    517e:   f7ff ff43   bl 0x5008
+    517e:   f7ff ff43   bl 0x5008               ; call function_43
     5182:   6265        str r5, [r4, #36]   ; 0x24
     5184:   bd38        pop {r3, r4, r5, pc}
     5186:   0000        movs r0, r0
@@ -4131,9 +4142,13 @@ function_12:
     52fe:   7020        strb r0, [r4, #0]
     5300:   2001        movs r0, #1
     5302:   bd10        pop {r4, pc}
+
     5304:   0228        lsls r0, r5, #8
     5306:   2000        movs r0, #0
-    5308:   f7ff bd94   b.w 0x4e34
+
+jump_2:
+  0x5308:   f7ff bd94   b.w 0x4e34
+
     530c:   e92d 43f0   stmdb sp!, {r4, r5, r6, r7, r8, r9, lr}
     5310:   f8df c064   ldr.w ip, [pc, #100]   ; 0x5378
     5314:   2100        movs r1, #0
@@ -5108,7 +5123,7 @@ function_36:
     5cb6:   2204        movs r2, #4
     5cb8:   2109        movs r1, #9
     5cba:   2002        movs r0, #2
-    5cbc:   f7fd faf2   bl 0x32a4               ; call function_35
+    5cbc:   f7fd faf2   bl 0x32a4               ; call afio_pin_config
     5cc0:   2202        movs r2, #2
     5cc2:   0251        lsls r1, r2, #9
     5cc4:   4620        mov r0, r4
@@ -5116,7 +5131,7 @@ function_36:
     5cca:   2204        movs r2, #4
     5ccc:   210a        movs r1, #10
     5cce:   2002        movs r0, #2
-    5cd0:   f7fd fae8   bl 0x32a4               ; call function_35
+    5cd0:   f7fd fae8   bl 0x32a4               ; call afio_pin_config
     5cd4:   2202        movs r2, #2
     5cd6:   0291        lsls r1, r2, #10
     5cd8:   4620        mov r0, r4
@@ -5124,7 +5139,7 @@ function_36:
     5cde:   2204        movs r2, #4
     5ce0:   210b        movs r1, #11
     5ce2:   2002        movs r0, #2
-    5ce4:   f7fd fade   bl 0x32a4               ; call function_35
+    5ce4:   f7fd fade   bl 0x32a4               ; call afio_pin_config
     5ce8:   4c2f        ldr r4, [pc, #188]   ; (0x5da8)
     5cea:   2202        movs r2, #2
     5cec:   2180        movs r1, #128   ; 0x80
@@ -5133,7 +5148,7 @@ function_36:
     5cf4:   2204        movs r2, #4
     5cf6:   2107        movs r1, #7
     5cf8:   2000        movs r0, #0
-    5cfa:   f7fd fad3   bl 0x32a4               ; call function_35
+    5cfa:   f7fd fad3   bl 0x32a4               ; call afio_pin_config
     5cfe:   2202        movs r2, #2
     5d00:   2101        movs r1, #1
     5d02:   4620        mov r0, r4
@@ -5141,7 +5156,7 @@ function_36:
     5d08:   2100        movs r1, #0
     5d0a:   2204        movs r2, #4
     5d0c:   4608        mov r0, r1
-    5d0e:   f7fd fac9   bl 0x32a4               ; call function_35
+    5d0e:   f7fd fac9   bl 0x32a4               ; call afio_pin_config
     5d12:   2202        movs r2, #2
     5d14:   4611        mov r1, r2
     5d16:   4620        mov r0, r4
@@ -5149,7 +5164,7 @@ function_36:
     5d1c:   2204        movs r2, #4
     5d1e:   2101        movs r1, #1
     5d20:   2000        movs r0, #0
-    5d22:   f7fd fabf   bl 0x32a4               ; call function_35
+    5d22:   f7fd fabf   bl 0x32a4               ; call afio_pin_config
     5d26:   2202        movs r2, #2
     5d28:   2104        movs r1, #4
     5d2a:   4620        mov r0, r4
@@ -5157,27 +5172,27 @@ function_36:
     5d30:   2204        movs r2, #4
     5d32:   2102        movs r1, #2
     5d34:   2000        movs r0, #0
-    5d36:   f7fd fab5   bl 0x32a4               ; call function_35
+    5d36:   f7fd fab5   bl 0x32a4               ; call afio_pin_config
     5d3a:   2204        movs r2, #4
     5d3c:   2103        movs r1, #3
     5d3e:   2002        movs r0, #2
-    5d40:   f7fd fab0   bl 0x32a4               ; call function_35
+    5d40:   f7fd fab0   bl 0x32a4               ; call afio_pin_config
     5d44:   2204        movs r2, #4
     5d46:   210e        movs r1, #14
     5d48:   2000        movs r0, #0
-    5d4a:   f7fd faab   bl 0x32a4               ; call function_35
+    5d4a:   f7fd faab   bl 0x32a4               ; call afio_pin_config
     5d4e:   2204        movs r2, #4
     5d50:   2100        movs r1, #0
     5d52:   2001        movs r0, #1
-    5d54:   f7fd faa6   bl 0x32a4               ; call function_35
+    5d54:   f7fd faa6   bl 0x32a4               ; call afio_pin_config
     5d58:   2204        movs r2, #4
     5d5a:   2102        movs r1, #2
     5d5c:   2001        movs r0, #1
-    5d5e:   f7fd faa1   bl 0x32a4               ; call function_35
+    5d5e:   f7fd faa1   bl 0x32a4               ; call afio_pin_config
     5d62:   2204        movs r2, #4
     5d64:   2107        movs r1, #7
     5d66:   2002        movs r0, #2
-    5d68:   f7fd fa9c   bl 0x32a4               ; call function_35
+    5d68:   f7fd fa9c   bl 0x32a4               ; call afio_pin_config
     5d6c:   2202        movs r2, #2
     5d6e:   2140        movs r1, #64   ; 0x40
     5d70:   480e        ldr r0, [pc, #56]   ; (0x5dac)
@@ -5185,27 +5200,28 @@ function_36:
     5d76:   2204        movs r2, #4
     5d78:   2106        movs r1, #6
     5d7a:   2001        movs r0, #1
-    5d7c:   f7fd fa92   bl 0x32a4               ; call function_35
+    5d7c:   f7fd fa92   bl 0x32a4               ; call afio_pin_config
     5d80:   2204        movs r2, #4
     5d82:   210a        movs r1, #10
     5d84:   2000        movs r0, #0
-    5d86:   f7fd fa8d   bl 0x32a4               ; call function_35
+    5d86:   f7fd fa8d   bl 0x32a4               ; call afio_pin_config
     5d8a:   2204        movs r2, #4
     5d8c:   4611        mov r1, r2
     5d8e:   2002        movs r0, #2
-    5d90:   f7fd fa88   bl 0x32a4               ; call function_35
+    5d90:   f7fd fa88   bl 0x32a4               ; call afio_pin_config
     5d94:   2204        movs r2, #4
     5d96:   2106        movs r1, #6
     5d98:   e8bd 4010   ldmia.w sp!, {r4, lr}
     5d9c:   2002        movs r0, #2
-    5d9e:   f7fd ba81   b.w 0x32a4              ; jump function_35
+    5d9e:   f7fd ba81   b.w 0x32a4              ; jump afio_pin_config
     5da2:   0000
 
   0x5da4:   0x400b4000  ; GPIO C
   0x5da8:   0x400b0000  ; GPIO A
   0x5dac:   0x400b2000  ; GPIO B
 
-    5db0:   b510        push {r4, lr}
+function_50:
+  0x5db0:   b510        push {r4, lr}
     5db2:   4c3e        ldr r4, [pc, #248]   ; (0x5eac)
     5db4:   2201        movs r2, #1
     5db6:   0251        lsls r1, r2, #9
@@ -5214,7 +5230,7 @@ function_36:
     5dbe:   2200        movs r2, #0
     5dc0:   2109        movs r1, #9
     5dc2:   2002        movs r0, #2
-    5dc4:   f7fd fa6e   bl 0x32a4               ; call function_35
+    5dc4:   f7fd fa6e   bl 0x32a4               ; call afio_pin_config
     5dc8:   2201        movs r2, #1
     5dca:   0291        lsls r1, r2, #10
     5dcc:   4620        mov r0, r4
@@ -5222,7 +5238,7 @@ function_36:
     5dd2:   2200        movs r2, #0
     5dd4:   210a        movs r1, #10
     5dd6:   2002        movs r0, #2
-    5dd8:   f7fd fa64   bl 0x32a4               ; call function_35
+    5dd8:   f7fd fa64   bl 0x32a4               ; call afio_pin_config
     5ddc:   2201        movs r2, #1
     5dde:   02d1        lsls r1, r2, #11
     5de0:   4620        mov r0, r4
@@ -5230,7 +5246,7 @@ function_36:
     5de6:   2200        movs r2, #0
     5de8:   210b        movs r1, #11
     5dea:   2002        movs r0, #2
-    5dec:   f7fd fa5a   bl 0x32a4               ; call function_35
+    5dec:   f7fd fa5a   bl 0x32a4               ; call afio_pin_config
     5df0:   4c2f        ldr r4, [pc, #188]   ; (0x5eb0)
     5df2:   2201        movs r2, #1
     5df4:   2180        movs r1, #128   ; 0x80
@@ -5239,7 +5255,7 @@ function_36:
     5dfc:   2200        movs r2, #0
     5dfe:   2107        movs r1, #7
     5e00:   4610        mov r0, r2
-    5e02:   f7fd fa4f   bl 0x32a4               ; call function_35
+    5e02:   f7fd fa4f   bl 0x32a4               ; call afio_pin_config
     5e06:   2201        movs r2, #1
     5e08:   4611        mov r1, r2
     5e0a:   4620        mov r0, r4
@@ -5247,7 +5263,7 @@ function_36:
     5e10:   2200        movs r2, #0
     5e12:   4611        mov r1, r2
     5e14:   4610        mov r0, r2
-    5e16:   f7fd fa45   bl 0x32a4               ; call function_35
+    5e16:   f7fd fa45   bl 0x32a4               ; call afio_pin_config
     5e1a:   2201        movs r2, #1
     5e1c:   2102        movs r1, #2
     5e1e:   4620        mov r0, r4
@@ -5255,7 +5271,7 @@ function_36:
     5e24:   2200        movs r2, #0
     5e26:   2101        movs r1, #1
     5e28:   4610        mov r0, r2
-    5e2a:   f7fd fa3b   bl 0x32a4               ; call function_35
+    5e2a:   f7fd fa3b   bl 0x32a4               ; call afio_pin_config
     5e2e:   2201        movs r2, #1
     5e30:   2104        movs r1, #4
     5e32:   4620        mov r0, r4
@@ -5263,27 +5279,27 @@ function_36:
     5e38:   2200        movs r2, #0
     5e3a:   2102        movs r1, #2
     5e3c:   4610        mov r0, r2
-    5e3e:   f7fd fa31   bl 0x32a4               ; call function_35
+    5e3e:   f7fd fa31   bl 0x32a4               ; call afio_pin_config
     5e42:   2200        movs r2, #0
     5e44:   2103        movs r1, #3
     5e46:   2002        movs r0, #2
-    5e48:   f7fd fa2c   bl 0x32a4               ; call function_35
+    5e48:   f7fd fa2c   bl 0x32a4               ; call afio_pin_config
     5e4c:   2200        movs r2, #0
     5e4e:   210e        movs r1, #14
     5e50:   4610        mov r0, r2
-    5e52:   f7fd fa27   bl 0x32a4               ; call function_35
+    5e52:   f7fd fa27   bl 0x32a4               ; call afio_pin_config
     5e56:   2200        movs r2, #0
     5e58:   4611        mov r1, r2
     5e5a:   2001        movs r0, #1
-    5e5c:   f7fd fa22   bl 0x32a4               ; call function_35
+    5e5c:   f7fd fa22   bl 0x32a4               ; call afio_pin_config
     5e60:   2200        movs r2, #0
     5e62:   2102        movs r1, #2
     5e64:   2001        movs r0, #1
-    5e66:   f7fd fa1d   bl 0x32a4               ; call function_35
+    5e66:   f7fd fa1d   bl 0x32a4               ; call afio_pin_config
     5e6a:   2200        movs r2, #0
     5e6c:   2107        movs r1, #7
     5e6e:   2002        movs r0, #2
-    5e70:   f7fd fa18   bl 0x32a4               ; call function_35
+    5e70:   f7fd fa18   bl 0x32a4               ; call afio_pin_config
     5e74:   2201        movs r2, #1
     5e76:   2140        movs r1, #64   ; 0x40
     5e78:   480e        ldr r0, [pc, #56]   ; (0x5eb4)
@@ -5291,20 +5307,20 @@ function_36:
     5e7e:   2200        movs r2, #0
     5e80:   2106        movs r1, #6
     5e82:   2001        movs r0, #1
-    5e84:   f7fd fa0e   bl 0x32a4               ; call function_35
+    5e84:   f7fd fa0e   bl 0x32a4               ; call afio_pin_config
     5e88:   2200        movs r2, #0
     5e8a:   210a        movs r1, #10
     5e8c:   4610        mov r0, r2
-    5e8e:   f7fd fa09   bl 0x32a4               ; call function_35
+    5e8e:   f7fd fa09   bl 0x32a4               ; call afio_pin_config
     5e92:   2200        movs r2, #0
     5e94:   2104        movs r1, #4
     5e96:   2002        movs r0, #2
-    5e98:   f7fd fa04   bl 0x32a4               ; call function_35
+    5e98:   f7fd fa04   bl 0x32a4               ; call afio_pin_config
     5e9c:   2200        movs r2, #0
     5e9e:   2106        movs r1, #6
     5ea0:   e8bd 4010   ldmia.w sp!, {r4, lr}
     5ea4:   2002        movs r0, #2
-    5ea6:   f7fd b9fd   b.w 0x32a4              ; jump function_35
+    5ea6:   f7fd b9fd   b.w 0x32a4              ; jump afio_pin_config
     5eaa:   0000
 
   0x5eac:   0x400b4000  ; GPIO C
@@ -5590,7 +5606,8 @@ function_3:
     616c:   7000        strb r0, [r0, #0]
     616e:   4007        ands r7, r0
 
-    6170:   e92d 5ff0   stmdb sp!, {r4, r5, r6, r7, r8, r9, sl, fp, ip, lr}
+function_51:
+  0x6170:   e92d 5ff0   stmdb sp!, {r4, r5, r6, r7, r8, r9, sl, fp, ip, lr}
     6174:   f8df 91c4   ldr.w r9, [pc, #452]   ; 0x633c
     6178:   f899 0000   ldrb.w r0, [r9]
     617c:   bbf0        cbnz r0, 0x61fc
@@ -5697,7 +5714,7 @@ function_3:
     6280:   2102        movs r1, #2
     6282:   203c        movs r0, #60   ; 0x3c
     6284:   f7fc fe64   bl 0x2f50
-    6288:   f8df a0c0   ldr.w sl, [pc, #192]   ; 0x634c
+    6288:   f8df a0c0   ldr.w sl, [pc, #192]    ; 0x634c
     628c:   2400        movs r4, #0
     628e:   eb0a 00c4   add.w r0, sl, r4, lsl #3
     6292:   6805        ldr r5, [r0, #0]
@@ -5769,18 +5786,12 @@ function_3:
     6336:   2001        movs r0, #1
     6338:   e8bd 9ff0   ldmia.w sp!, {r4, r5, r6, r7, r8, r9, sl, fp, ip, pc}
 
-    633c:   01d8        lsls r0, r3, #7
-    633e:   2000        movs r0, #0
+  0x633c:   0x200001d8  ; Stack location
+  0x6340:   0x400b0000  ; GPIO A
+  0x6344:   0x400b2000  ; GPIO B
+  0x6348:   0x400b4000  ; GPIO C
+  0x634c:   0x8fa8
 
-    6340:   0000        movs r0, r0
-    6342:   400b        ands r3, r1
-
-    6344:   2000        movs r0, #0
-    6346:   400b        ands r3, r1
-    6348:   4000        ands r0, r0
-    634a:   400b        ands r3, r1
-    634c:   8fa8        ldrh r0, [r5, #60]   ; 0x3c
-    634e:   0000        movs r0, r0
     6350:   e92d 47f0   stmdb sp!, {r4, r5, r6, r7, r8, r9, sl, lr}
     6354:   4c2a        ldr r4, [pc, #168]   ; (0x6400)
     6356:   4e2b        ldr r6, [pc, #172]   ; (0x6404)

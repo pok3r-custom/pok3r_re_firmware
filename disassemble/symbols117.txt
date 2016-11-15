@@ -19,15 +19,22 @@ reset_end                   @ 0x2d80
 
 function_4                  @ 0x2d94
 function_5                  @ 0x2ddc
-function_35                 @ 0x32a4
+function_44                 @ 0x3264
+function_45                 @ 0x3272
+function_46                 @ 0x3286
+function_47                 @ 0x329a
+function_48                 @ 0x329e
+afio_pin_config             @ 0x32a4
 function_9                  @ 0x32cc
 function_32                 @ 0x32d8
     function_15
     gpio_set_input_enable
     gpio_set_pin_mode
-    function_35
+    afio_pin_config
+
 function_14                 @ 0x33e0
 function_15                 @ 0x3424
+function_49                 @ 0x343c
 function_19                 @ 0x3454
 function_20                 @ 0x346c
 function_21                 @ 0x3480
@@ -45,12 +52,15 @@ gpio_set_pin                @ 0x3584
 gpio_set_reset_pin          @ 0x3588
 gptm_enable_disable         @ 0x3592
 
+function_38_nop             @ 0x37dc
 function_13                 @ 0x37e0
 
 exti_set_wakup              @ 0x3860
 exti_check_wakup            @ 0x3870
 
 function_37                 @ 0x461c
+    function_38_nop
+    jump_2
     gpio_set_open_drain
     gpio_set_input_output
     gpio_set_output_current
@@ -61,7 +71,21 @@ function_29                 @ 0x4d64
 function_10                 @ 0x4dd8
     function_11
     function_15
+function_39                 @ 0x4e34
+function_40                 @ 0x4e40
+    gpio_set_input_output
+    gpio_set_pin_mode
+    afio_pin_config
+function_41                 @ 0x4e84
+    gpio_set_input_output
+    gpio_set_pin_mode
+    afio_pin_config
+function_42                 @ 0x4fa0
+    function_9
 function_25                 @ 0x4fc8
+    function_43
+function_43                 @ 0x5008
+    watchdog_reload_timer
 function_27                 @ 0x50f0
 function_28                 @ 0x518c
     function_9
@@ -70,10 +94,22 @@ function_12                 @ 0x52a8
     function_29
     function_11
     function_28
+jump_2                      @ 0x5308
+    function_39
 function_36                 @ 0x5c9c
     gpio_set_pin_mode
-    function_35
+    afio_pin_config
+function_50                 @ 0x5db0
+    gpio_set_pin_mode
+    afio_pin_config
 function_3                  @ 0x5eb8
+function_51                 @ 0x6170
+    function_15
+    gpio_set_pin_mode
+    gpio_set_input_enable
+    gpio_set_open_drain
+    gpio_set_input_output
+    gpio_set_pin_mode
 function_17                 @ 0x6624
     function_6
     watchdog_reload_timer
