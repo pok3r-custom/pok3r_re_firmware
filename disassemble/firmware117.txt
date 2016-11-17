@@ -2,91 +2,91 @@
 fw_117.bin:     file format binary
 
 vector_table:
-  0x2c00:   20003760    ; Stack Pointer
-    2c04:   00002D55    ; PC Reset      (reset)
-    2c08:   00002D61    ; NMI           (nmi)
-    2c0C:   00002D63    ; Hard Fault    (hard_fault)
-    2c10:   00002D65    ; MCU Fault     (mcu_fault)
-    2c14:   00002D67    ; Bus Fault     (bus_fault)
-    2c18:   00002D69    ; Usage Fault   (usage_fault)
-    2c1C:   00000000    ; Reserved
-    2c20:   00000000    ; Reserved
-    2c24:   00000000    ; Reserved
-    2c28:   00000000    ; Reserved
-    2c2C:   00002D6B    ; SVCCall       (svccall_intr)
-    2c30:   00002D6D    ; Debug Monitor (debug_intr)
-    2c34:   00000000    ; Reserved
-    2c38:   00002D6F    ; PendSV        (pendsv_intr)
-    2c3C:   00002D71    ; SySTick       (systick_intr)
-    2c40:   00002D73    ; CKRDY         (generic_intr)
-    2c44:   00002D73    ; LVD           (generic_intr)
-    2c48:   00002D73    ; BOD           (generic_intr)
-    2c4C:   00002D73    ; WDT           (generic_intr)
-    2c50:   00002D73    ; RTC           (generic_intr)
-    2c54:   00002D73    ; FMC           (generic_intr)
-    2c58:   00002D73    ; EVWUP         (generic_intr)
-    2c5C:   00002D73    ; LPWUP         (generic_intr)
-    2c60:   00002D73    ; EXTI0         (generic_intr)
-    2c64:   00002D73    ; EXTI1         (generic_intr)
-    2c68:   00002D73    ; EXTI2         (generic_intr)
-    2c6C:   00002D73    ; EXTI3         (generic_intr)
-    2c70:   00002D73    ; EXTI4         (generic_intr)
-    2c74:   00002D73    ; EXTI5         (generic_intr)
-    2c78:   00002D73    ; EXTI6         (generic_intr)
-    2c7C:   00002D73    ; EXTI7         (generic_intr)
-    2c80:   00002D73    ; EXTI8         (generic_intr)
-    2c84:   00002D73    ; EXTI9         (generic_intr)
-    2c84:   00002D73    ; EXTI10        (generic_intr)
-    2c8C:   00002D73    ; EXTI11        (generic_intr)
-    2c90:   00002D73    ; EXTI12        (generic_intr)
-    2c94:   00002D73    ; EXTI13        (generic_intr)
-    2c98:   00002D73    ; EXTI14        (generic_intr)
-    2c9C:   00002D73    ; EXTI15        (generic_intr)
-    2cA0:   00002D73    ; COMP          (generic_intr)
-    2cA4:   00002D73    ; ADC           (generic_intr)
-    2cA8:   00000000    ; Reserved
-    2cAC:   00002D73    ; MCTM0_BRK     (generic_intr)
-    2cB0:   00002D73    ; MCTM0_UP      (generic_intr)
-    2cB4:   00002D73    ; MCTM0_TR_UP2  (generic_intr)
-    2cB8:   00002D73    ; MCTM0_CC      (generic_intr)
-    2cBC:   00002D73    ; MCTM1_BRK     (generic_intr)
-    2cC0:   00002D73    ; MCTM1_UP      (generic_intr)
-    2cC4:   00002D73    ; MCTM1_TR_UP2  (generic_intr)
-    2cC8:   00002D73    ; MCTM1_CC      (generic_intr)
-    2cCC:   00002D73    ; GPTM0         (generic_intr)
-    2cD0:   00002D73    ; GPTM1         (generic_intr)
-    2cD4:   00000000    ; Reserved
-    2cD8:   00000000    ; Reserved
-    2cDC:   00000000    ; Reserved
-    2cE0:   00000000    ; Reserved
-    2cE4:   000030C9    ; BFTM0         (bftm0_intr)
-    2cE8:   00003251    ; BFTM1         (bftm1_intr)
-    2cEC:   00002D73    ; I2C0          (generic_intr)
-    2cF0:   0000364D    ; I2C1          (i2c1_intr)
-    2cF4:   00002D73    ; SPI0          (generic_intr)
-    2cF8:   00002D73    ; SPI1          (generic_intr)
-    2cFC:   00002D73    ; USART0        (generic_intr)
-    2d00:   00002D73    ; USART1        (generic_intr)
-    2d04:   00002D73    ; UART0         (generic_intr)
-    2d08:   00002D73    ; UART1         (generic_intr)
-    2d0C:   00002D73    ; SCI           (generic_intr)
-    2d10:   00002D73    ; I2S           (generic_intr)
-    2d14:   000070DD    ; USB           (usb_intr)
-    2d18:   00000000    ; Reserved
-    2d1C:   00002D73    ; PDMA_CH0      (generic_intr)
-    2d20:   00002D73    ; PDMA_CH1      (generic_intr)
-    2d24:   00002D73    ; PDMA_CH2      (generic_intr)
-    2d28:   00002D73    ; PDMA_CH3      (generic_intr)
-    2d2C:   00002D73    ; PDMA_CH4      (generic_intr)
-    2d30:   00002D73    ; PDMA_CH5      (generic_intr)
-    2d34:   00002D73    ; PDMA_CH6      (generic_intr)
-    2d38:   00002D73    ; PDMA_CH7      (generic_intr)
-    2d3C:   00000000    ; Reserved
-    2d40:   00000000    ; Reserved
-    2d44:   00000000    ; Reserved
-    2d48:   00000000    ; Reserved
-    2d4C:   00000000    ; Reserved
-    2d50:   00002D73    ; EBI           (generic_intr)
+  0x2c00:   0x20003760  ; Stack Pointer
+    2c04:   0x2d55      ; PC Reset      (reset)
+    2c08:   0x2d61      ; NMI           (nmi)
+    2c0c:   0x2d63      ; Hard Fault    (hard_fault)
+    2c10:   0x2d65      ; MCU Fault     (mcu_fault)
+    2c14:   0x2d67      ; Bus Fault     (bus_fault)
+    2c18:   0x2d69      ; Usage Fault   (usage_fault)
+    2c1c:   0x0000      ; Reserved
+    2c20:   0x0000      ; Reserved
+    2c24:   0x0000      ; Reserved
+    2c28:   0x0000      ; Reserved
+    2c2c:   0x2d6b      ; SVCCall       (svccall_intr)
+    2c30:   0x2d6d      ; Debug Monitor (debug_intr)
+    2c34:   0x0000      ; Reserved
+    2c38:   0x2d6f      ; PendSV        (pendsv_intr)
+    2c3c:   0x2d71      ; SySTick       (systick_intr)
+    2c40:   0x2d73      ; CKRDY         (generic_intr)
+    2c44:   0x2d73      ; LVD           (generic_intr)
+    2c48:   0x2d73      ; BOD           (generic_intr)
+    2c4c:   0x2d73      ; WDT           (generic_intr)
+    2c50:   0x2d73      ; RTC           (generic_intr)
+    2c54:   0x2d73      ; FMC           (generic_intr)
+    2c58:   0x2d73      ; EVWUP         (generic_intr)
+    2c5c:   0x2d73      ; LPWUP         (generic_intr)
+    2c60:   0x2d73      ; EXTI0         (generic_intr)
+    2c64:   0x2d73      ; EXTI1         (generic_intr)
+    2c68:   0x2d73      ; EXTI2         (generic_intr)
+    2c6c:   0x2d73      ; EXTI3         (generic_intr)
+    2c70:   0x2d73      ; EXTI4         (generic_intr)
+    2c74:   0x2d73      ; EXTI5         (generic_intr)
+    2c78:   0x2d73      ; EXTI6         (generic_intr)
+    2c7c:   0x2d73      ; EXTI7         (generic_intr)
+    2c80:   0x2d73      ; EXTI8         (generic_intr)
+    2c84:   0x2d73      ; EXTI9         (generic_intr)
+    2c84:   0x2d73      ; EXTI10        (generic_intr)
+    2c8c:   0x2d73      ; EXTI11        (generic_intr)
+    2c90:   0x2d73      ; EXTI12        (generic_intr)
+    2c94:   0x2d73      ; EXTI13        (generic_intr)
+    2c98:   0x2d73      ; EXTI14        (generic_intr)
+    2c9c:   0x2d73      ; EXTI15        (generic_intr)
+    2ca0:   0x2d73      ; COMP          (generic_intr)
+    2ca4:   0x2d73      ; ADC           (generic_intr)
+    2ca8:   0x0000      ; Reserved
+    2cac:   0x2d73      ; MCTM0_BRK     (generic_intr)
+    2cb0:   0x2d73      ; MCTM0_UP      (generic_intr)
+    2cb4:   0x2d73      ; MCTM0_TR_UP2  (generic_intr)
+    2cb8:   0x2d73      ; MCTM0_CC      (generic_intr)
+    2cbc:   0x2d73      ; MCTM1_BRK     (generic_intr)
+    2cc0:   0x2d73      ; MCTM1_UP      (generic_intr)
+    2cc4:   0x2d73      ; MCTM1_TR_UP2  (generic_intr)
+    2cc8:   0x2d73      ; MCTM1_CC      (generic_intr)
+    2ccc:   0x2d73      ; GPTM0         (generic_intr)
+    2cd0:   0x2d73      ; GPTM1         (generic_intr)
+    2cd4:   0x0000      ; Reserved
+    2cd8:   0x0000      ; Reserved
+    2cdc:   0x0000      ; Reserved
+    2ce0:   0x0000      ; Reserved
+    2ce4:   0x30c9      ; BFTM0         (bftm0_intr)
+    2ce8:   0x3251      ; BFTM1         (bftm1_intr)
+    2cec:   0x2d73      ; I2C0          (generic_intr)
+    2cf0:   0x364d      ; I2C1          (i2c1_intr)
+    2cf4:   0x2d73      ; SPI0          (generic_intr)
+    2cf8:   0x2d73      ; SPI1          (generic_intr)
+    2cfc:   0x2d73      ; USART0        (generic_intr)
+    2d00:   0x2d73      ; USART1        (generic_intr)
+    2d04:   0x2d73      ; UART0         (generic_intr)
+    2d08:   0x2d73      ; UART1         (generic_intr)
+    2d0c:   0x2d73      ; SCI           (generic_intr)
+    2d10:   0x2d73      ; I2S           (generic_intr)
+    2d14:   0x70dd      ; USB           (usb_intr)
+    2d18:   0x0000      ; Reserved
+    2d1c:   0x2d73      ; PDMA_CH0      (generic_intr)
+    2d20:   0x2d73      ; PDMA_CH1      (generic_intr)
+    2d24:   0x2d73      ; PDMA_CH2      (generic_intr)
+    2d28:   0x2d73      ; PDMA_CH3      (generic_intr)
+    2d2c:   0x2d73      ; PDMA_CH4      (generic_intr)
+    2d30:   0x2d73      ; PDMA_CH5      (generic_intr)
+    2d34:   0x2d73      ; PDMA_CH6      (generic_intr)
+    2d38:   0x2d73      ; PDMA_CH7      (generic_intr)
+    2d3c:   0x0000      ; Reserved
+    2d40:   0x0000      ; Reserved
+    2d44:   0x0000      ; Reserved
+    2d48:   0x0000      ; Reserved
+    2d4c:   0x0000      ; Reserved
+    2d50:   0x2d73      ; EBI           (generic_intr)
 
 reset:
   0x2d54:   4807        ldr r0, [pc, #28]   ; r0 = (0x2d74)
@@ -821,28 +821,31 @@ function_32:
     33de:   bd10        pop {r4, pc}
 
 function_14:
+    ; r0 = pointer
+    ; r1 =
   0x33e0:   b530        push {r4, r5, lr}
-    33e2:   6843        ldr r3, [r0, #4]
-    33e4:   2200        movs r2, #0
-    33e6:   68c4        ldr r4, [r0, #12]
-    33e8:   1c5b        adds r3, r3, #1
-    33ea:   fbb3 f5f4   udiv r5, r3, r4
-    33ee:   fb04 3315   mls r3, r4, r5, r3
-    33f2:   6804        ldr r4, [r0, #0]
+    33e2:   6843        ldr r3, [r0, #4]        ; r3 = [r0 + 4]
+    33e4:   2200        movs r2, #0             ; r2 = 0
+    33e6:   68c4        ldr r4, [r0, #12]       ; r4 = [r0 + 0xc]
+    33e8:   1c5b        adds r3, r3, #1         ; r3 = r3 + 1
+    33ea:   fbb3 f5f4   udiv r5, r3, r4         ; r5 = r4 / r4
+    33ee:   fb04 3315   mls r3, r4, r5, r3      ; r3 = r3 - (r4 * r5)
+    33f2:   6804        ldr r4, [r0, #0]        ; r4 = [r0]
     33f4:   42a3        cmp r3, r4
-    33f6:   d00a        beq.n 0x340e
-    33f8:   6842        ldr r2, [r0, #4]
-    33fa:   6883        ldr r3, [r0, #8]
-    33fc:   5499        strb r1, [r3, r2]
-    33fe:   68c1        ldr r1, [r0, #12]
-    3400:   1c52        adds r2, r2, #1
-    3402:   fbb2 f3f1   udiv r3, r2, r1
-    3406:   fb01 2113   mls r1, r1, r3, r2
-    340a:   6041        str r1, [r0, #4]
-    340c:   2201        movs r2, #1
-    340e:   4610        mov r0, r2
+    33f6:   d00a        beq.n 0x340e            ; branch if r3 == r4
+    33f8:   6842        ldr r2, [r0, #4]        ; r2 = [r0 + 4]
+    33fa:   6883        ldr r3, [r0, #8]        ; r3 = [r0 + 8[
+    33fc:   5499        strb r1, [r3, r2]       ; [r3 + r2] = r1
+    33fe:   68c1        ldr r1, [r0, #12]       ; r1 = [r0 + 0xc]
+    3400:   1c52        adds r2, r2, #1         ; r2 = r2 + 1
+    3402:   fbb2 f3f1   udiv r3, r2, r1         ; r3 = r2 + 1
+    3406:   fb01 2113   mls r1, r1, r3, r2      ; r1 = r2 - (r1 * r3)
+    340a:   6041        str r1, [r0, #4]        ; [r0 + 4] = r1
+    340c:   2201        movs r2, #1             ; r2 = 1
+    340e:   4610        mov r0, r2              ; r0 = r2
     3410:   bd30        pop {r4, r5, pc}
-    3412:   6841        ldr r1, [r0, #4]
+
+  0x3412:   6841        ldr r1, [r0, #4]
     3414:   6800        ldr r0, [r0, #0]
     3416:   4281        cmp r1, r0
     3418:   d101        bne.n 0x341e
@@ -4004,12 +4007,13 @@ function_28:
     51ac:   2001        movs r0, #1
     51ae:   bd10        pop {r4, pc}
 
+function_55:
   0x51b0:   b510        push {r4, lr}
-    51b2:   f44f 5130   mov.w r1, #11264        ; 0x2c00
+    51b2:   f44f 5130   mov.w r1, #11264        ; r1 = 0x2c00
     51b6:   2000        movs r0, #0             ; r0 = 0
-    51b8:   f000 f86c   bl 0x5294
-    51bc:   491e        ldr r1, [pc, #120]      ; (0x5238)
-    51be:   6808        ldr r0, [r1, #0]
+    51b8:   f000 f86c   bl 0x5294               ; call nvic_set_vtor
+    51bc:   491e        ldr r1, [pc, #120]      ; r1 = (0x5238) AIRCR
+    51be:   6808        ldr r0, [r1, #0]        ; r0 = [r1]
     51c0:   f64f 02ff   movw r2, #63743         ; 0xf8ff
     51c4:   ea00 0002   and.w r0, r0, r2
     51c8:   4a1c        ldr r2, [pc, #112]      ; (0x523c)
@@ -4019,88 +4023,103 @@ function_28:
     51d4:   f04f 0200   mov.w r2, #0
     51d8:   4611        mov r1, r2
     51da:   f04f 0003   mov.w r0, #3
-    51de:   f000 f82f   bl 0x5240
+    51de:   f000 f82f   bl 0x5240               ; call function_54
     51e2:   4601        mov r1, r0
-    51e4:   202b        movs r0, #43            ; 0x2b
-    51e6:   f000 f844   bl 0x5272
+    51e4:   202b        movs r0, #43            ; r0 = 0x2b
+    51e6:   f000 f844   bl 0x5272               ; call function_56
     51ea:   2200        movs r2, #0
     51ec:   4611        mov r1, r2
     51ee:   2003        movs r0, #3
-    51f0:   f000 f826   bl 0x5240
+    51f0:   f000 f826   bl 0x5240               ; call function_54
     51f4:   4601        mov r1, r0
-    51f6:   202c        movs r0, #44   ; 0x2c
-    51f8:   f000 f83b   bl 0x5272
+    51f6:   202c        movs r0, #44            ; r0 = 0x2c
+    51f8:   f000 f83b   bl 0x5272               ; call function_56
     51fc:   2200        movs r2, #0
     51fe:   2101        movs r1, #1
     5200:   2003        movs r0, #3
-    5202:   f000 f81d   bl 0x5240
+    5202:   f000 f81d   bl 0x5240               ; call function_54
     5206:   4601        mov r1, r0
-    5208:   202a        movs r0, #42   ; 0x2a
-    520a:   f000 f832   bl 0x5272
+    5208:   202a        movs r0, #42            ; r0 = 0x2a
+    520a:   f000 f832   bl 0x5272               ; call function_56
     520e:   2200        movs r2, #0
     5210:   2102        movs r1, #2
     5212:   2003        movs r0, #3
-    5214:   f000 f814   bl 0x5240
+    5214:   f000 f814   bl 0x5240               ; call function_54
     5218:   4601        mov r1, r0
-    521a:   2029        movs r0, #41   ; 0x29
-    521c:   f000 f829   bl 0x5272
+    521a:   2029        movs r0, #41            ; r0 = 0x29
+    521c:   f000 f829   bl 0x5272               ; call function_56
     5220:   2200        movs r2, #0
     5222:   2102        movs r1, #2
     5224:   2003        movs r0, #3
-    5226:   f000 f80b   bl 0x5240
+    5226:   f000 f80b   bl 0x5240               ; call function_54
     522a:   4601        mov r1, r0
     522c:   e8bd 4010   ldmia.w sp!, {r4, lr}
-    5230:   2035        movs r0, #53   ; 0x35
-    5232:   f000 b81e   b.w 0x5272
-    5236:   0000        movs r0, r0
-    5238:   ed0c e000   stc 0, cr14, [ip, #-0]
-    523c:   0000        movs r0, r0
-    523e:   05fa        lsls r2, r7, #23
-    5240:   b530        push {r4, r5, lr}
-    5242:   f000 0307   and.w r3, r0, #7
-    5246:   2504        movs r5, #4
-    5248:   f1c3 0007   rsb r0, r3, #7
+    5230:   2035        movs r0, #53            ; r0 = 0x35
+    5232:   f000 b81e   b.w 0x5272              ; jump function_56
+    5236:   0000
+
+  0x5238:   0xe000ed0c  ; NVIC AIRCR register
+  0x523c:   0x05fa0000
+
+
+function_54:
+    ; I still have no idea what this does
+    ; r0 = 3
+    ; r1 = 2
+    ; r2 = 0
+    ; return r0 = 2
+  0x5240:   b530        push {r4, r5, lr}
+    5242:   f000 0307   and.w r3, r0, #7        ; r3 = r0 & 7       3
+    5246:   2504        movs r5, #4             ; r5 = 4            4
+    5248:   f1c3 0007   rsb r0, r3, #7          ; r0 = 7 - r3       4
     524c:   2804        cmp r0, #4
-    524e:   d800        bhi.n 0x5252
-    5250:   4605        mov r5, r0
-    5252:   2400        movs r4, #0
-    5254:   1d18        adds r0, r3, #4
+    524e:   d800        bhi.n 0x5252            ; branch if r0 > 4
+    5250:   4605        mov r5, r0              ; r5 = r0           4
+  0x5252:   2400        movs r4, #0             ; r4 = 0            0
+    5254:   1d18        adds r0, r3, #4         ; r0 = r3 + 4       7
     5256:   2807        cmp r0, #7
-    5258:   d300        bcc.n 0x525c
-    525a:   1edc        subs r4, r3, #3
-    525c:   2301        movs r3, #1
-    525e:   fa03 f005   lsl.w r0, r3, r5
-    5262:   1e40        subs r0, r0, #1
-    5264:   4008        ands r0, r1
-    5266:   40a0        lsls r0, r4
-    5268:   40a3        lsls r3, r4
-    526a:   1e5b        subs r3, r3, #1
-    526c:   4013        ands r3, r2
-    526e:   4318        orrs r0, r3
+    5258:   d300        bcc.n 0x525c            ; branch if r0 < 7
+    525a:   1edc        subs r4, r3, #3         ; r4 = r3 - 3       0
+  0x525c:   2301        movs r3, #1             ; r3 = 1            1
+    525e:   fa03 f005   lsl.w r0, r3, r5        ; r0 = r3 << r5     0x10
+    5262:   1e40        subs r0, r0, #1         ; r0 = r0 - 1       0xf
+    5264:   4008        ands r0, r1             ; r0 = r0 & r1      2
+    5266:   40a0        lsls r0, r4             ; r0 = r0 << r4     2
+    5268:   40a3        lsls r3, r4             ; r3 = r3 << r4     1
+    526a:   1e5b        subs r3, r3, #1         ; r3 = r3 - 1       0
+    526c:   4013        ands r3, r2             ; r3 = r3 & r2      0
+    526e:   4318        orrs r0, r3             ; r0 = r0 | r3      2
     5270:   bd30        pop {r4, r5, pc}
-    5272:   0709        lsls r1, r1, #28
-    5274:   0e09        lsrs r1, r1, #24
-    5276:   f04f 22e0   mov.w r2, #3758153728   ; 0xe000e000
+
+function_56:
+    ; r0 = 0x35
+    ; r1 = 2
+  0x5272:   0709        lsls r1, r1, #28        ; r1 = r1 << 28
+    5274:   0e09        lsrs r1, r1, #24        ; r1 = r1 >> 24
+    5276:   f04f 22e0   mov.w r2, #3758153728   ; r2 = 0xe000e000
     527a:   2800        cmp r0, #0
-    527c:   da05        bge.n 0x528a
-    527e:   f000 000f   and.w r0, r0, #15
-    5282:   4410        add r0, r2
-    5284:   f880 1d14   strb.w r1, [r0, #3348]   ; 0xd14
+    527c:   da05        bge.n 0x528a            ; branch if r0 >= 0
+    527e:   f000 000f   and.w r0, r0, #15       ; r0 = r0 + 0xf
+    5282:   4410        add r0, r2              ; r0 = r0 + r2
+    5284:   f880 1d14   strb.w r1, [r0, #3348]  ; [r0 + 0xd14] = r1
     5288:   4770        bx lr
-    528a:   4410        add r0, r2
-    528c:   f880 1400   strb.w r1, [r0, #1024]   ; 0x400
+  0x528a:   4410        add r0, r2              ; r0 = r0 + r2
+    528c:   f880 1400   strb.w r1, [r0, #1024]  ; [r0 + 0x400] = r1
     5290:   4770        bx lr
     5292:   0000
 
-  0x5294:   4a02        ldr r2, [pc, #8]        ; r2 = 0x1fffff80 (0x52a0)
+nvic_set_vtor:
+    ; r0 =
+    ; r1 = Offset address
+  0x5294:   4a02        ldr r2, [pc, #8]        ; r2 = (0x52a0)
     5296:   4011        ands r1, r2             ; r1 = r1 & r2
     5298:   4301        orrs r1, r0             ; r1 = r1 | r0
-    529a:   4802        ldr r0, [pc, #8]        ; r0 = 0xe000ed08 (0x52a4)
+    529a:   4802        ldr r0, [pc, #8]        ; r0 = (0x52a4)
     529c:   6001        str r1, [r0, #0]        ; [r0] = r1
     529e:   4770        bx lr
 
-  0x52a0:   0x1fffff80
-  0x52a4:   0xe000ed08
+  0x52a0:   0x1fffff80  ; Address mask
+  0x52a4:   0xe000ed08  ; NVIC VTOR register
 
 function_12:
   0x52a8:   b510        push {r4, lr}
@@ -6724,17 +6743,17 @@ usb_entry:
     6ba6:   4605        mov r5, r0
     6ba8:   0580        lsls r0, r0, #22
     6baa:   d522        bpl.n 0x6bf2
-    6bac:   4620        mov r0, r4
+    6bac:   4620        mov r0, r4              ; r0 = r4
     6bae:   f000 fa7b   bl 0x70a8               ; call usb_copy_ep_setup
     6bb2:   f884 7024   strb.w r7, [r4, #36]    ; 0x24
-    6bb6:   6227        str r7, [r4, #32]
-    6bb8:   7820        ldrb r0, [r4, #0]
+    6bb6:   6227        str r7, [r4, #32]       ; [r4 + 0x20] = r7
+    6bb8:   7820        ldrb r0, [r4, #0]       ; r0 = [r4]
     6bba:   f010 0060   ands.w r0, r0, #96      ; 0x60
     6bbe:   d002        beq.n 0x6bc6
     6bc0:   2820        cmp r0, #32
     6bc2:   d108        bne.n 0x6bd6
     6bc4:   e003        b.n 0x6bce
-    6bc6:   4620        mov r0, r4
+  0x6bc6:   4620        mov r0, r4              ; r0 = r4
     6bc8:   f000 fbae   bl 0x7328
     6bcc:   e003        b.n 0x6bd6
 
@@ -7298,8 +7317,10 @@ usb_set_genrsm:
 
   0x70c4:   0x400a8000  ; USB Registers
 
-usb_set_adrset:
+usb_set_addr:
     ; Set USBCSR.ADRSET
+    ; Write r0 to USBDEVA
+    ; r0 = usb device address
   0x70c8:   4903        ldr r1, [pc, #12]       ; r1 = (0x70d8) USB Registers
     70ca:   680a        ldr r2, [r1, #0]        ; r2 = [r1]
     70cc:   f442 7280   orr.w r2, r2, #256      ; r2 = r2 | 0x100
@@ -7375,52 +7396,55 @@ watchdog_reload_timer:
   0x7154:   204f        movs r0, #79            ; 0x4f
     7156:   4770        bx lr
 
+function_53:
   0x7158:   b510        push {r4, lr}
     715a:   f7fc f991   bl 0x3480               ; call function_21
-    715e:   4604        mov r4, r0
-    7160:   4601        mov r1, r0
-    7162:   4804        ldr r0, [pc, #16]       ; (0x7174)
-    7164:   f7fc f93c   bl 0x33e0
-    7168:   0a21        lsrs r1, r4, #8
-    716a:   4802        ldr r0, [pc, #8]        ; (0x7174)
-    716c:   f7fc f938   bl 0x33e0
-    7170:   204f        movs r0, #79            ; 0x4f
+    715e:   4604        mov r4, r0              ; r4 = r0
+    7160:   4601        mov r1, r0              ; r1 = r0
+    7162:   4804        ldr r0, [pc, #16]       ; r0 = (0x7174) Stack
+    7164:   f7fc f93c   bl 0x33e0               ; call function_14
+    7168:   0a21        lsrs r1, r4, #8         ; r1 = r4 << 8
+    716a:   4802        ldr r0, [pc, #8]        ; r0 = (0x7174) Stack
+    716c:   f7fc f938   bl 0x33e0               ; call function_14
+    7170:   204f        movs r0, #79            ; r0 = 0x4f
     7172:   bd10        pop {r4, pc}
 
   0x7174:   0x20000358  ; Stack position
 
+erase_flash:
   0x7178:   e92d 41f0   stmdb sp!, {r4, r5, r6, r7, r8, lr}
-    717c:   4616        mov r6, r2
+    717c:   4616        mov r6, r2              ; r6 = r2
     717e:   280a        cmp r0, #10
-    7180:   d002        beq.n 0x7188
+    7180:   d002        beq.n 0x7188            ; branch if r0 == 0xa
     7182:   f5b1 4f78   cmp.w r1, #63488        ; 0xf800
-    7186:   d202        bcs.n 0x718e
-    7188:   2046        movs r0, #70            ; r0 = 0x46
+    7186:   d202        bcs.n 0x718e            ; branch if r1 >= 0xf800
+  0x7188:   2046        movs r0, #70            ; r0 = 0x46
   0x718a:   e8bd 81f0   ldmia.w sp!, {r4, r5, r6, r7, r8, pc}
-  0x718e:   2500        movs r5, #0
-    7190:   460c        mov r4, r1
-    7192:   271e        movs r7, #30
+
+  0x718e:   2500        movs r5, #0             ; r5 = 0
+    7190:   460c        mov r4, r1              ; r4 = r1
+    7192:   271e        movs r7, #30            ; r7 = 0x1e
     7194:   e00c        b.n 0x71b0
-    7196:   4620        mov r0, r4
+  0x7196:   4620        mov r0, r4              ; r0 = r4
     7198:   f7fc f994   bl 0x34c4               ; call flash_page_erase
-    719c:   fbb5 f0f7   udiv r0, r5, r7
-    71a0:   fb07 5010   mls r0, r7, r0, r5
+    719c:   fbb5 f0f7   udiv r0, r5, r7         ; r0 = r5 / r7
+    71a0:   fb07 5010   mls r0, r7, r0, r5      ; r0 = r5 - (r7 * r0)
     71a4:   b908        cbnz r0, 0x71aa
     71a6:   f7ff ffcd   bl 0x7144               ; call watchdog_reload_timer
-  0x71aa:   f504 6480   add.w r4, r4, #1024     ; 0x400
-    71ae:   1c6d        adds r5, r5, #1
+  0x71aa:   f504 6480   add.w r4, r4, #1024     ; r4 = r4 + 0x400
+    71ae:   1c6d        adds r5, r5, #1         ; r5 = r5 + 1
   0x71b0:   42b4        cmp r4, r6
-    71b2:   d9f0        bls.n 0x7196
+    71b2:   d9f0        bls.n 0x7196            ; branch if r4 <= r6
     71b4:   204f        movs r0, #79            ; r0 = 0x4f
     71b6:   e7e8        b.n 0x718a
 
 usb_write:
   0x71b8:   e92d 5ff0   stmdb sp!, {r4, r5, r6, r7, r8, r9, sl, fp, ip, lr}
-    71bc:   2600        movs r6, #0
+    71bc:   2600        movs r6, #0             ; r6 = 0
     71be:   4680        mov r8, r0              ; r8 = r0
-    71c0:   460c        mov r4, r1              ; r4 = r1
+    71c0:   460c        mov r4, r1              ; r4 = r1 target address
     71c2:   4691        mov r9, r2              ; r9 = r2
-    71c4:   4f30        ldr r7, [pc, #192]      ; r7 = (0x7288) Stack position
+    71c4:   4f30        ldr r7, [pc, #192]      ; r7 = (0x7288) source address on stack at 0x200007d8
     71c6:   4635        mov r5, r6              ; r5 = r6
     71c8:   f8df b0c0   ldr.w fp, [pc, #192]    ; fp = (0x728c) USB SRAM
     71cc:   46b2        mov sl, r6              ; sl = r6
@@ -7435,7 +7459,7 @@ usb_write:
     71e6:   eba9 0004   sub.w r0, r9, r4        ; r0 = r9 - r4
     71ea:   1c40        adds r0, r0, #1         ; r0 = r0 + 1
     71ec:   e003        b.n 0x71f6              ;
-    71ee:   59a1        ldr r1, [r4, r6]
+    71ee:   59a1        ldr r1, [r4, r6]        ; r1 = [r4 + r6]
     71f0:   1c49        adds r1, r1, #1         ; r1 = r1 + 4
     71f2:   d122        bne.n 0x723a            ; branch if ?
     71f4:   1d36        adds r6, r6, #4         ; r6 = r6 + 4
@@ -7444,12 +7468,12 @@ usb_write:
     71fa:   f1b8 0f01   cmp.w r8, #1
     71fe:   d007        beq.n 0x7210            ; branch if r8 == 1
     7200:   e03d        b.n 0x727e              ; branch to end?
-  0x7202:   4621        mov r1, r4              ; r1 = r4 (target address)
-    7204:   2004        movs r0, #4             ; r0 = 4 (flash cmd: word program)
-    7206:   683a        ldr r2, [r7, #0]        ; r2 = [r7] (data)
+  0x7202:   4621        mov r1, r4              ; r1 = r4       (target address)
+    7204:   2004        movs r0, #4             ; r0 = 4        (flash cmd: word program)
+    7206:   683a        ldr r2, [r7, #0]        ; r2 = [r7]     (data)
     7208:   f7fc f96c   bl 0x34e4               ; call flash_write
-    720c:   1d24        adds r4, r4, #4         ; r4 = r4 + 4 (increment flash address)
-    720e:   1d3f        adds r7, r7, #4         ; r7 = r7 + 4 (increment source address)
+    720c:   1d24        adds r4, r4, #4         ; r4 = r4 + 4   (increment flash address)
+    720e:   1d3f        adds r7, r7, #4         ; r7 = r7 + 4   (increment source address)
   0x7210:   454c        cmp r4, r9
     7212:   d9f6        bls.n 0x7202            ; loop if r4 < r9
     7214:   e033        b.n 0x727e              ; branch to end?
@@ -7578,8 +7602,9 @@ usb_read_allow:
     7320:   2001        movs r0, #1
     7322:   f884 0024   strb.w r0, [r4, #36]   ; 0x24
     7326:   bd10        pop {r4, pc}
-    7328:   b570        push {r4, r5, r6, lr}
-    732a:   4604        mov r4, r0
+
+  0x7328:   b570        push {r4, r5, r6, lr}
+    732a:   4604        mov r4, r0              ; r4 = r0
     732c:   8800        ldrh r0, [r0, #0]
     732e:   2501        movs r5, #1
     7330:   f5b0 6fa0   cmp.w r0, #1280   ; 0x500
@@ -7646,9 +7671,9 @@ usb_read_allow:
     73cc:   2201        movs r2, #1
     73ce:   2100        movs r1, #0
     73d0:   e7ce        b.n 0x7370
-    73d2:   78a0        ldrb r0, [r4, #2]
-    73d4:   f7ff fe78   bl 0x70c8               ; call usb_set_adrset
-    73d8:   f884 5024   strb.w r5, [r4, #36]   ; 0x24
+  0x73d2:   78a0        ldrb r0, [r4, #2]       ; r0 = [r4 + 2]
+    73d4:   f7ff fe78   bl 0x70c8               ; call usb_set_addr
+    73d8:   f884 5024   strb.w r5, [r4, #36]    ; 0x24
     73dc:   2005        movs r0, #5
     73de:   e02c        b.n 0x743a
     73e0:   78e0        ldrb r0, [r4, #3]

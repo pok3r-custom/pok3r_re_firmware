@@ -26,6 +26,9 @@ SET(SOURCES
     README.md
     disassemble/build.sh
     disassemble/unas.sh
+    disassemble/firmware_builtin.bin
+    disassemble/firmware_builtin.txt
+    disassemble/firmware117.bin
     disassemble/firmware117.txt
     disassemble/symbols117.txt
     disassemble/descriptors.h

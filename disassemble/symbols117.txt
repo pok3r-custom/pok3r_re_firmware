@@ -90,6 +90,12 @@ function_27                 @ 0x50f0
 function_28                 @ 0x518c
     function_9
     function_10
+
+function_55                 @ 0x51b0
+    function_54
+    function_56
+function_54                 @ 0x5240
+nvic_set_vtor               @ 0x5294
 function_12                 @ 0x52a8
     function_29
     function_11
@@ -157,6 +163,10 @@ usb_intr                    @ 0x70dc
 watchdog_init               @ 0x70e8
 watchdog_reload_timer       @ 0x7144
 
+function_53                 @ 0x7158
+    function_21
+    function_14
+erase_flash                 @ 0x7178
 usb_write                   @ 0x71b8
     flash_get_protection_status
 usb_read_allow              @ 0x723c
