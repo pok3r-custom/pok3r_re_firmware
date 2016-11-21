@@ -1,0 +1,22 @@
+List of variables in sram (0x2000_0000) and where they are referenced.
+
+format:
+<variable name>                 @ address
+    // description
+    // if its used an array / struct
+    <functions its used in>
+
+
+variable_sram_e_1               @ 0x20000058
+    // used like struct
+    function_e_5
+    function_e_7
+    function_e_9
+    function_e_10
+    function_e_14
+    function_e_13
+    function_e_15
+    function_e_20
+    function_e_21
+    function_e_26
+
