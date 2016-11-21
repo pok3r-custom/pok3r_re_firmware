@@ -154,8 +154,6 @@ init_prg:
   0x2db0:   0x20000230                      ; must be a global variable, probably only used in these two functions.
   0x2db4:   0x41c64e6d                      ; This number has significance. Look it up.
 
-    2db6:   41c6        rors r6, r0
-
 memcpy:
     ; r0 = dest
     ; r1 = src
@@ -342,9 +340,10 @@ function_5:
     2f6e:   4319        orrs r1, r3
     2f70:   6011        str r1, [r2, #0]
     2f72:   bd10        pop {r4, pc}
-    2f74:   2000        movs r0, #0
-    2f76:   4002        ands r2, r0
-    2f78:   b570        push {r4, r5, r6, lr}
+
+  0x2f74:   0x40022000
+
+  0x2f78:   b570        push {r4, r5, r6, lr}
     2f7a:   481d        ldr r0, [pc, #116]   ; (0x2ff0)
     2f7c:   6801        ldr r1, [r0, #0]
     2f7e:   2901        cmp r1, #1
@@ -394,18 +393,15 @@ function_5:
     2fe6:   3810        subs r0, #16
     2fe8:   f000 b9fa   b.w 0x33e0
     2fec:   bd70        pop {r4, r5, r6, pc}
-    2fee:   0000        movs r0, r0
-    2ff0:   0028        movs r0, r5
-    2ff2:   2000        movs r0, #0
-    2ff4:   0054        lsls r4, r2, #1
-    2ff6:   2000        movs r0, #0
-    2ff8:   07cc        lsls r4, r1, #31
-    2ffa:   2000        movs r0, #0
-    2ffc:   0368        lsls r0, r5, #13
-    2ffe:   2000        movs r0, #0
-    3000:   8b54        ldrh r4, [r2, #26]
-    3002:   0000        movs r0, r0
-    3004:   4815        ldr r0, [pc, #84]   ; (0x305c)
+
+  0x2fee:   0000        ; padding
+  0x2ff0:   0x20000028
+  0x2ff4:   0x20000054
+  0x2ff8:   0x200007cc
+  0x2ffc:   0x20000368
+  0x3000:   0x00008b54
+
+  0x3004:   4815        ldr r0, [pc, #84]   ; (0x305c)
     3006:   b510        push {r4, lr}
     3008:   6801        ldr r1, [r0, #0]
     300a:   b289        uxth r1, r1
@@ -436,10 +432,10 @@ function_5:
     305a:   0000        movs r0, r0
     305c:   0180        lsls r0, r0, #6
     305e:   4008        ands r0, r1
-    3060:   07bc        lsls r4, r7, #30
-    3062:   2000        movs r0, #0
-    3064:   0378        lsls r0, r7, #13
-    3066:   2000        movs r0, #0
+
+  0x3060:   07bc2000
+  0x3064:   03782000
+
     3068:   2101        movs r1, #1
     306a:   0408        lsls r0, r1, #16
     306c:   f000 f9da   bl 0x3424               ; call function_15
@@ -9538,13 +9534,13 @@ function_1:
   0x864a:   2290        movs r2, #144   ; 0x90
     864c:   492e        ldr r1, [pc, #184]   ; (0x8708)
     864e:   4830        ldr r0, [pc, #192]   ; (0x8710)
-    8650:   f7fa fbb2   bl 0x2db8            ; call memcpy(0x2cc42000, 0x2e2c2000, 0x90);
+    8650:   f7fa fbb2   bl 0x2db8            ; call memcpy(0x20002cc4, 0x20002e2c, 0x90);
     8654:   e8bd 41f0   ldmia.w sp!, {r4, r5, r6, r7, r8, lr}   ; return
 
   0x8658:   2290        movs r2, #144   ; 0x90
     865a:   492c        ldr r1, [pc, #176]   ; (0x870c)
     865c:   482d        ldr r0, [pc, #180]   ; (0x8714)
-    865e:   f7fa bbab   b.w 0x2db8           ; return memcpy(0x2d542000, 0x2ebc2000, 0x90);
+    865e:   f7fa bbab   b.w 0x2db8           ; return memcpy(0x20002d54, 0x20002ebc, 0x90);
 
     8662:   f886 2025   strb.w r2, [r6, #37]   ; 0x25
     8666:   f8a0 2084   strh.w r2, [r0, #132]   ; 0x84
@@ -9599,36 +9595,36 @@ function_1:
     8700:   e7a3        b.n 0x864a
 
     8702:   0000
-  0x8704:   00582000
-  0x8708:   2e2c2000
-  0x870c:   2ebc2000
-  0x8710:   2cc42000
-  0x8714:   2d542000
+  0x8704:   0x20000058
+  0x8708:   0x20002e2c
+  0x870c:   0x20002ebc
+  0x8710:   0x20002cc4
+  0x8714:   0x20002d54
 
     ; r0 =
     ; r1 =
     ; r2 =
   0x8718:   b510        push {r4, lr}
     871a:   eb02 02c1   add.w r2, r2, r1, lsl #3    ; r2 = r2 + (r1 << 3)
-    871e:   4b19        ldr r3, [pc, #100]          ; r3 = 0x00582000
+    871e:   4b19        ldr r3, [pc, #100]          ; r3 = 0x20000058
     8720:   2a10        cmp r2, #16                 ; if(r2 == 0x100) branch to 0x873e
     8722:   d00c        beq.n 0x873e
     8724:   f893 102c   ldrb.w r1, [r3, #44]   ; 0x2c
     8728:   2901        cmp r1, #1
     872a:   d107        bne.n 0x873c                ; if(*(char *)(0x00582000 + 0x2c) == 1) return 1
-    872c:   4b16        ldr r3, [pc, #88]           ; r3 = 0x8b700000
+    872c:   4b16        ldr r3, [pc, #88]           ; r3 = 0x00008b70
     872e:   2100        movs r1, #0
 loop:
-    8730:   5c5c        ldrb r4, [r3, r1]           ; if(r2 == *(char *)0x8b700000 + r1) branch 0x8778
+    8730:   5c5c        ldrb r4, [r3, r1]           ; if(r2 == *(char *)0x00008b70 + r1) branch 0x8778
     8732:   42a2        cmp r2, r4
     8734:   d120        bne.n 0x8778
 
     8736:   4814        ldr r0, [pc, #80]   ; (0x8788)
     8738:   1d00        adds r0, r0, #4
     873a:   5c40        ldrb r0, [r0, r1]
-    873c:   bd10        pop {r4, pc}            ; return *(0x8b700004 + r1);
+    873c:   bd10        pop {r4, pc}            ; return *(0x8b74 + r1);
 
-    873e:   f893 1021   ldrb.w r1, [r3, #33]    ; r1 = *(char *)(0x582000 + 0x21)
+    873e:   f893 1021   ldrb.w r1, [r3, #33]    ; r1 = *(char *)(0x20000058 + 0x21)
     8742:   2901        cmp r1, #1
     8744:   d00b        beq.n 0x875e            ; if(r1 == 1), store a 0 and return 232;
     8746:   f893 1024   ldrb.w r1, [r3, #36]   ; 0x24
@@ -9645,7 +9641,7 @@ loop:
     875c:   bd10        pop {r4, pc}            ; return 0;
 
     875e:   2000        movs r0, #0
-    8760:   f883 0021   strb.w r0, [r3, #33]   ; *(char *)(0x582000 + 0x21) = 0;
+    8760:   f883 0021   strb.w r0, [r3, #33]   ; *(char *)(0x20000058 + 0x21) = 0;
     8764:   20e8        movs r0, #232   ; 0xe8
     8766:   bd10        pop {r4, pc}            ; return 238
 
@@ -9664,9 +9660,9 @@ loop:
     877e:   d3d7        bcc.n 0x8730            ; if(r1 >= 4) branch to 0x8730
     8780:   bd10        pop {r4, pc}            ; return what was passed in in r0.
 
-  0x8782:   0000        ; padding?
-  0x8784:   00582000    ; 0x582000 is in reserved space...
-  0x8788:   8b700000
+  0x8782:   0000
+  0x8784:   0x20000058
+  0x8788:   0x00008b70
 
     ; this function is very similar to the one above (0x8718)
   0x878c:   b510        push {r4, lr}
