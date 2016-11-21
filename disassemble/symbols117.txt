@@ -51,7 +51,14 @@ gpio_set_pin_mode           @ 0x355c
 gpio_set_pin                @ 0x3584
 gpio_set_reset_pin          @ 0x3588
 gptm_enable_disable         @ 0x3592
+function_62                 @ 0x35a6
 
+function_57                 @ 0x377c
+function_58                 @ 0x3790
+function_59                 @ 0x379a
+function_60                 @ 0x37ac
+    function_61
+function_61                 @ 0x37c8
 function_38_nop             @ 0x37dc
 function_13                 @ 0x37e0
 
