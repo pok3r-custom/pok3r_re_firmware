@@ -130,41 +130,50 @@ reset_end:
   0x2d8c:   0x7b95
   0x2d90:   0x20003760
 
-function_4:
-  0x2d94:   4906        ldr r1, [pc, #24]   ; (0x2db0)
-    2d96:   4a07        ldr r2, [pc, #28]   ; (0x2db4)
-    2d98:   6808        ldr r0, [r1, #0]
-    2d9a:   4350        muls r0, r2
-    2d9c:   f243 0239   movw r2, #12345   ; 0x3039
-    2da0:   4410        add r0, r2
-    2da2:   6008        str r0, [r1, #0]
-    2da4:   0840        lsrs r0, r0, #1
-    2da6:   4770        bx lr
+prg_term:
+    ; its possible that this is used as the random generator for a cipher. Its been done before.
+  0x2d94:   4906        ldr r1, [pc, #24]   ; (0x2db0)          |
+    2d96:   4a07        ldr r2, [pc, #28]   ; (0x2db4)          |
+    2d98:   6808        ldr r0, [r1, #0]                        | r0 = *0x20000230
+    2d9a:   4350        muls r0, r2                             | r0 = (r0 * 0x41c64e6d) & 0xffffffff + 0x3039
+    2d9c:   f243 0239   movw r2, #12345   ; 0x3039              |
+    2da0:   4410        add r0, r2                              |
+    2da2:   6008        str r0, [r1, #0]                        | *0x20000230 = r0
+    2da4:   0840        lsrs r0, r0, #1                         | return r0 >> 1
+    2da6:   4770        bx lr                                   |
 
-    2da8:   4901        ldr r1, [pc, #4]   ; (0x2db0)
-    2daa:   6008        str r0, [r1, #0]
-    2dac:   4770        bx lr
+init_prg:
+    ; r0 = seed
+  0x2da8:   4901        ldr r1, [pc, #4]   ; (0x2db0)           | *0x20000230 = r0
+    2daa:   6008        str r0, [r1, #0]                        | return
+    2dac:   4770        bx lr                                   |
     2dae:   0000
 
-  0x2db0:   0x20000230
-  0x2db4:   0x41c64e6d
+  0x2db0:   0x20000230                      ; must be a global variable, probably only used in these two functions.
+  0x2db4:   0x41c64e6d                      ; This number has significance. Look it up.
 
     2db6:   41c6        rors r6, r0
-    2db8:   ea40 0301   orr.w r3, r0, r1
-    2dbc:   079b        lsls r3, r3, #30
-    2dbe:   d003        beq.n 0x2dc8
-    2dc0:   e009        b.n 0x2dd6
-    2dc2:   c908        ldmia r1!, {r3}
-    2dc4:   1f12        subs r2, r2, #4
-    2dc6:   c008        stmia r0!, {r3}
-    2dc8:   2a04        cmp r2, #4
+
+memcpy:
+    ; r0 = dest
+    ; r1 = src
+    ; r2 = length (in bytes)
+  0x2db8:   ea40 0301   orr.w r3, r0, r1            ;
+    2dbc:   079b        lsls r3, r3, #30            ;
+    2dbe:   d003        beq.n 0x2dc8                ; if((r2 | r1) & 0x3 == 0) branch to 0x2dc8 | if((r2 | r1) & 0x3 == 0){
+
+    2dc0:   e009        b.n 0x2dd6                  ; branch 0x2dd6                             |     while(!((r2 -= 4) < 4))
+    2dc2:   c908        ldmia r1!, {r3}             ; r3 = *(int *)r1++                         |         *(int *)r1++ = *(int *)r0++;
+    2dc4:   1f12        subs r2, r2, #4             ; r2 -= 4                                   | }
+    2dc6:   c008        stmia r0!, {r3}             ; *(int *)r0++ = r3                         |
+    2dc8:   2a04        cmp r2, #4                  ; if(r2 < 4) branch 0x2dc2                  |
     2dca:   d2fa        bcs.n 0x2dc2
-    2dcc:   e003        b.n 0x2dd6
-    2dce:   f811 3b01   ldrb.w r3, [r1], #1
-    2dd2:   f800 3b01   strb.w r3, [r0], #1
-    2dd6:   1e52        subs r2, r2, #1
-    2dd8:   d2f9        bcs.n 0x2dce
-    2dda:   4770        bx lr
+    2dcc:   e003        b.n 0x2dd6                  ; branch 0x2dd6                             |
+    2dce:   f811 3b01   ldrb.w r3, [r1], #1         ; r3 = *(char *)r1++                        | while(r2-- >= 0)
+    2dd2:   f800 3b01   strb.w r3, [r0], #1         ; *(char *)r0++ = r3                        |     *(char *)r1++ = *(char *)r0++;
+    2dd6:   1e52        subs r2, r2, #1             ; r2 -= 1                                   |
+    2dd8:   d2f9        bcs.n 0x2dce                ; if(r2 >= 0) branch 0x2dce                 | return;
+    2dda:   4770        bx lr                       ; return
 
 function_5:
   0x2ddc:   4c06        ldr r4, [pc, #24]       ; r4 = (0x2df8) 0x8ff0
@@ -9523,15 +9532,18 @@ function_1:
     8640:   d02f        beq.n 0x86a2
     8642:   f8a0 2084   strh.w r2, [r0, #132]   ; 0x84
     8646:   f8a3 2084   strh.w r2, [r3, #132]   ; 0x84
-    864a:   2290        movs r2, #144   ; 0x90
+
+  0x864a:   2290        movs r2, #144   ; 0x90
     864c:   492e        ldr r1, [pc, #184]   ; (0x8708)
     864e:   4830        ldr r0, [pc, #192]   ; (0x8710)
-    8650:   f7fa fbb2   bl 0x2db8
-    8654:   e8bd 41f0   ldmia.w sp!, {r4, r5, r6, r7, r8, lr}
-    8658:   2290        movs r2, #144   ; 0x90
+    8650:   f7fa fbb2   bl 0x2db8            ; call memcpy(0x2cc42000, 0x2e2c2000, 0x90);
+    8654:   e8bd 41f0   ldmia.w sp!, {r4, r5, r6, r7, r8, lr}   ; return
+
+  0x8658:   2290        movs r2, #144   ; 0x90
     865a:   492c        ldr r1, [pc, #176]   ; (0x870c)
     865c:   482d        ldr r0, [pc, #180]   ; (0x8714)
-    865e:   f7fa bbab   b.w 0x2db8
+    865e:   f7fa bbab   b.w 0x2db8           ; return memcpy(0x2d542000, 0x2ebc2000, 0x90);
+
     8662:   f886 2025   strb.w r2, [r6, #37]   ; 0x25
     8666:   f8a0 2084   strh.w r2, [r0, #132]   ; 0x84
     866a:   f8a3 2084   strh.w r2, [r3, #132]   ; 0x84
@@ -9583,70 +9595,79 @@ function_1:
     86f8:   f8cc 2024   str.w r2, [ip, #36]   ; 0x24
     86fc:   f886 2025   strb.w r2, [r6, #37]   ; 0x25
     8700:   e7a3        b.n 0x864a
-    8702:   0000        movs r0, r0
-    8704:   0058        lsls r0, r3, #1
-    8706:   2000        movs r0, #0
-    8708:   2e2c        cmp r6, #44   ; 0x2c
-    870a:   2000        movs r0, #0
-    870c:   2ebc        cmp r6, #188   ; 0xbc
-    870e:   2000        movs r0, #0
-    8710:   2cc4        cmp r4, #196   ; 0xc4
-    8712:   2000        movs r0, #0
-    8714:   2d54        cmp r5, #84   ; 0x54
-    8716:   2000        movs r0, #0
-    8718:   b510        push {r4, lr}
-    871a:   eb02 02c1   add.w r2, r2, r1, lsl #3
-    871e:   4b19        ldr r3, [pc, #100]   ; (0x8784)
-    8720:   2a10        cmp r2, #16
+
+    8702:   0000
+  0x8704:   00582000
+  0x8708:   2e2c2000
+  0x870c:   2ebc2000
+  0x8710:   2cc42000
+  0x8714:   2d542000
+
+    ; r0 =
+    ; r1 =
+    ; r2 =
+  0x8718:   b510        push {r4, lr}
+    871a:   eb02 02c1   add.w r2, r2, r1, lsl #3    ; r2 = r2 + (r1 << 3)
+    871e:   4b19        ldr r3, [pc, #100]          ; r3 = 0x00582000
+    8720:   2a10        cmp r2, #16                 ; if(r2 == 0x100) branch to 0x873e
     8722:   d00c        beq.n 0x873e
     8724:   f893 102c   ldrb.w r1, [r3, #44]   ; 0x2c
     8728:   2901        cmp r1, #1
-    872a:   d107        bne.n 0x873c
-    872c:   4b16        ldr r3, [pc, #88]   ; (0x8788)
+    872a:   d107        bne.n 0x873c                ; if(*(char *)(0x00582000 + 0x2c) == 1) return 1
+    872c:   4b16        ldr r3, [pc, #88]           ; r3 = 0x8b700000
     872e:   2100        movs r1, #0
-    8730:   5c5c        ldrb r4, [r3, r1]
+loop:
+    8730:   5c5c        ldrb r4, [r3, r1]           ; if(r2 == *(char *)0x8b700000 + r1) branch 0x8778
     8732:   42a2        cmp r2, r4
     8734:   d120        bne.n 0x8778
+
     8736:   4814        ldr r0, [pc, #80]   ; (0x8788)
     8738:   1d00        adds r0, r0, #4
     873a:   5c40        ldrb r0, [r0, r1]
-    873c:   bd10        pop {r4, pc}
-    873e:   f893 1021   ldrb.w r1, [r3, #33]   ; 0x21
+    873c:   bd10        pop {r4, pc}            ; return *(0x8b700004 + r1);
+
+    873e:   f893 1021   ldrb.w r1, [r3, #33]    ; r1 = *(char *)(0x582000 + 0x21)
     8742:   2901        cmp r1, #1
-    8744:   d00b        beq.n 0x875e
+    8744:   d00b        beq.n 0x875e            ; if(r1 == 1), store a 0 and return 232;
     8746:   f893 1024   ldrb.w r1, [r3, #36]   ; 0x24
     874a:   29ff        cmp r1, #255   ; 0xff
     874c:   d00c        beq.n 0x8768
     874e:   7e1a        ldrb r2, [r3, #24]
-    8750:   b152        cbz r2, 0x8768
+    8750:   b152        cbz r2, 0x8768          ; if(r2 == 0) branch 0x8768
+
     8752:   2912        cmp r1, #18
     8754:   d0f2        beq.n 0x873c
     8756:   2913        cmp r1, #19
-    8758:   d0f0        beq.n 0x873c
+    8758:   d0f0        beq.n 0x873c            ; if(r1 == 18 || r1 == 19) branch 0x873c;
     875a:   2000        movs r0, #0
-    875c:   bd10        pop {r4, pc}
+    875c:   bd10        pop {r4, pc}            ; return 0;
+
     875e:   2000        movs r0, #0
-    8760:   f883 0021   strb.w r0, [r3, #33]   ; 0x21
+    8760:   f883 0021   strb.w r0, [r3, #33]   ; *(char *)(0x582000 + 0x21) = 0;
     8764:   20e8        movs r0, #232   ; 0xe8
-    8766:   bd10        pop {r4, pc}
+    8766:   bd10        pop {r4, pc}            ; return 238
+
     8768:   f893 0026   ldrb.w r0, [r3, #38]   ; 0x26
     876c:   2802        cmp r0, #2
-    876e:   d001        beq.n 0x8774
+    876e:   d001        beq.n 0x8774            ; if(r0 != 2) return 57;
     8770:   2039        movs r0, #57   ; 0x39
     8772:   bd10        pop {r4, pc}
+
     8774:   202a        movs r0, #42   ; 0x2a
-    8776:   bd10        pop {r4, pc}
-    8778:   1c49        adds r1, r1, #1
-    877a:   b2c9        uxtb r1, r1
+    8776:   bd10        pop {r4, pc}            ; return 42;
+
+    8778:   1c49        adds r1, r1, #1         ; r1++
+    877a:   b2c9        uxtb r1, r1             ; r1 &= 0xff
     877c:   2904        cmp r1, #4
-    877e:   d3d7        bcc.n 0x8730
-    8780:   bd10        pop {r4, pc}
-    8782:   0000        movs r0, r0
-    8784:   0058        lsls r0, r3, #1
-    8786:   2000        movs r0, #0
-    8788:   8b70        ldrh r0, [r6, #26]
-    878a:   0000        movs r0, r0
-    878c:   b510        push {r4, lr}
+    877e:   d3d7        bcc.n 0x8730            ; if(r1 >= 4) branch to 0x8730
+    8780:   bd10        pop {r4, pc}            ; return what was passed in in r0.
+
+  0x8782:   0000        ; padding?
+  0x8784:   00582000    ; 0x582000 is in reserved space...
+  0x8788:   8b700000
+
+    ; this function is very similar to the one above (0x8718)
+  0x878c:   b510        push {r4, lr}
     878e:   eb02 02c1   add.w r2, r2, r1, lsl #3
     8792:   4b18        ldr r3, [pc, #96]   ; (0x87f4)
     8794:   2a10        cmp r2, #16
