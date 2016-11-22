@@ -1,0 +1,43 @@
+Firmware v117 SRAM Variable Map:
+List of variables in sram (0x2000_0000) and where they are referenced.
+
+<variable name>                 @ 0x<address>
+    // description
+    // if its used an array / struct
+    <functions its used in>
+
+
+variable_sram_e_1               @ 0x20000058
+    // used like struct
+    function_e_5
+    function_e_7
+    function_e_9
+    function_e_10
+    function_e_13
+    function_e_14
+    function_e_15
+    function_e_20
+    function_e_21
+    function_e_26
+    function_e_86
+    function_e_88
+    function_e_90
+    function_e_91
+    function_e_95
+
+variable_2                      @ 0x2000023c
+    0x0:    0x8ac4
+    0x4:    0x8ad8
+    0x8:    0x20000044
+    0xc:    0x4
+    ptr_write_data_addr
+
+variable_1                      @ 0x20000270
+    0x0:    0x6919 (function_66)
+    0x8:    0x6a11 (function_65)
+    0x18:   0x6a85 (usb_get_descriptor)
+    0x24:   0x695d (function_67)
+    0x2c:   0x6809 (function_68)
+    0x30:   0x6815 (function_69)
+    0x38:   0x6821 (function_70)
+    ptr_write_func_ptrs
