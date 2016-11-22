@@ -31,7 +31,7 @@ SET(SOURCES
     disassemble/firmware117.bin
     disassemble/firmware117.txt
     disassemble/symbols117.txt
-    disassemble/variables117.txt
+    disassemble/sram-variables117.txt
     disassemble/descriptors.h
 )
 
