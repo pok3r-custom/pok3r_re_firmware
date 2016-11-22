@@ -6490,7 +6490,7 @@ function_70:
     68d6:   2000        movs r0, #0
 
 ptr_write_func_ptrs:
-    ; r0 = stack address
+    ; r0 = stack address (0x20000270)
   0x68d8:   4908        ldr r1, [pc, #32]       ; r1 = (0x68fc)
     68da:   6001        str r1, [r0, #0]        ; [r0] = r1
     68dc:   4908        ldr r1, [pc, #32]       ; r1 = (0x6900)
@@ -6745,6 +6745,7 @@ function_6:
     6af0:   4770        bx lr
 
 usb_entry:
+    ; r0 = pointer (0x20000234)
   0x6af2:   e92d 41f0   stmdb sp!, {r4, r5, r6, r7, r8, lr}
     6af6:   4604        mov r4, r0              ; r4 = r0
     6af8:   f000 fa60   bl 0x6fbc               ; call
@@ -6930,39 +6931,41 @@ function_23:
   0x6cc2:   2001        movs r0, #1
     6cc4:   4770        bx lr
 
-    6cc6:   b510        push {r4, lr}
-    6cc8:   f100 0430   add.w r4, r0, #48   ; 0x30
-    6ccc:   7920        ldrb r0, [r4, #4]
-    6cce:   f3c0 0100   ubfx r1, r0, #0, #1
-    6cd2:   6d60        ldr r0, [r4, #84]   ; 0x54
-    6cd4:   f000 f98c   bl 0x6ff0
-    6cd8:   78a0        ldrb r0, [r4, #2]
-    6cda:   f1a4 0430   sub.w r4, r4, #48   ; 0x30
+function_75:
+    ; r0 = pointer (0x20000234)
+  0x6cc6:   b510        push {r4, lr}
+    6cc8:   f100 0430   add.w r4, r0, #48       ; r4 = r0 + 0x30
+    6ccc:   7920        ldrb r0, [r4, #4]       ; r0 = [r4 + 4]
+    6cce:   f3c0 0100   ubfx r1, r0, #0, #1     ; r1 = r0 & 1
+    6cd2:   6d60        ldr r0, [r4, #84]       ; r0 = [r4 + 0x54]
+    6cd4:   f000 f98c   bl 0x6ff0               ; call function_28
+    6cd8:   78a0        ldrb r0, [r4, #2]       ; r0 = [r4 + 2]
+    6cda:   f1a4 0430   sub.w r4, r4, #48       ; r4 = r4 - 0x30
     6cde:   2803        cmp r0, #3
-    6ce0:   d105        bne.n 0x6cee
-    6ce2:   f8d4 1088   ldr.w r1, [r4, #136]   ; 0x88
-    6ce6:   b111        cbz r1, 0x6cee
-    6ce8:   f8d4 008c   ldr.w r0, [r4, #140]   ; 0x8c
-    6cec:   4788        blx r1
-    6cee:   6be1        ldr r1, [r4, #60]   ; 0x3c
+    6ce0:   d105        bne.n 0x6cee            ; branch if r0 != 3
+    6ce2:   f8d4 1088   ldr.w r1, [r4, #136]    ; r1 = [r4 + 0x88]
+    6ce6:   b111        cbz r1, 0x6cee          ; branch if r1 == 0
+    6ce8:   f8d4 008c   ldr.w r0, [r4, #140]    ; r0 = [r4 + 0x8c]
+    6cec:   4788        blx r1                  ; call r1
+  0x6cee:   6be1        ldr r1, [r4, #60]       ; r1 = [r4 + 0x3c]
     6cf0:   2900        cmp r1, #0
-    6cf2:   d007        beq.n 0x6d04
-    6cf4:   f894 0032   ldrb.w r0, [r4, #50]   ; 0x32
+    6cf2:   d007        beq.n 0x6d04            ; branch if r1 == 0
+    6cf4:   f894 0032   ldrb.w r0, [r4, #50]    ; r0 = [r4 + 0x32]
     6cf8:   2806        cmp r0, #6
-    6cfa:   d103        bne.n 0x6d04
-    6cfc:   6c20        ldr r0, [r4, #64]   ; 0x40
+    6cfa:   d103        bne.n 0x6d04            ; branch if r0 != 6
+    6cfc:   6c20        ldr r0, [r4, #64]       ; r0 = [r4 + 0x40]
     6cfe:   e8bd 4010   ldmia.w sp!, {r4, lr}
-    6d02:   4708        bx r1
-    6d04:   bd10        pop {r4, pc}
+    6d02:   4708        bx r1                   ; jump r1
+  0x6d04:   bd10        pop {r4, pc}
 
 function_7:
   0x6d06:   b510        push {r4, lr}
-    6d08:   f000 f96a   bl 0x6fe0
+    6d08:   f000 f96a   bl 0x6fe0               ; call usb_set_dppuen
     6d0c:   e8bd 4010   ldmia.w sp!, {r4, lr}
-    6d10:   f000 b9d2   b.w 0x70b8              ; branch usb_set_genrsm
+    6d10:   f000 b9d2   b.w 0x70b8              ; jump usb_set_genrsm
 
 ptr_write_data_addr:
-    ; r0 = stack address
+    ; r0 = stack address (0x2000023c)
   0x6d14:   4904        ldr r1, [pc, #16]       ; r1 = (0x6d28)
     6d16:   6001        str r1, [r0, #0]        ; [r0] = r1         put 0x8ac4 at r0
     6d18:   3114        adds r1, #20            ; r1 = r1 + 0x14
@@ -7008,11 +7011,11 @@ usb_init:
     6d5c:   490b        ldr r1, [pc, #44]       ; r1 = (0x6d8c)
     6d5e:   6041        str r1, [r0, #4]        ; [r0 + 4] = r1
     6d60:   387c        subs r0, #124           ; r0 = r0 - 0x7c
-    6d62:   f7ff ffd7   bl 0x6d14               ; call ptr_write_data_addr(stack address)
+    6d62:   f7ff ffd7   bl 0x6d14               ; call ptr_write_data_addr(stack address = 0x2000023c)
 
     6d66:   4808        ldr r0, [pc, #32]       ; r0 = (0x6d88)
     6d68:   3854        subs r0, #84            ; r0 = r0 - 0x54
-    6d6a:   f7ff fdb5   bl 0x68d8               ; call ptr_write_func_ptrs(stack address)
+    6d6a:   f7ff fdb5   bl 0x68d8               ; call ptr_write_func_ptrs(stack address = 0x20000270)
 
     6d6e:   4806        ldr r0, [pc, #24]       ; r0 = (0x6d88)
     6d70:   3890        subs r0, #144           ; r0 = r0 - 0x90
@@ -7421,7 +7424,7 @@ usb_set_addr:
 
 usb_intr:
   0x70dc:   4801        ldr r0, [pc, #4]        ; r0 = (0x70e4)
-    70de:   f7ff bd08   b.w 0x6af2              ; branch usb_entry
+    70de:   f7ff bd08   b.w 0x6af2              ; jump usb_entry
     70e2:   0000
 
   0x70e4:   0x20000234  ; Stack position
@@ -8611,9 +8614,9 @@ function_73:
     7c4a:   f7fb fb3f   bl 0x32cc               ; call spin_wait_maybe
     7c4e:   f7fb f9d9   bl 0x3004               ; call function_e_33
     7c52:   f7ff f873   bl 0x6d3c               ; call usb_init
-    7c56:   4e20        ldr r6, [pc, #128]      ; (0x7cd8)
-    7c58:   68a0        ldr r0, [r4, #8]
-    7c5a:   b130        cbz r0, 0x7c6a
+    7c56:   4e20        ldr r6, [pc, #128]      ; r6 = (0x7cd8)
+    7c58:   68a0        ldr r0, [r4, #8]        ; r0 = [r4 + 8]
+    7c5a:   b130        cbz r0, 0x7c6a          ; branch if r0 == 0
     7c5c:   e00d        b.n 0x7c7a
     7c5e:   7007        strb r7, [r0, #0]
     7c60:   e7df        b.n 0x7c22
@@ -8627,7 +8630,7 @@ function_73:
     7c72:   2000        movs r0, #0
     7c74:   60a5        str r5, [r4, #8]
     7c76:   f7fc fcd1   bl 0x461c               ; call function_37
-    7c7a:   68a0        ldr r0, [r4, #8]
+  0x7c7a:   68a0        ldr r0, [r4, #8]
     7c7c:   2801        cmp r0, #1
     7c7e:   d117        bne.n 0x7cb0
     7c80:   6920        ldr r0, [r4, #16]
@@ -8650,8 +8653,8 @@ function_73:
     7ca8:   2801        cmp r0, #1
     7caa:   d101        bne.n 0x7cb0
     7cac:   f7fc fd0a   bl 0x46c4               ; call function_e_21
-  0x7cb0:   4809        ldr r0, [pc, #36]   ; (0x7cd8)
-    7cb2:   f7ff f808   bl 0x6cc6
+  0x7cb0:   4809        ldr r0, [pc, #36]       ; r0 = (0x7cd8)
+    7cb2:   f7ff f808   bl 0x6cc6               ; call
     7cb6:   f7ff fa45   bl 0x7144               ; call watchdog_reload_timer
     7cba:   e7cd        b.n 0x7c58
 

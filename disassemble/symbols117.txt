@@ -1,8 +1,9 @@
+Firmware v117 Symbol Map:
 
-Functions:
+<function_name>                     @ 0x<offset>
+    <called function>
+    *<function referenced by pointer>
 
-indented funtions are referenced by call or jump
-functions with * are referenced by pointer, but not called
 
 reset                               @ 0x2d54
 
@@ -236,8 +237,11 @@ function_6                          @ 0x6ae8
 usb_entry                           @ 0x6af2
 function_23                         @ 0x6ca8
     jump_1
-
+function_75                         @ 0x6cc6
+    function_28
 function_7                          @ 0x6d06
+    usb_set_dppuen
+    usb_set_genrsm
 ptr_write_data_addr                 @ 0x6d14
 usb_set_intr_reg                    @ 0x6d30
 usb_init                            @ 0x6d3c
