@@ -295,6 +295,7 @@ function_73                         @ 0x7b94
     gpio_set_reset_pin
     usb_init
     function_e_21
+    function_75
     watchdog_reload_timer
 function_e_8                        @ 0x7f18
     watchdog_reload_timer
@@ -326,3 +327,10 @@ Data:
 descriptor_1                        @ 0x8998
 descriptor_2                        @ 0x89d8
 descriptor_3                        @ 0x89fc
+data_1                              @ 0x8ac4
+data_2                              @ 0x8ad8
+
+string_1                            @ 0x8b3a
+
+task_1                              @ 0x8ff0
+task_2                              @ 0x9000

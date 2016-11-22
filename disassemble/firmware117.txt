@@ -194,7 +194,7 @@ function_5:
     2df2:   d3f6        bcc.n 0x2de2            ; branch if r4 < r5
     2df4:   f7ff ffc8   bl 0x2d88
 
-  0x2df8:   0x8ff0
+  0x2df8:   0x8ff0  ; task_1
   0x2dfc:   0x9010
 
     ; r0 = 0x9010
@@ -6490,7 +6490,7 @@ function_70:
     68d6:   2000        movs r0, #0
 
 ptr_write_func_ptrs:
-    ; r0 = stack address (0x20000270)
+    ; r0 = stack address (0x20000270) (pointer_1)
   0x68d8:   4908        ldr r1, [pc, #32]       ; r1 = (0x68fc)
     68da:   6001        str r1, [r0, #0]        ; [r0] = r1
     68dc:   4908        ldr r1, [pc, #32]       ; r1 = (0x6900)
@@ -6965,11 +6965,11 @@ function_7:
     6d10:   f000 b9d2   b.w 0x70b8              ; jump usb_set_genrsm
 
 ptr_write_data_addr:
-    ; r0 = stack address (0x2000023c)
+    ; r0 = stack address (0x2000023c) (pointer_2)
   0x6d14:   4904        ldr r1, [pc, #16]       ; r1 = (0x6d28)
-    6d16:   6001        str r1, [r0, #0]        ; [r0] = r1         put 0x8ac4 at r0
+    6d16:   6001        str r1, [r0, #0]        ; [r0] = r1         put 0x8ac4 (data_1) at r0
     6d18:   3114        adds r1, #20            ; r1 = r1 + 0x14
-    6d1a:   6041        str r1, [r0, #4]        ; [r0 + 4] = r1     put 0x8ad8 at r0 + 4
+    6d1a:   6041        str r1, [r0, #4]        ; [r0 + 4] = r1     put 0x8ad8 (data_2) at r0 + 4
     6d1c:   4903        ldr r1, [pc, #12]       ; r1 = (0x6d2c)
     6d1e:   6081        str r1, [r0, #8]        ; [r0 + 8] = r1     put 0x20000044 at r0 + 8
     6d20:   2104        movs r1, #4             ; r1 = 4
@@ -6977,7 +6977,7 @@ ptr_write_data_addr:
     6d24:   4770        bx lr
     6d26:   0000
 
-  0x6d28:   0x8ac4
+  0x6d28:   0x8ac4 (data_1)
   0x6d2c:   0x20000044  ; Stack position
 
 usb_set_intr_reg:
@@ -7011,11 +7011,11 @@ usb_init:
     6d5c:   490b        ldr r1, [pc, #44]       ; r1 = (0x6d8c)
     6d5e:   6041        str r1, [r0, #4]        ; [r0 + 4] = r1
     6d60:   387c        subs r0, #124           ; r0 = r0 - 0x7c
-    6d62:   f7ff ffd7   bl 0x6d14               ; call ptr_write_data_addr(stack address = 0x2000023c)
+    6d62:   f7ff ffd7   bl 0x6d14               ; call ptr_write_data_addr(stack address = 0x2000023c (pointer_2))
 
     6d66:   4808        ldr r0, [pc, #32]       ; r0 = (0x6d88)
     6d68:   3854        subs r0, #84            ; r0 = r0 - 0x54
-    6d6a:   f7ff fdb5   bl 0x68d8               ; call ptr_write_func_ptrs(stack address = 0x20000270)
+    6d6a:   f7ff fdb5   bl 0x68d8               ; call ptr_write_func_ptrs(stack address = 0x20000270 (pointer_1))
 
     6d6e:   4806        ldr r0, [pc, #24]       ; r0 = (0x6d88)
     6d70:   3890        subs r0, #144           ; r0 = r0 - 0x90
@@ -7427,7 +7427,7 @@ usb_intr:
     70de:   f7ff bd08   b.w 0x6af2              ; jump usb_entry
     70e2:   0000
 
-  0x70e4:   0x20000234  ; Stack position
+  0x70e4:   0x20000234  ; pointer_3
 
 watchdog_init:
     ; Set APBCCR1.WDTREN
@@ -8654,7 +8654,7 @@ function_73:
     7caa:   d101        bne.n 0x7cb0
     7cac:   f7fc fd0a   bl 0x46c4               ; call function_e_21
   0x7cb0:   4809        ldr r0, [pc, #36]       ; r0 = (0x7cd8)
-    7cb2:   f7ff f808   bl 0x6cc6               ; call
+    7cb2:   f7ff f808   bl 0x6cc6               ; call function_75(0x20000234 (pointer_3))
     7cb6:   f7ff fa45   bl 0x7144               ; call watchdog_reload_timer
     7cba:   e7cd        b.n 0x7c58
 
@@ -8665,7 +8665,7 @@ function_73:
   0x7ccc:   0x20000000
   0x7cd0:   0x2000007e
   0x7cd4:   0x2000007f
-  0x7cd8:   0x20000234
+  0x7cd8:   0x20000234  ; pointer_3
 
     7cdc:   e92d 43f0   stmdb sp!, {r4, r5, r6, r7, r8, r9, lr}
     7ce0:   f1a0 02a0   sub.w r2, r0, #160   ; 0xa0
@@ -10136,12 +10136,14 @@ descriptor_3:
 
     8ac2:   00 00
 
+data_1:
   0x8ac4:   12 01 10 01
     8ac8:   00 00 00 40
     8acc:   d9 04 41 01
     8ad0:   17 01 00 02
     8ad4:   00 01 00 00
 
+data_2:
   0x8ad8:   09 02 5b 00
     8adc:   03 01 00 a0
     8ae0:   32 09 04 00
@@ -10169,6 +10171,7 @@ descriptor_3:
     8b34:   04 03 09 04
     8b38:   1a 03
 
+string_1:
   0x8b3a:   55 00       ; U
     8b3c:   53 00       ; S
     8b3e:   42 00       ; B
@@ -10482,13 +10485,15 @@ descriptor_3:
     8fe8:   00 40 0b 40
     8fec:   00 01 00 00
 
+task_1:
   0x8ff0:   0x9010
   0x8ff4:   0x20000000
   0x8ff8:   0x234
   0x8ffc:   0x2e00
 
+task_2:
   0x9000:   0x90d4
-  0x9004:   0x20000234
+  0x9004:   0x20000234 (pointer_3)
   0x9008:   0x352c
   0x900c:   0x74c0
 
