@@ -19,4 +19,9 @@ variable_sram_e_1               @ 0x20000058
     function_e_20
     function_e_21
     function_e_26
+    function_e_86
+    function_e_88
+    function_e_90
+    function_e_91
+    function_e_95
 

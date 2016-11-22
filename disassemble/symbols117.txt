@@ -20,16 +20,23 @@ generic_intr                        @ 0x2d72
 reset_end                           @ 0x2d80
     function_5
 
-function_4                          @ 0x2d94
+prg_term                            @ 0x2d94
+init_prg                            @ 0x2da8
+memcpy                              @ 0x2db8
 function_5                          @ 0x2ddc
-
+function_e_98                       @ 0x2e00
 function_e_32                       @ 0x2e5c
-
 afio_exti_ssr_write                 @ 0x2f50
 function_e_1                        @ 0x2f78
-    function_e_1
-
+    function_e_2
+    function_21
+    clear_two_words
+    function_e_4
 function_e_33                       @ 0x3004
+    clear_two_words_and_write_two_bytes
+enable_gpio_a_clock_unused          @ 0x3068
+function_e_99_unused                @ 0x30c8
+function_e_100_unused               @ 0x3250
 function_44                         @ 0x3264
 function_45                         @ 0x3272
 function_46                         @ 0x3286
@@ -44,10 +51,14 @@ function_32                         @ 0x32d8
     gpio_set_pin_pull_up_down
     afio_pin_config
 
+function_e_34                       @ 0x338c
+    function_31
+    spin_wait_maybe
 clear_two_words_and                 @ 0x33a4
 clear_two_words_and_write_two_bytes @ 0x33ac
 function_e_2                        @ 0x33b8
 function_14                         @ 0x33e0
+function_e_35                       @ 0x3412
 ckcu_ahb_clock_enable               @ 0x3424
 ckcu_apb0_clock_enable              @ 0x343c
 ckcu_apb1_clock_enable              @ 0x3454
@@ -67,6 +78,8 @@ gpio_set_pin                        @ 0x3584
 gpio_set_reset_pin                  @ 0x3588
 gptm_enable_disable                 @ 0x3592
 function_62                         @ 0x35a6
+function_e_36                       @ 0x35fc
+function_e_37_unused                @ 0x364c
 
 function_57                         @ 0x377c
 function_58                         @ 0x3790
@@ -81,22 +94,36 @@ exti_set_wakup                      @ 0x3860
 exti_check_wakup                    @ 0x3870
 function_74                         @ 0x3884
     function_12
+    function_e_95
     function_e_25
+    function_e_48
     function_e_18
     function_e_24
 function_e_17                       @ 0x394c
     function_e_15
     function_e_24
+    function_e_97
+    function_e_25
+    function_e_83
     function_e_18
+    function_e_85
+    function_e_13
+    function_e_82
+    function_e_92
+    function_e_90
+    function_e_88
 function_e_18                       @ 0x3f90
+    function_e_41
 
 function_e_19                       @ 0x425c
+    function_e_41
 
 nop_3                               @ 0x4618
 nop_2                               @ 0x461a
 function_37                         @ 0x461c
     nop_1
     jump_2
+    function_e_49
     gpio_set_open_drain
     gpio_set_input_output
     gpio_set_output_current
@@ -106,7 +133,11 @@ function_37                         @ 0x461c
 function_e_21                       @ 0x46c4
     function_e_19
     function_e_15
+    function_e_46
     function_e_7
+    function_e_87
+    function_e_43
+    function_e_86
     function_e_14
     function_e_18
     function_e_19
@@ -115,6 +146,7 @@ function_e_23                       @ 0x47bc
 function_e_24                       @ 0x4924
 function_e_25                       @ 0x4860
 function_e_26                       @ 0x4958
+    function_e_52
     function_e_18
     function_e_16
     function_e_5
@@ -128,6 +160,9 @@ function_e_31                       @ 0x4d26
 function_11                         @ 0x4d3c
 function_29                         @ 0x4d64
     ckcu_apb0_clock_enable
+    function_e_54
+    function_e_55
+    function_e_53
 function_10                         @ 0x4dd8
     function_11
     ckcu_ahb_clock_enable
@@ -140,12 +175,24 @@ function_41                         @ 0x4e84
     gpio_set_input_output
     gpio_set_pin_pull_up_down
     afio_pin_config
+function_e_38                       @ 0x4ecc
+    function_43
+function_e_39                       @ 0x4f18
+    function_43
+    function_e_38
+    spin_wait_maybe
+    function_10
 function_42                         @ 0x4fa0
     function_9
 function_25                         @ 0x4fc8
     function_43
 function_43                         @ 0x5008
     watchdog_reload_timer
+function_e_40                       @ 0x50a0
+    function_e_39
+    spin_wait_maybe
+    function_10
+    function_43
 function_27                         @ 0x50f0
 function_28                         @ 0x518c
     function_9
@@ -162,10 +209,26 @@ function_12                         @ 0x52a8
     function_28
 jump_2                              @ 0x5308
     function_39
-
+function_e_41                       @ 0x530c
+function_e_42                       @ 0x5380
+function_e_43                       @ 0x53e4
+    function_e_97
+    function_e_83
+    function_e_85
+    function_e_12
+    function_e_13
+    function_e_11
+    function_e_90
+    function_e_88
+    function_e_32
+    function_13
+    function_e_23
+function_e_44_unused                @ 0x5970
+    function_e_74
 function_63                         @ 0x59bc
     function_64
     ckcu_apb1_clock_enable
+    function_e_36
     function_62
     function_e_27
     function_e_28
@@ -173,7 +236,6 @@ function_63                         @ 0x59bc
     clear_some_mem
     function_e_30
     function_e_31
-
 function_64                         @ 0x5bc0
     ckcu_ahb_clock_enable
     gpio_set_output_current
@@ -186,7 +248,15 @@ function_50                         @ 0x5db0
     gpio_set_pin_pull_up_down
     afio_pin_config
 function_3                          @ 0x5eb8
-
+function_e_45                       @ 0x5efc
+function_e_46                       @ 0x5f18
+function_e_47                       @ 0x5f88
+    function_e_50
+    spin_wait_maybe
+    function_e_51
+function_e_48                       @ 0x60c0
+    ckcu_apb1_clock_enable
+    function_e_49
 function_51                         @ 0x6170
     ckcu_apb0_clock_enable
     ckcu_ahb_clock_enable
@@ -196,7 +266,16 @@ function_51                         @ 0x6170
     gpio_set_input_output
     gpio_set_pin_pull_up_down
     function_64
-
+function_e_49                       @ 0x6350
+    function_e6
+    spin_wait_maybe
+function_e_50                       @ 0x6414
+function_e_51                       @ 0x6478
+function_e_6                        @ 0x64cc
+function_e_52                       @ 0x6520
+function_e_53                       @ 0x6578
+function_e_54                       @ 0x658c
+function_e_55                       @ 0x65f0
 function_e_4                        @ 0x6604
     // this function has something to do with the
     // system control space and device debugging
@@ -207,14 +286,18 @@ function_17                         @ 0x6624
     watchdog_reload_timer
     exti_check_wakup
     function_3
-
 reset_main                          @ 0x66b8
-
+function_e_56                       @ 0x6718
+    function_e_74
+function_e_57                       @ 0x6780
+    function_e_74
 function_68                         @ 0x6808
 function_69                         @ 0x6814
 function_70                         @ 0x6820
     function_71
-
+function_e_58                       @ 0x6854
+    function_e_35
+    clear_two_words
 ptr_write_func_ptrs                 @ 0x68d8
     *function_66
     *function_65
@@ -228,15 +311,28 @@ function_66                         @ 0x6918
     nop_3
     function_e_20
     nop_2
+    function_e_56
+    function_e_57
 function_67                         @ 0x695c
-
+    function_e_58
 function_65                         @ 0x6a10
 usb_get_descriptor                  @ 0x6a84
 function_6                          @ 0x6ae8
 usb_entry                           @ 0x6af2
+    function_e_76
+    function_e_60
+    function_e_68
+    usb_copy_ep_setup
+    function_e_78
+    function_e_63
+    function_e_70
+    function_e_72
+    function_e_74
+    function_e_75
+    function_e_79
 function_23                         @ 0x6ca8
     jump_1
-
+function_e_59                       @ 0x6cc6
 function_7                          @ 0x6d06
 ptr_write_data_addr                 @ 0x6d14
 usb_set_intr_reg                    @ 0x6d30
@@ -247,13 +343,34 @@ usb_init                            @ 0x6d3c
     ptr_write_func_ptrs
     function_23
 function_31                         @ 0x6db0
-
+function_e_60                       @ 0x6dcc
+    function_e_45
+function_e_61                       @ 0x6dd4
+function_e_62                       @ 0x6de4
+function_e_63                       @ 0x6df4
+function_e_64                       @ 0x6e00
+function_e_65                       @ 0x6e18
+    function_e_66
+function_e_66                       @ 0x6e3c
+function_e_67                       @ 0x6e4a
+function_e_68                       @ 0x6e64
+function_e_69                       @ 0x6e72
+function_e_70                       @ 0x6e84
 function_72                         @ 0x6eaa
+    function_e_64
+    function_e_65
+    function_e_69
 function_71                         @ 0x6ee4
     function_72
-
+function_e_71                       @ 0x6f14
+function_e_72                       @ 0x6f24
+function_e_73                       @ 0x6f30
+function_e_74                       @ 0x6f44
+    function_e_66
+    function_e_64
 function_30                         @ 0x6f8c
-
+function_e_75                       @ 0x6f9c
+function_e_76                       @ 0x6fbc
 jump_1                              @ 0x6fcc
     ptr_write_data
 usb_set_lpmode_pdwn                 @ 0x6fd0
@@ -276,8 +393,53 @@ function_53                         @ 0x7158
 erase_flash                         @ 0x7178
 usb_write                           @ 0x71b8
     flash_get_protection_status
-usb_read_allow                      @ 0x723c
-
+function_e_77_unused                @ 0x729c
+    function_e_74
+function_e_78                       @ 0x72b0
+    function_e_66
+    function_e_74
+    function_e_67
+function_e_79                       @ 0x7328
+    usb_set_addr
+    function_e_70
+function_e_80                       @ 0x7444
+    function_e_73
+    function_e_62
+    function_e_61
+function_e_81_unsued                @ 0x74b0
+function_e_82                       @ 0x74d0
+    function_e_84
+    function_25
+    function_e_89
+function_e_83                       @ 0x7780
+    function_e_84
+function_e_84                       @ 0x77b8
+function_e_85                       @ 0x7848
+    function_25
+    function_e_25
+    function_e_18
+    function_e_83
+function_e_86                       @ 0x7918
+    function_e_32
+    function_e_23
+    function_13
+    function_e_89
+function_e_87                       @ 0x79d4
+    function_e_8
+    function_e_18
+function_e_88                       @ 0x7a50
+    function_e_10
+    function_e_18
+function_e_89                       @ 0x7a7c
+    function_e_88
+    function_e_90
+function_e_90                       @ 0x7a98
+    function_e_10
+    function_e_18
+function_e_91                       @ 0x7ac4
+    function_e_9
+    function_e_18
+    function_e_97
 function_24                         @ 0x7b50
     function_25
 function_73                         @ 0x7b94
@@ -289,31 +451,54 @@ function_73                         @ 0x7b94
     function_e_6
     gpio_set_input_output
     gpio_set_reset_pin
+    function_e_50
     usb_init
     function_e_21
     watchdog_reload_timer
+    function_e_59
+function_e_92                       @ 0x7cdc
+function_e_93                       @ 0x7dc8
+function_e_94                       @ 0x7e08
+    function_e_8
+    function_e_97
+function_e_95                       @ 0x7e7c
+    function_e_8
+    function_e_97
 function_e_8                        @ 0x7f18
+    function_e_97
+    function_e_40
     watchdog_reload_timer
-
 function_e_7                        @ 0x80a4
+    function_e_42
     function_e_8
     function_e_25
     function_e_18
     function_e_16
 function_e_5                        @ 0x8160
+    function_e_97
 function_e_9                        @ 0x8278
+    function_e_97
 function_e_10                       @ 0x82c4
+    function_e_97
 function_e_11                       @ 0x8310
 function_1                          @ 0x833c
 function_e_14                       @ 0x83bc
     function_e_18
+    function_e_83
+    function_e_93
+function_e_6                        @ 0x8580
+function_e_96                       @ 0x864a
 function_e_12                       @ 0x8718
 function_e_13                       @ 0x878c
 function_e_15                       @ 0x87fc
     function_e_18
+function_e_16
+    function_e_83
 function_26                         @ 0x88ec
+function_e_97                       @ 0x8934
     watchdog_reload_timer
     function_25
+    function_e_40
     function_27
 
 
