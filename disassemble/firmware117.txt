@@ -8930,11 +8930,11 @@ function_e_95:
     7f02:   e8bd 5ff0   ldmia.w sp!, {r4, r5, r6, r7, r8, r9, sl, fp, ip, lr}
 
   0x7f06:   f7fc b843   b.w 0x3f90                  ; call function_e_18
-
     7f0a:   0000        movs r0, r0
-    7f0c:   0x20000058
-    7f10:   0x20001cba
-    7f14:   0x00008d44
+
+  0x7f0c:   0x20000058
+  0x7f10:   0x20001cba
+  0x7f14:   0x00008d44
 
 function_e_8:
     ; r0 =
