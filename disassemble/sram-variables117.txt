@@ -6,6 +6,14 @@ List of variables in sram (0x2000_0000) and where they are referenced.
     // if its used an array / struct
     <functions its used in>
 
+main_state                              @ 0x20000000
+    0x0:
+    0x4:
+    0x8:
+    0xc:
+    0x10:
+    main
+    sram_decode_static
 
 variable_sram_e_1                       @ 0x20000058
     // used like struct
@@ -51,6 +59,7 @@ pointer_3                               @ 0x20000234
     usb_entry
     function_75
     sram_stack_zero
+    main
 
 pointer_2                               @ 0x2000023c
     0x0:    0x8ac4 (data_1)

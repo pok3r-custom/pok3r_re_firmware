@@ -6,6 +6,9 @@ Firmware v117 Symbol Map:
 
 
 reset                               @ 0x2d54
+    watchdog_init
+    clock_init
+    entry
 
 nmi                                 @ 0x2d60
 hard_fault                          @ 0x2d62
@@ -18,16 +21,18 @@ pendsv_intr                         @ 0x2d6e
 systick_intr                        @ 0x2d70
 generic_intr                        @ 0x2d72
 
-reset_2                             @ 0x2d80
-    function_5
-    function_73
+entry                               @ 0x2d80
+    sram_init
+    main
+
 rand                                @ 0x2d94
 srand                               @ 0x2da8
 memcpy                              @ 0x2db8
-function_5                          @ 0x2ddc
-    function_e_98
+
+sram_init                           @ 0x2ddc
+    sram_decode_static
     sram_stack_zero
-function_e_98                       @ 0x2e00
+sram_decode_static                  @ 0x2e00
 function_e_32                       @ 0x2e5c
 afio_exti_ssr_write                 @ 0x2f50
 function_e_1                        @ 0x2f78
@@ -207,10 +212,11 @@ function_28                         @ 0x518c
     function_9
     function_10
 
-function_55                         @ 0x51b0
-    function_54
-    function_56
-function_54                         @ 0x5240
+setup_intr_priority                         @ 0x51b0
+    calc_nvic_priority
+    ppb_set_nvic_priority
+calc_nvic_priority                  @ 0x5240
+ppb_set_nvic_priority               @ 0x5272
 nvic_set_vtor                       @ 0x5294
 function_12                         @ 0x52a8
     function_29
@@ -295,7 +301,7 @@ function_17                         @ 0x6624
     watchdog_reload_timer
     exti_check_wakup
     function_3
-reset_1                             @ 0x66b8
+clock_init                          @ 0x66b8
 function_e_56                       @ 0x6718
     function_e_74
 function_e_57                       @ 0x6780
@@ -419,7 +425,7 @@ function_e_80                       @ 0x7444
     function_e_62
     function_e_61
 function_e_81_unsued                @ 0x74b0
-sram_stack_zero                         @ 0x74c0
+sram_stack_zero                     @ 0x74c0
 function_e_82                       @ 0x74d0
     function_e_84
     function_25
@@ -455,8 +461,9 @@ function_e_91                       @ 0x7ac4
     function_e_97
 function_24                         @ 0x7b50
     function_25
-function_73                         @ 0x7b94
-    function_55
+
+main                                @ 0x7b94
+    setup_intr_priority
     function_32
     function_74
     spin_wait_maybe
@@ -470,6 +477,7 @@ function_73                         @ 0x7b94
     function_75
     watchdog_reload_timer
     function_e_59
+
 function_e_92                       @ 0x7cdc
 function_e_93                       @ 0x7dc8
 function_e_94                       @ 0x7e08
@@ -528,3 +536,4 @@ string_1                            @ 0x8b3a
 
 task_1                              @ 0x8ff0
 task_2                              @ 0x9000
+sram_init_data                      @ 0x9010

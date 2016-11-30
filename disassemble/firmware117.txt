@@ -94,9 +94,9 @@ reset:
   0x2d54:   4807        ldr r0, [pc, #28]   ; r0 = (0x2d74)
     2d56:   4780        blx r0              ; call r0 (watchdog_init)
     2d58:   4807        ldr r0, [pc, #28]   ; r0 = (0x2d78)
-    2d5a:   4780        blx r0              ; call r0 (reset_1)
+    2d5a:   4780        blx r0              ; call r0 (clock_init)
     2d5c:   4807        ldr r0, [pc, #28]   ; r0 = (0x2d7c)
-    2d5e:   4700        bx r0               ; jump r0 (reset_2)
+    2d5e:   4700        bx r0               ; jump r0 (entry)
 
 nmi:
   0x2d60:   e7fe        b.n 0x2d60
@@ -120,16 +120,18 @@ generic_intr:
   0x2d72:   e7fe        b.n 0x2d72
 
   0x2d74:   0x70e9 (watchdog_init)
-  0x2d78:   0x66b9 (reset_1)
-  0x2d7c:   0x2d81 (reset_2)
+  0x2d78:   0x66b9 (clock_init)
+  0x2d7c:   0x2d81 (entry)
 
-reset_2:
+entry:
+    ; Load stack pointer at top of stack (redundant?)
   0x2d80:   f8df d00c   ldr.w sp, [pc, #12]     ; sp = (0x2d90)
-    2d84:   f000 f82a   bl 0x2ddc               ; call function_5
+    2d84:   f000 f82a   bl 0x2ddc               ; call sram_init
+    ; Jump to main
   0x2d88:   4800        ldr r0, [pc, #0]        ; r0 = (0x2d8c)
-    2d8a:   4700        bx r0                   ; jump r0 = 0x7b95 (function_73)
+    2d8a:   4700        bx r0                   ; jump r0 = 0x7b95 (main)
 
-  0x2d8c:   0x7b95      ; (function_73)
+  0x2d8c:   0x7b95      ; (main)
   0x2d90:   0x20003760  ; top of stack
 
 rand:
@@ -183,13 +185,16 @@ memcpy:
     2dd8:   d2f9        bcs.n 0x2dce                ; if(r2 >= 0) branch 0x2dce                 | return;
     2dda:   4770        bx lr                       ; return
 
-function_5:
+sram_init:
+    ; This calls two functions to init parts of SRAM
+    ; Static data at 0x20000000 is decoded from flash
+    ; Everything after 0x20000234 until the top of the stack is zeroed
   0x2ddc:   4c06        ldr r4, [pc, #24]       ; r4 = (0x2df8) 0x8ff0
     2dde:   4d07        ldr r5, [pc, #28]       ; r5 = (0x2dfc) 0x9010
     2de0:   e006        b.n 0x2df0
 
     ; load function pointers and arguments from data
-    ; calls function_e_98(0x9010, 0x20000000, 0x234)
+    ; calls sram_decode_static(0x9010, 0x20000000, 0x234)
     ; calls sram_stack_zero(0x90d4, 0x20000234, 0x352c)
   0x2de2:   68e0        ldr r0, [r4, #12]           ; r0 = [r4 + 0xc] = 0x2e00, 0x74c0
                                                     ; set lsb (required by blx)
@@ -198,7 +203,7 @@ function_5:
                                                     ; r0 = 0x9010, 0x90d4
                                                     ; r1 = 0x20000000, 0x20000234
                                                     ; r2 = 0x234, 0x352c
-    2dec:   4798        blx r3                      ; call r3 (function_e_98, sram_stack_zero)
+    2dec:   4798        blx r3                      ; call r3 (sram_decode_static, sram_stack_zero)
     2dee:   3410        adds r4, #16                ; r4 = r4 + 0x10
 
   0x2df0:   42ac        cmp r4, r5
@@ -208,22 +213,26 @@ function_5:
   0x2df8:   0x8ff0  ; task_1
   0x2dfc:   0x9010
 
-function_e_98:
-    ; r0 = 0x9010
+sram_decode_static:
+    ; r0 = 0x9010 (sram_init_data)
     ; r1 = 0x20000000
     ; r2 = 0x234
+    ; Haven't gone in depth, but pretty sure this
+    ; decodes some data from flash, and loads
+    ; as static variables in SRAM
+    ; So, initializes SRAM from 0x20000000 to 0x20000234
   0x2e00:   b570        push {r4, r5, r6, lr}
     2e02:   eb01 0402   add.w r4, r1, r2        ; r4 = r1 + r2
-  0x2e06:   f810 5b01   ldrb.w r5, [r0], #1     ; r6 = [r0 + 1]
+  0x2e06:   f810 5b01   ldrb.w r5, [r0], #1     ; r5 = [r0++]
     2e0a:   f015 0307   ands.w r3, r5, #7       ; r3 = r5 & 7
     2e0e:   d101        bne.n 0x2e14
-    2e10:   f810 3b01   ldrb.w r3, [r0], #1     ; r3 = [r0 + 1]
+    2e10:   f810 3b01   ldrb.w r3, [r0], #1     ; r3 = [r0++]
   0x2e14:   112a        asrs r2, r5, #4         ; r2 = r5 >> 4
     2e16:   d106        bne.n 0x2e26
-    2e18:   f810 2b01   ldrb.w r2, [r0], #1     ; r2 = [r0 + 1]
+    2e18:   f810 2b01   ldrb.w r2, [r0], #1     ; r2 = [r0++]
     2e1c:   e003        b.n 0x2e26
-    2e1e:   f810 6b01   ldrb.w r6, [r0], #1     ; r6 = [r0 + 1]
-    2e22:   f801 6b01   strb.w r6, [r1], #1     ; [r1 + 1] = r6
+  0x2e1e:   f810 6b01   ldrb.w r6, [r0], #1     ; r6 = [r0++]
+    2e22:   f801 6b01   strb.w r6, [r1], #1     ; [r1++] = r6
   0x2e26:   1e5b        subs r3, r3, #1         ; r3 = r3 - 1
     2e28:   d1f9        bne.n 0x2e1e
     2e2a:   072b        lsls r3, r5, #28        ; r3 = r5 << r8
@@ -231,14 +240,14 @@ function_e_98:
     2e2e:   2300        movs r3, #0             ; r3 = 0
   0x2e30:   1e52        subs r2, r2, #1         ; r2 = r2 - 1
     2e32:   d40f        bmi.n 0x2e54
-    2e34:   f801 3b01   strb.w r3, [r1], #1     ; [r1 + 1] = r3
+    2e34:   f801 3b01   strb.w r3, [r1], #1     ; [r1++] = r3
     2e38:   e7fa        b.n 0x2e30
-  0x2e3a:   f810 3b01   ldrb.w r3, [r0], #1     ; r3 = [r0 + 1]
+  0x2e3a:   f810 3b01   ldrb.w r3, [r0], #1     ; r3 = [r0++]
     2e3e:   f102 0202   add.w r2, r2, #2        ; r2 = r2 + 2
     2e42:   eba1 0303   sub.w r3, r1, r3        ; r3 = r1 + r3
     2e46:   e003        b.n 0x2e50
-  0x2e48:   f813 5b01   ldrb.w r5, [r3], #1     ; r5 = [r3 + 1]
-    2e4c:   f801 5b01   strb.w r5, [r1], #1     ; [r1 + 1] = r5
+  0x2e48:   f813 5b01   ldrb.w r5, [r3], #1     ; r5 = [r3++]
+    2e4c:   f801 5b01   strb.w r5, [r1], #1     ; [r1++] = r5
   0x2e50:   1e52        subs r2, r2, #1         ; r2 = r2 - 1
     2e52:   d5f9        bpl.n 0x2e48
     2e54:   42a1        cmp r1, r4
@@ -2839,6 +2848,8 @@ nop_2:
   0x461a:   4770        bx lr
 
 function_37:
+    ; r0 =
+    ; r1 =
   0x461c:   e92d 41f0   stmdb sp!, {r4, r5, r6, r7, r8, lr}
     4620:   4604        mov r4, r0              ; r4 = r0
     4622:   f7ff f8db   bl 0x37dc               ; call nop_1
@@ -2919,6 +2930,7 @@ function_37:
   0x46c0:   0x400b0000  ; GPIO A
 
 function_e_21:
+    ; r0 =
   0x46c4:   b570        push {r4, r5, r6, lr}
     46c6:   4c33        ldr r4, [pc, #204]   ; (0x4794)
     46c8:   2500        movs r5, #0
@@ -4143,67 +4155,71 @@ function_28:
     51ac:   2001        movs r0, #1
     51ae:   bd10        pop {r4, pc}
 
-function_55:
+setup_intr_priority:
   0x51b0:   b510        push {r4, lr}
+
     51b2:   f44f 5130   mov.w r1, #11264        ; r1 = 0x2c00
     51b6:   2000        movs r0, #0             ; r0 = 0
-    51b8:   f000 f86c   bl 0x5294               ; call nvic_set_vtor
+    51b8:   f000 f86c   bl 0x5294               ; call nvic_set_vtor(0, 0x2c00)
+
     51bc:   491e        ldr r1, [pc, #120]      ; r1 = (0x5238) AIRCR
     51be:   6808        ldr r0, [r1, #0]        ; r0 = [r1]
-    51c0:   f64f 02ff   movw r2, #63743         ; 0xf8ff
-    51c4:   ea00 0002   and.w r0, r0, r2
-    51c8:   4a1c        ldr r2, [pc, #112]      ; (0x523c)
-    51ca:   f440 7040   orr.w r0, r0, #768      ; 0x300
-    51ce:   ea40 0002   orr.w r0, r0, r2
-    51d2:   6008        str r0, [r1, #0]
+    51c0:   f64f 02ff   movw r2, #63743         ; r2 = 0xf8ff
+    51c4:   ea00 0002   and.w r0, r0, r2        ; r0 = r0 & r2 Clear PRIGROUP interrupt priority grouping
+    51c8:   4a1c        ldr r2, [pc, #112]      ; r2 = (0x523c)
+    51ca:   f440 7040   orr.w r0, r0, #768      ; r0 = r0 | 0x300 SET PRIGROUP = 3
+    51ce:   ea40 0002   orr.w r0, r0, r2        ; r0 = r0 | r2
+    51d2:   6008        str r0, [r1, #0]        ; [r1] = r0
+
     51d4:   f04f 0200   mov.w r2, #0
     51d8:   4611        mov r1, r2
     51da:   f04f 0003   mov.w r0, #3
-    51de:   f000 f82f   bl 0x5240               ; call function_54
+    51de:   f000 f82f   bl 0x5240               ; call calc_nvic_priority(3, 0, 0)
     51e2:   4601        mov r1, r0
     51e4:   202b        movs r0, #43            ; r0 = 0x2b
-    51e6:   f000 f844   bl 0x5272               ; call function_56
+    51e6:   f000 f844   bl 0x5272               ; call ppb_set_nvic_priority(0x2b, r1)
     51ea:   2200        movs r2, #0
     51ec:   4611        mov r1, r2
     51ee:   2003        movs r0, #3
-    51f0:   f000 f826   bl 0x5240               ; call function_54
+    51f0:   f000 f826   bl 0x5240               ; call calc_nvic_priority(3, 0, 0)
     51f4:   4601        mov r1, r0
     51f6:   202c        movs r0, #44            ; r0 = 0x2c
-    51f8:   f000 f83b   bl 0x5272               ; call function_56
+    51f8:   f000 f83b   bl 0x5272               ; call ppb_set_nvic_priority(0x2c, r1)
     51fc:   2200        movs r2, #0
     51fe:   2101        movs r1, #1
     5200:   2003        movs r0, #3
-    5202:   f000 f81d   bl 0x5240               ; call function_54
+    5202:   f000 f81d   bl 0x5240               ; call calc_nvic_priority(3, 1, 0)
     5206:   4601        mov r1, r0
     5208:   202a        movs r0, #42            ; r0 = 0x2a
-    520a:   f000 f832   bl 0x5272               ; call function_56
+    520a:   f000 f832   bl 0x5272               ; call ppb_set_nvic_priority(0x2a, r1)
     520e:   2200        movs r2, #0
     5210:   2102        movs r1, #2
     5212:   2003        movs r0, #3
-    5214:   f000 f814   bl 0x5240               ; call function_54
+    5214:   f000 f814   bl 0x5240               ; call calc_nvic_priority(3, 2, 0)
     5218:   4601        mov r1, r0
     521a:   2029        movs r0, #41            ; r0 = 0x29
-    521c:   f000 f829   bl 0x5272               ; call function_56
+    521c:   f000 f829   bl 0x5272               ; call ppb_set_nvic_priority(0x29, r1)
     5220:   2200        movs r2, #0
     5222:   2102        movs r1, #2
     5224:   2003        movs r0, #3
-    5226:   f000 f80b   bl 0x5240               ; call function_54
+    5226:   f000 f80b   bl 0x5240               ; call calc_nvic_priority(3, 2, 0)
     522a:   4601        mov r1, r0
     522c:   e8bd 4010   ldmia.w sp!, {r4, lr}
     5230:   2035        movs r0, #53            ; r0 = 0x35
-    5232:   f000 b81e   b.w 0x5272              ; jump function_56
+    5232:   f000 b81e   b.w 0x5272              ; jump ppb_set_nvic_priority(0x35, r1)
     5236:   0000
 
   0x5238:   0xe000ed0c  ; NVIC AIRCR register
-  0x523c:   0x05fa0000
+  0x523c:   0x05fa0000  ; VECTKEY (needed to write AIRCR)
 
 
-function_54:
-    ; I still have no idea what this does
+calc_nvic_priority:
     ; r0 = 3
     ; r1 = 2
     ; r2 = 0
     ; return r0 = 2
+    ; I still have no idea what this really does
+    ; Best I can see, calculates interrupt priorities for ppb_set_nvic_priority
   0x5240:   b530        push {r4, r5, lr}
     5242:   f000 0307   and.w r3, r0, #7        ; r3 = r0 & 7       3
     5246:   2504        movs r5, #4             ; r5 = 4            4
@@ -4227,15 +4243,16 @@ function_54:
     526e:   4318        orrs r0, r3             ; r0 = r0 | r3      2
     5270:   bd30        pop {r4, r5, pc}
 
-function_56:
+ppb_set_nvic_priority:
     ; r0 = 0x35
     ; r1 = 2
+    ; Set some values in the PPB NVIC interrupt priority registers
   0x5272:   0709        lsls r1, r1, #28        ; r1 = r1 << 28
     5274:   0e09        lsrs r1, r1, #24        ; r1 = r1 >> 24
     5276:   f04f 22e0   mov.w r2, #3758153728   ; r2 = 0xe000e000
     527a:   2800        cmp r0, #0
     527c:   da05        bge.n 0x528a            ; branch if r0 >= 0
-    527e:   f000 000f   and.w r0, r0, #15       ; r0 = r0 + 0xf
+    527e:   f000 000f   and.w r0, r0, #15       ; r0 = r0 & 0xf
     5282:   4410        add r0, r2              ; r0 = r0 + r2
     5284:   f880 1d14   strb.w r1, [r0, #3348]  ; [r0 + 0xd14] = r1
     5288:   4770        bx lr
@@ -4245,8 +4262,9 @@ function_56:
     5292:   0000
 
 nvic_set_vtor:
-    ; r0 =
-    ; r1 = Offset address
+    ; r0 = OR with VTOR offset
+    ; r1 = VTOR offset
+    ; Set vetor table offset register
   0x5294:   4a02        ldr r2, [pc, #8]        ; r2 = (0x52a0)
     5296:   4011        ands r1, r2             ; r1 = r1 & r2
     5298:   4301        orrs r1, r0             ; r1 = r1 | r0
@@ -6252,7 +6270,7 @@ function_17:
     664e:   f010 0fc0   tst.w r0, #192          ; 0xc0
     6652:   d011        beq.n 0x6678
     6654:   2001        movs r0, #1
-    6656:   f7fd ffe1   bl 0x461c               ; call function_37
+    6656:   f7fd ffe1   bl 0x461c               ; call function_37(1)
     665a:   2000        movs r0, #0             ; r0 = 0
     665c:   60e8        str r0, [r5, #12]       ; [r5 + 0xc] = r0
     665e:   f897 0032   ldrb.w r0, [r7, #50]    ; 0x32
@@ -6284,11 +6302,11 @@ function_17:
   0x66a6:   e8bd 81f0   ldmia.w sp!, {r4, r5, r6, r7, r8, pc}
     66aa:   0000
 
-  0x66ac:   0x20000000  ; Stack limit
+  0x66ac:   0x20000000  ; main_state
   0x66b0:   0x20000234  ; Stack position
   0x66b4:   0x400a8000  ; USB registers
 
-reset_1:
+clock_init:
     ; Write 1 to CKCU.LPCR.BKISO
     ; Enable backup domain accessible by other power domain
   0x66b8:   4814        ldr r0, [pc, #80]       ; r0 = (0x670c) [0x40088000]
@@ -6302,35 +6320,44 @@ reset_1:
     66ca:   2b00        cmp r3, #0
     66cc:   d0fb        beq.n 0x66c6            ; loop if r3 == 0
 
-    66ce:   2300        movs r3, #0
-    66d0:   6213        str r3, [r2, #32]
-    66d2:   f04f 6310   mov.w r3, #150994944    ; 0x9000000
-    66d6:   6183        str r3, [r0, #24]
-    66d8:   f8c2 10a4   str.w r1, [r2, #164]    ; 0xa4
+    66ce:   2300        movs r3, #0             ; r3 = 0
+    66d0:   6213        str r3, [r2, #32]       ; [r2 + 0x20] = r3
 
-    66dc:   f8d2 3104   ldr.w r3, [r2, #260]    ; 0x104
+    ; Set CKCU.PLLCFGR.PFBD = 9
+    ; Set PLL VCO output clock feddback divider to 9
+    66d2:   f04f 6310   mov.w r3, #150994944    ; r3 = 0x9000000
+    66d6:   6183        str r3, [r0, #24]       ; [r0 + 0x18] = r3
+
+    66d8:   f8c2 10a4   str.w r1, [r2, #164]    ; [r2 + 0xa4] = r1
+  0x66dc:   f8d2 3104   ldr.w r3, [r2, #260]    ; r3 = [r2 + 0x104]
     66e0:   2b00        cmp r3, #0
     66e2:   d0fb        beq.n 0x66dc            ; loop if r3 == 0
 
-    66e4:   4a0b        ldr r2, [pc, #44]       ; (0x6714) [0x40080200]
-    66e6:   6813        ldr r3, [r2, #0]
-    66e8:   f023 0307   bic.w r3, r3, #7
-    66ec:   f103 0303   add.w r3, r3, #3
-    66f0:   6013        str r3, [r2, #0]
-    66f2:   6201        str r1, [r0, #32]
-    66f4:   6842        ldr r2, [r0, #4]
-    66f6:   f022 0203   bic.w r2, r2, #3
-    66fa:   f102 0201   add.w r2, r2, #1
-    66fe:   6042        str r2, [r0, #4]
-    6700:   6b42        ldr r2, [r0, #52]       ; 0x34
+    ; Set FMC.CFCR.WAIT = 3
+    ; Sets the flash wait clock
+    66e4:   4a0b        ldr r2, [pc, #44]       ; r2 = (0x6714) [0x40080200] FMC.CFCR
+    66e6:   6813        ldr r3, [r2, #0]        ; r3 = [r2]
+    66e8:   f023 0307   bic.w r3, r3, #7        ; r3 = r3 & ~7
+    66ec:   f103 0303   add.w r3, r3, #3        ; r3 = r3 + 3
+    66f0:   6013        str r3, [r2, #0]        ; [r2] = r3
+
+    ; Set CKCU.AHBCFGR = 1
+    ; Sets the system clock frequency to CK_AHB = CK_SYS / 2
+    66f2:   6201        str r1, [r0, #32]       ; [r0 + 0x20] = r1
+
+    66f4:   6842        ldr r2, [r0, #4]        ; r2 = [r0 + 4]
+    66f6:   f022 0203   bic.w r2, r2, #3        ; r2 = r2 & ~2
+    66fa:   f102 0201   add.w r2, r2, #1        ; r2 = r2 + 1
+    66fe:   6042        str r2, [r0, #4]        ; [r0 + 4] = r2
+    6700:   6b42        ldr r2, [r0, #52]       ; r2 = [r0 + 0x34]
     6702:   ebb1 7f92   cmp.w r1, r2, lsr #30
-    6706:   d1fb        bne.n 0x6700
+    6706:   d1fb        bne.n 0x6700            ; branch if r1 != r2 >> 30
     6708:   4770        bx lr
     670a:   0000
 
   0x670c:   0x40088000  ; CKCU Registers
   0x6710:   0x43100000  ; In APB/AHB bit band alias block
-  0x6714:   0x40080200  ; In FMC Registers
+  0x6714:   0x40080200  ; FMC.CFCR
 
 function_e_56:
   0x6718:   b570        push {r4, r5, r6, lr}
@@ -8663,131 +8690,149 @@ function_24:
   0x7b8c:   0x8d50
   0x7b90:   0x20001cba
 
-function_73:
-  0x7b94:   f7fd fb0c   bl 0x51b0               ; call function_55
+main:
+    ; This function is called at the end of initialization, and does not return,
+    ; or branch elsewhere. So, this is main.
+  0x7b94:   f7fd fb0c   bl 0x51b0               ; call setup_intr_priority()
     7b98:   f7fb fb9e   bl 0x32d8               ; call function_32
     7b9c:   f7fb fe72   bl 0x3884               ; call function_74
+
     7ba0:   4846        ldr r0, [pc, #280]      ; r0 = (0x7cbc)
     7ba2:   f7fb fb93   bl 0x32cc               ; call spin_wait_maybe(400000)
+
     7ba6:   2001        movs r0, #1
-    7ba8:   f7fc fd38   bl 0x461c               ; call function_37
+    7ba8:   f7fc fd38   bl 0x461c               ; call function_37(1)
     7bac:   2001        movs r0, #1
-    7bae:   f7fe fc8d   bl 0x64cc               ; call function_e_6
+    7bae:   f7fe fc8d   bl 0x64cc               ; call function_e_6(1)
+
     7bb2:   4843        ldr r0, [pc, #268]      ; r0 = (0x7cc0)
     7bb4:   f7fb fb8a   bl 0x32cc               ; call spin_wait_maybe(100000)
     7bb8:   200a        movs r0, #10
     7bba:   f7fb fb87   bl 0x32cc               ; call spin_wait_maybe(10)
 
-                                                ; Reset pin 9 output on GPIO A
-    7bbe:   f8df 8104   ldr.w r8, [pc, #260]    ; r8 = (0x7cc4)
+    ; Reset pin 9 output on GPIO A
+    7bbe:   f8df 8104   ldr.w r8, [pc, #260]    ; r8 = (0x7cc4) GPIO A
     7bc2:   f44f 7600   mov.w r6, #512          ; r6 = 0x200
     7bc6:   f8c8 6028   str.w r6, [r8, #40]     ; [r8 + 0x28] = r6
 
     7bca:   200a        movs r0, #10
     7bcc:   f7fb fb7e   bl 0x32cc               ; call spin_wait_maybe(10)
 
-    7bd0:   f8df a0f4   ldr.w sl, [pc, #244]    ; sl = (0x7cc8)
+    7bd0:   f8df a0f4   ldr.w sl, [pc, #244]    ; sl = (0x7cc8) GPIO C
     7bd4:   f44f 7980   mov.w r9, #256          ; r9 = 0x100
-
     7bd8:   2201        movs r2, #1
     7bda:   464c        mov r4, r9
     7bdc:   4649        mov r1, r9
     7bde:   4655        mov r5, sl
     7be0:   4650        mov r0, sl
-    7be2:   f7fb fc9b   bl 0x351c               ; call gpio_set_input_output
+    7be2:   f7fb fc9b   bl 0x351c               ; call gpio_set_input_output(GPIO C, 0x100, 1)
     7be6:   2200        movs r2, #0
     7be8:   4621        mov r1, r4
     7bea:   4628        mov r0, r5
-    7bec:   f7fb fccc   bl 0x3588               ; call gpio_set_reset_pin
+    7bec:   f7fb fccc   bl 0x3588               ; call gpio_set_reset_pin(GPIO C, 0x100, 0)
+
     7bf0:   200a        movs r0, #10
     7bf2:   f7fb fb6b   bl 0x32cc               ; call spin_wait_maybe(10)
-    7bf6:   f7fe fc0d   bl 0x6414               ; call function_e_50
-    7bfa:   4c34        ldr r4, [pc, #208]   ; (0x7ccc)
-    7bfc:   7020        strb r0, [r4, #0]
-    7bfe:   7820        ldrb r0, [r4, #0]
-    7c00:   f000 0044   and.w r0, r0, #68   ; 0x44
-    7c04:   7020        strb r0, [r4, #0]
-    7c06:   7821        ldrb r1, [r4, #0]
-    7c08:   4831        ldr r0, [pc, #196]   ; (0x7cd0)
-    7c0a:   2700        movs r7, #0
-    7c0c:   2501        movs r5, #1
-    7c0e:   2944        cmp r1, #68   ; 0x44
-    7c10:   d025        beq.n 0x7c5e
-    7c12:   7821        ldrb r1, [r4, #0]
+
+    7bf6:   f7fe fc0d   bl 0x6414               ; call function_e_50()
+
+    7bfa:   4c34        ldr r4, [pc, #208]      ; r4 = (0x7ccc) main_state
+    7bfc:   7020        strb r0, [r4, #0]       ; [r4] =
+    7bfe:   7820        ldrb r0, [r4, #0]       ; r0 = [r4]
+    7c00:   f000 0044   and.w r0, r0, #68       ; r0 = r0 & 0x44
+    7c04:   7020        strb r0, [r4, #0]       ; [r4] = r0
+    7c06:   7821        ldrb r1, [r4, #0]       ; r1 = [r4]
+    7c08:   4831        ldr r0, [pc, #196]      ; r0 = (0x7cd0)
+    7c0a:   2700        movs r7, #0             ; r7 = 0
+    7c0c:   2501        movs r5, #1             ; r5 = 1
+    7c0e:   2944        cmp r1, #68
+    7c10:   d025        beq.n 0x7c5e            ; branch if r1 == 0x44
+    7c12:   7821        ldrb r1, [r4, #0]       ; r1 = [r4]
     7c14:   2904        cmp r1, #4
-    7c16:   d024        beq.n 0x7c62
-    7c18:   7821        ldrb r1, [r4, #0]
-    7c1a:   2944        cmp r1, #68   ; 0x44
-    7c1c:   d023        beq.n 0x7c66
-    7c1e:   2103        movs r1, #3
-  0x7c20:   7001        strb r1, [r0, #0]
-  0x7c22:   492c        ldr r1, [pc, #176]   ; (0x7cd4)
-    7c24:   7800        ldrb r0, [r0, #0]
-    7c26:   7008        strb r0, [r1, #0]
-    7c28:   2201        movs r2, #1
-    7c2a:   4649        mov r1, r9
-    7c2c:   4650        mov r0, sl
-    7c2e:   f7fb fcab   bl 0x3588               ; call gpio_set_reset_pin
+    7c16:   d024        beq.n 0x7c62            ; branch if r1 == 4
+    7c18:   7821        ldrb r1, [r4, #0]       ; r1 = [r4]
+    7c1a:   2944        cmp r1, #68
+    7c1c:   d023        beq.n 0x7c66            ; branch if r1 == 0x44
+    7c1e:   2103        movs r1, #3             ; r1 = 3
+
+    ; Main loop
+  0x7c20:   7001        strb r1, [r0, #0]       ; [r0] = r1
+  0x7c22:   492c        ldr r1, [pc, #176]      ; r1 = (0x7cd4)
+    7c24:   7800        ldrb r0, [r0, #0]       ; r0 = [r0]
+    7c26:   7008        strb r0, [r1, #0]       ; [r1] = r0
+
+    7c28:   2201        movs r2, #1             ; r2 = 1
+    7c2a:   4649        mov r1, r9              ; r1 = r9
+    7c2c:   4650        mov r0, sl              ; r0 = sl
+    7c2e:   f7fb fcab   bl 0x3588               ; call gpio_set_reset_pin(GPIO C, 0x100l 1)
     7c32:   200a        movs r0, #10
-    7c34:   f7fb fb4a   bl 0x32cc               ; call spin_wait_maybe
+    7c34:   f7fb fb4a   bl 0x32cc               ; call spin_wait_maybe(10)
     7c38:   2001        movs r0, #1
     7c3a:   f7fe fc47   bl 0x64cc               ; call function_e_6
     7c3e:   200a        movs r0, #10
-    7c40:   f7fb fb44   bl 0x32cc               ; call spin_wait_maybe
-    7c44:   f8c8 6024   str.w r6, [r8, #36]     ; 0x24
+    7c40:   f7fb fb44   bl 0x32cc               ; call spin_wait_maybe(10)
+    7c44:   f8c8 6024   str.w r6, [r8, #36]     ; [r8 + 0x24] = r6
+
     7c48:   200a        movs r0, #10
-    7c4a:   f7fb fb3f   bl 0x32cc               ; call spin_wait_maybe
+    7c4a:   f7fb fb3f   bl 0x32cc               ; call spin_wait_maybe(10)
     7c4e:   f7fb f9d9   bl 0x3004               ; call function_e_33
     7c52:   f7ff f873   bl 0x6d3c               ; call usb_init
-    7c56:   4e20        ldr r6, [pc, #128]      ; r6 = (0x7cd8)
-    7c58:   68a0        ldr r0, [r4, #8]        ; r0 = [r4 + 8]
+
+    7c56:   4e20        ldr r6, [pc, #128]      ; r6 = (0x7cd8) pointer_3
+
+  0x7c58:   68a0        ldr r0, [r4, #8]        ; r0 = [r4 + 8]
     7c5a:   b130        cbz r0, 0x7c6a          ; branch if r0 == 0
-    7c5c:   e00d        b.n 0x7c7a
-    7c5e:   7007        strb r7, [r0, #0]
-    7c60:   e7df        b.n 0x7c22
-    7c62:   7005        strb r5, [r0, #0]
-    7c64:   e7dd        b.n 0x7c22
-    7c66:   2102        movs r1, #2
-    7c68:   e7da        b.n 0x7c20
-  0x7c6a:   f896 0032   ldrb.w r0, [r6, #50]   ; 0x32
+    7c5c:   e00d        b.n 0x7c7a              ; branch
+  0x7c5e:   7007        strb r7, [r0, #0]       ; r7 = [r0]
+    7c60:   e7df        b.n 0x7c22              ; branch
+  0x7c62:   7005        strb r5, [r0, #0]       ; r5 = [r0]
+    7c64:   e7dd        b.n 0x7c22              ; branch
+  0x7c66:   2102        movs r1, #2             ; r1 = 2
+    7c68:   e7da        b.n 0x7c20              ; branch
+  0x7c6a:   f896 0032   ldrb.w r0, [r6, #50]    ; r0 = [r6 + 0x32]
     7c6e:   2806        cmp r0, #6
-    7c70:   d11e        bne.n 0x7cb0
+    7c70:   d11e        bne.n 0x7cb0            ; jump to end if r0 != 6
     7c72:   2000        movs r0, #0
-    7c74:   60a5        str r5, [r4, #8]
-    7c76:   f7fc fcd1   bl 0x461c               ; call function_37
-  0x7c7a:   68a0        ldr r0, [r4, #8]
+    7c74:   60a5        str r5, [r4, #8]        ; [r4 + 8] = r5
+    7c76:   f7fc fcd1   bl 0x461c               ; call function_37(0)
+  0x7c7a:   68a0        ldr r0, [r4, #8]        ; r0 = [r4 + 8]
     7c7c:   2801        cmp r0, #1
-    7c7e:   d117        bne.n 0x7cb0
-    7c80:   6920        ldr r0, [r4, #16]
-    7c82:   b120        cbz r0, 0x7c8e
-    7c84:   6127        str r7, [r4, #16]
+    7c7e:   d117        bne.n 0x7cb0            ; jump to end if r0 != 1
+    7c80:   6920        ldr r0, [r4, #16]       ; r0 = [r4 + 0x10]
+    7c82:   b120        cbz r0, 0x7c8e          ; branch if r0 == 0
+    7c84:   6127        str r7, [r4, #16]       ; [r4 + 0x10] = r7
     7c86:   2001        movs r0, #1
-    7c88:   60e7        str r7, [r4, #12]
-    7c8a:   f7fc fcc7   bl 0x461c               ; call function_37
-    7c8e:   68e0        ldr r0, [r4, #12]
+    7c88:   60e7        str r7, [r4, #12]       ; [r4 + 0xc] = r7
+    7c8a:   f7fc fcc7   bl 0x461c               ; call function_37(1)
+
+  0x7c8e:   68e0        ldr r0, [r4, #12]       ; r0 = [r4 + 0xc]
     7c90:   b948        cbnz r0, 0x7ca6
-    7c92:   6920        ldr r0, [r4, #16]
-    7c94:   b960        cbnz r0, 0x7cb0
-    7c96:   f896 0032   ldrb.w r0, [r6, #50]   ; 0x32
+    7c92:   6920        ldr r0, [r4, #16]       ; [r4 + 0x10] = r0
+    7c94:   b960        cbnz r0, 0x7cb0         ; jump to end if r0 == 0
+    7c96:   f896 0032   ldrb.w r0, [r6, #50]    ; r0 = [r6 + 0x32]
     7c9a:   2806        cmp r0, #6
-    7c9c:   d108        bne.n 0x7cb0
+    7c9c:   d108        bne.n 0x7cb0            ; jump to end if r0 != 6
     7c9e:   2000        movs r0, #0
-    7ca0:   60e5        str r5, [r4, #12]
-    7ca2:   f7fc fcbb   bl 0x461c               ; call function_37
-    7ca6:   68e0        ldr r0, [r4, #12]
+    7ca0:   60e5        str r5, [r4, #12]       ; [r4 + 0xc] = r5
+    7ca2:   f7fc fcbb   bl 0x461c               ; call function_37(0)
+
+  0x7ca6:   68e0        ldr r0, [r4, #12]       ; r0 = [r4 + 0xc]
     7ca8:   2801        cmp r0, #1
-    7caa:   d101        bne.n 0x7cb0
+    7caa:   d101        bne.n 0x7cb0            ; branch if r0 != 1
     7cac:   f7fc fd0a   bl 0x46c4               ; call function_e_21
+
   0x7cb0:   4809        ldr r0, [pc, #36]       ; r0 = (0x7cd8)
-    7cb2:   f7ff f808   bl 0x6cc6               ; call function_75(0x20000234 (pointer_3))
+    7cb2:   f7ff f808   bl 0x6cc6               ; call function_75(pointer_3)
+
     7cb6:   f7ff fa45   bl 0x7144               ; call watchdog_reload_timer
-    7cba:   e7cd        b.n 0x7c58
+
+    7cba:   e7cd        b.n 0x7c58              ; unconditional loop
 
   0x7cbc:   0x61a80     ; 400,000
   0x7cc0:   0x186a0     ; 100,000
   0x7cc4:   0x400b0000  ; GPIO A
   0x7cc8:   0x400b4000  ; GPIO C
-  0x7ccc:   0x20000000
+  0x7ccc:   0x20000000  ; main_state
   0x7cd0:   0x2000007e
   0x7cd4:   0x2000007f
   0x7cd8:   0x20000234  ; pointer_3
@@ -10622,7 +10667,7 @@ task_1:
   0x8ff0:   0x9010
   0x8ff4:   0x20000000
   0x8ff8:   0x234
-  0x8ffc:   0x2e00 (function_e_98)
+  0x8ffc:   0x2e00 (sram_decode_static)
 
 task_2:
   0x9000:   0x90d4
@@ -10630,7 +10675,8 @@ task_2:
   0x9008:   0x352c
   0x900c:   0x74c0 (sram_stack_zero)
 
-    9010:   41 02 17 01
+sram_init_data:
+  0x9010:   41 02 17 01
     9014:   29 18 69 04
     9018:   01 1c 63 34
     901c:   8b 5a 38 08
