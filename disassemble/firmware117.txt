@@ -94,9 +94,9 @@ reset:
   0x2d54:   4807        ldr r0, [pc, #28]   ; r0 = (0x2d74)
     2d56:   4780        blx r0              ; call r0 (watchdog_init)
     2d58:   4807        ldr r0, [pc, #28]   ; r0 = (0x2d78)
-    2d5a:   4780        blx r0              ; call r0 (reset_main)
+    2d5a:   4780        blx r0              ; call r0 (reset_1)
     2d5c:   4807        ldr r0, [pc, #28]   ; r0 = (0x2d7c)
-    2d5e:   4700        bx r0               ; jump r0 (reset_end)
+    2d5e:   4700        bx r0               ; jump r0 (reset_2)
 
 nmi:
   0x2d60:   e7fe        b.n 0x2d60
@@ -120,39 +120,47 @@ generic_intr:
   0x2d72:   e7fe        b.n 0x2d72
 
   0x2d74:   0x70e9 (watchdog_init)
-  0x2d78:   0x66b9 (reset_main)
-  0x2d7c:   0x2d81 (reset_end)
+  0x2d78:   0x66b9 (reset_1)
+  0x2d7c:   0x2d81 (reset_2)
 
-reset_end:
+reset_2:
   0x2d80:   f8df d00c   ldr.w sp, [pc, #12]     ; sp = (0x2d90)
     2d84:   f000 f82a   bl 0x2ddc               ; call function_5
   0x2d88:   4800        ldr r0, [pc, #0]        ; r0 = (0x2d8c)
-    2d8a:   4700        bx r0                   ; jump r0 (0x7b95)
+    2d8a:   4700        bx r0                   ; jump r0 = 0x7b95 (function_73)
 
-  0x2d8c:   0x7b95
-  0x2d90:   0x20003760
+  0x2d8c:   0x7b95      ; (function_73)
+  0x2d90:   0x20003760  ; top of stack
 
-prg_term:
-    ; its possible that this is used as the random generator for a cipher. Its been done before.
-  0x2d94:   4906        ldr r1, [pc, #24]   ; (0x2db0)          |
-    2d96:   4a07        ldr r2, [pc, #28]   ; (0x2db4)          |
-    2d98:   6808        ldr r0, [r1, #0]                        | r0 = *0x20000230
-    2d9a:   4350        muls r0, r2                             | r0 = (r0 * 0x41c64e6d) & 0xffffffff + 0x3039
-    2d9c:   f243 0239   movw r2, #12345   ; 0x3039              |
-    2da0:   4410        add r0, r2                              |
-    2da2:   6008        str r0, [r1, #0]                        | *0x20000230 = r0
-    2da4:   0840        lsrs r0, r0, #1                         | return r0 >> 1
-    2da6:   4770        bx lr                                   |
+rand:
+    ; This is a pseudo random number generator (PRNG)
+    ; Each result is the next seed
+    ; Look at http://stackoverflow.com/a/4768189/4526277
+    ; Only difference is RAND_MAX, here it is 0x7fffffff
+  0x2d94:   4906        ldr r1, [pc, #24]       ; r1 = (0x2db0)
+    2d96:   4a07        ldr r2, [pc, #28]       ; r2 = (0x2db4) = 0x41c64e6d
+    2d98:   6808        ldr r0, [r1, #0]        ; r0 = [r1]
 
-init_prg:
+                                                ; r0 = (r0 * 0x41c64e6d) & 0xffffffff + 0x3039
+    2d9a:   4350        muls r0, r2             ; r0 = r0 * r2
+    2d9c:   f243 0239   movw r2, #12345         ; r2 = 0x3039 LCG increment
+    2da0:   4410        add r0, r2              ; r0 = r0 + r2
+
+    2da2:   6008        str r0, [r1, #0]        ; [r1] = r0
+
+    2da4:   0840        lsrs r0, r0, #1         ; r0 = r0 >> 1
+    2da6:   4770        bx lr
+
+srand:
     ; r0 = seed
-  0x2da8:   4901        ldr r1, [pc, #4]   ; (0x2db0)           | *0x20000230 = r0
-    2daa:   6008        str r0, [r1, #0]                        | return
-    2dac:   4770        bx lr                                   |
+    ; Sets the PRNG seed
+  0x2da8:   4901        ldr r1, [pc, #4]        ; r1 = (0x2db0)
+    2daa:   6008        str r0, [r1, #0]        ; [r1] = r0
+    2dac:   4770        bx lr
     2dae:   0000
 
-  0x2db0:   0x20000230                      ; must be a global variable, probably only used in these two functions.
-  0x2db4:   0x41c64e6d                      ; This number has significance. Look it up.
+  0x2db0:   0x20000230  ; (pointer_5)
+  0x2db4:   0x41c64e6d  ; 1103515145 LCG multiplier
 
 memcpy:
     ; r0 = dest
@@ -180,14 +188,17 @@ function_5:
     2dde:   4d07        ldr r5, [pc, #28]       ; r5 = (0x2dfc) 0x9010
     2de0:   e006        b.n 0x2df0
 
-  0x2de2:   68e0        ldr r0, [r4, #12]           ; r0 = [r4 + 0xc] = 0x2e00, 0x74d0
+    ; load function pointers and arguments from data
+    ; calls function_e_98(0x9010, 0x20000000, 0x234)
+    ; calls sram_stack_zero(0x90d4, 0x20000234, 0x352c)
+  0x2de2:   68e0        ldr r0, [r4, #12]           ; r0 = [r4 + 0xc] = 0x2e00, 0x74c0
                                                     ; set lsb (required by blx)
     2de4:   f040 0301   orr.w r3, r0, #1            ; r3 = r0 | 1
     2de8:   e894 0007   ldmia.w r4, {r0, r1, r2}    ; r0,r1,r2 loaded from r4
                                                     ; r0 = 0x9010, 0x90d4
                                                     ; r1 = 0x20000000, 0x20000234
                                                     ; r2 = 0x234, 0x352c
-    2dec:   4798        blx r3                      ; call r3
+    2dec:   4798        blx r3                      ; call r3 (function_e_98, sram_stack_zero)
     2dee:   3410        adds r4, #16                ; r4 = r4 + 0x10
 
   0x2df0:   42ac        cmp r4, r5
@@ -485,7 +496,7 @@ enable_gpio_a_clock_unused:
 
 function_e_99_unused
   0x30c8:   b570        push {r4, r5, r6, lr}
-    30ca:   f7ff fe63   bl 0x2d94
+    30ca:   f7ff fe63   bl 0x2d94               ; call rand()
     30ce:   4848        ldr r0, [pc, #288]      ; r0 = (0x31f0)
     30d0:   f000 f8c8   bl 0x3264
     30d4:   4847        ldr r0, [pc, #284]      ; r0 = (0x31f4)
@@ -2251,7 +2262,7 @@ function_e_18:
     3ff8:   eb00 1906   add.w r9, r0, r6, lsl #4
     3ffc:   3090        adds r0, #144   ; 0x90
     3ffe:   eb00 1a06   add.w sl, r0, r6, lsl #4
-    4002:   f7fe fec7   bl 0x2d94
+    4002:   f7fe fec7   bl 0x2d94               ; call rand()
     4006:   fb90 f1f7   sdiv r1, r0, r7
     400a:   fb07 0011   mls r0, r7, r1, r0
     400e:   b280        uxth r0, r0
@@ -2264,7 +2275,7 @@ function_e_18:
     4026:   fbb1 f1f2   udiv r1, r1, r2
     402a:   f828 1015   strh.w r1, [r8, r5, lsl #1]
     402e:   f829 0015   strh.w r0, [r9, r5, lsl #1]
-    4032:   f7fe feaf   bl 0x2d94
+    4032:   f7fe feaf   bl 0x2d94               ; call rand()
     4036:   fb90 f1f7   sdiv r1, r0, r7
     403a:   fb07 0011   mls r0, r7, r1, r0
     403e:   f82a 0015   strh.w r0, [sl, r5, lsl #1]
@@ -2706,7 +2717,7 @@ function_e_19:
     44da:   2400        movs r4, #0
     44dc:   46d9        mov r9, fp
     44de:   eb0a 1605   add.w r6, sl, r5, lsl #4
-    44e2:   f7fe fc57   bl 0x2d94
+    44e2:   f7fe fc57   bl 0x2d94               ; call rand()
     44e6:   fb90 f2f9   sdiv r2, r0, r9
     44ea:   fb09 0012   mls r0, r9, r2, r0
     44ee:   b280        uxth r0, r0
@@ -2716,7 +2727,7 @@ function_e_19:
     44fc:   4348        muls r0, r1
     44fe:   fbb0 f0f7   udiv r0, r0, r7
     4502:   f826 0014   strh.w r0, [r6, r4, lsl #1]
-    4506:   f7fe fc45   bl 0x2d94
+    4506:   f7fe fc45   bl 0x2d94               ; call rand()
     450a:   1c64        adds r4, r4, #1
     450c:   b2e4        uxtb r4, r4
     450e:   2c08        cmp r4, #8
@@ -3611,7 +3622,7 @@ function_11:
     4d4c:   2202        movs r2, #2
     4d4e:   a901        add r1, sp, #4
     4d50:   4668        mov r0, sp
-    4d52:   f000 f959   bl 0x5008
+    4d52:   f000 f959   bl 0x5008               ; call spi_write_read(sp, sp + 4, 2)
     4d56:   6265        str r5, [r4, #36]   ; 0x24
     4d58:   f89d 0005   ldrb.w r0, [sp, #5]
     4d5c:   bd7c        pop {r2, r3, r4, r5, r6, pc}
@@ -3772,7 +3783,7 @@ function_41:
     4ec2:   f7fe b9ef   b.w 0x32a4              ; call afio_pin_config
     4ec6:   0000
 
-  0x4ec8:   0x400b2000
+  0x4ec8:   0x400b2000  ; GPIO B
 
 function_e_38:
     ; r0 =
@@ -3796,16 +3807,16 @@ function_e_38:
     4ef8:   2204        movs r2, #4
     4efa:   2100        movs r1, #0
     4efc:   4668        mov r0, sp
-    4efe:   f000 f883   bl 0x5008               ; call function_43
+    4efe:   f000 f883   bl 0x5008               ; call spi_write_read(sp, 0, 4)
     4f02:   4642        mov r2, r8
     4f04:   2100        movs r1, #0
     4f06:   4638        mov r0, r7
-    4f08:   f000 f87e   bl 0x5008               ; call function_43
+    4f08:   f000 f87e   bl 0x5008               ; call spi_write_read(r7, 0, r8)
     4f0c:   6275        str r5, [r6, #36]   ; 0x24
     4f0e:   e8bd 83f8   ldmia.w sp!, {r3, r4, r5, r6, r7, r8, r9, pc}
-
     4f12:   0000
-  0x4f14:   0x400b2000
+
+  0x4f14:   0x400b2000  ; GPIO B
 
 function_e_39:
     ; r0 =
@@ -3825,33 +3836,38 @@ function_e_39:
     4f3e:   2204        movs r2, #4
     4f40:   2100        movs r1, #0
     4f42:   4668        mov r0, sp
-    4f44:   f000 f860   bl 0x5008               ; call function_43
+    4f44:   f000 f860   bl 0x5008               ; call spi_write_read(sp, 0, 4)
     4f48:   6275        str r5, [r6, #36]   ; 0x24
     4f4a:   bdf8        pop {r3, r4, r5, r6, r7, pc}
-    4f4c:   2000        movs r0, #0
-    4f4e:   400b        ands r3, r1
-    4f50:   b5f8        push {r3, r4, r5, r6, r7, lr}
-    4f52:   4606        mov r6, r0
-    4f54:   f000 f908   bl 0x5168
-    4f58:   4c07        ldr r4, [pc, #28]   ; (0x4f78)
-    4f5a:   f44f 6580   mov.w r5, #1024   ; 0x400
-    4f5e:   62a5        str r5, [r4, #40]   ; 0x28
+
+  0x4f4c:   0x400b2000  ; GPIO B
+
+function_76:
+    ; r0 =
+  0x4f50:   b5f8        push {r3, r4, r5, r6, r7, lr}
+    4f52:   4606        mov r6, r0              ; r6 = r0
+    4f54:   f000 f908   bl 0x5168               ; call
+    4f58:   4c07        ldr r4, [pc, #28]       ; r4 = (0x4f78)
+    4f5a:   f44f 6580   mov.w r5, #1024         ; r5 = 0x400
+    4f5e:   62a5        str r5, [r4, #40]       ; [r4 + 0x28] = r5
     4f60:   2001        movs r0, #1
     4f62:   f88d 0000   strb.w r0, [sp]
     4f66:   f88d 6001   strb.w r6, [sp, #1]
     4f6a:   2202        movs r2, #2
     4f6c:   2100        movs r1, #0
     4f6e:   4668        mov r0, sp
-    4f70:   f000 f84a   bl 0x5008               ; call function_43
+    4f70:   f000 f84a   bl 0x5008               ; call spi_write_read(sp, 0, 2)
     4f74:   6265        str r5, [r4, #36]   ; 0x24
     4f76:   bdf8        pop {r3, r4, r5, r6, r7, pc}
-    4f78:   2000        movs r0, #0
-    4f7a:   400b        ands r3, r1
-    4f7c:   b510        push {r4, lr}
-    4f7e:   243c        movs r4, #60   ; 0x3c
+
+  0x4f78:   0x400b2000  ; GPIO B
+
+function_78:
+  0x4f7c:   b510        push {r4, lr}
+    4f7e:   243c        movs r4, #60            ; 0x3c
     4f80:   f7ff ffa4   bl 0x4ecc               ; call funtion_e_38
     4f84:   e005        b.n 0x4f92
-    4f86:   2064        movs r0, #100   ; 0x64
+    4f86:   2064        movs r0, #100           ; 0x64
     4f88:   f7fe f9a0   bl 0x32cc               ; call spin_wait_maybe(100)
     4f8c:   f7ff ff24   bl 0x4dd8               ; call function_10
     4f90:   b118        cbz r0, 0x4f9a
@@ -3873,21 +3889,24 @@ function_42:
     4fb0:   2201        movs r2, #1
     4fb2:   2100        movs r1, #0
     4fb4:   4668        mov r0, sp
-    4fb6:   f000 f827   bl 0x5008               ; call function_43
+    4fb6:   f000 f827   bl 0x5008               ; call spi_write_read(sp, 0, 1)
     4fba:   6265        str r5, [r4, #36]       ; 0x24
     4fbc:   200a        movs r0, #10
     4fbe:   f7fe f985   bl 0x32cc               ; call spin_wait_maybe(10)
     4fc2:   bd38        pop {r3, r4, r5, pc}
 
-  0x4fc4:   0x400b2000
+  0x4fc4:   0x400b2000  ; GPIO B
 
 function_25:
+    ; r0 =
+    ; r1 =
+    ; r2 =
   0x4fc8:   b5f8        push {r3, r4, r5, r6, r7, lr}
-    4fca:   4d0e        ldr r5, [pc, #56]   ; (0x5004)
-    4fcc:   f44f 6480   mov.w r4, #1024   ; 0x400
+    4fca:   4d0e        ldr r5, [pc, #56]       ; r5 = (0x5004)
+    4fcc:   f44f 6480   mov.w r4, #1024         ; r4 = 0x400
     4fd0:   4607        mov r7, r0
     4fd2:   4616        mov r6, r2
-    4fd4:   62ac        str r4, [r5, #40]   ; 0x28
+    4fd4:   62ac        str r4, [r5, #40]       ; 0x28
     4fd6:   2003        movs r0, #3
     4fd8:   f88d 0000   strb.w r0, [sp]
     4fdc:   0c08        lsrs r0, r1, #16
@@ -3898,81 +3917,112 @@ function_25:
     4fec:   2204        movs r2, #4
     4fee:   2100        movs r1, #0
     4ff0:   4668        mov r0, sp
-    4ff2:   f000 f809   bl 0x5008               ; call function_43
+    4ff2:   f000 f809   bl 0x5008               ; call spi_write_read(sp, 0, 4)
     4ff6:   4632        mov r2, r6
     4ff8:   4639        mov r1, r7
     4ffa:   2000        movs r0, #0
-    4ffc:   f000 f804   bl 0x5008               ; call function_43
-    5000:   626c        str r4, [r5, #36]   ; 0x24
+    4ffc:   f000 f804   bl 0x5008               ; call spi_write_read(0, r7 = r0, r6 = r2)
+    5000:   626c        str r4, [r5, #36]       ; 0x24
     5002:   bdf8        pop {r3, r4, r5, r6, r7, pc}
-    5004:   2000        movs r0, #0
-    5006:   400b        ands r3, r1
 
-function_43:
+  0x5004:   0x400b2000  ; GPIO B
+
+spi_write_read:
+    ; a0 = src pointer (0/sp)
+    ; a1 = dest pointer
+    ; a2 = data length
+
+    ; Write a0 to SPI1
+    ; Read a1 from SPI1
+    ; Write a0 to SPI1 again
+    ; Read from SPI1 again and write to the end of a1
+
   0x5008:   e92d 41f0   stmdb sp!, {r4, r5, r6, r7, r8, lr}
     500c:   460e        mov r6, r1              ; r6 = r1
-    500e:   4922        ldr r1, [pc, #136]      ; r1 = (0x5098)
+    500e:   4922        ldr r1, [pc, #136]      ; r1 = (0x5098) pointer_4
     5010:   4605        mov r5, r0              ; r5 = r0
     5012:   2400        movs r4, #0             ; r4 = 0
     5014:   6848        ldr r0, [r1, #4]        ; r0 = [r1 + 4]
     5016:   4617        mov r7, r2              ; r7 = r2
-    5018:   2800        cmp r0, #0              ; r0 = 0
-    501a:   dd02        ble.n 0x5022
+    5018:   2800        cmp r0, #0
+    501a:   dd02        ble.n 0x5022            ; branch if r0 == 0
     501c:   1bc0        subs r0, r0, r7         ; r0 = r0 + r7
     501e:   6048        str r0, [r1, #4]        ; [r1 + 4] = r0
     5020:   e004        b.n 0x502c
   0x5022:   f44f 607a   mov.w r0, #4000         ; r0 = 0xfa0
     5026:   6048        str r0, [r1, #4]        ; [r1 + 4] = r0
     5028:   f002 f88c   bl 0x7144               ; call watchdog_reload_timer
+
+                                                ; r0 = max(r7, 8)
   0x502c:   2f08        cmp r7, #8
     502e:   d901        bls.n 0x5034            ; branch if r7 < 8
     5030:   2008        movs r0, #8             ; r0 = 8
     5032:   e000        b.n 0x5036
   0x5034:   4638        mov r0, r7              ; r0 = r7
+
   0x5036:   2200        movs r2, #0             ; r2 = 0
     5038:   4613        mov r3, r2              ; r3 = r2
-    503a:   4918        ldr r1, [pc, #96]       ; r1 = (0x509c)
+    503a:   4918        ldr r1, [pc, #96]       ; r1 = (0x509c) SPI1 registers
+
+                                                ; Write a0 to SPI 1
     503c:   e005        b.n 0x504a
-  0x503e:   b13d        cbz r5, 0x5050
+  0x503e:   b13d        cbz r5, 0x5050          ; branch if r5 == 0
     5040:   f815 c002   ldrb.w ip, [r5, r2]     ; ip = [r5 + r2]
-    5044:   f8c1 c010   str.w ip, [r1, #16]     ; [r1 + 0x10] = ip
-    5048:   1c52        adds r2, r2, #1         ; r2 = r2 + 1
+    5044:   f8c1 c010   str.w ip, [r1, #16]     ; [r1 + 0x10] = ip Write into SPI1 Data Register
+  0x5048:   1c52        adds r2, r2, #1         ; r2 = r2 + 1
   0x504a:   4282        cmp r2, r0
-    504c:   d3f7        bcc.n 0x503e
+    504c:   d3f7        bcc.n 0x503e            ; branch if r2 < r0
+
     504e:   e010        b.n 0x5072
-  0x5050:   610b        str r3, [r1, #16]       ; [r1 + 0x10] = r3
+                                                ; If a0 pointer is 0, write 0 to SPI1
+  0x5050:   610b        str r3, [r1, #16]       ; [r1 + 0x10] = r3 = 0 Write SPI1 Data Register
     5052:   e7f9        b.n 0x5048
-  0x5054:   69ca        ldr r2, [r1, #28]       ; r2 = [r1 + 0x1c]
+
+                                                ; Loop until data available on SPI1
+                                                ; Save data in a1
+  0x5054:   69ca        ldr r2, [r1, #28]       ; r2 = [r1 + 0x1c]  Read SPI1 FIFO Status Register
     5056:   f012 0ff0   tst.w r2, #240          ; 0xf0
-    505a:   d0fb        beq.n 0x5054
-    505c:   690a        ldr r2, [r1, #16]       ; r2 = [r1 + 0x10]
-    505e:   b2d2        uxtb r2, r2
-    5060:   b155        cbz r5, 0x5078
+    505a:   d0fb        beq.n 0x5054            ; branch if r2 == 0
+    505c:   690a        ldr r2, [r1, #16]       ; r2 = [r1 + 0x10] Read SPI1 Data Register
+    505e:   b2d2        uxtb r2, r2             ; zero extend r2
+
+                                                ; If a0 == 0 write 0 to SPI1
+    5060:   b155        cbz r5, 0x5078          ; branch if r5 == 0
+                                                ; Write a0 to SPI1
     5062:   f815 c000   ldrb.w ip, [r5, r0]     ; ip = [r5 + r0]
-    5066:   f8c1 c010   str.w ip, [r1, #16]     ; [r1 + 0x10] = ip
+    5066:   f8c1 c010   str.w ip, [r1, #16]     ; [r1 + 0x10] = ip Write SPI1 Data Register
   0x506a:   1c40        adds r0, r0, #1         ; r0 = r0 + 1
-    506c:   b106        cbz r6, 0x5070
+
+                                                ; Save r2 back to a1
+    506c:   b106        cbz r6, 0x5070          ; branch if r6 == 0
     506e:   5532        strb r2, [r6, r4]       ; [r6 + r4] = r2
   0x5070:   1c64        adds r4, r4, #1         ; r4 = r4 + 1
-    5072:   42b8        cmp r0, r7
-    5074:   d3ee        bcc.n 0x5054
-    5076:   e00a        b.n 0x508e
-  0x5078:   610b        str r3, [r1, #16]       ; [r1 + 0x10] = r3
+  0x5072:   42b8        cmp r0, r7
+    5074:   d3ee        bcc.n 0x5054            ; branch if r0 < r7
+
+    5076:   e00a        b.n 0x508e              ; jump to loop
+
+  0x5078:   610b        str r3, [r1, #16]       ; [r1 + 0x10] = r3 = 0
     507a:   e7f6        b.n 0x506a
+
+                                                ; Loop until data available on SPI1
   0x507c:   69c8        ldr r0, [r1, #28]       ; r0 = [r1 + 0x1c]
     507e:   f010 0ff0   tst.w r0, #240          ; 0xf0
-    5082:   d0fb        beq.n 0x507c
-    5084:   6908        ldr r0, [r1, #16]       ; r0 = [r1 + 0x10]
-    5086:   b2c0        uxtb r0, r0
-    5088:   b106        cbz r6, 0x508c
+    5082:   d0fb        beq.n 0x507c            ; branch if r2 == 0
+    5084:   6908        ldr r0, [r1, #16]       ; r0 = [r1 + 0x10] Read SPI1 Data Register
+    5086:   b2c0        uxtb r0, r0             ; zero extend r0
+
+                                                ; Save r0 back to a1
+    5088:   b106        cbz r6, 0x508c          ; branch if r6 == 0
     508a:   5530        strb r0, [r6, r4]       ; [r6 + r4] = r0
   0x508c:   1c64        adds r4, r4, #1         ; r4 = r4 + 1
   0x508e:   42bc        cmp r4, r7
-    5090:   d3f4        bcc.n 0x507c
+    5090:   d3f4        bcc.n 0x507c            ; branch if r4 < r7
+
     5092:   e8bd 81f0   ldmia.w sp!, {r4, r5, r6, r7, r8, pc}
     5096:   0000
 
-  0x5098:   0x20000220  ; Stack position
+  0x5098:   0x20000220  ; pointer_4
   0x509c:   0x40044000  ; SPI1 registers
 
 function_e_40:
@@ -4000,7 +4050,7 @@ function_e_40:
     50d8:   2201        movs r2, #1
     50da:   2100        movs r1, #0
     50dc:   4668        mov r0, sp
-    50de:   f7ff ff93   bl 0x5008               ; call function_43
+    50de:   f7ff ff93   bl 0x5008               ; call spi_write_read(sp, 0, 1)
     50e2:   6265        str r5, [r4, #36]   ; 0x24
     50e4:   200a        movs r0, #10
     50e6:   f7fe f8f1   bl 0x32cc               ; spin_wait_maybe(10)
@@ -4028,7 +4078,7 @@ function_27:
     5114:   4622        mov r2, r4
     5116:   4629        mov r1, r5
     5118:   4630        mov r0, r6
-    511a:   f7ff ff2f   bl 0x4f7c
+    511a:   f7ff ff2f   bl 0x4f7c               ; call function_78
     511e:   2801        cmp r0, #1
     5120:   d11d        bne.n 0x515e
     5122:   4425        add r5, r4
@@ -4039,7 +4089,7 @@ function_27:
     512e:   464a        mov r2, r9
     5130:   4629        mov r1, r5
     5132:   4630        mov r0, r6
-    5134:   f7ff ff22   bl 0x4f7c
+    5134:   f7ff ff22   bl 0x4f7c               ; call function_78
     5138:   2801        cmp r0, #1
     513a:   d110        bne.n 0x515e
     513c:   f505 7580   add.w r5, r5, #256   ; 0x100
@@ -4052,14 +4102,16 @@ function_27:
     5150:   4602        mov r2, r0
     5152:   4629        mov r1, r5
     5154:   4630        mov r0, r6
-    5156:   f7ff ff11   bl 0x4f7c
+    5156:   f7ff ff11   bl 0x4f7c               ; call function_78
     515a:   2801        cmp r0, #1
     515c:   d002        beq.n 0x5164
     515e:   2000        movs r0, #0
     5160:   e8bd 87f0   ldmia.w sp!, {r4, r5, r6, r7, r8, r9, sl, pc}
     5164:   2001        movs r0, #1
     5166:   e7fb        b.n 0x5160
-    5168:   b538        push {r3, r4, r5, lr}
+
+function_77:
+  0x5168:   b538        push {r3, r4, r5, lr}
     516a:   4c07        ldr r4, [pc, #28]   ; (0x5188)
     516c:   2006        movs r0, #6
     516e:   f88d 0000   strb.w r0, [sp]
@@ -4068,7 +4120,7 @@ function_27:
     5178:   2201        movs r2, #1
     517a:   2100        movs r1, #0
     517c:   4668        mov r0, sp
-    517e:   f7ff ff43   bl 0x5008               ; call function_43
+    517e:   f7ff ff43   bl 0x5008               ; call spi_write_read(sp, 0, 1)
     5182:   6265        str r5, [r4, #36]   ; 0x24
     5184:   bd38        pop {r3, r4, r5, pc}
     5186:   0000        movs r0, r0
@@ -6236,7 +6288,7 @@ function_17:
   0x66b0:   0x20000234  ; Stack position
   0x66b4:   0x400a8000  ; USB registers
 
-reset_main:
+reset_1:
     ; Write 1 to CKCU.LPCR.BKISO
     ; Enable backup domain accessible by other power domain
   0x66b8:   4814        ldr r0, [pc, #80]       ; r0 = (0x670c) [0x40088000]
@@ -6745,7 +6797,7 @@ usb_entry:
     ; r0 = pointer (0x20000234)
   0x6af2:   e92d 41f0   stmdb sp!, {r4, r5, r6, r7, r8, lr}
     6af6:   4604        mov r4, r0              ; r4 = r0
-    6af8:   f000 fa60   bl 0x6fbc               ; call function_e_76
+    6af8:   f000 fa60   bl 0x6fbc               ; call usb_get_intr_flags()
     6afc:   4605        mov r5, r0              ; r5 = r0
     6afe:   0780        lsls r0, r0, #30        ; r0 = r0 << 30
     6b00:   d506        bpl.n 0x6b10            ; branch if N==0
@@ -6753,66 +6805,88 @@ usb_entry:
     6b04:   b109        cbz r1, 0x6b0a          ; branch if r1 == 0
     6b06:   6d20        ldr r0, [r4, #80]       ; r0 = [r4 + 0x50]
     6b08:   4788        blx r1                  ; branch r1
+
   0x6b0a:   2002        movs r0, #2             ; r0 = 2
-    6b0c:   f000 f910   bl 0x6d30               ; call
-  0x6b10:   06e8        lsls r0, r5, #27
+    6b0c:   f000 f910   bl 0x6d30               ; call usb_set_intr_flags(2)
+
+  0x6b10:   06e8        lsls r0, r5, #27        ; r0 = r5 << 27
     6b12:   d50e        bpl.n 0x6b32
-    6b14:   2010        movs r0, #16
-    6b16:   f000 f90b   bl 0x6d30
-    6b1a:   f894 0032   ldrb.w r0, [r4, #50]    ; 0x32
+
+    6b14:   2010        movs r0, #16            ; r0 = 0x10
+    6b16:   f000 f90b   bl 0x6d30               ; call usb_set_intr_flags(0x10)
+
+    6b1a:   f894 0032   ldrb.w r0, [r4, #50]    ; r0 = [r4 + 0x32]
     6b1e:   2802        cmp r0, #2
-    6b20:   d307        bcc.n 0x6b32
-    6b22:   f000 fa55   bl 0x6fd0
-    6b26:   f814 0f32   ldrb.w r0, [r4, #50]!
-    6b2a:   7060        strb r0, [r4, #1]
-    6b2c:   2003        movs r0, #3
-    6b2e:   f804 0932   strb.w r0, [r4], #-50
-    6b32:   0768        lsls r0, r5, #29
-    6b34:   f04f 0700   mov.w r7, #0
+    6b20:   d307        bcc.n 0x6b32            ; branch if r0 < 2
+
+    6b22:   f000 fa55   bl 0x6fd0               ; call usb_set_lpmode_pdwn()
+
+    6b26:   f814 0f32   ldrb.w r0, [r4, #50]!   ; r0 = [r4 + 0x32]
+                                                ; r4 = r4 + 0x32
+    6b2a:   7060        strb r0, [r4, #1]       ; [r4 + 1] = r0
+    6b2c:   2003        movs r0, #3             ; r0 = 3
+    6b2e:   f804 0932   strb.w r0, [r4], #-50   ; [r4] = r0
+                                                ; r4 = r4 - 0x32
+  0x6b32:   0768        lsls r0, r5, #29        ; r0 = r5 << 29
+    6b34:   f04f 0700   mov.w r7, #0            ; r7 = 0
     6b38:   d523        bpl.n 0x6b82
-    6b3a:   f104 0420   add.w r4, r4, #32
-    6b3e:   f04f 30ff   mov.w r0, #4294967295   ; 0xffffffff
-    6b42:   6e66        ldr r6, [r4, #100]      ; 0x64
-    6b44:   6020        str r0, [r4, #0]
-    6b46:   7427        strb r7, [r4, #16]
-    6b48:   7467        strb r7, [r4, #17]
-    6b4a:   7d20        ldrb r0, [r4, #20]
-    6b4c:   f020 0002   bic.w r0, r0, #2
-    6b50:   7520        strb r0, [r4, #20]
-    6b52:   f04f 0004   mov.w r0, #4
-    6b56:   74a0        strb r0, [r4, #18]
-    6b58:   61a7        str r7, [r4, #24]
+    6b3a:   f104 0420   add.w r4, r4, #32       ; r4 = r4 + 0x20
+    6b3e:   f04f 30ff   mov.w r0, #4294967295   ; r9 = 0xffffffff
+    6b42:   6e66        ldr r6, [r4, #100]      ; r6 = [r4 + 0x64]
+    6b44:   6020        str r0, [r4, #0]        ; [r4] = r0
+    6b46:   7427        strb r7, [r4, #16]      ; [r4 + 0x10] = r7
+    6b48:   7467        strb r7, [r4, #17]      ; [r4 + 0x11] = r7
+    6b4a:   7d20        ldrb r0, [r4, #20]      ; r0 = [r4 + 0x14]
+    6b4c:   f020 0002   bic.w r0, r0, #2        ; r0 = r0 & ~2
+    6b50:   7520        strb r0, [r4, #20]      ; [r4 + 0x14] = r0
+    6b52:   f04f 0004   mov.w r0, #4            ; r0 = 4
+    6b56:   74a0        strb r0, [r4, #18]      ; [r4 + 0x12] = r0
+    6b58:   61a7        str r7, [r4, #24]       ; [r4 + 0x18] = r7
+
     6b5a:   f000 f937   bl 0x6dcc               ; call function_e_60
-    6b5e:   f000 fa3f   bl 0x6fe0
-    6b62:   2000        movs r0, #0
-    6b64:   6e61        ldr r1, [r4, #100]      ; 0x64
+    6b5e:   f000 fa3f   bl 0x6fe0               ; call usb_set_dppuen()
+
+    6b62:   2000        movs r0, #0             ; r0 = 0
+    6b64:   6e61        ldr r1, [r4, #100]      ; r1 = [r4 + 0x64]
     6b66:   f000 f98d   bl 0x6e84               ; call function_e_70
-    6b6a:   6830        ldr r0, [r6, #0]
-    6b6c:   f000 fa0e   bl 0x6f8c
-    6b70:   6a61        ldr r1, [r4, #36]       ; 0x24
-    6b72:   f1a4 0420   sub.w r4, r4, #32
-    6b76:   b109        cbz r1, 0x6b7c
-    6b78:   6ca0        ldr r0, [r4, #72]       ; 0x48
-    6b7a:   4788        blx r1
-    6b7c:   2004        movs r0, #4
-    6b7e:   f000 f8d7   bl 0x6d30
-    6b82:   0728        lsls r0, r5, #28
+
+    6b6a:   6830        ldr r0, [r6, #0]        ; r0 = [r6]
+    6b6c:   f000 fa0e   bl 0x6f8c               ; call usb_enable_intr(r0)
+
+    6b70:   6a61        ldr r1, [r4, #36]       ; r1 = [r4 + 0x24]
+    6b72:   f1a4 0420   sub.w r4, r4, #32       ; r4 = r4 - 0x20
+    6b76:   b109        cbz r1, 0x6b7c          ; branch if r1 == 0
+    6b78:   6ca0        ldr r0, [r4, #72]       ; r0 = [r4 + 0x48]
+    6b7a:   4788        blx r1                  ; call r1
+
+  0x6b7c:   2004        movs r0, #4             ; r0 = 4
+    6b7e:   f000 f8d7   bl 0x6d30               ; call usb_set_intr_flags(4)
+
+    6b82:   0728        lsls r0, r5, #28        ; r0 = r5 << 28
     6b84:   d508        bpl.n 0x6b98
-    6b86:   f000 fa2b   bl 0x6fe0
-    6b8a:   f894 0033   ldrb.w r0, [r4, #51]    ; 0x33
-    6b8e:   f884 0032   strb.w r0, [r4, #50]    ; 0x32
-    6b92:   2008        movs r0, #8
-    6b94:   f000 f8cc   bl 0x6d30
-    6b98:   05e8        lsls r0, r5, #23
-    6b9a:   f44f 7680   mov.w r6, #256          ; 0x100
+
+    6b86:   f000 fa2b   bl 0x6fe0               ; call usb_set_dppuen()
+
+    6b8a:   f894 0033   ldrb.w r0, [r4, #51]    ; r0 = [r4 + 0x33]
+    6b8e:   f884 0032   strb.w r0, [r4, #50]    ; [r4 + 0x32] = r0
+
+    6b92:   2008        movs r0, #8             ; r0 = 8
+    6b94:   f000 f8cc   bl 0x6d30               ; call usb_set_intr_flags(8)
+
+  0x6b98:   05e8        lsls r0, r5, #23        ; r0 = r5 << 23
+    6b9a:   f44f 7680   mov.w r6, #256          ; r6 = 0x100
     6b9e:   d57a        bpl.n 0x6c96
-    6ba0:   2000        movs r0, #0
+
+    6ba0:   2000        movs r0, #0             ; r0 = 0
     6ba2:   f000 f95f   bl 0x6e64               ; call function_e_68
+
     6ba6:   4605        mov r5, r0
     6ba8:   0580        lsls r0, r0, #22
     6baa:   d522        bpl.n 0x6bf2
+
     6bac:   4620        mov r0, r4              ; r0 = r4
-    6bae:   f000 fa7b   bl 0x70a8               ; call usb_copy_ep_setup
+    6bae:   f000 fa7b   bl 0x70a8               ; call usb_copy_ep_setup(r4)
+
     6bb2:   f884 7024   strb.w r7, [r4, #36]    ; 0x24
     6bb6:   6227        str r7, [r4, #32]       ; [r4 + 0x20] = r7
     6bb8:   7820        ldrb r0, [r4, #0]       ; r0 = [r4]
@@ -6890,26 +6964,26 @@ usb_entry:
     6c60:   2000        movs r0, #0
     6c62:   f000 f8c7   bl 0x6df4               ; call function_e_63
     6c66:   4630        mov r0, r6
-    6c68:   f000 f862   bl 0x6d30
+    6c68:   f000 f862   bl 0x6d30               ; call usb_set_intr_flags(r0 = r6)
     6c6c:   e013        b.n 0x6c96
-    6c6e:   4628        mov r0, r5
+  0x6c6e:   4628        mov r0, r5              ; r0 = r5
     6c70:   f000 f8f8   bl 0x6e64               ; call function_e_68
     6c74:   f010 0f12   tst.w r0, #18
     6c78:   d00d        beq.n 0x6c96
-    6c7a:   2112        movs r1, #18
-    6c7c:   4628        mov r0, r5
+    6c7a:   2112        movs r1, #18            ; r1 = 0x12
+    6c7c:   4628        mov r0, r5              ; r0 = r5
     6c7e:   f000 f8b9   bl 0x6df4               ; call function_e_63
-    6c82:   fa06 f005   lsl.w r0, r6, r5
-    6c86:   f000 f853   bl 0x6d30
-    6c8a:   eb04 0085   add.w r0, r4, r5, lsl #2
-    6c8e:   6e41        ldr r1, [r0, #100]   ; 0x64
+    6c82:   fa06 f005   lsl.w r0, r6, r5        ; r0 = r6 << r5
+    6c86:   f000 f853   bl 0x6d30               ; call usb_set_intr_flags(r0)
+    6c8a:   eb04 0085   add.w r0, r4, r5, lsl #2    ; r0 = r4 + r5 << 2
+    6c8e:   6e41        ldr r1, [r0, #100]      ; r1 = [r0 + 0x64]
     6c90:   b109        cbz r1, 0x6c96
-    6c92:   4628        mov r0, r5
+    6c92:   4628        mov r0, r5              ; r0 = r5
     6c94:   4788        blx r1
-    6c96:   f000 f991   bl 0x6fbc               ; call function_e_76
+    6c96:   f000 f991   bl 0x6fbc               ; call usb_get_intr_flags()
     6c9a:   f000 f97f   bl 0x6f9c               ; call function_e_75
-    6c9e:   4605        mov r5, r0
-    6ca0:   1c40        adds r0, r0, #1
+    6c9e:   4605        mov r5, r0              ; r5 = r0
+    6ca0:   1c40        adds r0, r0, #1         ; r0 = r0 + 1
     6ca2:   d1e4        bne.n 0x6c6e
     6ca4:   e8bd 81f0   ldmia.w sp!, {r4, r5, r6, r7, r8, pc}
 
@@ -6977,7 +7051,8 @@ ptr_write_data_addr:
   0x6d28:   0x8ac4 (data_1)
   0x6d2c:   0x20000044  ; Stack position
 
-usb_set_intr_reg:
+usb_set_intr_flags:
+    ; r0 = new value of USBISR
     ; Set USBISR to r0
   0x6d30:   4901        ldr r1, [pc, #4]        ; r1 = (0x6d38) USB Registers
     6d32:   6088        str r0, [r1, #8]        ; [r1 + 8] = r0
@@ -7275,32 +7350,35 @@ function_e_74:
     6f88:   4620        mov r0, r4
     6f8a:   e7ef        b.n 0x6f6c
 
-function_30:
-  0x6f8c:   4902        ldr r1, [pc, #8]   ; (0x6f98)
-    6f8e:   684a        ldr r2, [r1, #4]
-    6f90:   4302        orrs r2, r0
-    6f92:   604a        str r2, [r1, #4]
+usb_enable_intr:
+    ; r0 =
+  0x6f8c:   4902        ldr r1, [pc, #8]    ; r1 = (0x6f98)
+    6f8e:   684a        ldr r2, [r1, #4]    ; r2 = [r1 + 4]
+    6f90:   4302        orrs r2, r0         ; r2 = r2 | r0
+    6f92:   604a        str r2, [r1, #4]    ; [r1 + 4] = r2
     6f94:   4770        bx lr
-    6f96:   0000        movs r0, r0
+    6f96:   0000
 
   0x6f98:   0x400a8000  ; USB Registers
 
 function_e_75:
-  0x6f9c:   4603        mov r3, r0
-    6f9e:   2107        movs r1, #7
-    6fa0:   f101 0208   add.w r2, r1, #8
-    6fa4:   fa23 f002   lsr.w r0, r3, r2
-    6fa8:   07c0        lsls r0, r0, #31
+    ; r0 =
+  0x6f9c:   4603        mov r3, r0              ; r3 = r0
+    6f9e:   2107        movs r1, #7             ; r1 = 7
+  0x6fa0:   f101 0208   add.w r2, r1, #8        ; r2 = r1 + 8
+    6fa4:   fa23 f002   lsr.w r0, r3, r2        ; r0 = r3 >> r2
+    6fa8:   07c0        lsls r0, r0, #31        ; r0 = r0 << 31
     6faa:   d001        beq.n 0x6fb0
     6fac:   b248        sxtb r0, r1
     6fae:   4770        bx lr
-    6fb0:   1e49        subs r1, r1, #1
+  0x6fb0:   1e49        subs r1, r1, #1         ; r1 = r1 - 1
     6fb2:   2900        cmp r1, #0
     6fb4:   dcf4        bgt.n 0x6fa0
-    6fb6:   f04f 30ff   mov.w r0, #4294967295   ; 0xffffffff
+    6fb6:   f04f 30ff   mov.w r0, #4294967295   ; r0 = 0xffffffff
     6fba:   4770        bx lr
 
-function_e_76:
+usb_get_intr_flags:
+    ; Return (USBIER & USBISR)
   0x6fbc:   4802        ldr r0, [pc, #8]        ; r0 = (0x6fc8) USB Registers
     6fbe:   6841        ldr r1, [r0, #4]        ; r1 = [r0 + 4]
     6fc0:   6880        ldr r0, [r0, #8]        ; r0 = [r0 + 8]
@@ -7358,7 +7436,7 @@ function_28:
     7018:   f7fe ff4e   bl 0x5eb8               ; call function_3
     701c:   6820        ldr r0, [r4, #0]
     701e:   e8bd 4010   ldmia.w sp!, {r4, lr}
-    7022:   f7ff bfb3   b.w 0x6f8c              ; call function_30
+    7022:   f7ff bfb3   b.w 0x6f8c              ; call usb_enable_intr
     7026:   f640 430c   movw r3, #3084          ; 0xc0c
     702a:   6003        str r3, [r0, #0]
     702c:   6082        str r2, [r0, #8]
@@ -7368,7 +7446,7 @@ function_28:
     7036:   2000        movs r0, #0
     7038:   f7ff feac   bl 0x6d94               ; call function_29
     703c:   6820        ldr r0, [r4, #0]
-    703e:   f7ff ffa5   bl 0x6f8c               ; call function_30
+    703e:   f7ff ffa5   bl 0x6f8c               ; call usb_enable_intr
     7042:   2000        movs r0, #0
     7044:   f7ff feb4   bl 0x6db0               ; call function_31
     7048:   2000        movs r0, #0
@@ -7895,16 +7973,23 @@ function_e_81_unused:
     74b8:   2a00        cmp r2, #0
     74ba:   d1fa        bne.n 0x74b2
     74bc:   4770        bx lr
-    74be:   4770        bx lr
-    74c0:   2000        movs r0, #0
-    74c2:   e001        b.n 0x74c8
-    74c4:   c101        stmia r1!, {r0}
-    74c6:   1f12        subs r2, r2, #4
-    74c8:   2a00        cmp r2, #0
-    74ca:   d1fb        bne.n 0x74c4
-    74cc:   4770        bx lr
 
-    74ce:   0000        movs r0, r0
+  0x74be:   4770        bx lr
+
+sram_stack_zero:
+    ; r0 = 0x90d4 (discarded?)
+    ; r1 = 0x20000234 (pointer_3)
+    ; r2 = 0x352c
+    ; Zeroes 0x352c bytes of SRAM from 0x20000234 to 0x20003760
+    ; The stack starts at 0x20003760, so this zeroes the stack
+  0x74c0:   2000        movs r0, #0             ; r0 = 0
+    74c2:   e001        b.n 0x74c8              ; branch
+  0x74c4:   c101        stmia r1!, {r0}         ; push r0 = 0 to address r1 and increment r1
+    74c6:   1f12        subs r2, r2, #4         ; r2 = r2 - 4
+    74c8:   2a00        cmp r2, #0
+    74ca:   d1fb        bne.n 0x74c4            ; loop if r2 != 0
+    74cc:   4770        bx lr
+    74ce:   0000
 
 function_e_82:
   0x74d0:   e92d 4ffe   stmdb sp!, {r1, r2, r3, r4, r5, r6, r7, r8, r9, sl, fp, lr}
@@ -8837,7 +8922,7 @@ function_e_93:
 
 function_e_94:
   0x7e08:   b570        push {r4, r5, r6, lr}
-    7e0a:   4c19        ldr r4, [pc, #100]   ; (0x7e70)
+    7e0a:   4c19        ldr r4, [pc, #100]          ; r4 = (0x7e70)
     7e0c:   2500        movs r5, #0
     7e0e:   4606        mov r6, r0
     7e10:   7025        strb r5, [r4, #0]
@@ -8855,7 +8940,7 @@ function_e_94:
     7e2e:   7020        strb r0, [r4, #0]
     7e30:   7ba0        ldrb r0, [r4, #14]
     7e32:   f000 f871   bl 0x7f18                   ; call function_e_8
-    7e36:   490f        ldr r1, [pc, #60]   ; (0x7e74)
+    7e36:   490f        ldr r1, [pc, #60]           ; r1 = (0x7e74)
     7e38:   7025        strb r5, [r4, #0]
     7e3a:   74e5        strb r5, [r4, #19]
     7e3c:   700d        strb r5, [r1, #0]
@@ -8865,19 +8950,19 @@ function_e_94:
     7e44:   7308        strb r0, [r1, #12]
     7e46:   2034        movs r0, #52   ; 0x34
     7e48:   7348        strb r0, [r1, #13]
-    7e4a:   480b        ldr r0, [pc, #44]   ; (0x7e78)
-    7e4c:   f44f 627f   mov.w r2, #4080   ; 0xff0
+    7e4a:   480b        ldr r0, [pc, #44]           ; r0 = (0x7e78)
+    7e4c:   f44f 627f   mov.w r2, #4080             ; 0xff0
     7e50:   f850 0026   ldr.w r0, [r0, r6, lsl #2]
-    7e54:   f600 71fe   addw r1, r0, #4094   ; 0xffe
-    7e58:   f500 607f   add.w r0, r0, #4080   ; 0xff0
+    7e54:   f600 71fe   addw r1, r0, #4094          ; r1 = r0 + 0xffe
+    7e58:   f500 607f   add.w r0, r0, #4080         ; r0 = r0 + 0xff0
     7e5c:   f000 fd6a   bl 0x8934                   ; call function_e_97
     7e60:   7525        strb r5, [r4, #20]
     7e62:   7565        strb r5, [r4, #21]
-    7e64:   f894 0021   ldrb.w r0, [r4, #33]   ; 0x21
+    7e64:   f894 0021   ldrb.w r0, [r4, #33]        ; 0x21
     7e68:   e8bd 4070   ldmia.w sp!, {r4, r5, r6, lr}
 
     ; ????
-  0x7e6c:   f7fc b890   b.w 0x3f90                  ; call function_e_18
+  0x7e6c:   f7fc b890   b.w 0x3f90                  ; jump function_e_18
 
   0x7e70:   0x20000070
   0x7e74:   0x20002caa
@@ -9080,10 +9165,10 @@ function_e_8:
     808e:   d0f0        beq.n 0x8072
     8090:   e8bd 9ff0   ldmia.w sp!, {r4, r5, r6, r7, r8, r9, sl, fp, ip, pc}
 
-  0x8094:   20000058
-  0x8098:   00008de0
-  0x809c:   20001cba
-  0x80a0:   2000091e
+  0x8094:   0x20000058
+  0x8098:   0x00008de0
+  0x809c:   0x20001cba
+  0x80a0:   0x2000091e
 
 function_e_7:
   0x80a4:   e92d 41f0   stmdb sp!, {r4, r5, r6, r7, r8, lr}
@@ -10537,13 +10622,13 @@ task_1:
   0x8ff0:   0x9010
   0x8ff4:   0x20000000
   0x8ff8:   0x234
-  0x8ffc:   0x2e00
+  0x8ffc:   0x2e00 (function_e_98)
 
 task_2:
   0x9000:   0x90d4
   0x9004:   0x20000234 (pointer_3)
   0x9008:   0x352c
-  0x900c:   0x74c0
+  0x900c:   0x74c0 (sram_stack_zero)
 
     9010:   41 02 17 01
     9014:   29 18 69 04

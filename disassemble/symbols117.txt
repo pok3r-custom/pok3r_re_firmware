@@ -18,13 +18,15 @@ pendsv_intr                         @ 0x2d6e
 systick_intr                        @ 0x2d70
 generic_intr                        @ 0x2d72
 
-reset_end                           @ 0x2d80
+reset_2                             @ 0x2d80
     function_5
-
-prg_term                            @ 0x2d94
-init_prg                            @ 0x2da8
+    function_73
+rand                                @ 0x2d94
+srand                               @ 0x2da8
 memcpy                              @ 0x2db8
 function_5                          @ 0x2ddc
+    function_e_98
+    sram_stack_zero
 function_e_98                       @ 0x2e00
 function_e_32                       @ 0x2e5c
 afio_exti_ssr_write                 @ 0x2f50
@@ -157,8 +159,8 @@ function_e_29                       @ 0x4c6c
 clear_some_mem                      @ 0x4cde
 function_e_30                       @ 0x4cf6
 function_e_31                       @ 0x4d26
-
 function_11                         @ 0x4d3c
+    spi_write_read
 function_29                         @ 0x4d64
     ckcu_apb0_clock_enable
     function_e_54
@@ -177,24 +179,30 @@ function_41                         @ 0x4e84
     gpio_set_pin_pull_up_down
     afio_pin_config
 function_e_38                       @ 0x4ecc
-    function_43
+    spi_write_read
 function_e_39                       @ 0x4f18
-    function_43
+    spi_write_read
+function_76                         @ 0x4f50
+    spi_write_read
+function_78                         @ 0x4f7c
     function_e_38
     spin_wait_maybe
     function_10
 function_42                         @ 0x4fa0
-    function_9
+    spi_write_read
+    spin_wait_maybe
 function_25                         @ 0x4fc8
-    function_43
-function_43                         @ 0x5008
+    spi_write_read
+spi_write_read                      @ 0x5008
     watchdog_reload_timer
 function_e_40                       @ 0x50a0
     function_e_39
     spin_wait_maybe
     function_10
-    function_43
+    spi_write_read
 function_27                         @ 0x50f0
+function_77                         @ 0x5168
+    spi_write_read
 function_28                         @ 0x518c
     function_9
     function_10
@@ -287,7 +295,7 @@ function_17                         @ 0x6624
     watchdog_reload_timer
     exti_check_wakup
     function_3
-reset_main                          @ 0x66b8
+reset_1                             @ 0x66b8
 function_e_56                       @ 0x6718
     function_e_74
 function_e_57                       @ 0x6780
@@ -320,7 +328,7 @@ function_65                         @ 0x6a10
 usb_get_descriptor                  @ 0x6a84
 function_6                          @ 0x6ae8
 usb_entry                           @ 0x6af2
-    function_e_76
+    usb_get_intr_flags
     function_e_60
     function_e_68
     usb_copy_ep_setup
@@ -339,7 +347,7 @@ function_7                          @ 0x6d06
     usb_set_dppuen
     usb_set_genrsm
 ptr_write_data_addr                 @ 0x6d14
-usb_set_intr_reg                    @ 0x6d30
+usb_set_intr_flags                    @ 0x6d30
 usb_init                            @ 0x6d3c
     ckcu_apb1_clock_enable
     ckcu_ahb_clock_enable
@@ -372,9 +380,9 @@ function_e_73                       @ 0x6f30
 function_e_74                       @ 0x6f44
     function_e_66
     function_e_64
-function_30                         @ 0x6f8c
+usb_enable_intr                     @ 0x6f8c
 function_e_75                       @ 0x6f9c
-function_e_76                       @ 0x6fbc
+usb_get_intr_flags                  @ 0x6fbc
 jump_1                              @ 0x6fcc
     ptr_write_data
 usb_set_lpmode_pdwn                 @ 0x6fd0
@@ -382,7 +390,7 @@ usb_set_dppuen                      @ 0x6fe0
 function_28                         @ 0x6ff0
     function_3
     function_29
-    function_30
+    usb_enable_intr
     function_31
 ptr_write_data                      @ 0x7064
 usb_copy_ep_setup                   @ 0x70a8
@@ -411,6 +419,7 @@ function_e_80                       @ 0x7444
     function_e_62
     function_e_61
 function_e_81_unsued                @ 0x74b0
+sram_stack_zero                         @ 0x74c0
 function_e_82                       @ 0x74d0
     function_e_84
     function_25

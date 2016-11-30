@@ -25,8 +25,32 @@ variable_sram_e_1                       @ 0x20000058
     function_e_91
     function_e_95
 
-pointer_3                               @ 0x20000234
+pointer_4                               @ 0x20000220
+    0x0:
+    0x4: a0 of spi_write_read
+    spi_write_read
 
+pointer_5                               @ 0x20000230
+    0x0:    PRNG seed
+    rand
+    srand
+
+pointer_3                               @ 0x20000234
+    0x0:    3
+    0x10:
+    0x11:
+    0x14:
+    0x24:   function pointer
+
+    0x32:
+    0x33:
+    0x48:
+    0x4c:   function pointer called in usb_entry
+    0x50:   argument to function in 0x4c
+    0x64:
+    usb_entry
+    function_75
+    sram_stack_zero
 
 pointer_2                               @ 0x2000023c
     0x0:    0x8ac4 (data_1)
