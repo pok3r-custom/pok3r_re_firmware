@@ -45,6 +45,7 @@ function_e_33                       @ 0x3004
 enable_gpio_a_clock_unused          @ 0x3068
 function_e_99_unused                @ 0x30c8
 function_e_100_unused               @ 0x3250
+    function_44
 function_44                         @ 0x3264
 function_45                         @ 0x3272
 function_46                         @ 0x3286
@@ -62,6 +63,8 @@ function_32                         @ 0x32d8
 function_e_34                       @ 0x338c
     function_31
     spin_wait_maybe
+function_79                         @ 0x339e
+    function_31
 clear_two_words_and                 @ 0x33a4
 clear_two_words_and_write_two_bytes @ 0x33ac
 function_e_2                        @ 0x33b8
@@ -533,6 +536,13 @@ data_1                              @ 0x8ac4
 data_2                              @ 0x8ad8
 
 string_1                            @ 0x8b3a
+
+data_4                              @ 0x8b70
+data_8                              @ 0x8bb2
+data_3                              @ 0x8d44
+data_7                              @ 0x8ec8
+data_5                              @ 0x8f10
+data_6                              @ 0x8f58
 
 task_1                              @ 0x8ff0
 task_2                              @ 0x9000

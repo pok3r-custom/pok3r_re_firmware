@@ -15,8 +15,25 @@ main_state                              @ 0x20000000
     main
     sram_decode_static
 
+pointer_33                              @ 0x2000003c
+    function_13
+    function_e_17
+
 variable_sram_e_1                       @ 0x20000058
-    // used like struct
+    0x6:    byte
+    0x14:   byte
+    0x24:   byte
+    0x26:   byte
+    0x39:   byte
+    0x3d:   byte
+    0x3e:   byte
+    0x46:   half
+    0x48:   half
+    0x4a:   half
+    0x4c:   half
+    0xf8:   word
+    0xfc:   word
+
     function_e_5
     function_e_7
     function_e_9
@@ -32,6 +49,71 @@ variable_sram_e_1                       @ 0x20000058
     function_e_90
     function_e_91
     function_e_95
+
+pointer_9                               @ 0x2000006b
+    0x0:
+    function_e_99_unused
+pointer_10                              @ 0x2000006c
+    0x0:
+    function_e_99_unused
+pointer_11                              @ 0x2000006d
+    0x0:
+    function_e_99_unused
+
+pointer_7                               @ 0x20000090
+    0x0:
+    function_e_99_unused
+pointer_25                              @ 0x2000009a
+    function_e_99_unused
+pointer_13                              @ 0x200000c0
+    function_e_99_unused
+pointer_24                              @ 0x200000b4
+    function_e_99_unused
+pointer_14                              @ 0x200000c4
+    function_e_99_unused
+pointer_21                              @ 0x200000c8
+    function_e_99_unused
+pointer_22                              @ 0x200000cc
+    function_e_99_unused
+pointer_23                              @ 0x200000d0
+    function_e_99_unused
+pointer_16                              @ 0x200000d4
+    function_e_99_unused
+pointer_15                              @ 0x200000d8
+    function_e_99_unused
+    function_13
+    function_e_23
+    function_e_17
+    function_e_18
+    function_e_41
+    function_e_43
+    function_e_87
+    function_e_32
+pointer_20                              @ 0x200000dc
+    function_e_99_unused
+pointer_28                              @ 0x200000e0
+    function_e_99_unused
+pointer_17                              @ 0x200000e4
+    function_e_99_unused
+pointer_26                              @ 0x200000fc
+    function_e_99_unused
+pointer_6                               @ 0x20000100
+    0x0:
+    function_e_99_unused
+pointer_8                               @ 0x20000104
+    function_e_99_unused
+pointer_18                              @ 0x20000108
+    function_e_99_unused
+pointer_19                              @ 0x2000010c
+    function_e_99_unused
+pointer_27                              @ 0x200001d0
+    function_e_99_unused
+
+pointer_31                              @ 0x2000021c
+    function_60
+    function_61
+pointer_29                              @ 0x2000021e
+    function_e_37_unused
 
 pointer_4                               @ 0x20000220
     0x0:
@@ -77,3 +159,27 @@ pointer_1                               @ 0x20000270
     0x30:   0x6815 (function_69)
     0x38:   0x6821 (function_70)
     ptr_write_func_ptrs
+
+usb_handler_ptr                         @ 0x20000280
+    0x0:    function pointer
+    0x0:    argument r0
+
+pointer_12                              @ 0x20000308
+    0x0:
+    0x4:
+    function_e_99_unused
+
+pointer_32                              @ 0x2000032c
+    function_13
+
+pointer_34                              @ 0x20002dec
+    function_e_17
+    function_e_19
+    function_e_26
+    function_e_43
+    function_e_46
+    function_e_7
+    function_e_14
+    function_e_16
+pointer_30                              @ 0x20002f4c
+    function_e_37_unused
