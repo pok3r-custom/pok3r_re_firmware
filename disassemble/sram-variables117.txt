@@ -15,6 +15,16 @@ main_state                              @ 0x20000000
     main
     sram_decode_static
 
+pointer_35                              @ 0x20000018
+    0x1:    byte
+    function_e_32
+
+pointer_36                              @ 0x2000002c
+    0x1:    byte
+    0x2:    byte
+    0x3:    byte
+    function_e_32
+
 pointer_33                              @ 0x2000003c
     function_13
     function_e_17
@@ -79,7 +89,10 @@ pointer_23                              @ 0x200000d0
     function_e_99_unused
 pointer_16                              @ 0x200000d4
     function_e_99_unused
+
 pointer_15                              @ 0x200000d8
+    0x28:   word
+
     function_e_99_unused
     function_13
     function_e_23
@@ -89,6 +102,7 @@ pointer_15                              @ 0x200000d8
     function_e_43
     function_e_87
     function_e_32
+
 pointer_20                              @ 0x200000dc
     function_e_99_unused
 pointer_28                              @ 0x200000e0
@@ -181,5 +195,6 @@ pointer_34                              @ 0x20002dec
     function_e_7
     function_e_14
     function_e_16
+
 pointer_30                              @ 0x20002f4c
     function_e_37_unused

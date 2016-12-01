@@ -256,99 +256,148 @@ sram_decode_static:
     2e5a:   bd70        pop {r4, r5, r6, pc}
 
 function_e_32:
+    ; r0 =
+    ; r1 =
   0x2e5c:   b5f0        push {r4, r5, r6, r7, lr}
-    2e5e:   4b39        ldr r3, [pc, #228]   ; (0x2f44)
-    2e60:   4e39        ldr r6, [pc, #228]   ; (0x2f48)
-    2e62:   2501        movs r5, #1
-    2e64:   785a        ldrb r2, [r3, #1]
+    2e5e:   4b39        ldr r3, [pc, #228]      ; r3 = (0x2f44) pointer_35
+    2e60:   4e39        ldr r6, [pc, #228]      ; r6 = (0x2f48) pointer_15
+    2e62:   2501        movs r5, #1             ; r5 = 1
+    2e64:   785a        ldrb r2, [r3, #1]       ; r2 = [r3 + 1]
     2e66:   f001 0101   and.w r1, r1, #1
-    2e6a:   28e9        cmp r0, #233   ; 0xe9
+    2e6a:   28e9        cmp r0, #233            ; 0xe9
     2e6c:   d004        beq.n 0x2e78
-    2e6e:   28ea        cmp r0, #234   ; 0xea
+    2e6e:   28ea        cmp r0, #234            ; 0xea
     2e70:   d005        beq.n 0x2e7e
-    2e72:   28eb        cmp r0, #235   ; 0xeb
+    2e72:   28eb        cmp r0, #235            ; 0xeb
     2e74:   d107        bne.n 0x2e86
     2e76:   e01e        b.n 0x2eb6
     2e78:   f361 0200   bfi r2, r1, #0, #1
     2e7c:   e001        b.n 0x2e82
     2e7e:   f361 0241   bfi r2, r1, #1, #1
-    2e82:   705a        strb r2, [r3, #1]
-    2e84:   61f5        str r5, [r6, #28]
-    2e86:   38ec        subs r0, #236   ; 0xec
+
+  0x2e82:   705a        strb r2, [r3, #1]       ; [r3 + 1] = r2
+    2e84:   61f5        str r5, [r6, #28]       ; [r6 + 0x28] = r5 = 1
+    2e86:   38ec        subs r0, #236           ; r0 = r0 - 0xec
     2e88:   2811        cmp r0, #17
-    2e8a:   d859        bhi.n 0x2f40
-    2e8c:   4a2f        ldr r2, [pc, #188]   ; (0x2f4c)
-    2e8e:   f8df c0b8   ldr.w ip, [pc, #184]   ; 0x2f48
+    2e8a:   d859        bhi.n 0x2f40            ; branch if r0 > 17
+    2e8c:   4a2f        ldr r2, [pc, #188]      ; r2 = (0x2f4c) pointer_36
+    2e8e:   f8df c0b8   ldr.w ip, [pc, #184]    ; ip = (0x2f48) pointer_15
     2e92:   2812        cmp r0, #18
-    2e94:   7853        ldrb r3, [r2, #1]
-    2e96:   7894        ldrb r4, [r2, #2]
-    2e98:   78d7        ldrb r7, [r2, #3]
-    2e9a:   f1ac 0c80   sub.w ip, ip, #128   ; 0x80
-    2e9e:   d24e        bcs.n 0x2f3e
+    2e94:   7853        ldrb r3, [r2, #1]       ; r3 = [r2 + 1]
+    2e96:   7894        ldrb r4, [r2, #2]       ; r4 = [r2 + 2]
+    2e98:   78d7        ldrb r7, [r2, #3]       ; r7 = [r2 + 3]
+    2e9a:   f1ac 0c80   sub.w ip, ip, #128      ; ip = ip - 0x80
+    2e9e:   d24e        bcs.n 0x2f3e            ; branch if r0 >= 18
+
+    ; table branch
     2ea0:   e8df f000   tbb [pc, r0]
-    2ea4:   0f0c        lsrs r4, r1, #28
-    2ea6:   1613        asrs r3, r2, #24
-    2ea8:   1c19        adds r1, r3, #0
-    2eaa:   221f        movs r2, #31
-    2eac:   2b25        cmp r3, #37   ; 0x25
-    2eae:   3730        adds r7, #48   ; 0x30
-    2eb0:   3e3a        subs r6, #58   ; 0x3a
-    2eb2:   4441        add r1, r8
-    2eb4:   4a47        ldr r2, [pc, #284]   ; (0x2fd4)
-    2eb6:   f361 0282   bfi r2, r1, #2, #1
+    2ea4:   0c          ; 0x2eb8
+            0f          ; 0x2ebe
+    2ea6:   13          ; 0x2ec6
+            16          ; 0x2ecc
+    2ea8:   19          ; 0x2ed2
+            1c          ; 0x2ed8
+    2eaa:   1f          ; 0x2ede
+            22          ; 0x2ee4
+    2eac:   25          ; 0x2eea
+            2b          ; 0x2ef6
+    2eae:   30          ; 0x2f00
+            37          ; 0x2f0e
+    2eb0:   3a          ; 0x2f14
+            3e          ; 0x2f1c
+    2eb2:   41          ; 0x2f22
+            44          ; 0x2f28
+    2eb4:   47          ; 0x2f2e
+            4a          ; 0x2f34
+    2eb6:   f361
+
+  0x2eb8:   0282        lsls r2, r0, #10
     2eba:   e7e2        b.n 0x2e82
-    2ebc:   f361 0300   bfi r3, r1, #0, #1
+    2ebc:   f361
+
+  0x2ebe:   0300        lsls r0, r0, #12
     2ec0:   e001        b.n 0x2ec6
-    2ec2:   f361 0341   bfi r3, r1, #1, #1
-    2ec6:   7053        strb r3, [r2, #1]
+    2ec2:   f361 0341
+
+  0x2ec6:   7053        strb r3, [r2, #1]
     2ec8:   e039        b.n 0x2f3e
-    2eca:   f361 0382   bfi r3, r1, #2, #1
+    2eca:   f361
+
+  0x2ecc:   0382        lsls r2, r0, #14
     2ece:   e7fa        b.n 0x2ec6
-    2ed0:   f361 03c3   bfi r3, r1, #3, #1
+    2ed0:   f361
+
+  0x2ed2:   03c3        lsls r3, r0, #15
     2ed4:   e7f7        b.n 0x2ec6
-    2ed6:   f361 1304   bfi r3, r1, #4, #1
+    2ed6:   f361
+
+  0x2ed8:   1304        asrs r4, r0, #12
     2eda:   e7f4        b.n 0x2ec6
-    2edc:   f361 1345   bfi r3, r1, #5, #1
+    2edc:   f361
+
+  0x2ede:   1345        asrs r5, r0, #13
     2ee0:   e7f1        b.n 0x2ec6
-    2ee2:   f361 1386   bfi r3, r1, #6, #1
+    2ee2:   f361
+
+  0x2ee4:   1386
     2ee6:   e7ee        b.n 0x2ec6
-    2ee8:   f361 13c7   bfi r3, r1, #7, #1
+    2ee8:   f361
+            13c7
     2eec:   e7eb        b.n 0x2ec6
-    2eee:   f361 0400   bfi r4, r1, #0, #1
+    2eee:   f361
+            0400
     2ef2:   7094        strb r4, [r2, #2]
-    2ef4:   f88c 5017   strb.w r5, [ip, #23]
+    2ef4:   f88c
+
+  0x2ef6:   5017   strb.w r5, [ip, #23]
     2ef8:   e021        b.n 0x2f3e
-    2efa:   f361 0441   bfi r4, r1, #1, #1
+    2efa:   f361
+
+    2efc:   0441   bfi r4, r1, #1, #1
     2efe:   7094        strb r4, [r2, #2]
-    2f00:   2002        movs r0, #2
+  0x2f00:   2002        movs r0, #2
     2f02:   e003        b.n 0x2f0c
     2f04:   f361 0482   bfi r4, r1, #2, #1
     2f08:   7094        strb r4, [r2, #2]
     2f0a:   2004        movs r0, #4
     2f0c:   f88c 0017   strb.w r0, [ip, #23]
     2f10:   e015        b.n 0x2f3e
-    2f12:   f361 04c3   bfi r4, r1, #3, #1
+    2f12:   f361
+
+  0x2f14:   04c3   bfi r4, r1, #3, #1
     2f16:   e001        b.n 0x2f1c
-    2f18:   f361 1404   bfi r4, r1, #4, #1
-    2f1c:   7094        strb r4, [r2, #2]
+    2f18:   f361
+
+  0x2f1a:   1404   bfi r4, r1, #4, #1
+
+  0x2f1c:   7094        strb r4, [r2, #2]
     2f1e:   e00e        b.n 0x2f3e
-    2f20:   f361 1445   bfi r4, r1, #5, #1
+    2f20:   f361
+
+  0x2f22:   1445
     2f24:   e7fa        b.n 0x2f1c
-    2f26:   f361 1486   bfi r4, r1, #6, #1
+    2f26:   f361
+
+  0x2f28:   1486
     2f2a:   e7f7        b.n 0x2f1c
-    2f2c:   f361 14c7   bfi r4, r1, #7, #1
+    2f2c:   f361
+
+  0x2f2e:   14c7
     2f30:   e7f4        b.n 0x2f1c
-    2f32:   f361 0700   bfi r7, r1, #0, #1
+    2f32:   f361
+
+  0x2f34:   0700
     2f36:   e001        b.n 0x2f3c
     2f38:   f361 0741   bfi r7, r1, #1, #1
     2f3c:   70d7        strb r7, [r2, #3]
-    2f3e:   61b5        str r5, [r6, #24]
-    2f40:   bdf0        pop {r4, r5, r6, r7, pc}
+
+  0x2f3e:   61b5        str r5, [r6, #24]       ; r5 = [r6 + 0x18]
+  0x2f40:   bdf0        pop {r4, r5, r6, r7, pc}
     2f42:   0000
 
-  0x2f44:   0x20000018
+  0x2f44:   0x20000018  ; pointer_35
   0x2f48:   0x200000d8  ; pointer_15
-  0x2f4c:   0x2000002c
+  0x2f4c:   0x2000002c  ; pointer_36
 
 afio_exti_ssr_write:
     ; this writes to the EXTI source selection register 0 or 1 (ESSR0, ESSR1) in the AFIO control registers
@@ -2137,10 +2186,10 @@ function_e_17:
     3e34:   2400        movs r4, #0
   0x3e36:   4620        mov r0, r4
     3e38:   9906        ldr r1, [sp, #24]
-    3e3a:   f7ff f80f   bl 0x2e5c                   ; call function_e_32
+    3e3a:   f7ff f80f   bl 0x2e5c               ; call function_e_32
     3e3e:   4620        mov r0, r4
     3e40:   9906        ldr r1, [sp, #24]
-    3e42:   f003 ff4b   bl 0x7cdc                   ; call function_e_92
+    3e42:   f003 ff4b   bl 0x7cdc               ; call function_e_92
     3e46:   2801        cmp r0, #1
     3e48:   d037        beq.n 0x3eba
     3e4a:   e037        b.n 0x3ebc
@@ -4831,7 +4880,7 @@ function_e_43:
     57b2:   3180        adds r1, #128   ; 0x80
     57b4:   f8c1 9010   str.w r9, [r1, #16]
     57b8:   2100        movs r1, #0
-    57ba:   f7fd fb4f   bl 0x2e5c                   ; call function_e_32
+    57ba:   f7fd fb4f   bl 0x2e5c               ; call function_e_32
     57be:   f898 0000   ldrb.w r0, [r8]
     57c2:   2801        cmp r0, #1
     57c4:   d004        beq.n 0x57d0
