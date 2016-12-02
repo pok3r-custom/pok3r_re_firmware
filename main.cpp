@@ -28,8 +28,8 @@ int readfw(ZPath out){
             LOG("Reading...");
             ZBinary data;
             // Flash
-//            zu64 start = 0x0;
-//            zu64 len =   0x20000;
+            zu64 start = 0x0;
+            zu64 len =   0x20000;
             // Boot loader
 //            zu64 start = 0x1F000000;
 //            zu64 len =       0x2000;
@@ -40,8 +40,8 @@ int readfw(ZPath out){
 //            zu64 start = 0x400B0000;
 //            zu64 len =       0xA000;
             // VTOR
-            zu64 start = 0xE0000000;
-            zu64 len =     0x100000;
+//            zu64 start = 0xE0000000;
+//            zu64 len =     0x100000;
             for(zu64 o = 0; o < len; o += 64){
                 if(pok3r.read(start + o, data) != 64){
                     LOG("Failed to read: 0x" << ZString::ItoS(start + o, 16));
