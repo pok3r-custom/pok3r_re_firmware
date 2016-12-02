@@ -1,36 +1,31 @@
-Vortex Pok3r Custom Firmware Project
+# Vortex Pok3r Custom Firmware Project
 
-Holtek MCU HT32F1655
-ARM Cortex M3
+### General Notes
 
-## Firmware Updaters:
-- POK3R_V113.exe
-- POK3R_V114.exe
-- POK3R_V115.exe
-- POK3R_V116.exe
-- POK3R_V117.exe
+- Holtek MCU HT32F1655
+- ARM Cortex M3
 
 ## PCB Notes
 
-# Header CN2
+### Header CN2
 - Pin 1: 3.3V?
 - Pin 2: SWDIO
 - Pin 3: SWCLK
 - Pin 4: nRST
 - Pin 5: GND
 
-# Boot Mode
+### Boot Mode
 - BOOT_0: 0
 - BOOT_1: 0
 
-# JTAG to SWD
+### JTAG to SWD
 - SWDCK: TCK
 - SWDIO: TMS
 - nRST
 
 ## Firmware Notes
 
-# USB Descriptor Hierarchy
+### USB Descriptor Hierarchy
 - usb_device_desc
     - usb_config_desc
         - usb_interface0_desc
@@ -48,3 +43,10 @@ ARM Cortex M3
                 - usb_report2_desc
 - usb_str0_desc
 - usb_str1_desc
+
+### Firmware Updaters
+- POK3R_V113.exe
+- POK3R_V114.exe
+- POK3R_V115.exe
+- POK3R_V116.exe
+- POK3R_V117.exe
