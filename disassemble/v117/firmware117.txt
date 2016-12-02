@@ -1,5 +1,4 @@
-
-fw_117.bin:     file format binary
+Firmware v117 Disassembly:
 
 vector_table:
   0x2c00:   0x20003760  ; Stack Pointer     (stack_max)
@@ -449,12 +448,14 @@ function_e_1:
     2fc2:   e00c        b.n 0x2fde
     2fc4:   f06f 0001   mvn.w r0, #1
     2fc8:   f003 fb1c   bl 0x6604               ; call function_e_4
-    2fcc:   782b        ldrb r3, [r5, #0]
-    2fce:   4c0c        ldr r4, [pc, #48]   ; (0x3000)
-    2fd0:   e9d5 1201   ldrd r1, r2, [r5, #4]
-    2fd4:   f854 3023   ldr.w r3, [r4, r3, lsl #2]
-    2fd8:   7868        ldrb r0, [r5, #1]
-    2fda:   4798        blx r3
+
+    2fcc:   782b        ldrb r3, [r5, #0]           ; r3 = [r5]
+    2fce:   4c0c        ldr r4, [pc, #48]           ; r4 = (0x3000)
+    2fd0:   e9d5 1201   ldrd r1, r2, [r5, #4]       ; r1 = [r5 + 4]
+                                                    ; r2 = [r5 + 8]
+    2fd4:   f854 3023   ldr.w r3, [r4, r3, lsl #2]  ; r3 = [r4 + r3 << 2]
+    2fd8:   7868        ldrb r0, [r5, #1]           ; r0 = [r5 + 1]
+    2fda:   4798        blx r3                      ; call r3
     2fdc:   4604        mov r4, r0
     2fde:   4621        mov r1, r4
     2fe0:   e8bd 4070   ldmia.w sp!, {r4, r5, r6, lr}
@@ -1111,7 +1112,7 @@ flash_write:
     34f0:   4770        bx lr
     34f2:   0000
 
-  0x34f4:   0x40080000  ; FMC_Registers
+  0x34f4:   0x40080000  ; FMC registers
 
     ; Continuation from flash_page_erase
   0x34f8:   4806        ldr r0, [pc, #24]       ; r0 = (0x3514) 0xfffff
@@ -6256,8 +6257,6 @@ function_e_52:
     6560:   280e        cmp r0, #14
     6562:   d3e9        bcc.n 0x6538
     6564:   e8bd 41f0   ldmia.w sp!, {r4, r5, r6, r7, r8, lr}
-
-    ; ???
     6568:   f002 b80a   b.w 0x8580                  ; call function_e_6
 
   0x656c:   0x20000160
@@ -6552,8 +6551,8 @@ function_e_57:
     67e6:   f000 fbad   bl 0x6f44               ; call function_e_74
     67ea:   702c        strb r4, [r5, #0]
     67ec:   bd70        pop {r4, r5, r6, pc}
-
     67ee:   0000
+
   0x67f0:   0x200000f0
   0x67f4:   0x20000014
   0x67f8:   0x200000f4
@@ -6594,7 +6593,7 @@ function_70:
     6840:   6148        str r0, [r1, #20]
     6842:   e8bd 4010   ldmia.w sp!, {r4, lr}
     6846:   f7fc bb97   b.w 0x2f78              ; call function_e_1
-    684a:   0000        movs r0, r0
+    684a:   0000
 
   0x684c:   0x20000368
   0x6850:   0x20000014
@@ -6656,8 +6655,8 @@ function_e_58:
     68c4:   4802        ldr r0, [pc, #8]   ; (0x68d0)
     68c6:   3808        subs r0, #8
     68c8:   e7f3        b.n 0x68b2
+    68ca:   0000
 
-    68ca:   0000        movs r0, r0
   0x68cc:   0x2000032c  ; pointer_32
   0x68d0:   0x2000003c  ; pointer_33
   0x68d4:   0x20000358
@@ -7758,7 +7757,7 @@ erase_flash:
     71b4:   204f        movs r0, #79            ; r0 = 0x4f
     71b6:   e7e8        b.n 0x718a
 
-usb_write:
+usb_read_write:
   0x71b8:   e92d 5ff0   stmdb sp!, {r4, r5, r6, r7, r8, r9, sl, fp, ip, lr}
     71bc:   2600        movs r6, #0             ; r6 = 0
     71be:   4680        mov r8, r0              ; r8 = r0
@@ -7791,7 +7790,7 @@ usb_write:
   0x7202:   4621        mov r1, r4              ; r1 = r4       (target address)
     7204:   2004        movs r0, #4             ; r0 = 4        (flash cmd: word program)
     7206:   683a        ldr r2, [r7, #0]        ; r2 = [r7]     (data)
-    7208:   f7fc f96c   bl 0x34e4               ; call flash_write
+    7208:   f7fc f96c   bl 0x34e4               ; call flash_write(4, r4, [r7])
     720c:   1d24        adds r4, r4, #4         ; r4 = r4 + 4   (increment flash address)
     720e:   1d3f        adds r7, r7, #4         ; r7 = r7 + 4   (increment source address)
   0x7210:   454c        cmp r4, r9
@@ -7813,9 +7812,8 @@ usb_write:
     7234:   e012        b.n 0x725c
     7236:   1c40        adds r0, r0, #1
     7238:   d020        beq.n 0x727c
-  0x723a:   2046        movs r0, #70            ; r0 = 0x46
 
-    ; continuation of previous function; was labeled usb_read_allow
+  0x723a:   2046        movs r0, #70            ; r0 = 0x46
   0x723c:   e8bd 9ff0   ldmia.w sp!, {r4, r5, r6, r7, r8, r9, sl, fp, ip, pc}
     7240:   f5a4 5120   sub.w r1, r4, #10240    ; r1 = r4 - 0x2800
     7244:   f5b1 6f80   cmp.w r1, #1024         ; 0x400

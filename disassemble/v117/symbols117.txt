@@ -1,9 +1,10 @@
 Firmware v117 Symbol Map:
 
+Functions:
+
 <function_name>                     @ 0x<offset>
     <called function>
     *<function referenced by pointer>
-
 
 reset                               @ 0x2d54
     watchdog_init
@@ -413,7 +414,7 @@ function_53                         @ 0x7158
     function_21
     function_14
 erase_flash                         @ 0x7178
-usb_write                           @ 0x71b8
+usb_read_write                      @ 0x71b8
     flash_get_protection_status
 function_e_77_unused                @ 0x729c
     function_e_74

@@ -55,7 +55,7 @@ When it is built, this will attempt to read the 128K flash:
 Without the patch, it will read a lot of 0x00 and 0xFF. With the single-instruction patch, the
 tool will read back the entirety of flash, including the unencrypted firmware. Comparing this
 version against the earlier version extracted from the updater, we can see the obfuscated region is
-aligned on 52-byte bounares. It looks like the update packets where 10 < i < 100 are decrypted by
+aligned on 52-byte boundaries. It looks like the update packets where 10 < i < 100 are decrypted by
 the keyboard, and the rest are written untouched.
 
 And that is the current state of the project, trying to determine the update and decryption

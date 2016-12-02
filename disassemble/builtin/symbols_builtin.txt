@@ -1,0 +1,62 @@
+Firmware Builtin Symbol Map:
+
+Functions:
+
+<function_name>                     @ 0x<offset>
+    <called function>
+    *<function referenced by pointer>
+
+entry                               @ 0x20
+    sram_init
+    main
+
+sram_init                           @ 0x50
+
+reset                               @ 0x118
+    watchdog_init
+    clock_init
+    entry
+
+generic_fault                       @ 0x124
+
+flash_page_erase                    @ 0x440
+flash_get_protection_status         @ 0x454
+flash_write                         @ 0x460
+
+clock_init                          @ 0x10e4
+
+ptr_write_func_ptrs                 @ 0x12ac
+function_67                         @ 0x1330
+function_81                         @ 0x1424
+usb_get_descriptor                  @ 0x1434
+
+usb_read_write                      @ 0x1b7c
+
+main                                @ 0x1ee0
+
+firmware_decrypt                    @ 0x1f90
+
+
+Data:
+
+usb_report0_desc                    @ 0x2024
+usb_report1_desc                    @ 0x2064
+usb_report2_desc                    @ 0x2088
+usb_device_desc                     @ 0x20f0
+usb_config_desc                     @ 0x2104
+usb_interface0_desc                 @ 0x210d
+usb_hid0_desc                       @ 0x2116
+usb_endpoint1_desc                  @ 0x211f
+usb_interface1_desc                 @ 0x2126
+usb_hid1_desc                       @ 0x212f
+usb_endpoint3_desc                  @ 0x2138
+usb_endpoint4_desc                  @ 0x213f
+usb_interface2_desc                 @ 0x2146
+usb hid2_desc                       @ 0x214f
+usb_endpoint2_desc                  @ 0x2158
+usb_str0_desc                       @ 0x2160
+usb_str1_desc                       @ 0x2164
+
+xor_key                             @ 0x2188
+
+stack_max                           @ 0x20000ed8

@@ -1,8 +1,7 @@
-
-firmware_builtin.bin:     file format binary
+Firmware Builtin Disassembly:
 
 vector_table:
-     0x0:   0x20000ed8  ; Stack Pointer
+     0x0:   0x20000ed8  ; Stack Pointer (stack_max)
        4:   0x119       ; PC Reset      (reset)
        8:   0x125       ; NMI           (generic_fault)
        c:   0x125       ; Hard Fault    (generic_fault)
@@ -13,14 +12,14 @@ vector_table:
 
 .text:
 
-reset_3:
+entry:
     0x20:   f8df d00c   ldr.w sp, [pc, #12]     ; sp = (0x30)
-      24:   f000 f814   bl 0x50                 ; call reset_4
+      24:   f000 f814   bl 0x50                 ; call sram_init
       28:   4800        ldr r0, [pc, #0]        ; r0 = (0x2c)
-      2a:   4700        bx r0                   ; jump reset_5
+      2a:   4700        bx r0                   ; jump main
 
-    0x2c:   0x1ee1      ; (reset_5)
-    0x30:   0x20000ed8  ; Stack Pointer
+    0x2c:   0x1ee1      ; (main)
+    0x30:   0x20000ed8  ; stack_max
 
     0x34:   60c1        str r1, [r0, #12]
       36:   4770        bx lr
@@ -41,17 +40,17 @@ reset_3:
       4c:   6841        ldr r1, [r0, #4]
       4e:   4708        bx r1
 
-reset_4:
-    0x50:   4c06        ldr r4, [pc, #24]    ; r4 = (0x6c)
-      52:   4d07        ldr r5, [pc, #28]    ; r5 = (0x70)
-      54:   e006        b.n 0x64
-    0x56:   68e0        ldr r0, [r4, #12]
-      58:   f040 0301   orr.w r3, r0, #1
+sram_init:
+    0x50:   4c06        ldr r4, [pc, #24]           ; r4 = (0x6c)
+      52:   4d07        ldr r5, [pc, #28]           ; r5 = (0x70)
+      54:   e006        b.n 0x64                    ; enter loop
+    0x56:   68e0        ldr r0, [r4, #12]           ; r0 = [r4 + 0xc]
+      58:   f040 0301   orr.w r3, r0, #1            ; r3 = r0 | 1
       5c:   e894 0007   ldmia.w r4, {r0, r1, r2}
-      60:   4798        blx r3
-      62:   3410        adds r4, #16
+      60:   4798        blx r3                      ; call r3
+      62:   3410        adds r4, #16                ; r4 += 16
     0x64:   42ac        cmp r4, r5
-      66:   d3f6        bcc.n 0x56              ; branch if r4 < r5
+      66:   d3f6        bcc.n 0x56                  ; branch if r4 < r5
       68:   f7ff ffde   bl 0x28
 
     0x6c:   0x22ac
@@ -133,11 +132,11 @@ reset_4:
 
 reset:
    0x118:   4803        ldr r0, [pc, #12]   ; r0 = (0x128)
-     11a:   4780        blx r0              ; call reset_1
+     11a:   4780        blx r0              ; call watchdog_init
      11c:   4803        ldr r0, [pc, #12]   ; r0 = (0x12c)
-     11e:   4780        blx r0              ; call reset_2
+     11e:   4780        blx r0              ; call clock_init
      120:   4803        ldr r0, [pc, #12]   ; r0 = (0x130)
-     122:   4700        bx r0               ; jump reset_3
+     122:   4700        bx r0               ; jump entry
 
 generic_fault:
      124:   e7fe        b.n 0x124
@@ -489,7 +488,10 @@ generic_fault:
      43a:   d3e2        bcc.n 0x402
      43c:   b280        uxth r0, r0
      43e:   bdf0        pop {r4, r5, r6, r7, pc}
-     440:   4903        ldr r1, [pc, #12]    ; (0x450)
+
+flash_page_erase:
+    ; r0 = page address
+   0x440:   4903        ldr r1, [pc, #12]    ; (0x450)
      442:   6008        str r0, [r1, #0]
      444:   2008        movs r0, #8
      446:   60c8        str r0, [r1, #12]
@@ -497,30 +499,33 @@ generic_fault:
      44a:   6108        str r0, [r1, #16]
      44c:   f000 b812   b.w 0x474
 
-     450:   0000        movs r0, r0
-     452:   4008        ands r0, r1
+   0x450:   0x40080000  ; FMC base
 
-     454:   4801        ldr r0, [pc, #4]    ; (0x45c)
+flash_get_protection_status:
+   0x454:   4801        ldr r0, [pc, #4]    ; (0x45c)
      456:   6b00        ldr r0, [r0, #48]    ; 0x30
      458:   4770        bx lr
-     45a:   0000        movs r0, r0
+     45a:   0000
 
-     45c:   0000        movs r0, r0
-     45e:   4008        ands r0, r1
+   0x45c:   0x40080000  ; FMC base
 
-     460:   4b03        ldr r3, [pc, #12]    ; (0x470)
+flash_write:
+    ; r0 = Flash CMD command
+    ; r1 = Flash TADR target address
+    ; r2 = Flash WRDR write data
+   0x460:   4b03        ldr r3, [pc, #12]    ; (0x470)
      462:   60d8        str r0, [r3, #12]
      464:   6019        str r1, [r3, #0]
      466:   605a        str r2, [r3, #4]
      468:   2014        movs r0, #20
      46a:   6118        str r0, [r3, #16]
      46c:   4770        bx lr
-     46e:   0000        movs r0, r0
+     46e:   0000
 
-     470:   0000        movs r0, r0
-     472:   4008        ands r0, r1
+   0x470:   0x40080000  ; FMC base
 
-     474:   4806        ldr r0, [pc, #24]    ; (0x490)
+    ; continuation frim flash_page_erase
+   0x474:   4806        ldr r0, [pc, #24]    ; (0x490)
      476:   4907        ldr r1, [pc, #28]    ; (0x494)
      478:   e004        b.n 0x484
      47a:   690a        ldr r2, [r1, #16]
@@ -534,10 +539,8 @@ generic_fault:
      48c:   2000        movs r0, #0
      48e:   4770        bx lr
 
-     490:   ffff 000f   vaddl.u<illegal width 64> q8, d15, d15
-
-     494:   0000        movs r0, r0
-     496:   4008        ands r0, r1
+   0x490:  0xfffff      ; timeout counter
+   0x494:  0x40080000   ; FMC base
 
      498:   2a00        cmp r2, #0
      49a:   6802        ldr r2, [r0, #0]
@@ -732,7 +735,8 @@ generic_fault:
      64a:   61c1        str r1, [r0, #28]
      64c:   4770        bx lr
      64e:   0000        movs r0, r0
-     650:   b570        push {r4, r5, r6, lr}
+
+   0x650:   b570        push {r4, r5, r6, lr}
      652:   481d        ldr r0, [pc, #116]    ; (0x6c8)
      654:   6801        ldr r1, [r0, #0]
      656:   2901        cmp r1, #1
@@ -769,35 +773,28 @@ generic_fault:
      69a:   e00c        b.n 0x6b6
      69c:   f06f 0001   mvn.w r0, #1
      6a0:   f000 fcc4   bl 0x102c
-     6a4:   782b        ldrb r3, [r5, #0]
-     6a6:   4c0c        ldr r4, [pc, #48]    ; (0x6d8)
-     6a8:   e9d5 1201   ldrd r1, r2, [r5, #4]
-     6ac:   f854 3023   ldr.w r3, [r4, r3, lsl #2]
-     6b0:   7868        ldrb r0, [r5, #1]
+     6a4:   782b        ldrb r3, [r5, #0]               ; r4 = [r5]
+     6a6:   4c0c        ldr r4, [pc, #48]               ; r4 = (0x6d8)
+     6a8:   e9d5 1201   ldrd r1, r2, [r5, #4]           ; r1 = [r5 + 4]
+                                                        ; r2 = [r5 + 8]
+     6ac:   f854 3023   ldr.w r3, [r4, r3, lsl #2]      ; r3 = [r4 + r3 << 2]
+     6b0:   7868        ldrb r0, [r5, #1]               ; r0 = [r5 + 1]
      6b2:   4798        blx r3
-     6b4:   4604        mov r4, r0
-     6b6:   4621        mov r1, r4
+     6b4:   4604        mov r4, r0                      ; r4 = r0
+     6b6:   4621        mov r1, r4                      ; r1 = r4
      6b8:   e8bd 4070   ldmia.w sp!, {r4, r5, r6, lr}
-     6bc:   4805        ldr r0, [pc, #20]    ; (0x6d4)
+     6bc:   4805        ldr r0, [pc, #20]               ; r0 = (0x6d4)
      6be:   3810        subs r0, #16
      6c0:   f7ff be4d   b.w 0x35e
      6c4:   bd70        pop {r4, r5, r6, pc}
-     6c6:   0000        movs r0, r0
+     6c6:   0000
 
-     6c8:   0024        movs r4, r4
-     6ca:   2000        movs r0, #0
+   0x6c8:   0x20000024
+   0x6cc:   0x20000048
+   0x6d0:   0x20000630
+   0x6d4:   0x200001cc
+   0x6d8:   0x21bc
 
-     6cc:   0048        lsls r0, r1, #1
-     6ce:   2000        movs r0, #0
-
-     6d0:   0630        lsls r0, r6, #24
-     6d2:   2000        movs r0, #0
-
-     6d4:   01cc        lsls r4, r1, #7
-     6d6:   2000        movs r0, #0
-
-     6d8:   21bc        movs r1, #188    ; 0xbc
-     6da:   0000        movs r0, r0
      6dc:   4815        ldr r0, [pc, #84]    ; (0x734)
      6de:   b510        push {r4, lr}
      6e0:   6801        ldr r1, [r0, #0]
@@ -1921,7 +1918,7 @@ generic_fault:
   0x10e0:   4770        bx lr
     10e2:   0000
 
-reset_2:
+clock_init:
   0x10e4:   4814        ldr r0, [pc, #80]    ; (0x1138)
     10e6:   2101        movs r1, #1
     10e8:   f8c0 1300   str.w r1, [r0, #768]    ; 0x300
@@ -2050,7 +2047,7 @@ reset_2:
 
   0x1208:   0x20000010
 
-    120c:   b510        push {r4, lr}
+  0x120c:   b510        push {r4, lr}
     120e:   4c0a        ldr r4, [pc, #40]    ; (0x1238)
     1210:   e9d4 1001   ldrd r1, r0, [r4, #4]
     1214:   4401        add r1, r0
@@ -2122,7 +2119,8 @@ reset_2:
   0x12a4:   0x20000028
   0x12a8:   0x200001bc
 
-    12ac:   4908        ldr r1, [pc, #32]    ; (0x12d0)
+ptr_write_func_ptrs:
+  0x12ac:   4908        ldr r1, [pc, #32]    ; (0x12d0)
     12ae:   6001        str r1, [r0, #0]
     12b0:   4908        ldr r1, [pc, #32]    ; (0x12d4)
     12b2:   6081        str r1, [r0, #8]
@@ -2140,13 +2138,13 @@ reset_2:
     12ca:   f000 b88b   b.w 0x13e4
     12ce:   0000
 
-  0x12d0:   0x000012ed
-  0x12d4:   0x000013e5
-  0x12d8:   0x00001435
-  0x12dc:   0x00001331
-  0x12e0:   0x000011f5
-  0x12e4:   0x00001201
-  0x12e8:   0x0000120d
+  0x12d0:   0x12ed
+  0x12d4:   0x13e5
+  0x12d8:   0x1435 (usb_get_descriptor)
+  0x12dc:   0x1331
+  0x12e0:   0x11f5
+  0x12e4:   0x1201
+  0x12e8:   0x120d
 
     12ec:   480e        ldr r0, [pc, #56]    ; (0x1328)
     12ee:   b510        push {r4, lr}
@@ -2173,7 +2171,8 @@ reset_2:
   0x1328:   0x200001a4
   0x132c:   0x20000010
 
-    1330:   b4f0        push {r4, r5, r6, r7}
+function_67:
+  0x1330:   b4f0        push {r4, r5, r6, r7}
     1332:   8801        ldrh r1, [r0, #0]
     1334:   f44f 7580   mov.w r5, #256    ; 0x100
     1338:   f640 1721   movw r7, #2337    ; 0x921
@@ -2248,7 +2247,7 @@ reset_2:
 
   0x13d8:   0x20000198
   0x13dc:   0x20000018
-  0x13e0:   0x00001425
+  0x13e0:   0x1425
 
     13e4:   480d        ldr r0, [pc, #52]    ; (0x141c)
     13e6:   b510        push {r4, lr}
@@ -2279,7 +2278,8 @@ reset_2:
   0x141c:   0x20000010
   0x1420:   0x2000000c
 
-    1424:   4a02        ldr r2, [pc, #8]    ; (0x1430)
+function_81:
+  0x1424:   4a02        ldr r2, [pc, #8]    ; (0x1430)
     1426:   2101        movs r1, #1
     1428:   f842 1020   str.w r1, [r2, r0, lsl #2]
     142c:   4770        bx lr
@@ -2287,7 +2287,8 @@ reset_2:
 
   0x1430:   0x200001a4
 
-    1434:   78c2        ldrb r2, [r0, #3]
+usb_get_descriptor:
+  0x1434:   78c2        ldrb r2, [r0, #3]
     1436:   8881        ldrh r1, [r0, #4]
     1438:   2301        movs r3, #1
     143a:   2a21        cmp r2, #33    ; 0x21
@@ -2317,25 +2318,25 @@ reset_2:
     146a:   68c1        ldr r1, [r0, #12]
     146c:   314b        adds r1, #75    ; 0x4b
     146e:   e7f9        b.n 0x1464
-    1470:   4908        ldr r1, [pc, #32]    ; (0x1494)
-    1472:   61c1        str r1, [r0, #28]
+    1470:   4908        ldr r1, [pc, #32]       ; r1 = (0x1494)
+    1472:   61c1        str r1, [r0, #28]       ; [r0 + 0x1c] = r1 = (usb_report0_desc)
     1474:   2140        movs r1, #64    ; 0x40
     1476:   e003        b.n 0x1480
-    1478:   4906        ldr r1, [pc, #24]    ; (0x1494)
-    147a:   3140        adds r1, #64    ; 0x40
-    147c:   61c1        str r1, [r0, #28]
-    147e:   2122        movs r1, #34    ; 0x22
+    1478:   4906        ldr r1, [pc, #24]       ; r1 = (0x1494)
+    147a:   3140        adds r1, #64            ; r1 += 0x40
+    147c:   61c1        str r1, [r0, #28]       ; [r0 + 0x1c] = r1 = (usb_report1_desc)
+    147e:   2122        movs r1, #34            ; r1 = 0x22
     1480:   6201        str r1, [r0, #32]
     1482:   f880 3024   strb.w r3, [r0, #36]    ; 0x24
     1486:   4770        bx lr
-    1488:   4902        ldr r1, [pc, #8]    ; (0x1494)
-    148a:   3164        adds r1, #100    ; 0x64
-    148c:   61c1        str r1, [r0, #28]
-    148e:   2165        movs r1, #101    ; 0x65
+    1488:   4902        ldr r1, [pc, #8]        ; r1 = (0x1494)
+    148a:   3164        adds r1, #100           ; r1 += 0x64
+    148c:   61c1        str r1, [r0, #28]       ; [r0 + 0x1c] = r1 = (usb_report2_desc)
+    148e:   2165        movs r1, #101           ; r1 = 0x65
     1490:   e7f6        b.n 0x1480
     1492:   0000        movs r0, r0
 
-  0x1494:   0x00002024        movs
+  0x1494:   0x2024
 
     1498:   f890 0034   ldrb.w r0, [r0, #52]    ; 0x34
     149c:   f3c0 0040   ubfx r0, r0, #1, #1
@@ -2560,7 +2561,7 @@ reset_2:
     16d4:   4770        bx lr
     16d6:   0000        movs r0, r0
 
-  0x16d8:   0x000020f0
+  0x16d8:   0x20f0
   0x16dc:   0x20000038
 
     16e0:   4901        ldr r1, [pc, #4]    ; (0x16e8)
@@ -2599,7 +2600,7 @@ reset_2:
     1734:   f7fe bdec   b.w 0x310
 
   0x1738:   0x20000148
-  0x173c:   0x0000104d
+  0x173c:   0x104d
   0x1740:   0xe000e004
 
     1744:   4905        ldr r1, [pc, #20]    ; (0x175c)
@@ -2962,7 +2963,7 @@ reset_2:
 
   0x1a94:   0x200000b8
 
-reset_1:
+watchdog_init:
   0x1a98:   4913        ldr r1, [pc, #76]       ; r1 = (0x1ae8) CKCU registers
     1a9a:   4812        ldr r0, [pc, #72]       ; r0 = (0x1ae4)
     1a9c:   6b0a        ldr r2, [r1, #48]       ; r2 = [r1 + 0x30]
@@ -3048,37 +3049,48 @@ reset_1:
     1b6a:   d9ee        bls.n 0x1b4a
     1b6c:   204f        movs r0, #79    ; 0x4f
     1b6e:   e7e2        b.n 0x1b36
-    1b70:   0048        lsls r0, r1, #1
-    1b72:   2000        movs r0, #0
+
+  0x1b70: 0x20000048        lsls r0, r1, #1
+
     1b74:   f7fe fab2   bl 0xdc
     1b78:   e7fe        b.n 0x1b78
-    1b7a:   0000        movs r0, r0
-    1b7c:   e92d 5ff0   stmdb sp!, {r4, r5, r6, r7, r8, r9, sl, fp, ip, lr}
-    1b80:   f04f 0700   mov.w r7, #0
-    1b84:   4d40        ldr r5, [pc, #256]    ; (0x1c88)
-    1b86:   f8df b104   ldr.w fp, [pc, #260]    ; 0x1c8c
-    1b8a:   ea5f 0800   movs.w r8, r0
-    1b8e:   460c        mov r4, r1
-    1b90:   4691        mov r9, r2
-    1b92:   463e        mov r6, r7
-    1b94:   46ba        mov sl, r7
+    1b7a:   0000
+
+usb_read_write:
+    ; r0 =
+    ; r1 = start address
+    ; r2 = end address
+    ; This function is called for each write packet
+  0x1b7c:   e92d 5ff0   stmdb sp!, {r4, r5, r6, r7, r8, r9, sl, fp, ip, lr}
+    1b80:   f04f 0700   mov.w r7, #0            ; r7 = 0
+    1b84:   4d40        ldr r5, [pc, #256]      ; r5 = (0x1c88) payload_data
+    1b86:   f8df b104   ldr.w fp, [pc, #260]    ; fp = (0x1c8c)
+    1b8a:   ea5f 0800   movs.w r8, r0           ; r8 = r0
+    1b8e:   460c        mov r4, r1              ; r4 = r1
+    1b90:   4691        mov r9, r2              ; r9 = r2
+    1b92:   463e        mov r6, r7              ; r6 = r7
+    1b94:   46ba        mov sl, r7              ; sl = r7
     1b96:   d10e        bne.n 0x1bb6
-    1b98:   493d        ldr r1, [pc, #244]    ; (0x1c90)
-    1b9a:   7808        ldrb r0, [r1, #0]
-    1b9c:   b918        cbnz r0, 0x1ba6
-    1b9e:   1e78        subs r0, r7, #1
-    1ba0:   6048        str r0, [r1, #4]
-    1ba2:   2001        movs r0, #1
-    1ba4:   7008        strb r0, [r1, #0]
-    1ba6:   6848        ldr r0, [r1, #4]
-    1ba8:   1c40        adds r0, r0, #1
-    1baa:   6048        str r0, [r1, #4]
-    1bac:   380a        subs r0, #10
-    1bae:   285a        cmp r0, #90    ; 0x5a
-    1bb0:   d801        bhi.n 0x1bb6
-    1bb2:   f000 f9ed   bl 0x1f90
-    1bb6:   f7fe fc4d   bl 0x454
-    1bba:   07c0        lsls r0, r0, #31
+
+    1b98:   493d        ldr r1, [pc, #244]      ; r1 = (0x1c90)
+    1b9a:   7808        ldrb r0, [r1, #0]       ; r0 = [r1]
+    1b9c:   b918        cbnz r0, 0x1ba6         ; branch if r0 != 0
+    1b9e:   1e78        subs r0, r7, #1         ; r0 = r7 - 1
+    1ba0:   6048        str r0, [r1, #4]        ; [r1 + 4] = r0
+    1ba2:   2001        movs r0, #1             ; r0  = 1
+    1ba4:   7008        strb r0, [r1, #0]       ; [r1] = r0
+  0x1ba6:   6848        ldr r0, [r1, #4]        ; r0 = [r1 + 4]
+    1ba8:   1c40        adds r0, r0, #1         ; r0 += 1
+    1baa:   6048        str r0, [r1, #4]        ; [r1 + 4] = r0
+    1bac:   380a        subs r0, #10            ; r0 -= 10
+    1bae:   285a        cmp r0, #90
+    1bb0:   d801        bhi.n 0x1bb6            ; branch if r0 > 90
+
+    1bb2:   f000 f9ed   bl 0x1f90               ; call firmware_decrypt()
+
+  0x1bb6:   f7fe fc4d   bl 0x454                ; call flash_get_protection_status()
+    1bba:   07c0        lsls r0, r0, #31        ; r0 <<= 31
+
     1bbc:   d101        bne.n 0x1bc2
     1bbe:   f04f 0a01   mov.w sl, #1
     1bc2:   f1b8 0f01   cmp.w r8, #1
@@ -3090,7 +3102,7 @@ reset_1:
     1bd4:   e003        b.n 0x1bde
     1bd6:   59e1        ldr r1, [r4, r7]
     1bd8:   1c49        adds r1, r1, #1
-    1bda:   d131        bne.n 0x1c40
+    1bda:   d131        bne.n 0x1c40            ; jump to reading if
     1bdc:   1d3f        adds r7, r7, #4
     1bde:   42b8        cmp r0, r7
     1be0:   d8f9        bhi.n 0x1bd6
@@ -3102,19 +3114,24 @@ reset_1:
     1bee:   6848        ldr r0, [r1, #4]
     1bf0:   1c40        adds r0, r0, #1
     1bf2:   6048        str r0, [r1, #4]
-    1bf4:   380a        subs r0, #10
-    1bf6:   285a        cmp r0, #90    ; 0x5a
-    1bf8:   d809        bhi.n 0x1c0e
-    1bfa:   f000 f9c9   bl 0x1f90
+    1bf4:   380a        subs r0, #10            ; r0 -= 10
+    1bf6:   285a        cmp r0, #90
+    1bf8:   d809        bhi.n 0x1c0e            ; branch if r0 > 90
+
+    1bfa:   f000 f9c9   bl 0x1f90               ; call firmware_decrypt()
     1bfe:   e006        b.n 0x1c0e
-    1c00:   4621        mov r1, r4
+
+    ; write a word to flash
+  0x1c00:   4621        mov r1, r4
     1c02:   2004        movs r0, #4
     1c04:   682a        ldr r2, [r5, #0]
-    1c06:   f7fe fc2b   bl 0x460
-    1c0a:   1d24        adds r4, r4, #4
-    1c0c:   1d2d        adds r5, r5, #4
-    1c0e:   454c        cmp r4, r9
-    1c10:   d9f6        bls.n 0x1c00
+    1c06:   f7fe fc2b   bl 0x460                ; call flash_write(4, r4, [r5])
+    1c0a:   1d24        adds r4, r4, #4         ; r4 += 4
+    1c0c:   1d2d        adds r5, r5, #4         ; r5 += 4
+
+  0x1c0e:   454c        cmp r4, r9
+    1c10:   d9f6        bls.n 0x1c00            ; loop if r4 <= r9
+
     1c12:   e034        b.n 0x1c7e
     1c14:   481f        ldr r0, [pc, #124]    ; (0x1c94)
     1c16:   4284        cmp r4, r0
@@ -3135,32 +3152,36 @@ reset_1:
     1c3a:   e01e        b.n 0x1c7a
     1c3c:   1c40        adds r0, r0, #1
     1c3e:   d01c        beq.n 0x1c7a
-    1c40:   2046        movs r0, #70    ; 0x46
+
+    ; code for reading flash
+  0x1c40:   2046        movs r0, #70                ; r0 = 0x46
     1c42:   e8bd 9ff0   ldmia.w sp!, {r4, r5, r6, r7, r8, r9, sl, fp, ip, pc}
-    1c46:   f5a4 5120   sub.w r1, r4, #10240    ; 0x2800
-    1c4a:   f5b1 6f80   cmp.w r1, #1024    ; 0x400
-    1c4e:   d304        bcc.n 0x1c5a
-    1c50:   4911        ldr r1, [pc, #68]    ; (0x1c98)
-    1c52:   4421        add r1, r4
-    1c54:   2950        cmp r1, #80    ; 0x50
-    1c56:   d300        bcc.n 0x1c5a
-    1c58:   2000        movs r0, #0
-    1c5a:   f84b 0026   str.w r0, [fp, r6, lsl #2]
-    1c5e:   1c76        adds r6, r6, #1
+    1c46:   f5a4 5120   sub.w r1, r4, #10240        ; r1 = r4 - 0x2800
+    1c4a:   f5b1 6f80   cmp.w r1, #1024
+    1c4e:   d304        bcc.n 0x1c5a                ; allow if r4 < 0x400
+    1c50:   4911        ldr r1, [pc, #68]           ; r1 = (0x1c98)
+    1c52:   4421        add r1, r4                  ; r1 += r4
+    1c54:   2950        cmp r1, #80
+    1c56:   d300        bcc.n 0x1c5a                ; allow if r1 < 0x50
+    1c58:   2000        movs r0, #0                 ; r0 = 0
+  0x1c5a:   f84b 0026   str.w r0, [fp, r6, lsl #2]  ; [fp + r6 << 2] = r0
+    1c5e:   1c76        adds r6, r6, #1             ; r6++
     1c60:   2e10        cmp r6, #16
-    1c62:   d10a        bne.n 0x1c7a
-    1c64:   480d        ldr r0, [pc, #52]    ; (0x1c9c)
-    1c66:   2600        movs r6, #0
+    1c62:   d10a        bne.n 0x1c7a                ; branch if r6 != 0x10
+
+    1c64:   480d        ldr r0, [pc, #52]           ; r0 = (0x1c9c)
+    1c66:   2600        movs r6, #0                 ; r6 = 0
     1c68:   2110        movs r1, #16
-    1c6a:   6581        str r1, [r0, #88]    ; 0x58
-    1c6c:   2140        movs r1, #64    ; 0x40
-    1c6e:   65c1        str r1, [r0, #92]    ; 0x5c
+    1c6a:   6581        str r1, [r0, #88]           ; [r0 + 0x58] = r1 = 0x10   Set ep3 status reg
+    1c6c:   2140        movs r1, #64
+    1c6e:   65c1        str r1, [r0, #92]           ; [r0 + 0x5c] = r1 = 0x40   Set ep3 count reg
     1c70:   2102        movs r1, #2
-    1c72:   6501        str r1, [r0, #80]    ; 0x50
-    1c74:   6d81        ldr r1, [r0, #88]    ; 0x58
-    1c76:   06c9        lsls r1, r1, #27
-    1c78:   d5fc        bpl.n 0x1c74
-    1c7a:   1d24        adds r4, r4, #4
+    1c72:   6501        str r1, [r0, #80]           ; [r0 + 0x50] = r1 = 2      Set ep3 control reg
+  0x1c74:   6d81        ldr r1, [r0, #88]           ; r1 = [r1 + 0x58]          Get ep3 status reg
+    1c76:   06c9        lsls r1, r1, #27            ; r1 <<= 17
+    1c78:   d5fc        bpl.n 0x1c74                ; loop until status ok
+
+  0x1c7a:   1d24        adds r4, r4, #4
     1c7c:   1d2d        adds r5, r5, #4
     1c7e:   454c        cmp r4, r9
     1c80:   d9c8        bls.n 0x1c14
@@ -3168,12 +3189,12 @@ reset_1:
     1c84:   e7dd        b.n 0x1c42
     1c86:   0000        movs r0, r0
 
-  0x1c88:   0x2000063c
-  0x1c8c:   0x400aa0d0
-  0x1c90:   0x20000048
-  0x1c94:   0x1ff003fc
-  0x1c98:   0xe0100000
-  0x1c9c:   0x400a8000
+  0x1c88:   0x2000063c  ; payload_data
+  0x1c8c:   0x400aa0d0  ; USB SRAM
+  0x1c90:   0x20000048  ; byteswap key
+  0x1c94:   0x1ff003fc  ; Option bytes
+  0x1c98:   0xe0100000  ; end of PPB, reserved
+  0x1c9c:   0x400a8000  ; USB registers
 
     1ca0:   b510        push {r4, lr}
     1ca2:   2240        movs r2, #64    ; 0x40
@@ -3417,7 +3438,7 @@ reset_1:
     1edc:   4770        bx lr
     1ede:   0000
 
-reset_5:
+main:
   0x1ee0:   4827        ldr r0, [pc, #156]    ; (0x1f80)
     1ee2:   6800        ldr r0, [r0, #0]
     1ee4:   4927        ldr r1, [pc, #156]    ; (0x1f84)
@@ -3479,229 +3500,368 @@ reset_5:
     1f74:   f7ff fb7f   bl 0x1676
     1f78:   f7ff fdbc   bl 0x1af4
     1f7c:   e7d4        b.n 0x1f28
-    1f7e:   0000        movs r0, r0
+    1f7e:   0000
 
   0x1f80:   0x40080304  ; FMC
   0x1f84:   0x55aafaf5
   0x1f88:   0x200000b8  ; Stack position
   0x1f8c:   0x20000000  ; Stack limit
 
-    1f90:   b570        push {r4, r5, r6, lr}
-    1f92:   4821        ldr r0, [pc, #132]    ; (0x2018)
-    1f94:   4a21        ldr r2, [pc, #132]    ; (0x201c)
-    1f96:   4604        mov r4, r0
-    1f98:   2100        movs r1, #0
-    1f9a:   6803        ldr r3, [r0, #0]
-    1f9c:   f852 5021   ldr.w r5, [r2, r1, lsl #2]
-    1fa0:   1c49        adds r1, r1, #1
-    1fa2:   406b        eors r3, r5
-    1fa4:   c008        stmia r0!, {r3}
+firmware_decrypt:
+  0x1f90:   b570        push {r4, r5, r6, lr}
+
+    1f92:   4821        ldr r0, [pc, #132]          ; r0 = (0x2018) source data
+    1f94:   4a21        ldr r2, [pc, #132]          ; r2 = (0x201c) xor_key values
+    1f96:   4604        mov r4, r0                  ; r4 = r0
+    1f98:   2100        movs r1, #0                 ; r1 = 0        word counter
+
+    ; XOR decryption loop
+  0x1f9a:   6803        ldr r3, [r0, #0]            ; r3 = [r0]     read word
+    1f9c:   f852 5021   ldr.w r5, [r2, r1, lsl #2]  ; r5 = [r2 + r1 << 2] read xor key
+    1fa0:   1c49        adds r1, r1, #1             ; r1++
+    1fa2:   406b        eors r3, r5                 ; r3 = r3 ^ r5
+    1fa4:   c008        stmia r0!, {r3}             ; push word into sram at r0
     1fa6:   290d        cmp r1, #13
-    1fa8:   d9f7        bls.n 0x1f9a
-    1faa:   481d        ldr r0, [pc, #116]    ; (0x2020)
-    1fac:   2500        movs r5, #0
-    1fae:   6840        ldr r0, [r0, #4]
-    1fb0:   f000 0607   and.w r6, r0, #7
-    1fb4:   6823        ldr r3, [r4, #0]
+    1fa8:   d9f7        bls.n 0x1f9a                ; loop 13 times
+
+    1faa:   481d        ldr r0, [pc, #116]          ; r0 = (0x2020) byteswap number
+    1fac:   2500        movs r5, #0                 ; r5 = 0        word counter
+    1fae:   6840        ldr r0, [r0, #4]            ; r0 = [r0 + 4]
+    1fb0:   f000 0607   and.w r6, r0, #7            ; r6 = r0 & 7
+
+    ; byteswap loop
+  0x1fb4:   6823        ldr r3, [r4, #0]            ; r3 = [r4]     read word
     1fb6:   2e08        cmp r6, #8
-    1fb8:   b2d9        uxtb r1, r3
-    1fba:   f403 427f   and.w r2, r3, #65280    ; 0xff00
-    1fbe:   f403 007f   and.w r0, r3, #16711680    ; 0xff0000
-    1fc2:   f003 437f   and.w r3, r3, #4278190080    ; 0xff000000
-    1fc6:   d21f        bcs.n 0x2008
+
+    1fb8:   b2d9        uxtb r1, r3                 ; r1 = r3 & 0xff
+    1fba:   f403 427f   and.w r2, r3, #65280        ; r2 = r3 & 0xff00
+    1fbe:   f403 007f   and.w r0, r3, #16711680     ; r0 = r3 & 0xff0000
+    1fc2:   f003 437f   and.w r3, r3, #4278190080   ; r3 = r3 & 0xff000000
+
+    1fc6:   d21f        bcs.n 0x2008                ; default if r6 >= 8
+
+    ; table branch
     1fc8:   e8df f006   tbb [pc, r6]
-    1fcc:   041e        lsls r6, r3, #16
-    1fce:   0c08        lsrs r0, r1, #16
-    1fd0:   1410        asrs r0, r2, #16
-    1fd2:   1c17        adds r7, r2, #0
-    1fd4:   0609        lsls r1, r1, #24
-    1fd6:   0a12        lsrs r2, r2, #8
-    1fd8:   0a00        lsrs r0, r0, #8
+    1fcc:   1e          ; 0: 0x2008
+            04          ; 1: 0x1fd4
+    1fce:   08          ; 2: 0x1fdc
+            0c          ; 3: 0x1fe4
+    1fd0:   10          ; 4: 0x1fec
+            14          ; 5: 0x1ff4
+    1fd2:   17          ; 6: 0x1ffa
+            1c          ; 7: 0x2004
+
+  0x1fd4:   0609        lsls r1, r1, #24    ; r1 <<= 24
+    1fd6:   0a12        lsrs r2, r2, #8     ; r2 >>= 8
+    1fd8:   0a00        lsrs r0, r0, #8     ; r0 >>= 8
     1fda:   e001        b.n 0x1fe0
-    1fdc:   0609        lsls r1, r1, #24
-    1fde:   0c00        lsrs r0, r0, #16
-    1fe0:   0a1b        lsrs r3, r3, #8
+
+  0x1fdc:   0609        lsls r1, r1, #24    ; r1 <<= 24
+    1fde:   0c00        lsrs r0, r0, #16    ; r0 >>= 16
+  0x1fe0:   0a1b        lsrs r3, r3, #8     ; r3 >>= 8
     1fe2:   e011        b.n 0x2008
-    1fe4:   0609        lsls r1, r1, #24
-    1fe6:   0212        lsls r2, r2, #8
-    1fe8:   0a00        lsrs r0, r0, #8
+
+  0x1fe4:   0609        lsls r1, r1, #24    ; r1 <<= 24
+    1fe6:   0212        lsls r2, r2, #8     ; r2 <<= 8
+    1fe8:   0a00        lsrs r0, r0, #8     ; r0 >>= 8
     1fea:   e001        b.n 0x1ff0
-    1fec:   0409        lsls r1, r1, #16
-    1fee:   0200        lsls r0, r0, #8
-    1ff0:   0e1b        lsrs r3, r3, #24
+
+  0x1fec:   0409        lsls r1, r1, #16    ; r1 <<= 16
+    1fee:   0200        lsls r0, r0, #8     ; r0 <<= 8
+  0x1ff0:   0e1b        lsrs r3, r3, #24    ; r3 >>= 24
     1ff2:   e009        b.n 0x2008
-    1ff4:   0409        lsls r1, r1, #16
-    1ff6:   0a12        lsrs r2, r2, #8
+
+  0x1ff4:   0409        lsls r1, r1, #16    ; r1 <<= 16
+    1ff6:   0a12        lsrs r2, r2, #8     ; r2 >>= 8
     1ff8:   e005        b.n 0x2006
-    1ffa:   0609        lsls r1, r1, #24
-    1ffc:   0212        lsls r2, r2, #8
-    1ffe:   0c00        lsrs r0, r0, #16
-    2000:   0c1b        lsrs r3, r3, #16
+
+  0x1ffa:   0609        lsls r1, r1, #24    ; r1 <<= 24
+    1ffc:   0212        lsls r2, r2, #8     ; r2 <<= 8
+    1ffe:   0c00        lsrs r0, r0, #16    ; r0 >>= 16
+    2000:   0c1b        lsrs r3, r3, #16    ; r3 >>= 16
     2002:   e001        b.n 0x2008
-    2004:   0212        lsls r2, r2, #8
-    2006:   0a00        lsrs r0, r0, #8
-    2008:   4311        orrs r1, r2
-    200a:   4301        orrs r1, r0
-    200c:   4319        orrs r1, r3
-    200e:   c402        stmia r4!, {r1}
-    2010:   1c6d        adds r5, r5, #1
+
+  0x2004:   0212        lsls r2, r2, #8     ; r2 <<= 8
+    2006:   0a00        lsrs r0, r0, #8     ; r0 >>= 8
+
+  0x2008:   4311        orrs r1, r2         ; r1 |= r2
+    200a:   4301        orrs r1, r0         ; r1 |= r0
+    200c:   4319        orrs r1, r3         ; r1 |= r3
+    200e:   c402        stmia r4!, {r1}     ; push word into sram at r4
+    2010:   1c6d        adds r5, r5, #1     ; r5++
+
     2012:   2d0d        cmp r5, #13
-    2014:   d9ce        bls.n 0x1fb4
+    2014:   d9ce        bls.n 0x1fb4        ; loop 13 times
+
     2016:   bd70        pop {r4, r5, r6, pc}
 
-  0x2018:   0x2000063c
-  0x201c:   0x00002188
-  0x2020:   0x20000048
+  0x2018:   0x2000063c  ; payload_data
+  0x201c:   0x2188      ; xor_key
+  0x2020:   0x20000048  ; location of byteswap number
 
 .data:
 
-descriptor_1:
-  0x2024:   05 01
-    2026:   09 06
-    2028:   a1 01
-    202a:   05 07
-    202c:   19 e0
-    202e:   29 e7
-    2030:   15 00
-    2032:   25 01
-    2034:   75 01
-    2036:   95 08
-    2038:   81 02
-    203a:   95 01
-    203c:   75 08
-    203e:   81 03
-    2040:   95 03
-    2042:   75 01
-    2044:   05 08
-    2046:   19 01
-    2048:   29 03
-    204a:   91 02
-    204c:   95 01
-    204e:   75 05
-    2050:   91 03
-    2052:   95 06
-    2054:   75 08
-    2056:   15 00
-    2058:   26 a4
-    205a:   00 05
-    205c:   07 19
-    205e:   00 29
-    2060:   a4 81
-    2062:   00 c0
+usb_report0_desc:
+  0x2024:
+    ; 0x05, 0x01,        // Usage Page (Generic Desktop Ctrls)
+    ; 0x09, 0x06,        // Usage (Keyboard)
+    ; 0xA1, 0x01,        // Collection (Application)
+    ; 0x05, 0x07,        //   Usage Page (Kbrd/Keypad)
+    ; 0x19, 0xE0,        //   Usage Minimum (0xE0)
+    ; 0x29, 0xE7,        //   Usage Maximum (0xE7)
+    ; 0x15, 0x00,        //   Logical Minimum (0)
+    ; 0x25, 0x01,        //   Logical Maximum (1)
+    ; 0x75, 0x01,        //   Report Size (1)
+    ; 0x95, 0x08,        //   Report Count (8)
+    ; 0x81, 0x02,        //   Input (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
+    ; 0x95, 0x01,        //   Report Count (1)
+    ; 0x75, 0x08,        //   Report Size (8)
+    ; 0x81, 0x03,        //   Input (Const,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
+    ; 0x95, 0x03,        //   Report Count (3)
+    ; 0x75, 0x01,        //   Report Size (1)
+    ; 0x05, 0x08,        //   Usage Page (LEDs)
+    ; 0x19, 0x01,        //   Usage Minimum (Num Lock)
+    ; 0x29, 0x03,        //   Usage Maximum (Scroll Lock)
+    ; 0x91, 0x02,        //   Output (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position,Non-volatile)
+    ; 0x95, 0x01,        //   Report Count (1)
+    ; 0x75, 0x05,        //   Report Size (5)
+    ; 0x91, 0x03,        //   Output (Const,Var,Abs,No Wrap,Linear,Preferred State,No Null Position,Non-volatile)
+    ; 0x95, 0x06,        //   Report Count (6)
+    ; 0x75, 0x08,        //   Report Size (8)
+    ; 0x15, 0x00,        //   Logical Minimum (0)
+    ; 0x26, 0xA4, 0x00,  //   Logical Maximum (164)
+    ; 0x05, 0x07,        //   Usage Page (Kbrd/Keypad)
+    ; 0x19, 0x00,        //   Usage Minimum (0x00)
+    ; 0x29, 0xA4,        //   Usage Maximum (0xA4)
+    ; 0x81, 0x00,        //   Input (Data,Array,Abs,No Wrap,Linear,Preferred State,No Null Position)
+    ; 0xC0,              // End Collection
 
-descriptor_2:
-  0x2064:   06 00
-    2066:   ff 09
-    2068:   01 a1
-    206a:   01 09
-    206c:   02 15
-    206e:   00 26
-    2070:   ff 00
-    2072:   75 08
-    2074:   95 40
-    2076:   81 02
-    2078:   09 03
-    207a:   15 00
-    207c:   26 ff
-    207e:   00 75
-    2080:   08 95
-    2082:   40 91
-    2084:   02 c0
+usb_report1_desc:
+  0x2064:
+    ; 0x06, 0x00, 0xFF,  // Usage Page (Vendor Defined 0xFF00)
+    ; 0x09, 0x01,        // Usage (0x01)
+    ; 0xA1, 0x01,        // Collection (Application)
+    ; 0x09, 0x02,        //   Usage (0x02)
+    ; 0x15, 0x00,        //   Logical Minimum (0)
+    ; 0x26, 0xFF, 0x00,  //   Logical Maximum (255)
+    ; 0x75, 0x08,        //   Report Size (8)
+    ; 0x95, 0x40,        //   Report Count (64)
+    ; 0x81, 0x02,        //   Input (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
+    ; 0x09, 0x03,        //   Usage (0x03)
+    ; 0x15, 0x00,        //   Logical Minimum (0)
+    ; 0x26, 0xFF, 0x00,  //   Logical Maximum (255)
+    ; 0x75, 0x08,        //   Report Size (8)
+    ; 0x95, 0x40,        //   Report Count (64)
+    ; 0x91, 0x02,        //   Output (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position,Non-volatile)
+    ; 0xC0,              // End Collection
+
     2086:   00 00
 
-descriptor_3:
-  0x2088:   05 01
-    208a:   09 80
-    208c:   a1 01
-    208e:   85 01
-    2090:   19 81
-    2092:   29 83
-    2094:   15 00
-    2096:   25 01
-    2098:   95 03
-    209a:   75 01
-    209c:   81 02
-    209e:   95 01
-    20a0:   75 05
-    20a2:   81 01
-    20a4:   c0 05
-    20a6:   0c 09
-    20a8:   01 a1
-    20aa:   01 85
-    20ac:   02 15
-    20ae:   00 25
-    20b0:   01 95
-    20b2:   12 75
-    20b4:   01 0a
-    20b6:   83 01
-    20b8:   0a 8a
-    20ba:   01 0a
-    20bc:   92 01
-    20be:   0a 94
-    20c0:   01 09
-    20c2:   cd 09
-    20c4:   b7 09
-    20c6:   b6 09
-    20c8:   b5 09
-    20ca:   e2 09
-    20cc:   ea 09
-    20ce:   e9 0a
-    20d0:   21 02
-    20d2:   0a 23
-    20d4:   02 0a
-    20d6:   24 02
-    20d8:   0a 25
-    20da:   02 0a
-    20dc:   26 02
-    20de:   0a 27
-    20e0:   02 0a
-    20e2:   2a 02
-    20e4:   81 02
-    20e6:   95 01
-    20e8:   75 0e
-    20ea:   81 01
-    20ec:   c0 00
+usb_report2_desc:
+  0x2088:
+    ; 0x05, 0x01,        // Usage Page (Generic Desktop Ctrls)
+    ; 0x09, 0x80,        // Usage (Sys Control)
+    ; 0xA1, 0x01,        // Collection (Application)
+    ; 0x85, 0x01,        //   Report ID (1)
+    ; 0x19, 0x81,        //   Usage Minimum (Sys Power Down)
+    ; 0x29, 0x83,        //   Usage Maximum (Sys Wake Up)
+    ; 0x15, 0x00,        //   Logical Minimum (0)
+    ; 0x25, 0x01,        //   Logical Maximum (1)
+    ; 0x95, 0x03,        //   Report Count (3)
+    ; 0x75, 0x01,        //   Report Size (1)
+    ; 0x81, 0x02,        //   Input (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
+    ; 0x95, 0x01,        //   Report Count (1)
+    ; 0x75, 0x05,        //   Report Size (5)
+    ; 0x81, 0x01,        //   Input (Const,Array,Abs,No Wrap,Linear,Preferred State,No Null Position)
+    ; 0xC0,              // End Collection
+    ; 0x05, 0x0C,        // Usage Page (Consumer)
+    ; 0x09, 0x01,        // Usage (Consumer Control)
+    ; 0xA1, 0x01,        // Collection (Application)
+    ; 0x85, 0x02,        //   Report ID (2)
+    ; 0x15, 0x00,        //   Logical Minimum (0)
+    ; 0x25, 0x01,        //   Logical Maximum (1)
+    ; 0x95, 0x12,        //   Report Count (18)
+    ; 0x75, 0x01,        //   Report Size (1)
+    ; 0x0A, 0x83, 0x01,  //   Usage (AL Consumer Control Configuration)
+    ; 0x0A, 0x8A, 0x01,  //   Usage (AL Email Reader)
+    ; 0x0A, 0x92, 0x01,  //   Usage (AL Calculator)
+    ; 0x0A, 0x94, 0x01,  //   Usage (AL Local Machine Browser)
+    ; 0x09, 0xCD,        //   Usage (Play/Pause)
+    ; 0x09, 0xB7,        //   Usage (Stop)
+    ; 0x09, 0xB6,        //   Usage (Scan Previous Track)
+    ; 0x09, 0xB5,        //   Usage (Scan Next Track)
+    ; 0x09, 0xE2,        //   Usage (Mute)
+    ; 0x09, 0xEA,        //   Usage (Volume Decrement)
+    ; 0x09, 0xE9,        //   Usage (Volume Increment)
+    ; 0x0A, 0x21, 0x02,  //   Usage (AC Search)
+    ; 0x0A, 0x23, 0x02,  //   Usage (AC Home)
+    ; 0x0A, 0x24, 0x02,  //   Usage (AC Back)
+    ; 0x0A, 0x25, 0x02,  //   Usage (AC Forward)
+    ; 0x0A, 0x26, 0x02,  //   Usage (AC Stop)
+    ; 0x0A, 0x27, 0x02,  //   Usage (AC Refresh)
+    ; 0x0A, 0x2A, 0x02,  //   Usage (AC Bookmarks)
+    ; 0x81, 0x02,        //   Input (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
+    ; 0x95, 0x01,        //   Report Count (1)
+    ; 0x75, 0x0E,        //   Report Size (14)
+    ; 0x81, 0x01,        //   Input (Const,Array,Abs,No Wrap,Linear,Preferred State,No Null Position)
+    ; 0xC0,              // End Collection
 
+    20ed:   00
     20ee:   00 00
 
-    20f0:   12 01 10 01
-    20f4:   00 00 00 40
-    20f8:   d9 04 41 11
-    20fc:   01 01 00 02
-    2100:   00 01 00 00
-    2104:   09 02 5b 00
-    2108:   03 01 00 a0
-    210c:   32 09 04 00
-    2110:   00 01 03 01
-    2114:   01 00 09 21
-    2118:   11 01 00 01
-    211c:   22 40 00 07
-    2120:   05 81 03 08
-    2124:   00 01 09 04
-    2128:   01 00 02 03
-    212c:   00 00 00 09
-    2130:   21 11 01 00
-    2134:   01 22 22 00
-    2138:   07 05 83 03
-    213c:   40 00 01 07
-    2140:   05 04 03 40
-    2144:   00 01 09 04
-    2148:   02 00 01 03
-    214c:   00 00 00 09
-    2150:   21 11 01 00
-    2154:   01 22 65 00
-    2158:   07 05 82 03
-    215c:   40 00 01 00
-    2160:   04 03 09 04
-    2164:   22 03 55 00
-    2168:   53 00 42 00
-    216c:   2d 00 48 00
-    2170:   49 00 44 00
-    2174:   20 00 4b 00
-    2178:   65 00 79 00
-    217c:   62 00 6f 00
-    2180:   61 00 72 00
-    2184:   64 00 00 00
+usb_device_desc:
+  0x20f0:
+    ; 0x12,        // bLength
+    ; 0x01,        // bDescriptorType (Device)
+    ; 0x10, 0x01,  // bcdUSB 1.10
+    ; 0x00,        // bDeviceClass (Use class information in the Interface Descriptors)
+    ; 0x00,        // bDeviceSubClass
+    ; 0x00,        // bDeviceProtocol
+    ; 0x40,        // bMaxPacketSize0 64
+    ; 0xD9, 0x04,  // idVendor 0x04D9
+    ; 0x41, 0x11,  // idProduct 0x1141
+    ; 0x01, 0x01,  // bcdDevice 2.01
+    ; 0x00,        // iManufacturer (String Index)
+    ; 0x02,        // iProduct (String Index)
+    ; 0x00,        // iSerialNumber (String Index)
+    ; 0x01,        // bNumConfigurations 1
+
+    2102:   00 00
+
+usb_config_desc:
+  0x2104:
+    ; 0x09,        // bLength
+    ; 0x02,        // bDescriptorType (Configuration)
+    ; 0x5B, 0x00,  // wTotalLength 91
+    ; 0x03,        // bNumInterfaces 3
+    ; 0x01,        // bConfigurationValue
+    ; 0x00,        // iConfiguration (String Index)
+    ; 0xA0,        // bmAttributes Remote Wakeup
+    ; 0x32,        // bMaxPower 100mA
+
+usb_interface0_desc;
+  0x210d:
+    ; 0x09,        // bLength
+    ; 0x04,        // bDescriptorType (Interface)
+    ; 0x00,        // bInterfaceNumber 0
+    ; 0x00,        // bAlternateSetting
+    ; 0x01,        // bNumEndpoints 1
+    ; 0x03,        // bInterfaceClass
+    ; 0x01,        // bInterfaceSubClass
+    ; 0x01,        // bInterfaceProtocol
+    ; 0x00,        // iInterface (String Index)
+
+usb_hid0_desc:
+  0x2116:
+    ; 0x09,        // bLength
+    ; 0x21,        // bDescriptorType (HID)
+    ; 0x11, 0x01,  // bcdHID 1.11
+    ; 0x00,        // bCountryCode
+    ; 0x01,        // bNumDescriptors
+    ; 0x22,        // bDescriptorType[0] (HID)
+    ; 0x40, 0x00,  // wDescriptorLength[0] 64
+
+usb_endpoint1_desc:
+  0x211f:
+    ; 0x07,        // bLength
+    ; 0x05,        // bDescriptorType (Endpoint)
+    ; 0x81,        // bEndpointAddress (IN/D2H)
+    ; 0x03,        // bmAttributes (Interrupt)
+    ; 0x08, 0x00,  // wMaxPacketSize 8
+    ; 0x01,        // bInterval 1 (unit depends on device speed)
+
+usb_interface1_desc:
+  0x2126:
+    ; 0x09,        // bLength
+    ; 0x04,        // bDescriptorType (Interface)
+    ; 0x01,        // bInterfaceNumber 1
+    ; 0x00,        // bAlternateSetting
+    ; 0x02,        // bNumEndpoints 2
+    ; 0x03,        // bInterfaceClass
+    ; 0x00,        // bInterfaceSubClass
+    ; 0x00,        // bInterfaceProtocol
+    ; 0x00,        // iInterface (String Index)
+
+usb_hid1_desc:
+  0x212f:
+    ; 0x09,        // bLength
+    ; 0x21,        // bDescriptorType (HID)
+    ; 0x11, 0x01,  // bcdHID 1.11
+    ; 0x00,        // bCountryCode
+    ; 0x01,        // bNumDescriptors
+    ; 0x22,        // bDescriptorType[0] (HID)
+    ; 0x22, 0x00,  // wDescriptorLength[0] 34
+
+usb_endpoint3_desc:
+  0x2138:
+    ; 0x07,        // bLength
+    ; 0x05,        // bDescriptorType (Endpoint)
+    ; 0x83,        // bEndpointAddress (IN/D2H)
+    ; 0x03,        // bmAttributes (Interrupt)
+    ; 0x40, 0x00,  // wMaxPacketSize 64
+    ; 0x01,        // bInterval 1 (unit depends on device speed)
+
+usb_endpoint4_desc:
+  0x213f:
+    ; 0x07,        // bLength
+    ; 0x05,        // bDescriptorType (Endpoint)
+    ; 0x04,        // bEndpointAddress (OUT/H2D)
+    ; 0x03,        // bmAttributes (Interrupt)
+    ; 0x40, 0x00,  // wMaxPacketSize 64
+    ; 0x01,        // bInterval 1 (unit depends on device speed)
+
+usb_interface2_desc:
+  0x2146:
+    ; 0x09,        // bLength
+    ; 0x04,        // bDescriptorType (Interface)
+    ; 0x02,        // bInterfaceNumber 2
+    ; 0x00,        // bAlternateSetting
+    ; 0x01,        // bNumEndpoints 1
+    ; 0x03,        // bInterfaceClass
+    ; 0x00,        // bInterfaceSubClass
+    ; 0x00,        // bInterfaceProtocol
+    ; 0x00,        // iInterface (String Index)
+
+usb_hid2_desc:
+  0x214f:
+    ; 0x09,        // bLength
+    ; 0x21,        // bDescriptorType (HID)
+    ; 0x11, 0x01,  // bcdHID 1.11
+    ; 0x00,        // bCountryCode
+    ; 0x01,        // bNumDescriptors
+    ; 0x22,        // bDescriptorType[0] (HID)
+    ; 0x65, 0x00,  // wDescriptorLength[0] 101
+
+usb_endpoint2_desc:
+  0x2158:
+    ; 0x07,        // bLength
+    ; 0x05,        // bDescriptorType (Endpoint)
+    ; 0x82,        // bEndpointAddress (IN/D2H)
+    ; 0x03,        // bmAttributes (Interrupt)
+    ; 0x40, 0x00,  // wMaxPacketSize 64
+    ; 0x01,        // bInterval 1 (unit depends on device speed)
+
+    215f:   00
+
+usb_str0_desc:
+  0x2160:
+    ; 0x04,        // bLength
+    ; 0x03,        // bDescriptorType (String)
+    ; 0x09, 0x04,
+
+usb_str1_desc:
+    ; "USB - HID Keyboard"
+  0x2164:
+    ; 0x22,        // bLength
+    ; 0x03,        // bDescriptorType (String)
+    ; 0x55, 0x00, 0x53, 0x00, 0x42, 0x00, 0x2D, 0x00, 0x48,
+    ; 0x00, 0x49, 0x00, 0x44, 0x00, 0x20, 0x00, 0x4B, 0x00,
+    ; 0x65, 0x00, 0x79, 0x00, 0x62, 0x00, 0x6F, 0x00, 0x61,
+    ; 0x00, 0x72, 0x00, 0x64, 0x00,
+
+    2186:   00 00
+
+xor_key:
   0x2188:   aa 55 aa 55
     218c:   55 aa 55 aa
     2190:   ff 00 00 00
@@ -3715,12 +3875,14 @@ descriptor_3:
     21b0:   aa aa aa aa
     21b4:   55 55 55 55
     21b8:   00 00 00 00
-    21bc:   25 1b 00 00
-    21c0:   7d 1b 00 00
-    21c4:   05 1b 00 00
-    21c8:   a1 1c 00 00
-    21cc:   41 07 00 00
-    21d0:   75 1b 00 00
+
+  0x21bc:   25 1b 00 00     0x1b25
+    21c0:   7d 1b 00 00     0x1b7d
+    21c4:   05 1b 00 00     0x1b05
+    21c8:   a1 1c 00 00     0x1ca1
+    21cc:   41 07 00 00     0x741
+    21d0:   75 1b 00 00     0x1b75
+
     21d4:   35 1e 1f 20
     21d8:   21 22 23 24
     21dc:   25 26 27 2d
@@ -3775,15 +3937,18 @@ descriptor_3:
     22a0:   20 00 00 00
     22a4:   00 40 0b 40
     22a8:   00 01 00 00
-    22ac:   cc 22 00 00
+
+  0x22ac:   cc 22 00 00
     22b0:   00 00 00 20
     22b4:   b8 00 00 00
-    22b8:   c0 1e 00 00
-    22bc:   84 23 00 00
+    22b8:   c0 1e 00 00     0x1ec0
+
+  0x22bc:   84 23 00 00
     22c0:   b8 00 00 20
     22c4:   20 0e 00 00
-    22c8:   d0 1e 00 00
-    22cc:   01 00 00 00
+    22c8:   d0 1e 00 00     0x1ed0
+
+  0x22cc:   01 00 00 00
     22d0:   00 00 00 00
     22d4:   00 00 00 00
     22d8:   00 00 00 00

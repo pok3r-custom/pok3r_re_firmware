@@ -26,13 +26,17 @@ SET(SOURCES
     README.md
     disassemble/build.sh
     disassemble/unas.sh
-    disassemble/firmware_builtin.bin
-    disassemble/firmware_builtin.txt
-    disassemble/firmware117.bin
-    disassemble/firmware117.txt
-    disassemble/symbols117.txt
-    disassemble/sram-variables117.txt
-    disassemble/descriptors.h
+
+    disassemble/builtin/firmware_builtin.bin
+    disassemble/builtin/firmware_builtin.txt
+    disassemble/builtin/symbols_builtin.txt
+    disassemble/builtin/sram-variables_builtin.txt
+
+    disassemble/v117/firmware117.bin
+    disassemble/v117/firmware117.txt
+    disassemble/v117/symbols117.txt
+    disassemble/v117/sram-variables117.txt
+    disassemble/v117/descriptors.h
 )
 
 SET(FILES
