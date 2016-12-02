@@ -32,8 +32,10 @@ pointer_33                              @ 0x2000003c
 variable_sram_e_1                       @ 0x20000058
     0x6:    byte
     0x14:   byte
+    0x22:   byte
     0x24:   byte
     0x26:   byte
+    0x29:   byte
     0x39:   byte
     0x3d:   byte
     0x3e:   byte
@@ -91,6 +93,7 @@ pointer_16                              @ 0x200000d4
     function_e_99_unused
 
 pointer_15                              @ 0x200000d8
+    0x17:   byte
     0x28:   word
 
     function_e_99_unused

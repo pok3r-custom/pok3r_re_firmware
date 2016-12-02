@@ -10,7 +10,6 @@ ARM Cortex M3
 - POK3R_V116.exe
 - POK3R_V117.exe
 
-
 ## PCB Notes
 
 # Header CN2
@@ -28,3 +27,24 @@ ARM Cortex M3
 - SWDCK: TCK
 - SWDIO: TMS
 - nRST
+
+## Firmware Notes
+
+# USB Descriptor Hierarchy
+- usb_device_desc
+    - usb_config_desc
+        - usb_interface0_desc
+            - usb_endpoint1_desc
+            - usb_hid0_desc
+                - usb_report0_desc
+        - usb_interface1_desc
+            - usb_endpoint3_desc
+            - usb_endpoint4_desc
+            - usb_hid1_desc
+                - usb_report1_desc
+        - usb_interface2_desc
+            - usb_endpoint2_desc
+            - usb_hid2_desc
+                - usb_report2_desc
+- usb_str0_desc
+- usb_str1_desc

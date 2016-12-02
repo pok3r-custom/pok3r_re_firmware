@@ -519,6 +519,7 @@ function_e_15                       @ 0x87fc
     function_e_18
 function_e_16
     function_e_83
+function_80                         @ 0x88bc
 function_26                         @ 0x88ec
 function_e_97                       @ 0x8934
     watchdog_reload_timer
@@ -529,13 +530,23 @@ function_e_97                       @ 0x8934
 
 Data:
 
-descriptor_1                        @ 0x8998
-descriptor_2                        @ 0x89d8
-descriptor_3                        @ 0x89fc
-data_1                              @ 0x8ac4
-data_2                              @ 0x8ad8
-
-string_1                            @ 0x8b3a
+usb_report0_desc                    @ 0x8998
+usb_report1_desc                    @ 0x89d8
+usb_report2_desc                    @ 0x89fc
+usb_device_desc                     @ 0x8ac4
+usb_config_desc                     @ 0x8ad8
+usb_interface0_desc                 @ 0x8ae1
+usb_hid0_desc                       @ 0x8aea
+usb_endpoint1_desc                  @ 0x8af3
+usb_interface1_desc                 @ 0x8afa
+usb_hid1_desc                       @ 0x8b03
+usb_endpoint3_desc                  @ 0x8b0c
+usb_endpoint4_desc                  @ 0x8b13
+usb_interface2_desc                 @ 0x8b1a
+usb hid2_desc                       @ 0x8b23
+usb_endpoint2_desc                  @ 0x8b2c
+usb_str0_desc                       @ 0x8b3a
+usb_str1_desc                       @ 0x8b3a
 
 data_4                              @ 0x8b70
 data_8                              @ 0x8bb2
