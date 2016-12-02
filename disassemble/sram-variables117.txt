@@ -3,8 +3,17 @@ List of variables in sram (0x2000_0000) and where they are referenced.
 
 <variable name>                         @ 0x<address>
     // description
-    // if its used an array / struct
-    <functions its used in>
+    0x<offset>: <type> <possible values / description>
+        <field-referencing functions>
+    <pointer-referencing functions>
+
+types:
+    b   byte
+    h   halfword
+    w   word
+    p   sram address
+    d   data address
+    f   function address
 
 main_state                              @ 0x20000000
     0x0:
@@ -28,6 +37,9 @@ pointer_36                              @ 0x2000002c
 pointer_33                              @ 0x2000003c
     function_13
     function_e_17
+
+pointer_37                              @ 0x20000044
+    ptr_set_desc_ptr
 
 variable_sram_e_1                       @ 0x20000058
     0x6:    byte
@@ -137,49 +149,96 @@ pointer_4                               @ 0x20000220
     0x4: a0 of spi_write_read
     spi_write_read
 
-pointer_5                               @ 0x20000230
+prng_seed                               @ 0x20000230
     0x0:    PRNG seed
     rand
     srand
 
 pointer_3                               @ 0x20000234
     0x0:    3
-    0x10:
+    0x2:  b 2
+
+    0x10:   see pointer_2 + 0x8
     0x11:
     0x14:
-    0x24:   function pointer
-
+    0x24:   see pointer_2 + 0x1c
     0x32:
     0x33:
-    0x48:
-    0x4c:   function pointer called in usb_entry
-    0x50:   argument to function in 0x4c
-    0x64:
+    0x34:   see pointer_2 + 0x2c
+    0x48:   see pointer_1 + 0xc
+    0x4c:   see pointer_1 + 0x10
+    0x50:   see pointer_1 + 0x14
+    0x64:   see pointer_1 + 0x28
     usb_entry
     function_75
     sram_stack_zero
     main
+    function_23
 
 pointer_2                               @ 0x2000023c
-    0x0:    0x8ac4 (data_1)
-    0x4:    0x8ad8 (data_2)
-    0x8:    0x20000044
-    0xc:    0x4
-    ptr_write_data_addr
+    0x0:  w 0x8ac4 (usb_device_desc)
+    0x4:  w 0x8ad8 (usb_config_desc)
+    0x8:  w 0x20000044 (pointer_37)
+    0xa:  b
+    0xc:  w 4
+    0x1c:   function pointer
+    0x2a: b 2
+        function_23
+    0x2c: b bit1 returned in function_6
+    ptr_set_desc_ptr
+    function_23
 
 pointer_1                               @ 0x20000270
-    0x0:    0x6919 (function_66)
-    0x8:    0x6a11 (function_65)
-    0x18:   0x6a85 (usb_get_descriptor)
-    0x24:   0x695d (function_67)
-    0x2c:   0x6809 (function_68)
-    0x30:   0x6815 (function_69)
-    0x38:   0x6821 (function_70)
+    0x0:  w 0x6919 (function_66)
+    0x4:
+    0x8:  w 0x6a11 (function_65)
+    0xc:
+
+    0x10:   see usb_handler_ptr + 0x0
+    0x14:   see usb_handler_ptr + 0x4
+    0x18:   see usb_handler_ptr + 0x8
+    0x24:   see usb_handler_ptr + 0x14
+    0x28:   see usb_handler_ptr + 0x18
+    0x2c:   see usb_handler_ptr + 0x1c
+    0x30:   see usb_handler_ptr + 0x20
+    0x38:   see usb_handler_ptr + 0x28
     ptr_write_func_ptrs
+    usb_entry
 
 usb_handler_ptr                         @ 0x20000280
-    0x0:    function pointer
-    0x0:    argument r0
+    0x0:  f function pointer called in usb_entry
+    0x4:  w argument to above function
+    0x8:  f 0x6a85 (usb_get_descriptor) / argument for jump_1
+    0x14: f 0x695d (function_67)
+    0x18:
+    0x1c: f 0x6809 (function_68)
+    0x20: f 0x6815 (function_69)
+    0x28: f 0x6821 (function_70)
+    ptr_write_func_ptrs
+    usb_entry
+    function_23
+
+pointer_38                              @ 0x200002b8
+    0x0:    0x200002c4 (pointer_39)
+        usb_init
+        function_23
+    0x4:    0x6625 (function_17)
+        usb_init
+
+pointer_39                              @ 0x200002c4
+    0x0:  w 0x171d
+    0x4:  w 0x80010008
+    0x8:  w 0x212
+    0xc:  w 0x91002088
+    0x10: w 0x10
+    0x14: w 0x92010090
+    0x18: w 0x10
+    0x1c: w 0x930100d0
+    0x20: w 0
+    0x24: w 0x84010110
+    0x28: w 2
+    ptr_write_data
+    usb_init
 
 pointer_12                              @ 0x20000308
     0x0:
@@ -201,3 +260,5 @@ pointer_34                              @ 0x20002dec
 
 pointer_30                              @ 0x20002f4c
     function_e_37_unused
+
+stack_max                               @ 0x20003760

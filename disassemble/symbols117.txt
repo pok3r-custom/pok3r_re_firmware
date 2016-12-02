@@ -215,7 +215,7 @@ function_28                         @ 0x518c
     function_9
     function_10
 
-setup_intr_priority                         @ 0x51b0
+setup_intr_priority                 @ 0x51b0
     calc_nvic_priority
     ppb_set_nvic_priority
 calc_nvic_priority                  @ 0x5240
@@ -334,6 +334,7 @@ function_66                         @ 0x6918
 function_67                         @ 0x695c
     function_e_58
 function_65                         @ 0x6a10
+function_81                         @ 0x6a74
 usb_get_descriptor                  @ 0x6a84
 function_6                          @ 0x6ae8
 usb_entry                           @ 0x6af2
@@ -355,8 +356,8 @@ function_75                         @ 0x6cc6
 function_7                          @ 0x6d06
     usb_set_dppuen
     usb_set_genrsm
-ptr_write_data_addr                 @ 0x6d14
-usb_set_intr_flags                    @ 0x6d30
+ptr_set_desc_ptr                    @ 0x6d14
+usb_set_intr_flags                  @ 0x6d30
 usb_init                            @ 0x6d3c
     ckcu_apb1_clock_enable
     ckcu_ahb_clock_enable
@@ -545,15 +546,23 @@ usb_endpoint4_desc                  @ 0x8b13
 usb_interface2_desc                 @ 0x8b1a
 usb hid2_desc                       @ 0x8b23
 usb_endpoint2_desc                  @ 0x8b2c
-usb_str0_desc                       @ 0x8b3a
-usb_str1_desc                       @ 0x8b3a
+usb_str0_desc                       @ 0x8b34
+usb_str1_desc                       @ 0x8b38
 
+data_11                             @ 0x8b54
 data_4                              @ 0x8b70
 data_8                              @ 0x8bb2
+data_13                             @ 0x8c36
+data_15                             @ 0x8d34
 data_3                              @ 0x8d44
+data_16                             @ 0x8d50
+data_12                             @ 0x8de0
+data_10                             @ 0x8e80
 data_7                              @ 0x8ec8
 data_5                              @ 0x8f10
 data_6                              @ 0x8f58
+data_14                             @ 0x8fa0
+data_9                              @ 0x8fa8
 
 task_1                              @ 0x8ff0
 task_2                              @ 0x9000
