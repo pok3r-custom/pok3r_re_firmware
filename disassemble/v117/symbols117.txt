@@ -38,14 +38,14 @@ function_e_32                       @ 0x2e5c
 afio_exti_ssr_write                 @ 0x2f50
 function_e_1                        @ 0x2f78
     function_e_2
-    function_21
+    crc16
     clear_two_words
     function_e_4
 function_e_33                       @ 0x3004
     clear_two_words_and_write_two_bytes
-enable_gpio_a_clock_unused          @ 0x3068
-function_e_99_unused                @ 0x30c8
-function_e_100_unused               @ 0x3250
+enable_gpio_a_clock                 @ 0x3068
+function_e_99                       @ 0x30c8
+function_e_100                      @ 0x3250
     function_44
 function_44                         @ 0x3264
 function_45                         @ 0x3272
@@ -54,7 +54,7 @@ function_47                         @ 0x329a
 function_48                         @ 0x329e
 afio_pin_config                     @ 0x32a4
 spin_wait_maybe                     @ 0x32cc
-function_32                         @ 0x32d8
+setup_afio_gpio                     @ 0x32d8
     ckcu_apb0_clock_enable
     ckcu_ahb_clock_enable
     gpio_set_input_enable
@@ -62,11 +62,11 @@ function_32                         @ 0x32d8
     afio_pin_config
 
 function_e_34                       @ 0x338c
-    function_31
+    usb_dp_pull_up
     spin_wait_maybe
-function_79                         @ 0x339e
-    function_31
-clear_two_words_and                 @ 0x33a4
+usb_disable_ddpu                    @ 0x339e
+    usb_dp_pull_up
+clear_two_words                     @ 0x33a4
 clear_two_words_and_write_two_bytes @ 0x33ac
 function_e_2                        @ 0x33b8
 function_14                         @ 0x33e0
@@ -75,7 +75,7 @@ ckcu_ahb_clock_enable               @ 0x3424
 ckcu_apb0_clock_enable              @ 0x343c
 ckcu_apb1_clock_enable              @ 0x3454
 function_20                         @ 0x346c
-function_21                         @ 0x3480
+crc16                         @ 0x3480
 flash_page_erase                    @ 0x34c4
 
 flash_get_protection_status         @ 0x34d8
@@ -91,7 +91,7 @@ gpio_set_reset_pin                  @ 0x3588
 gptm_enable_disable                 @ 0x3592
 function_62                         @ 0x35a6
 function_e_36                       @ 0x35fc
-function_e_37_unused                @ 0x364c
+function_e_37                       @ 0x364c
 
 function_57                         @ 0x377c
 function_58                         @ 0x3790
@@ -242,7 +242,7 @@ function_e_43                       @ 0x53e4
     function_e_32
     function_13
     function_e_23
-function_e_44_unused                @ 0x5970
+function_e_44                       @ 0x5970
     function_e_74
 function_63                         @ 0x59bc
     function_64
@@ -355,7 +355,7 @@ function_23                         @ 0x6ca8
 function_75                         @ 0x6cc6
     function_28
 function_7                          @ 0x6d06
-    usb_set_dppuen
+    usb_clear_csr
     usb_set_genrsm
 ptr_set_desc_ptr                    @ 0x6d14
 usb_set_intr_flags                  @ 0x6d30
@@ -365,7 +365,7 @@ usb_init                            @ 0x6d3c
     function_20
     ptr_write_func_ptrs
     function_23
-function_31                         @ 0x6db0
+usb_dp_pull_up                      @ 0x6db0
 function_e_60                       @ 0x6dcc
     function_e_45
 function_e_61                       @ 0x6dd4
@@ -397,12 +397,12 @@ usb_get_intr_flags                  @ 0x6fbc
 jump_1                              @ 0x6fcc
     ptr_write_data
 usb_set_lpmode_pdwn                 @ 0x6fd0
-usb_set_dppuen                      @ 0x6fe0
+usb_clear_csr                       @ 0x6fe0
 function_28                         @ 0x6ff0
     function_3
     function_29
     usb_enable_intr
-    function_31
+    usb_dp_pull_up
 ptr_write_data                      @ 0x7064
 usb_copy_ep_setup                   @ 0x70a8
 usb_set_genrsm                      @ 0x70b8
@@ -410,13 +410,14 @@ usb_set_adrset                      @ 0x70c8
 usb_intr                            @ 0x70dc
 watchdog_init                       @ 0x70e8
 watchdog_reload_timer               @ 0x7144
-function_53                         @ 0x7158
-    function_21
+usb_disconnect                      @ 0x7154
+crc_flash                           @ 0x7158
+    crc16
     function_14
 erase_flash                         @ 0x7178
 usb_read_write                      @ 0x71b8
     flash_get_protection_status
-function_e_77_unused                @ 0x729c
+function_e_77                       @ 0x729c
     function_e_74
 function_e_78                       @ 0x72b0
     function_e_66
@@ -429,6 +430,8 @@ function_e_80                       @ 0x7444
     function_e_73
     function_e_62
     function_e_61
+function_84                         @ 0x7490
+function_83                         @ 0x74a0
 function_e_81_unsued                @ 0x74b0
 sram_stack_zero                     @ 0x74c0
 function_e_82                       @ 0x74d0
@@ -469,7 +472,7 @@ function_24                         @ 0x7b50
 
 main                                @ 0x7b94
     setup_intr_priority
-    function_32
+    setup_afio_gpio
     function_74
     spin_wait_maybe
     function_37
@@ -550,7 +553,7 @@ usb_endpoint2_desc                  @ 0x8b2c
 usb_str0_desc                       @ 0x8b34
 usb_str1_desc                       @ 0x8b38
 
-data_11                             @ 0x8b54
+update_handlers                     @ 0x8b54
 data_4                              @ 0x8b70
 data_8                              @ 0x8bb2
 data_13                             @ 0x8c36

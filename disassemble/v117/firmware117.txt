@@ -436,7 +436,7 @@ function_e_1:
     2fa6:   2240        movs r2, #64   ; 0x40
     2fa8:   4913        ldr r1, [pc, #76]   ; (0x2ff8)
     2faa:   2000        movs r0, #0
-    2fac:   f000 fa68   bl 0x3480               ; call function_21
+    2fac:   f000 fa68   bl 0x3480               ; call crc16
     2fb0:   7829        ldrb r1, [r5, #0]
     2fb2:   2907        cmp r1, #7
     2fb4:   d801        bhi.n 0x2fba
@@ -469,7 +469,7 @@ function_e_1:
   0x2ff4:   0x20000054
   0x2ff8:   0x200007cc
   0x2ffc:   0x20000368
-  0x3000:   0x8b54      ; data_11
+  0x3000:   0x8b54      ; update_handlers
 
 function_e_33:
   0x3004:   4815        ldr r0, [pc, #84]   ; (0x305c)
@@ -506,42 +506,57 @@ function_e_33:
   0x3060:   0x07bc2000
   0x3064:   0x03782000
 
-enable_gpio_a_clock_unused:
-    ; Enable GPIO A clock
+do_soft_reset:
   0x3068:   2101        movs r1, #1
     306a:   0408        lsls r0, r1, #16
     306c:   f000 f9da   bl 0x3424               ; call ckcu_ahb_clock_enable(0x10000, 1)
+
+    ; Set GPIO A pin 9
     3070:   490f        ldr r1, [pc, #60]       ; (0x30b0)
     3072:   f44f 7000   mov.w r0, #512          ; 0x200
     3076:   6248        str r0, [r1, #36]       ; 0x24
+
+    ; Disable interrupt 53 (USB)
+    ; Write 0x200000 to NVIC_ICER1 (0xe000e184)
     3078:   490e        ldr r1, [pc, #56]       ; (0x30b4)
     307a:   0300        lsls r0, r0, #12
     307c:   f04f 24e0   mov.w r4, #3758153728   ; 0xe000e000
     3080:   6008        str r0, [r1, #0]
-    3082:   f000 f98c   bl 0x339e               ; call function_79
+    3082:   f000 f98c   bl 0x339e               ; call usb_disable_ddpu()
+
+    ; Set FMC.SVBT1 (PC) to specific value
     3086:   490d        ldr r1, [pc, #52]       ; (0x30bc)
     3088:   480b        ldr r0, [pc, #44]       ; (0x30b8)
     308a:   f8c1 0304   str.w r0, [r1, #772]    ; 0x304
+
+    ; spin loop on counter
     308e:   480c        ldr r0, [pc, #48]       ; (0x30c0)
     3090:   1e40        subs r0, r0, #1
     3092:   d1fd        bne.n 0x3090
+
     3094:   f3bf 8f4f   dsb sy
+
+    ; Request system reset
+    ; Write 0x5fa0004 to AIRCR
+    ; Set SYSRESETREQ
     3098:   f8d4 0d0c   ldr.w r0, [r4, #3340]   ; 0xd0c
     309c:   4909        ldr r1, [pc, #36]       ; (0x30c4)
     309e:   f400 60e0   and.w r0, r0, #1792     ; 0x700
     30a2:   ea40 0001   orr.w r0, r0, r1
     30a6:   f8c4 0d0c   str.w r0, [r4, #3340]   ; 0xd0c
+
     30aa:   f3bf 8f4f   dsb sy
-    30ae:   e7fe        b.n 0x30ae              ; dead loop
+
+  0x30ae:   e7fe        b.n 0x30ae              ; dead loop
 
   0x30b0:   0x400b0000  ; GPIO A
   0x30b4:   0xe000e184
   0x30b8:   0x55aafaf5
-  0x30bc:   0x40080000
+  0x30bc:   0x40080000  ; FMC
   0x30c0:   0x61a80
   0x30c4:   0x5fa0004
 
-function_e_99_unused:
+function_e_99:
   0x30c8:   b570        push {r4, r5, r6, lr}
     30ca:   f7ff fe63   bl 0x2d94               ; call rand()
 
@@ -741,7 +756,7 @@ function_e_99_unused:
   0x3248:   0x200001d0  ; pointer_27
   0x324c:   0x200000e0  ; pointer_28
 
-function_e_100_unused:
+function_e_100:
   0x3250:   b510        push {r4, lr}
     3252:   4803        ldr r0, [pc, #12]       ; r0 = (0x3260)
     3254:   f000 f806   bl 0x3264               ; call bftm_clear(BFTM1)
@@ -824,77 +839,88 @@ spin_wait_maybe:
     32d4:   d2fd        bcs.n 0x32d2
     32d6:   4770        bx lr
 
-function_32:
+setup_afio_gpio:
   0x32d8:   e92d 41f0   stmdb sp!, {r4, r5, r6, r7, r8, lr}
+
+    ; Enable AFIO clock
     32dc:   2101        movs r1, #1             ; r1 = 1
     32de:   038d        lsls r5, r1, #14        ; r5 = 0x4000
     32e0:   4628        mov r0, r5              ; r0 = r5
-    32e2:   f000 f8ab   bl 0x343c               ; call ckcu_apb0_clock_enable
-                                                ; // Enable GPIO A clock
+    32e2:   f000 f8ab   bl 0x343c               ; call ckcu_apb0_clock_enable(0x4000, 1)
+
+    ; Enable GPIO A clock
     32e6:   2101        movs r1, #1
     32e8:   040c        lsls r4, r1, #16
     32ea:   4620        mov r0, r4
     32ec:   f000 f89a   bl 0x3424               ; call ckcu_ahb_clock_enable(0x10000, 1)
+
     32f0:   4e24        ldr r6, [pc, #144]      ; r6 = (0x3384) GPIO A
     32f2:   2200        movs r2, #0
     32f4:   4629        mov r1, r5
     32f6:   4630        mov r0, r6
-    32f8:   f000 f920   bl 0x353c               ; call gpio_set_input_enable(GPIO A,
+    32f8:   f000 f920   bl 0x353c               ; call gpio_set_input_enable(GPIO A, 0x4000, 0)
     32fc:   1067        asrs r7, r4, #1
     32fe:   2200        movs r2, #0
     3300:   4639        mov r1, r7
     3302:   4630        mov r0, r6
-    3304:   f000 f91a   bl 0x353c               ; call gpio_set_input_enable
+    3304:   f000 f91a   bl 0x353c               ; call gpio_set_input_enable(GPIO A, 0x8000, 0)
     3308:   2202        movs r2, #2
     330a:   4629        mov r1, r5
     330c:   4630        mov r0, r6
-    330e:   f000 f925   bl 0x355c               ; call gpio_set_pin_pull_up_down
+    330e:   f000 f925   bl 0x355c               ; call gpio_set_pin_pull_up_down(GPIO A, 0x4000, 2)
     3312:   2202        movs r2, #2
     3314:   4639        mov r1, r7
     3316:   4630        mov r0, r6
-    3318:   f000 f920   bl 0x355c               ; call gpio_set_pin_pull_up_down
+    3318:   f000 f920   bl 0x355c               ; call gpio_set_pin_pull_up_down(GPIO A, 0x8000, 2)
+
     331c:   1165        asrs r5, r4, #5
     331e:   2200        movs r2, #0
     3320:   4629        mov r1, r5
     3322:   4630        mov r0, r6
-    3324:   f000 f90a   bl 0x353c               ; call gpio_set_input_enable
+    3324:   f000 f90a   bl 0x353c               ; call gpio_set_input_enable(GPIO A, 0x800, 0)
     3328:   2202        movs r2, #2
     332a:   4629        mov r1, r5
     332c:   4630        mov r0, r6
-    332e:   f000 f915   bl 0x355c               ; call gpio_set_pin_pull_up_down
-    3332:   2201        movs r2, #1             ; r2 = 1
-    3334:   210b        movs r1, #11            ; r1 = 0xb
-    3336:   2000        movs r0, #0             ; r0 = 0
-    3338:   f7ff ffb4   bl 0x32a4               ; call afio_pin_config
+    332e:   f000 f915   bl 0x355c               ; call gpio_set_pin_pull_up_down(GPIO A, 0x800, 2)
+
+    3332:   2201        movs r2, #1
+    3334:   210b        movs r1, #11
+    3336:   2000        movs r0, #0
+    3338:   f7ff ffb4   bl 0x32a4               ; call afio_pin_config(0, 0xb, 1)
     333c:   2201        movs r2, #1
     333e:   210d        movs r1, #13
     3340:   2002        movs r0, #2
-    3342:   f7ff ffaf   bl 0x32a4               ; call afio_pin_config
+    3342:   f7ff ffaf   bl 0x32a4               ; call afio_pin_config(2, 0xd, 1)
     3346:   2201        movs r2, #1
     3348:   210e        movs r1, #14
     334a:   2002        movs r0, #2
-    334c:   f7ff ffaa   bl 0x32a4               ; call afio_pin_config
+    334c:   f7ff ffaa   bl 0x32a4               ; call afio_pin_config(2, 0xe, 1)
     3350:   2201        movs r2, #1
     3352:   210f        movs r1, #15
     3354:   2002        movs r0, #2
-    3356:   f7ff ffa5   bl 0x32a4               ; call afio_pin_config
-    335a:   480b        ldr r0, [pc, #44]       ; (0x3388)
-    335c:   6840        ldr r0, [r0, #4]
-    335e:   0540        lsls r0, r0, #21
-    3360:   d409        bmi.n 0x3376
+    3356:   f7ff ffa5   bl 0x32a4               ; call afio_pin_config(2, 0xf, 1)
+
+    ; Check if CKCU.HSEEN set (external high-speed oscillator)
+    335a:   480b        ldr r0, [pc, #44]       ; r0 = (0x3388) CKCU
+    335c:   6840        ldr r0, [r0, #4]        ; r0 = [r0 + 4]
+    335e:   0540        lsls r0, r0, #21        ; r0 <<= 21
+    3360:   d409        bmi.n 0x3376            ; branch if HSEEN set
+
     3362:   2201        movs r2, #1
     3364:   210e        movs r1, #14
     3366:   4610        mov r0, r2
-    3368:   f7ff ff9c   bl 0x32a4               ; call afio_pin_config
+    3368:   f7ff ff9c   bl 0x32a4               ; call afio_pin_config(1, 0xe, 1)
     336c:   2201        movs r2, #1
     336e:   210f        movs r1, #15
     3370:   4610        mov r0, r2
-    3372:   f7ff ff97   bl 0x32a4               ; call afio_pin_config
-                                                ; // Disable GPIO A clock
-    3376:   2100        movs r1, #0
+    3372:   f7ff ff97   bl 0x32a4               ; call afio_pin_config(1, 0xf, 1)
+
+    ; Disable GPIO A clock
+  0x3376:   2100        movs r1, #0
     3378:   4620        mov r0, r4
     337a:   f000 f853   bl 0x3424               ; call ckcu_ahb_clock_enable(0x1000, 0)
-    337e:   2001        movs r0, #1
+
+    337e:   2001        movs r0, #1             ; return 1
     3380:   e8bd 81f0   ldmia.w sp!, {r4, r5, r6, r7, r8, pc}
 
   0x3384:   0x400b0000  ; GPIO A
@@ -903,15 +929,15 @@ function_32:
 function_e_34:
   0x338c:   b510        push {r4, lr}
     338e:   2001        movs r0, #1
-    3390:   f003 fd0e   bl 0x6db0               ; call function_31
+    3390:   f003 fd0e   bl 0x6db0               ; call usb_dp_pull_up
     3394:   e8bd 4010   ldmia.w sp!, {r4, lr}
 
   0x3398:   20fa        movs r0, #250   ; 0xfa
     339a:   f7ff bf97   b.w 0x32cc              ; spin_wait_maybe(250)
 
-function_79:
+usb_disable_ddpu:
   0x339e:   2000        movs r0, #0
-    33a0:   f003 bd06   b.w 0x6db0              ; jump function_31
+    33a0:   f003 bd06   b.w 0x6db0              ; return usb_dp_pull_up(0)
 
 clear_two_words:
     ; r0 = pointer
@@ -1049,7 +1075,7 @@ ckcu_set_usb_prescaler:
 
   0x347c:   0x40088000  ; CKCU Registers
 
-function_21:
+crc16:
   0x3480:   b5f0        push {r4, r5, r6, r7, lr}
     3482:   2600        movs r6, #0
     3484:   e01a        b.n 0x34bc
@@ -1331,7 +1357,7 @@ function_e_36:
     3648:   4770        bx lr
     364a:   0000
 
-function_e_37_unused:
+function_e_37:
   0x364c:   e92d 47f0   stmdb sp!, {r4, r5, r6, r7, r8, r9, sl, lr}
     3650:   4847        ldr r0, [pc, #284]   ; (0x3770)
     3652:   68c2        ldr r2, [r0, #12]
@@ -5047,7 +5073,7 @@ function_e_43:
   0x5968:   0x8d50      ; data_16
   0x596c:   0x200000d8  ; pointer_15
 
-function_e_44_unused:
+function_e_44:
   0x5970:   b508        push {r3, lr}
     5972:   490e        ldr r1, [pc, #56]   ; (0x59ac)
     5974:   4a0e        ldr r2, [pc, #56]   ; (0x59b0)
@@ -6101,8 +6127,8 @@ function_e_49:
     63f4:   4648        mov r0, r9
     63f6:   e8bd 47f0   ldmia.w sp!, {r4, r5, r6, r7, r8, r9, sl, lr}
     63fa:   f7ff bc4f   b.w 0x5c9c
-
     63fe:   0000
+
   0x6400:   0x400b0000  ; GPIO A
   0x6404:   0x40077000  ; BFTM 1
   0x6408:   0xe000e004
@@ -6966,7 +6992,7 @@ usb_entry:
     6b58:   61a7        str r7, [r4, #24]       ; [r4 + 0x18] = r7
 
     6b5a:   f000 f937   bl 0x6dcc               ; call function_e_60
-    6b5e:   f000 fa3f   bl 0x6fe0               ; call usb_set_dppuen()
+    6b5e:   f000 fa3f   bl 0x6fe0               ; call usb_clear_csr()
 
     6b62:   2000        movs r0, #0             ; r0 = 0
     6b64:   6e61        ldr r1, [r4, #100]      ; r1 = [r4 + 0x64]
@@ -6987,7 +7013,7 @@ usb_entry:
     6b82:   0728        lsls r0, r5, #28        ; r0 = r5 << 28
     6b84:   d508        bpl.n 0x6b98
 
-    6b86:   f000 fa2b   bl 0x6fe0               ; call usb_set_dppuen()
+    6b86:   f000 fa2b   bl 0x6fe0               ; call usb_clear_csr()
 
     6b8a:   f894 0033   ldrb.w r0, [r4, #51]    ; r0 = [r4 + 0x33]
     6b8e:   f884 0032   strb.w r0, [r4, #50]    ; [r4 + 0x32] = r0
@@ -7153,7 +7179,7 @@ function_75:
 
 function_7:
   0x6d06:   b510        push {r4, lr}
-    6d08:   f000 f96a   bl 0x6fe0               ; call usb_set_dppuen
+    6d08:   f000 f96a   bl 0x6fe0               ; call usb_clear_csr
     6d0c:   e8bd 4010   ldmia.w sp!, {r4, lr}
     6d10:   f000 b9d2   b.w 0x70b8              ; jump usb_set_genrsm
 
@@ -7216,7 +7242,7 @@ usb_init:
     6d70:   3890        subs r0, #144           ; r0 = r0 - 0x90 = 0x20000234
     6d72:   f7ff ff99   bl 0x6ca8               ; call function_23(pointer_3)
 
-    ; Enable interrupt 53 (USB):
+    ; Enable interrupt 53 (USB)
     ; Write 0x200000 to 0xe000e104
     ; Set NVIC_ISER1 to 0x200000
     6d76:   4906        ldr r1, [pc, #24]       ; r1 = (0x6d90)
@@ -7245,15 +7271,18 @@ function_29:
 
   0x6dac:   0x400a8000  ; USB Registers
 
-function_31:
-  0x6db0:   4905        ldr r1, [pc, #20]   ; (0x6dc8)
+usb_dp_pull_up:
+    ; r0 = 0/1 disable/enable
+    ; Set USBCSR.DPPUEN
+    : Enable/Disable USB DP pull up
+  0x6db0:   4905        ldr r1, [pc, #20]       ; (0x6dc8)
     6db2:   2801        cmp r0, #1
     6db4:   6808        ldr r0, [r1, #0]
     6db6:   d003        beq.n 0x6dc0
-    6db8:   f420 6080   bic.w r0, r0, #1024   ; 0x400
+    6db8:   f420 6080   bic.w r0, r0, #1024     ; 0x400
     6dbc:   6008        str r0, [r1, #0]
     6dbe:   4770        bx lr
-    6dc0:   f440 6080   orr.w r0, r0, #1024   ; 0x400
+    6dc0:   f440 6080   orr.w r0, r0, #1024     ; 0x400
     6dc4:   e7fa        b.n 0x6dbc
     6dc6:   0000        movs r0, r0
 
@@ -7262,11 +7291,11 @@ function_31:
 function_e_60:
   0x6dcc:   2101        movs r1, #1
     6dce:   2020        movs r0, #32
-    6dd0:   f7ff b894   b.w 0x5efc                  ; call function_e_45
+    6dd0:   f7ff b894   b.w 0x5efc              ; call function_e_45
 
 function_e_61:
   0x6dd4:   b510        push {r4, lr}
-    6dd6:   f000 fb63   bl 0x74a0
+    6dd6:   f000 fb63   bl 0x74a0               ; call function_83
     6dda:   6801        ldr r1, [r0, #0]
     6ddc:   f001 0109   and.w r1, r1, #9
     6de0:   6001        str r1, [r0, #0]
@@ -7274,7 +7303,7 @@ function_e_61:
 
 function_e_62:
   0x6de4:   b510        push {r4, lr}
-    6de6:   f000 fb5b   bl 0x74a0
+    6de6:   f000 fb5b   bl 0x74a0               ; call function_83
     6dea:   6801        ldr r1, [r0, #0]
     6dec:   f001 0124   and.w r1, r1, #36   ; 0x24
     6df0:   6001        str r1, [r0, #0]
@@ -7283,13 +7312,13 @@ function_e_62:
 function_e_63:
   0x6df4:   b510        push {r4, lr}
     6df6:   460c        mov r4, r1
-    6df8:   f000 fb52   bl 0x74a0
+    6df8:   f000 fb52   bl 0x74a0               ; call function_83
     6dfc:   6084        str r4, [r0, #8]
     6dfe:   bd10        pop {r4, pc}
 
 function_e_64:
   0x6e00:   b510        push {r4, lr}
-    6e02:   f000 fb4d   bl 0x74a0
+    6e02:   f000 fb4d   bl 0x74a0               ; call function_83
     6e06:   6900        ldr r0, [r0, #16]
     6e08:   4902        ldr r1, [pc, #8]   ; (0x6e14)
     6e0a:   f3c0 0009   ubfx r0, r0, #0, #10
@@ -7302,7 +7331,7 @@ function_e_64:
 function_e_65:
   0x6e18:   b570        push {r4, r5, r6, lr}
     6e1a:   4605        mov r5, r0
-    6e1c:   f000 fb40   bl 0x74a0
+    6e1c:   f000 fb40   bl 0x74a0               ; call function_83
     6e20:   4604        mov r4, r0
     6e22:   4628        mov r0, r5
     6e24:   f000 f80a   bl 0x6e3c               ; call function_e_66
@@ -7318,14 +7347,14 @@ function_e_65:
 
 function_e_66:
   0x6e3c:   b510        push {r4, lr}
-    6e3e:   f000 fb2f   bl 0x74a0
+    6e3e:   f000 fb2f   bl 0x74a0               ; call function_83
     6e42:   6900        ldr r0, [r0, #16]
     6e44:   f3c0 2089   ubfx r0, r0, #10, #10
     6e48:   bd10        pop {r4, pc}
 
 function_e_67:
   0x6e4a:   b510        push {r4, lr}
-    6e4c:   f000 fb28   bl 0x74a0
+    6e4c:   f000 fb28   bl 0x74a0               ; call function_83
     6e50:   6901        ldr r1, [r0, #16]
     6e52:   6800        ldr r0, [r0, #0]
     6e54:   00c9        lsls r1, r1, #3
@@ -7337,7 +7366,7 @@ function_e_67:
 
 function_e_68:
   0x6e64:   b510        push {r4, lr}
-    6e66:   f000 fb1b   bl 0x74a0
+    6e66:   f000 fb1b   bl 0x74a0               ; call function_83
     6e6a:   6841        ldr r1, [r0, #4]
     6e6c:   6880        ldr r0, [r0, #8]
     6e6e:   4008        ands r0, r1
@@ -7346,7 +7375,7 @@ function_e_68:
 function_e_69:
   0x6e72:   b510        push {r4, lr}
     6e74:   460c        mov r4, r1
-    6e76:   f000 fb13   bl 0x74a0
+    6e76:   f000 fb13   bl 0x74a0               ; call function_83
     6e7a:   68c0        ldr r0, [r0, #12]
     6e7c:   40e0        lsrs r0, r4
     6e7e:   f3c0 0008   ubfx r0, r0, #0, #9
@@ -7356,7 +7385,7 @@ function_e_70:
   0x6e84:   b570        push {r4, r5, r6, lr}
     6e86:   460c        mov r4, r1
     6e88:   4605        mov r5, r0
-    6e8a:   f000 fb09   bl 0x74a0
+    6e8a:   f000 fb09   bl 0x74a0               ; call function_83
     6e8e:   eb04 01c5   add.w r1, r4, r5, lsl #3
     6e92:   684a        ldr r2, [r1, #4]
     6e94:   6102        str r2, [r0, #16]
@@ -7400,7 +7429,7 @@ function_71:
     6ee8:   460f        mov r7, r1
     6eea:   4615        mov r5, r2
     6eec:   4606        mov r6, r0
-    6eee:   f000 fad7   bl 0x74a0
+    6eee:   f000 fad7   bl 0x74a0               ; call function_83
     6ef2:   4604        mov r4, r0
     6ef4:   2000        movs r0, #0
     6ef6:   b13d        cbz r5, 0x6f08
@@ -7418,7 +7447,7 @@ function_71:
 
 function_e_71:
   0x6f14:   b510        push {r4, lr}
-    6f16:   f000 fac3   bl 0x74a0
+    6f16:   f000 fac3   bl 0x74a0               ; call function_83
     6f1a:   6801        ldr r1, [r0, #0]
     6f1c:   f001 0119   and.w r1, r1, #25
     6f20:   6001        str r1, [r0, #0]
@@ -7426,14 +7455,14 @@ function_e_71:
 
 function_e_72:
   0x6f24:   b510        push {r4, lr}
-    6f26:   f000 fabb   bl 0x74a0
+    6f26:   f000 fabb   bl 0x74a0               ; call function_83
     6f2a:   2104        movs r1, #4
     6f2c:   6001        str r1, [r0, #0]
     6f2e:   bd10        pop {r4, pc}
 
 function_e_73:
   0x6f30:   b510        push {r4, lr}
-    6f32:   f000 fab5   bl 0x74a0
+    6f32:   f000 fab5   bl 0x74a0               ; call function_83
     6f36:   2140        movs r1, #64   ; 0x40
     6f38:   6081        str r1, [r0, #8]
     6f3a:   6802        ldr r2, [r0, #0]
@@ -7447,21 +7476,22 @@ function_e_74:
     6f48:   4688        mov r8, r1
     6f4a:   4614        mov r4, r2
     6f4c:   4607        mov r7, r0
-    6f4e:   f7ff ff75   bl 0x6e3c                   ; call function_e_66
+    6f4e:   f7ff ff75   bl 0x6e3c               ; call function_e_66
     6f52:   4606        mov r6, r0
     6f54:   4638        mov r0, r7
-    6f56:   f000 faa3   bl 0x74a0
+    6f56:   f000 faa3   bl 0x74a0               ; call function_83
     6f5a:   4605        mov r5, r0
     6f5c:   2100        movs r1, #0
     6f5e:   4638        mov r0, r7
-    6f60:   f7ff ff87   bl 0x6e72
+    6f60:   f7ff ff87   bl 0x6e72               ; call function_e_69
     6f64:   42b4        cmp r4, r6
     6f66:   d800        bhi.n 0x6f6a
     6f68:   b110        cbz r0, 0x6f70
     6f6a:   2000        movs r0, #0
-    6f6c:   e8bd 81f0   ldmia.w sp!, {r4, r5, r6, r7, r8, pc}
+  0x6f6c:   e8bd 81f0   ldmia.w sp!, {r4, r5, r6, r7, r8, pc}
+
     6f70:   4638        mov r0, r7
-    6f72:   f7ff ff45   bl 0x6e00                   ; call function_e_64
+    6f72:   f7ff ff45   bl 0x6e00               ; call function_e_64
     6f76:   4601        mov r1, r0
     6f78:   1ce0        adds r0, r4, #3
     6f7a:   0882        lsrs r2, r0, #2
@@ -7471,7 +7501,7 @@ function_e_74:
     6f84:   2002        movs r0, #2
     6f86:   6028        str r0, [r5, #0]
     6f88:   4620        mov r0, r4
-    6f8a:   e7ef        b.n 0x6f6c
+  0x6f8a:   e7ef        b.n 0x6f6c
 
 usb_enable_intr:
     ; r0 =
@@ -7526,9 +7556,9 @@ usb_set_lpmode_pdwn:
 
   0x6fdc:   0x400a8000  ; USB Registers
 
-usb_set_dppuen:
-    ; Set USBCSR.DPPUEN
-    ; Enable DP pull up
+usb_clear_csr:
+    ; Clear USBCSR (control and status)
+    ; Keep the value of USBCSR.DPPUEN
   0x6fe0:   4802        ldr r0, [pc, #8]        ; r0 = (0x6fec) USB Registers
     6fe2:   6801        ldr r1, [r0, #0]        ; r1 = [r0]
     6fe4:   f401 6180   and.w r1, r1, #1024     ; r1 = r1 & 0x400
@@ -7571,14 +7601,14 @@ function_28:
     703c:   6820        ldr r0, [r4, #0]
     703e:   f7ff ffa5   bl 0x6f8c               ; call usb_enable_intr
     7042:   2000        movs r0, #0
-    7044:   f7ff feb4   bl 0x6db0               ; call function_31
+    7044:   f7ff feb4   bl 0x6db0               ; call usb_dp_pull_up
     7048:   2000        movs r0, #0
     704a:   1c40        adds r0, r0, #1
     704c:   28c8        cmp r0, #200            ; 0xc8
     704e:   d3fc        bcc.n 0x704a
     7050:   e8bd 4010   ldmia.w sp!, {r4, lr}
     7054:   2001        movs r0, #1
-    7056:   f7ff beab   b.w 0x6db0              ; jump function_31
+    7056:   f7ff beab   b.w 0x6db0              ; jump usb_dp_pull_up
     705a:   bd10        pop {r4, pc}
 
   0x705c:   0x2000022c  ; Stack position
@@ -7713,12 +7743,14 @@ watchdog_reload_timer:
   0x714c:   0x5fa00001  ; Watchdog timer reload lock and set
   0x7150:   0x40068000  ; WDT Registers
 
-  0x7154:   204f        movs r0, #79            ; 0x4f
-    7156:   4770        bx lr
+usb_disconnect:
+    ; Not supported in this firmware, only in builtin
+  0x7154:   204f        movs r0, #79
+    7156:   4770        bx lr                   ; return 0x4f
 
-function_53:
+crc_flash:
   0x7158:   b510        push {r4, lr}
-    715a:   f7fc f991   bl 0x3480               ; call function_21
+    715a:   f7fc f991   bl 0x3480               ; call crc16
     715e:   4604        mov r4, r0              ; r4 = r0
     7160:   4601        mov r1, r0              ; r1 = r0
     7162:   4804        ldr r0, [pc, #16]       ; r0 = (0x7174) Stack
@@ -7738,8 +7770,11 @@ erase_flash:
     7180:   d002        beq.n 0x7188            ; branch if r0 == 0xa
     7182:   f5b1 4f78   cmp.w r1, #63488        ; 0xf800
     7186:   d202        bcs.n 0x718e            ; branch if r1 >= 0xf800
+
   0x7188:   2046        movs r0, #70            ; r0 = 0x46
+    ; return
   0x718a:   e8bd 81f0   ldmia.w sp!, {r4, r5, r6, r7, r8, pc}
+
   0x718e:   2500        movs r5, #0             ; r5 = 0
     7190:   460c        mov r4, r1              ; r4 = r1
     7192:   271e        movs r7, #30            ; r7 = 0x1e
@@ -7758,6 +7793,10 @@ erase_flash:
     71b6:   e7e8        b.n 0x718a
 
 usb_read_write:
+    ; r0 =
+    ; r1 = start address
+    ; r2 = end address
+    ; This function is called for each write packet
   0x71b8:   e92d 5ff0   stmdb sp!, {r4, r5, r6, r7, r8, r9, sl, fp, ip, lr}
     71bc:   2600        movs r6, #0             ; r6 = 0
     71be:   4680        mov r8, r0              ; r8 = r0
@@ -7813,8 +7852,11 @@ usb_read_write:
     7236:   1c40        adds r0, r0, #1
     7238:   d020        beq.n 0x727c
 
+
   0x723a:   2046        movs r0, #70            ; r0 = 0x46
+    ; return
   0x723c:   e8bd 9ff0   ldmia.w sp!, {r4, r5, r6, r7, r8, r9, sl, fp, ip, pc}
+
     7240:   f5a4 5120   sub.w r1, r4, #10240    ; r1 = r4 - 0x2800
     7244:   f5b1 6f80   cmp.w r1, #1024         ; 0x400
     7248:   d308        bcc.n 0x725c            ; allow if r4 < 0x400
@@ -7860,7 +7902,7 @@ usb_read_write:
   0x7294:   0x1fef0850  ; ?
   0x7298:   0x400a8000  ; USB Registers
 
-function_e_77_unused:
+function_e_77:
   0x729c:   b510        push {r4, lr}
     729e:   2240        movs r2, #64   ; 0x40
     72a0:   4902        ldr r1, [pc, #8]   ; (0x72ac)
@@ -8074,20 +8116,25 @@ function_e_80:
     7488:   b268        sxtb r0, r5
     748a:   f7ff fca3   bl 0x6dd4               ; call function_e_61
     748e:   e7e7        b.n 0x7460
-    7490:   1e52        subs r2, r2, #1
+
+function_84:
+  0x7490:   1e52        subs r2, r2, #1
     7492:   d404        bmi.n 0x749e
     7494:   f850 3022   ldr.w r3, [r0, r2, lsl #2]
     7498:   f841 3022   str.w r3, [r1, r2, lsl #2]
     749c:   e7f8        b.n 0x7490
     749e:   4770        bx lr
-    74a0:   4902        ldr r1, [pc, #8]   ; (0x74ac)
-    74a2:   eb00 0080   add.w r0, r0, r0, lsl #2
-    74a6:   eb01 0080   add.w r0, r1, r0, lsl #2
+
+function_83:
+    ; r0 =
+  0x74a0:   4902        ldr r1, [pc, #8]            ; r1 = (0x74ac)
+    74a2:   eb00 0080   add.w r0, r0, r0, lsl #2    ; r0 += r0 << 2
+    74a6:   eb01 0080   add.w r0, r1, r0, lsl #2    ; r0 = r1 + r0 << 2
     74aa:   4770        bx lr
 
   0x74ac:   0x400a8014
 
-function_e_81_unused:
+function_e_81:
   0x74b0:   e002        b.n 0x74b8
     74b2:   c808        ldmia r0!, {r3}
     74b4:   1f12        subs r2, r2, #4
@@ -8791,7 +8838,7 @@ main:
     ; This function is called at the end of initialization, and does not return,
     ; or branch elsewhere. So, this is main.
   0x7b94:   f7fd fb0c   bl 0x51b0               ; call setup_intr_priority()
-    7b98:   f7fb fb9e   bl 0x32d8               ; call function_32
+    7b98:   f7fb fb9e   bl 0x32d8               ; call setup_afio_gpio()
     7b9c:   f7fb fe72   bl 0x3884               ; call function_74
 
     7ba0:   4846        ldr r0, [pc, #280]      ; r0 = (0x7cbc)
@@ -10581,14 +10628,14 @@ usb_str1_desc:
     ; 0x4B, 0x00, 0x65, 0x00, 0x79, 0x00, 0x62, 0x00,
     ; 0x6F, 0x00, 0x61, 0x00, 0x72, 0x00, 0x64, 0x00,
 
-data_11:
-  0x8b54:   79 71 00 00
-    8b58:   b9 71 00 00
-    8b5c:   59 71 00 00
-    8b60:   9d 72 00 00
-    8b64:   69 30 00 00
-    8b68:   55 71 00 00
-    8b6c:   71 59 00 00
+update_handlers:
+  0x8b54:   79 71 00 00     0x7179  (erase_flash)
+    8b58:   b9 71 00 00     0x71b9  (usb_read_write)
+    8b5c:   59 71 00 00     0x7159  (crc_flash)
+    8b60:   9d 72 00 00     0x729d  (function_e_77)
+    8b64:   69 30 00 00     0x3069  (do_soft_reset)
+    8b68:   55 71 00 00     0x7155  (usb_disconnect)
+    8b6c:   71 59 00 00     0x5971  (function_e_44)
 
 data_4:
   0x8b70:   3e 47 45 44

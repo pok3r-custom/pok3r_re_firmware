@@ -1,0 +1,49 @@
+Firmware Builtin SRAM Variable Map:
+List of variables in sram (0x2000_0000) and where they are referenced.
+
+<variable name>                         @ 0x<address>
+    // description
+    0x<offset>: <type> <possible values / description>
+        <field-referencing functions>
+    <pointer-referencing functions>
+
+types:
+    b   byte
+    h   halfword
+    w   word
+    p   sram address
+    d   data address
+    f   function address
+
+pointer_b_2                         @ 0x20000024
+
+byteswap_key                        @ 0x20000048
+    0x0:  w 0
+        function_e_1
+    0x4:  w packet counter (byteswap switch value) / 0xffffffff
+        function_e_77
+
+pointer_b_1                         @ 0x200001bc
+    0x4:    offset
+    0x8:    address
+
+pointer_b_5                         @ 0x200001cc
+    0x0:  w offset
+    0x4:  w compared against 0x0
+    0x8:  w pointer
+    0xc:  w
+    pointer_e_2
+
+pointer_b_6                         @ 0x20000620
+
+update_packet                       @ 0x20000630
+    0x0:  b update cmd
+    0x1:  b update subcmd
+    0x2:  h crc
+    0x4:  w update start address
+    0x8:  w update end address
+    0xc:  a data words
+    ...
+    function_e_1
+
+stack_max                           @ 0x20000ed8

@@ -10,7 +10,12 @@ entry                               @ 0x20
     sram_init
     main
 
+load_jump_fw                        @ 0x48
+
 sram_init                           @ 0x50
+
+usb_disable_dppu                    @ 0xdc
+    usb_dp_pull_up
 
 reset                               @ 0x118
     watchdog_init
@@ -19,9 +24,40 @@ reset                               @ 0x118
 
 generic_fault                       @ 0x124
 
+setup_afio_gpio                     @ 0x25c
+    ckcu_ahb_clock_enable
+
+clear_two_words                     @ 0x322
+clear_two_words_and_write_two_bytes @ 0x32a
+
+function_e_2                        @ 0x336
+function_14                         @ 0x35e
+
+ckcu_ahb_clock_enable               @ 0x3a0
+
+crc16                         @ 0x3fc
+
 flash_page_erase                    @ 0x440
 flash_get_protection_status         @ 0x454
 flash_write                         @ 0x460
+
+function_e_1
+
+function_b_3                        @ 0x6dc
+
+enable_gpio_a_clock                 @ 0x740
+check_fw_sp_pc                      @ 0x7c0
+check_ver_str                       @ 0x7c0
+
+function_b_1                        @ 0x8fc
+
+function_b_2                        @ 0xa30
+
+ckcu_set_wtf                        @ 0xbb0
+
+function_e_4                        @ 0x102c
+
+function_17                         @ 0x104c
 
 clock_init                          @ 0x10e4
 
@@ -30,9 +66,42 @@ function_67                         @ 0x1330
 function_81                         @ 0x1424
 usb_get_descriptor                  @ 0x1434
 
+usb_init                            @ 0x16ec
+
+usb_dp_pull_up                      @ 0x1760
+
+function_e_66                       @ 0x17ec
+
+function_e_69                       @ 0x1822
+
+function_e_74                       @ 0x18f4
+
+usb_clear_csr                       @ 0x1990
+
+watchdog_reload_timer               @ 0x1af4
+
+crc_flash                           @ 0x1b04
+    crc16
+erase_flash                         @ 0x1b24
+    flash_page_erase
+    watchdog_reload_timer
+usb_disconnect                      @ 0x1b74
+    usb_disable_dppu
 usb_read_write                      @ 0x1b7c
+    firmware_decrypt
+    flash_get_protection_status
+    flash_write
+function_e_77                       @ 0x1ca0
+    function_e_74
+
+function_83                         @ 0x1eb0
 
 main                                @ 0x1ee0
+    check_fw_sp_pc
+    check_ver_str
+    ckcu_set_wtf
+    load_jump_fw
+    setup_afio_gpio
 
 firmware_decrypt                    @ 0x1f90
 
@@ -59,4 +128,6 @@ usb_str1_desc                       @ 0x2164
 
 xor_key                             @ 0x2188
 
-stack_max                           @ 0x20000ed8
+update_handlers                     @ 0x21bc
+
+data_9                              @ 0x2264

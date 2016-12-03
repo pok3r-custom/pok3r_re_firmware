@@ -12,7 +12,7 @@ void setword(unsigned char *b, int i){
 zu16 crc16(unsigned char *addr, zu64 size) {
     zu32 crc = 0;
     for(zu64 i = 0; i < size; ++i){             /* Step through bytes in memory */
-        crc ^= (zu16)(addr[i] << 8);                  /* Fetch byte from memory, XOR into CRC top byte*/
+        crc ^= (zu16)(addr[i] << 8);            /* Fetch byte from memory, XOR into CRC top byte*/
         for(int j = 0; j < 8; j++){             /* Prepare to rotate 8 bits */
             crc = crc << 1;                     /* rotate */
             if(crc & 0x10000)                   /* bit 15 was set (now bit 16)... */
@@ -124,42 +124,14 @@ void Pok3r::close(){
 }
 
 zu32 Pok3r::read(zu32 addr, ZBinary &bin){
-    int status;
-    const zu8 cmd = 1;
-    const zu8 scmd = 2;
-    const zu16 len = 64;
-    const zu32 eaddr = addr + len;
-    int olen;
-
     //LOG("Read 0x" << ZString::ItoS((zu64)addr, 16));
 
-    ZBinary data(len);
-    data.fill(0, len);
-    data.writeu8(cmd); // Command
-    data.writeu8(scmd); // Subcommand
-    data.writeleu16(0); // CRC
-    data.writeleu32(addr); // Address
-    data.writeleu32(eaddr); // End address
-    data.seek(2);
-    data.writeleu16(crc16(data.raw(), len)); // CRC
+    zbyte data[64];
+    memset(data, 0, 64);
+    sendCmd(DATA_CMD, DATA_READ_SUBCMD, addr, addr + 64, data, 0);
 
-    // Send command
-    status = libusb_interrupt_transfer(handle, LIBUSB_ENDPOINT_OUT | SEND_EP, data.raw(), len, &olen, TIMEOUT);
-    if(status != 0){
-        ELOG("Failed to send: " << libusb_error_name(status) << " " << olen);
-        return 0;
-    }
-
-    // Recv data
-    status = libusb_interrupt_transfer(handle, LIBUSB_ENDPOINT_IN | RECV_EP, data.raw(), len, &olen, TIMEOUT);
-    if(status != 0){
-        ELOG("Failed to recv: " << libusb_error_name(status) << " " << olen);
-        return 0;
-    }
-
-    bin.write(data.raw(), data.size());
-
-    return data.size();
+    bin.write(data, 64);
+    return 64;
 }
 
 zu32 Pok3r::write(zu32 addr, ZBinary bin){
@@ -167,13 +139,75 @@ zu32 Pok3r::write(zu32 addr, ZBinary bin){
     return 0;
 }
 
+zu16 Pok3r::crcFlash(zu32 addr, zu32 len){
+    zbyte data[64];
+    zu8 olen = sendCmd(CRC_CMD, 0, addr, len, data, 0);
+
+    ZBinary(data, 64).dumpBytes();
+
+    return 0;
+}
+
 ZString Pok3r::getVersion(){
     ZBinary bin;
     zu32 len = read(VER_ADDR, bin);
-    if(len == 64 && bin[0] == 0x05){
+    if(len == 64){
         return ZString(bin.raw() + 4);
     }
     return "NONE";
+}
+
+zu32 Pok3r::sendCmd(zu8 cmd, zu8 subcmd, zu32 a1, zu32 a2, zbyte *data, zu8 len){
+    if(len > 52)
+        return 0;
+
+    ZBinary packet;
+    packet.fill(0, PKT_LEN);
+    packet.writeu8(cmd);      // command
+    packet.writeu8(subcmd);   // subcommand
+    packet.seek(4);
+    packet.writeleu32(a1);    // arg1
+    packet.writeleu32(a2);    // arg2
+
+    if(data){
+        packet.write(data, len);  // data
+    }
+
+    packet.seek(2);
+    packet.writeleu16(crc16(packet.raw(), PKT_LEN)); // CRC
+
+    // Send command (interrupt write)
+    int olen;
+    int status = libusb_interrupt_transfer(handle,
+                                           LIBUSB_ENDPOINT_OUT | SEND_EP,
+                                           packet.raw(),
+                                           PKT_LEN,
+                                           &olen,
+                                           SEND_TIMEOUT);
+    LOG(olen);
+    if(status != 0){
+        ELOG("Failed to send: error " << libusb_error_name(status) << " length " << olen);
+        return 0;
+    }
+    if(olen != PKT_LEN){
+        ELOG("Failed to send: length " << olen);
+        return 0;
+    }
+
+    // Recv data (interrupt read)
+    status = libusb_interrupt_transfer(handle,
+                                       LIBUSB_ENDPOINT_IN | RECV_EP,
+                                       data,
+                                       PKT_LEN,
+                                       &olen,
+                                       RECV_TIMEOUT);
+    LOG(olen);
+    if(status != 0){
+        ELOG("Failed to recv: error " << libusb_error_name(status) << " length " << olen);
+        return 0;
+    }
+
+    return olen;
 }
 
 bool Pok3r::claimInterface(int interface){

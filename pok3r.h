@@ -10,21 +10,25 @@ using namespace LibChaos;
 #define HOLTEK_VID          0x04d9
 #define VORTEX_POK3R_PID    0x0141
 
-#define SEND_EP             0x04
-#define RECV_EP             0x03
-#define TIMEOUT             1000
+#define SEND_EP             4
+#define RECV_EP             3
+#define PKT_LEN             64
+#define SEND_TIMEOUT        1000
+#define RECV_TIMEOUT        100
 
 #define VER_ADDR            0x2800
 #define FW_ADDR             0x2c00
 #define FW_LEN              0xcc00
 
-#define A_CMD               0
-#define A_SUBCMD            8
+#define ERASE_CMD           0
+#define ERASE_SUBCMD        10
 
 #define DATA_CMD            1
 #define DATA_CHECK_SUBCMD   0
 #define DATA_WRITE_SUBCMD   1
 #define DATA_READ_SUBCMD    2
+
+#define CRC_CMD             2
 
 #define BUMP_CMD            3
 #define BUMP_SUBCMD         0
@@ -32,6 +36,8 @@ using namespace LibChaos;
 #define FLASH_CMD           4
 #define FLASH_ENTER_SUBCMD  0
 #define FLASH_LEAVE_SUBCMD  1
+
+#define DISCONNECT_CMD      5
 
 // Pok3r Update Protocol
 
@@ -109,10 +115,14 @@ public:
     //! Write 64 bytes at address from the keyboard.
     zu32 write(zu32 addr, ZBinary bin);
 
+    zu16 crcFlash(zu32 addr, zu32 len);
+
     //! Read the firmware version from the keyboard.
     ZString getVersion();
 
 private:
+    zu32 sendCmd(zu8 cmd, zu8 subcmd, zu32 a1, zu32 a2, zbyte *data, zu8 len);
+
     bool claimInterface(int interface);
     bool releaseInterface(int interface);
     bool detachKernel(int interface);
