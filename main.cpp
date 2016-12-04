@@ -285,18 +285,22 @@ void encode_firmware_scheme(ZBinary &bin){
 
 void fwDecode(ZBinary &bin){
     decode_package_scheme(bin);
-    decode_firmware_scheme(bin);
+//    decode_firmware_scheme(bin);
 }
 
 void fwEncode(ZBinary &bin){
     decode_package_scheme(bin);
 }
 
+// POK3R
 #define V113_HASH       0x62FCF913A689C9AE
 #define V114_HASH       0xFE37430DB1FFCF5F
 #define V115_HASH       0x8986F7893143E9F7
 #define V116_HASH       0xA28E5EFB3F796181
 #define V117_HASH       0xEA55CB190C35505F
+
+// POK3R RGB
+#define V130_HASH       0X6CFF0BB4F4086C2F
 
 #define FWU_START       0x1A3800
 #define STRINGS_LEN     0x4B8
@@ -311,8 +315,10 @@ int decfw(ZPath exe, ZPath out){
 
     zu64 exehash = ZFile::fileHash(exe);
 
+    zu64 fw_start = FWU_START;
     zu64 fw_len;
     zu64 strings_start;
+    zu64 strings_len = STRINGS_LEN;
 
     switch(exehash){
         case V113_HASH:
@@ -335,8 +341,17 @@ int decfw(ZPath exe, ZPath out){
             fw_len = 0x64D4;
             strings_start = 0x1A9CD4;
             break;
+
+        case V130_HASH:
+            fw_start =  0x2BE000;
+            fw_len =    39940 + 3024;
+
+            strings_start = 0x2C7C10;
+            strings_len = 3012;
+            break;
+
         default:
-            ELOG("Unknown updater executable");
+            ELOG("Unknown updater executable: " << ZString::ItoS(exehash, 16));
             return -2;
     }
 
@@ -346,7 +361,7 @@ int decfw(ZPath exe, ZPath out){
         LOG("File too short - seek");
         return -4;
     }
-    if(file.read(strs, STRINGS_LEN) != STRINGS_LEN){
+    if(file.read(strs, strings_len) != strings_len){
         LOG("File too short - read");
         return -5;
     }
@@ -377,7 +392,7 @@ int decfw(ZPath exe, ZPath out){
 
     // Read firmware
     ZBinary fw;
-    if(file.seek(FWU_START) != FWU_START){
+    if(file.seek(fw_start) != fw_start){
         LOG("File too short - seek");
         return -2;
     }

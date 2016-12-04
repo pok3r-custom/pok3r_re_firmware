@@ -48,7 +48,7 @@ So, the C++ program that can read the flash over USB is built in this project wi
 I won't detail how to use CMake, it is a pretty standard procedure. You will need the LibChaos
 submodule cloned, and libusb installed. It works on Linux, and ocassionally Windows. (seriously)
 
-When it is built, this will attempt to read the 128K flash:
+This will attempt to read the 128K flash:
 
     ./pok3rtest read pok3rdump_flash.bin
 
@@ -63,34 +63,45 @@ procedure in the firmware by static analysis of the disassembly. I have attempte
 to get a JTAG emulator to work over the SWD pins, but have not had much luck. I don't want to brick
 my keyboard, so I haven't pushed too hard at that.
 
-###
 
-### General Notes
+## Pok3r Notes
 
+### General
 - Holtek MCU HT32F1655
 - ARM Cortex M3
 
-## PCB Notes
+### Updater
+The updater executable contains the firmware update, encrypted twice. It is decrypted once by
+the updater (package encryption), sent to the keyboard, and decrypted again (firmware encryption)
+before being written to flash.
 
-### Header CN2
+The updater also contains a chunk of strings for the updater UI. These are encrypted only by the
+first scheme (package encryption).
+
+The Windows program version string identifies the program name as "FWUpdate.exe", and the other
+fields are "TODO: <field name in chinese characters>.
+
+### PCB
+
+#### Header CN2
 - Pin 1: 3.3V?
 - Pin 2: SWDIO
 - Pin 3: SWCLK
 - Pin 4: nRST
 - Pin 5: GND
 
-### Boot Mode
+#### Boot Mode
 - BOOT_0: 0
 - BOOT_1: 0
 
-### JTAG to SWD
+#### JTAG to SWD
 - SWDCK: TCK
 - SWDIO: TMS
 - nRST
 
-## Firmware Notes
+### Firmware
 
-### USB Descriptor Hierarchy
+#### USB Descriptor Hierarchy
 - usb_device_desc
     - usb_config_desc
         - usb_interface0_desc
@@ -109,9 +120,35 @@ my keyboard, so I haven't pushed too hard at that.
 - usb_str0_desc
 - usb_str1_desc
 
-### Firmware Updaters
+#### Firmware Updaters
 - POK3R_V113.exe
 - POK3R_V114.exe
 - POK3R_V115.exe
 - POK3R_V116.exe
 - POK3R_V117.exe
+
+
+## Pok3r RGB Notes
+
+### General
+- Unknown processor (do not actually have a pok3r RGB)
+
+### Updater
+This updater will be harder to break, if even possible. The firmware and string chunks are present
+as in the Pok3r updater, and seem to be encrypted with the same scheme (package encryption). It
+also seems that there are two firmware chunks. Based on the strings in the file, the first is for
+US Layout, and the second is for EU Layout.
+
+However, the updates do not look like firmware at all. I cannot see a vector table or a data region,
+like was visible in the Pok3r updates. An encryption scheme that encrypts words in-place, even with
+a rotating key, should leave some pattern behind, so my guess is the encryption is a lot better on
+this firmware.
+
+Also, it is worth noting that the Windows program version string info identifies the company and
+copyright at "Cooler Master", and also names the program "FWUpdate.exe".
+
+### Firmware
+
+#### Firmware Updaters
+- POK3R_V124.exe
+- POK3R_V130.exe

@@ -1,0 +1,23 @@
+{
+    "POK3R_V117.exe" : {
+        "LegalCopyright" : "TODO: (c) <\u516c\u53f8\u540d\u7a31>.  All rights reserved.",
+        "InternalName" : "FWUpdate.exe",
+        "FileVersion" : "1.0.0.2",
+        "CompanyName" : "TODO: <\u516c\u53f8\u540d\u7a31>",
+        "ProductName" : "TODO: <\u7522\u54c1\u540d\u7a31>",
+        "ProductVersion" : "1.0.0.1",
+        "FileDescription" : "TODO: <\u6a94\u6848\u8aaa\u660e>",
+        "OriginalFilename" : "FWUpdate.exe"
+    },
+
+    "POK3R_RGB_V130.exe" : {
+        "LegalCopyright" : "Cooler Master.  All rights reserved.",
+        "InternalName" : "FWUpdate.exe",
+        "FileVersion" : "1.0.0.3",
+        "CompanyName" : "Cooler Master",
+        "ProductName" : "FWUpdate",
+        "ProductVersion" : "1.0.0.3",
+        "FileDescription" : "FWUpdate",
+        "OriginalFilename" : "FWUpdate.exe"
+    },
+}
