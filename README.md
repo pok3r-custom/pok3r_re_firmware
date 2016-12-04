@@ -150,5 +150,5 @@ copyright at "Cooler Master", and also names the program "FWUpdate.exe".
 ### Firmware
 
 #### Firmware Updaters
-- POK3R_V124.exe
-- POK3R_V130.exe
+- POK3R_RGB_V124.exe
+- POK3R_RGB_V130.exe
