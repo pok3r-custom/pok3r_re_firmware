@@ -57,7 +57,7 @@ sram_init:
       66:   d3f6        bcc.n 0x56                  ; branch if r4 < r5
       68:   f7ff ffde   bl 0x28
 
-    0x6c:   0x22ac
+    0x6c:   0x22ac  ; task_1
     0x70:   0x22cc
 
       74:   b510        push {r4, lr}
@@ -370,6 +370,8 @@ clear_two_words:
 
 clear_two_words_and_write_two_bytes:
     ; r0 = pointer
+    ; r1 = word (+0x8)
+    ; r2 = word (+0x10)
    0x32a:   2300        movs r3, #0
      32c:   6003        str r3, [r0, #0]
      32e:   6043        str r3, [r0, #4]
@@ -403,7 +405,7 @@ function_e_2:
 
 function_14:
     ; r0 = pointer_b_1
-    ; r1 = return code from update handler
+    ; r1 = byte
    0x35e:   b530        push {r4, r5, lr}
      360:   6843        ldr r3, [r0, #4]        ; r3 = [r0 + 4]
      362:   2200        movs r2, #0             ; r2 = 0
@@ -415,7 +417,7 @@ function_14:
      372:   42a3        cmp r3, r4
      374:   d00a        beq.n 0x38c             ; branch if r3 == r4
 
-    ; Save return code
+    ; Save byte
      376:   6842        ldr r2, [r0, #4]        ; r2 = [r0 + 4]
      378:   6883        ldr r3, [r0, #8]        ; r3 = [r0 + 8]
      37a:   5499        strb r1, [r3, r2]       ; [r3 + r2] = r1
@@ -781,19 +783,20 @@ flash_write:
      64c:   4770        bx lr
      64e:   0000        movs r0, r0
 
-function_e_1:
+handle_update_packet:
    0x650:   b570        push {r4, r5, r6, lr}
-     652:   481d        ldr r0, [pc, #116]      ; r0 = (0x6c8)
-     654:   6801        ldr r1, [r0, #0]
+     652:   481d        ldr r0, [pc, #116]      ; r0 = (0x6c8) pointer_b_2
+     654:   6801        ldr r1, [r0, #0]        ; r1 = [r0]
      656:   2901        cmp r1, #1
-     658:   d134        bne.n 0x6c4
+     658:   d134        bne.n 0x6c4             ; return if r1 != 1
+
      65a:   2600        movs r6, #0             ; r6 = 0
      65c:   6006        str r6, [r0, #0]        ; [r0] = r6
      65e:   4c1b        ldr r4, [pc, #108]      ; r4 = (0x6cc) byteswap_key
      660:   4d1b        ldr r5, [pc, #108]      ; r5 = (0x6d0) update_packet
      662:   60a6        str r6, [r4, #8]        ; [r4 + 8] = r6
 
-    ; loop
+    ; call function_e_2 in a loop
    0x664:   68a0        ldr r0, [r4, #8]        ; r0 = [r4 + 8]
      666:   1829        adds r1, r5, r0         ; r1 = r5 + r0
      668:   1c40        adds r0, r0, #1         ; r0++
@@ -832,7 +835,13 @@ function_e_1:
    0x69c:   f06f 0001   mvn.w r0, #1
      6a0:   f000 fcc4   bl 0x102c               ; call function_e_4(0xfffffffe)
 
-    ; call an update handler function form the update cmd
+    ; call an update handler function from the update cmd
+    ; 0: flash_erase_cmd
+    ; 1: flash_read_write_cmd
+    ; 2: flash_crc_cmd
+    ; 3: update_start_cmd
+    ; 4: reset_cmd
+    ; 5: disconnect_cmd
      6a4:   782b        ldrb r3, [r5, #0]               ; r3 = [r5]             cmd
      6a6:   4c0c        ldr r4, [pc, #48]               ; r4 = (0x6d8) update_handlers
      6a8:   e9d5 1201   ldrd r1, r2, [r5, #4]           ; r1 = [r5 + 4]         start address
@@ -840,15 +849,16 @@ function_e_1:
      6ac:   f854 3023   ldr.w r3, [r4, r3, lsl #2]      ; r3 = [r4 + r3 << 2]
      6b0:   7868        ldrb r0, [r5, #1]               ; r0 = [r5 + 1]         subcmd
      6b2:   4798        blx r3                          ; call r3               call handler
+
+    ; seems 0x4f = success, 0x46 = failure
      6b4:   4604        mov r4, r0                      ; r4 = r0
    0x6b6:   4621        mov r1, r4                      ; r1 = r4               return code
      6b8:   e8bd 4070   ldmia.w sp!, {r4, r5, r6, lr}
-
      6bc:   4805        ldr r0, [pc, #20]               ; r0 = (0x6d4)
      6be:   3810        subs r0, #16                    ; r0 -= 0x10
      6c0:   f7ff be4d   b.w 0x35e                       ; call function_14(pointer_b_1, r1)
 
-     6c4:   bd70        pop {r4, r5, r6, pc}
+   0x6c4:   bd70        pop {r4, r5, r6, pc}
      6c6:   0000
 
    0x6c8:   0x20000024  ; pointer_b_2
@@ -858,42 +868,49 @@ function_e_1:
    0x6d8:   0x21bc      ; update_handlers
 
 function_b_3:
-   0x6dc:   4815        ldr r0, [pc, #84]       ; r0 = (0x734)
+   0x6dc:   4815        ldr r0, [pc, #84]           ; r0 = (0x734)
      6de:   b510        push {r4, lr}
-     6e0:   6801        ldr r1, [r0, #0]        ; r1 = [r0]
+     6e0:   6801        ldr r1, [r0, #0]            ; r1 = [r0]
      6e2:   b289        uxth r1, r1
-     6e4:   f041 5288   orr.w r2, r1, #285212672    ; 0x11000000
-     6e8:   4913        ldr r1, [pc, #76]    ; (0x738)
-     6ea:   600a        str r2, [r1, #0]
-     6ec:   6882        ldr r2, [r0, #8]
-     6ee:   f44f 5330   mov.w r3, #11264    ; 0x2c00
-     6f2:   ea43 4202   orr.w r2, r3, r2, lsl #16
-     6f6:   604a        str r2, [r1, #4]
-     6f8:   6842        ldr r2, [r0, #4]
-     6fa:   6840        ldr r0, [r0, #4]
-     6fc:   f1a2 020a   sub.w r2, r2, #10
-     700:   f1a0 000a   sub.w r0, r0, #10
-     704:   ea42 4000   orr.w r0, r2, r0, lsl #16
-     708:   6088        str r0, [r1, #8]
-     70a:   f44f 5020   mov.w r0, #10240    ; 0x2800
-     70e:   60c8        str r0, [r1, #12]
-     710:   f1a1 0144   sub.w r1, r1, #68    ; 0x44
-     714:   f04f 0244   mov.w r2, #68    ; 0x44
-     718:   f5a1 6084   sub.w r0, r1, #1056    ; 0x420
-     71c:   f7ff fe05   bl 0x32a
-     720:   4906        ldr r1, [pc, #24]    ; (0x73c)
+     6e4:   f041 5288   orr.w r2, r1, #285212672    ; r2 = r1 | 0x11000000
+     6e8:   4913        ldr r1, [pc, #76]           ; r1 = (0x738) pointer_b_6
+     6ea:   600a        str r2, [r1, #0]            ; [r1] = r2
+
+     6ec:   6882        ldr r2, [r0, #8]            ; r2 = [r0 + 8]
+     6ee:   f44f 5330   mov.w r3, #11264
+     6f2:   ea43 4202   orr.w r2, r3, r2, lsl #16   ; r2 = 0x2c00 | (r2 << 16)
+     6f6:   604a        str r2, [r1, #4]            ; [r1 + 4] = r2
+
+     6f8:   6842        ldr r2, [r0, #4]            ; r2 = [r0 + 4]
+     6fa:   6840        ldr r0, [r0, #4]            ; r0 = [r0 + 4]
+     6fc:   f1a2 020a   sub.w r2, r2, #10           ; r2 -= 10
+     700:   f1a0 000a   sub.w r0, r0, #10           ; r0 -= 10
+     704:   ea42 4000   orr.w r0, r2, r0, lsl #16   ; r0 = r2 | (r0 << 16)
+     708:   6088        str r0, [r1, #8]            ; [r1 + 8] = r0
+     70a:   f44f 5020   mov.w r0, #10240
+     70e:   60c8        str r0, [r1, #12]           ; [r0 + 0xc] = 0x2800
+
+     710:   f1a1 0144   sub.w r1, r1, #68           ; r1 -= 0x44
+     714:   f04f 0244   mov.w r2, #68               ; r2 = 0x44
+     718:   f5a1 6084   sub.w r0, r1, #1056         ; r0 = r1 - 0x420
+     71c:   f7ff fe05   bl 0x32a                    ; call clear_two_words_and_write_two_bytes
+
+     720:   4906        ldr r1, [pc, #24]           ; r1 = (0x73c) pointer_b_8
      722:   e8bd 4010   ldmia.w sp!, {r4, lr}
-     726:   f44f 6280   mov.w r2, #1024    ; 0x400
-     72a:   f1a1 0010   sub.w r0, r1, #16
-     72e:   f7ff bdfc   b.w 0x32a
+     726:   f44f 6280   mov.w r2, #1024             ; r2 = 0x400
+     72a:   f1a1 0010   sub.w r0, r1, #16           ; r0 = r1 - 0x10
+     72e:   f7ff bdfc   b.w 0x32a                   ; call clear_two_words_and_write_two_bytes
+
      732:   0000        movs r0, r0
 
-   0x734:   0x40080180  ; FMC register?
-   0x738:   0x20000620
-   0x73c:   0x200001dc
+   0x734:   0x40080180  ; FMC register? (undocumented)
+   0x738:   0x20000620  ; pointer_b_6
+   0x73c:   0x200001dc  ; pointer_b_8
 
-do_soft_reset:
-    ; r0 = 0/1 check sp and pc
+reset_cmd:
+    ; This will disconnect usb, and reset the processor.
+    ; If r0 is 0, the builtin firmware will jump to the main firmware on reset.
+    ; r0 = 0/1
     ; r1 unused
     ; r2 unused
    0x740:   b570        push {r4, r5, r6, lr}
@@ -904,6 +921,7 @@ do_soft_reset:
      748:   f7ff fe2a   bl 0x3a0                ; call ckcu_ahb_clock_enable(0x10000, 1)
 
     ; Set GPIO A pin 9
+    ; Why?
      74c:   4916        ldr r1, [pc, #88]       ; r1 = (0x7a8) GPIO A
      74e:   f44f 7200   mov.w r2, #512          ; r2 = 0x200
      752:   624a        str r2, [r1, #36]       ; [r1 + 0x24] = r2
@@ -921,17 +939,20 @@ do_soft_reset:
      766:   b1e0        cbz r0, 0x7a2           ; return 0 if r0 == 0
 
     ; Set FMC.SVBT1 (PC) to specific value
+    ; This is checked on reboot of the builtin firmware
+    ; It will jump to the main firmware if SVBT1 is not 0x55aafaf5
      768:   4811        ldr r0, [pc, #68]       ; r0 = (0x7b0) = 0x55aafaf5
      76a:   1f40        subs r0, r0, #5         ; r0 -= 5
-   0x76c:   f8c5 0304   str.w r0, [r5, #772]    ; [r5 + 0x304] = r0 = 0x55aafaf0
+
+   0x76c:   f8c5 0304   str.w r0, [r5, #772]    ; [r5 + 0x304] = r0
 
     ; Disable interrupt 53 (USB)
     ; Write 0x200000 to NVIC_ICER1 (0xe000e184)
+    ; Disconnect USB
      770:   4910        ldr r1, [pc, #64]       ; r1 = (0x7b4)
      772:   f44f 1000   mov.w r0, #2097152      ; r0 = 0x200000
      776:   f04f 24e0   mov.w r4, #3758153728   ; r4 = 0xe000e000 PPB
      77a:   6008        str r0, [r1, #0]        ; [r1] = r0
-
      77c:   f7ff fcae   bl 0xdc                 ; call usb_disable_dppu()
 
     ; spin loop on counter
@@ -2071,13 +2092,16 @@ clock_init:
     1152:   2901        cmp r1, #1
     1154:   d107        bne.n 0x1166
     1156:   60c4        str r4, [r0, #12]
+
     1158:   f100 0120   add.w r1, r0, #32
     115c:   2208        movs r2, #8
     115e:   2001        movs r0, #1
-    1160:   f000 fbc8   bl 0x18f4               ; call function_e_74
+    1160:   f000 fbc8   bl 0x18f4               ; call usb_copy_send(1, pointer_b_7 + 0x20, 8)
+
     1164:   602c        str r4, [r5, #0]
     1166:   bd70        pop {r4, r5, r6, pc}
-    1168:   4d0f        ldr r5, [pc, #60]    ; (0x11a8)
+
+  0x1168:   4d0f        ldr r5, [pc, #60]    ; (0x11a8)
     116a:   6829        ldr r1, [r5, #0]
     116c:   2900        cmp r1, #0
     116e:   d1fa        bne.n 0x1166
@@ -2090,10 +2114,12 @@ clock_init:
     117e:   d1f2        bne.n 0x1166
     1180:   60c4        str r4, [r0, #12]
     1182:   4908        ldr r1, [pc, #32]    ; (0x11a4)
+
     1184:   2208        movs r2, #8
     1186:   3120        adds r1, #32
     1188:   2001        movs r0, #1
-    118a:   f000 fbb3   bl 0x18f4               ; call function_e_74
+    118a:   f000 fbb3   bl 0x18f4               ; call usb_copy_send(1, pointer_b_7 +  0x20, 8)
+
     118e:   6830        ldr r0, [r6, #0]
     1190:   f44f 617a   mov.w r1, #4000    ; 0xfa0
     1194:   4348        muls r0, r1
@@ -2103,7 +2129,7 @@ clock_init:
     119e:   bd70        pop {r4, r5, r6, pc}
 
   0x11a0:   0x20000058
-  0x11a4:   0x20000010
+  0x11a4:   0x20000010  ; pointer_b_7
   0x11a8:   0x2000018c
 
     11ac:   b570        push {r4, r5, r6, lr}
@@ -2128,15 +2154,17 @@ clock_init:
     11d4:   d107        bne.n 0x11e6
     11d6:   6104        str r4, [r0, #16]
     11d8:   4904        ldr r1, [pc, #16]    ; (0x11ec)
+
     11da:   2202        movs r2, #2
     11dc:   1d09        adds r1, r1, #4
     11de:   2002        movs r0, #2
-    11e0:   f000 fb88   bl 0x18f4               ; call function_e_74
+    11e0:   f000 fb88   bl 0x18f4               ; call usb_copy_send(2, pointer_b_7 + 4, 2)
+
     11e4:   602c        str r4, [r5, #0]
     11e6:   bd70        pop {r4, r5, r6, pc}
 
   0x11e8:   0x2000005c
-  0x11ec:   0x20000010
+  0x11ec:   0x20000010  ; pointer_b_7
   0x11f0:   0x20000060
 
     11f4:   4901        ldr r1, [pc, #4]    ; (0x11fc)
@@ -2144,15 +2172,16 @@ clock_init:
     11f8:   60c8        str r0, [r1, #12]
     11fa:   4770        bx lr
 
-  0x11fc:   0x20000010
+  0x11fc:   0x20000010  ; pointer_b_7
 
     1200:   4901        ldr r1, [pc, #4]    ; (0x1208)
     1202:   2001        movs r0, #1
     1204:   6108        str r0, [r1, #16]
     1206:   4770        bx lr
 
-  0x1208:   0x20000010
+  0x1208:   0x20000010  ; pointer_b_7
 
+function_70:
   0x120c:   b510        push {r4, lr}
     120e:   4c0a        ldr r4, [pc, #40]       ; r4 = (0x1238)
     1210:   e9d4 1001   ldrd r1, r0, [r4, #4]
@@ -2171,11 +2200,11 @@ clock_init:
     122c:   6148        str r0, [r1, #20]       ; [r1 + 0x14] = r0
 
     122e:   e8bd 4010   ldmia.w sp!, {r4, lr}
-    1232:   f7ff ba0d   b.w 0x650
+    1232:   f7ff ba0d   b.w 0x650               ; call handle_update_packet
     1236:   0000
 
   0x1238:   0x200001cc
-  0x123c:   0x20000010
+  0x123c:   0x20000010  ; pointer_b_7
 
     1240:   b570        push {r4, r5, r6, lr}
     1242:   4604        mov r4, r0
@@ -2253,7 +2282,7 @@ ptr_write_func_ptrs:
   0x12dc:   0x1331
   0x12e0:   0x11f5
   0x12e4:   0x1201
-  0x12e8:   0x120d
+  0x12e8:   0x120d (function_70)
 
     12ec:   480e        ldr r0, [pc, #56]    ; (0x1328)
     12ee:   b510        push {r4, lr}
@@ -2278,7 +2307,7 @@ ptr_write_func_ptrs:
     1326:   0000
 
   0x1328:   0x200001a4
-  0x132c:   0x20000010
+  0x132c:   0x20000010  ; pointer_b_7
 
 function_67:
   0x1330:   b4f0        push {r4, r5, r6, r7}
@@ -2384,7 +2413,7 @@ function_67:
     1418:   6003        str r3, [r0, #0]
     141a:   bd10        pop {r4, pc}
 
-  0x141c:   0x20000010
+  0x141c:   0x20000010  ; pointer_b_7
   0x1420:   0x2000000c
 
 function_81:
@@ -2447,11 +2476,13 @@ usb_get_descriptor:
 
   0x1494:   0x2024
 
-    1498:   f890 0034   ldrb.w r0, [r0, #52]    ; 0x34
+function_6:
+  0x1498:   f890 0034   ldrb.w r0, [r0, #52]    ; 0x34
     149c:   f3c0 0040   ubfx r0, r0, #1, #1
     14a0:   4770        bx lr
 
-    14a2:   e92d 41f0   stmdb sp!, {r4, r5, r6, r7, r8, lr}
+usb_entry:
+  0x14a2:   e92d 41f0   stmdb sp!, {r4, r5, r6, r7, r8, lr}
     14a6:   4604        mov r4, r0
     14a8:   f000 fa60   bl 0x196c
     14ac:   4605        mov r5, r0
@@ -2566,10 +2597,12 @@ usb_get_descriptor:
     15c8:   4620        mov r0, r4
     15ca:   f000 fb79   bl 0x1cc0
     15ce:   e7e3        b.n 0x1598
+
     15d0:   2200        movs r2, #0
     15d2:   4611        mov r1, r2
     15d4:   4610        mov r0, r2
-    15d6:   f000 f98d   bl 0x18f4               ; call function_e_74
+    15d6:   f000 f98d   bl 0x18f4               ; call usb_copy_send(0, 0, 0)
+
     15da:   e7dd        b.n 0x1598
     15dc:   2240        movs r2, #64    ; 0x40
     15de:   2000        movs r0, #0
@@ -2746,37 +2779,44 @@ usb_dp_pull_up:
     177c:   2101        movs r1, #1
     177e:   2020        movs r0, #32
     1780:   f7ff ba08   b.w 0xb94
+
     1784:   b510        push {r4, lr}
-    1786:   f000 fb93   bl 0x1eb0               ; call function_83
+    1786:   f000 fb93   bl 0x1eb0               ; call usb_get_ep_reg(r0)
     178a:   6801        ldr r1, [r0, #0]
     178c:   f001 0109   and.w r1, r1, #9
     1790:   6001        str r1, [r0, #0]
     1792:   bd10        pop {r4, pc}
+
     1794:   b510        push {r4, lr}
-    1796:   f000 fb8b   bl 0x1eb0               ; call function_83
+    1796:   f000 fb8b   bl 0x1eb0               ; call usb_get_ep_reg(r0)
     179a:   6801        ldr r1, [r0, #0]
     179c:   f001 0124   and.w r1, r1, #36    ; 0x24
     17a0:   6001        str r1, [r0, #0]
     17a2:   bd10        pop {r4, pc}
+
     17a4:   b510        push {r4, lr}
     17a6:   460c        mov r4, r1
-    17a8:   f000 fb82   bl 0x1eb0               ; call function_83
+    17a8:   f000 fb82   bl 0x1eb0               ; call usb_get_ep_reg(r0)
     17ac:   6084        str r4, [r0, #8]
     17ae:   bd10        pop {r4, pc}
-    17b0:   b510        push {r4, lr}
-    17b2:   f000 fb7d   bl 0x1eb0               ; call function_83
-    17b6:   6900        ldr r0, [r0, #16]
-    17b8:   4902        ldr r1, [pc, #8]    ; (0x17c4)
-    17ba:   f3c0 0009   ubfx r0, r0, #0, #10
-    17be:   4408        add r0, r1
-    17c0:   bd10        pop {r4, pc}
-    17c2:   0000        movs r0, r0
 
-  0x17c4:   0x400aa000
+usb_get_ep_buff:
+    ; Get the address of the buffer for an endpoint
+    ; r0 = endpoint num
+  0x17b0:   b510        push {r4, lr}
+    17b2:   f000 fb7d   bl 0x1eb0               ; r0 = usb_get_ep_reg(r0)
+    17b6:   6900        ldr r0, [r0, #16]       ; r0 = [r0 + 0x10] read endpoint config reg
+    17b8:   4902        ldr r1, [pc, #8]        ; r1 = (0x17c4) USB SRAM
+    17ba:   f3c0 0009   ubfx r0, r0, #0, #10    ; r0 = r0 & 0x3ff
+    17be:   4408        add r0, r1              ; r0 = r1
+    17c0:   bd10        pop {r4, pc}
+    17c2:   0000
+
+  0x17c4:   0x400aa000  ; USB SRAM
 
     17c8:   b570        push {r4, r5, r6, lr}
     17ca:   4605        mov r5, r0
-    17cc:   f000 fb70   bl 0x1eb0               ; call function_83
+    17cc:   f000 fb70   bl 0x1eb0               ; call usb_get_ep_reg(r0)
     17d0:   4604        mov r4, r0
     17d2:   4628        mov r0, r5
     17d4:   f000 f80a   bl 0x17ec
@@ -2790,15 +2830,17 @@ usb_dp_pull_up:
 
   0x17e8:   0x400aa000
 
-function_e_66:
+usb_get_ep_len:
+    ; Get the buffer length of and endpoint
+    ; r0 = endpoint num
   0x17ec:   b510        push {r4, lr}
-    17ee:   f000 fb5f   bl 0x1eb0               ; call function_83
-    17f2:   6900        ldr r0, [r0, #16]
-    17f4:   f3c0 2089   ubfx r0, r0, #10, #10
+    17ee:   f000 fb5f   bl 0x1eb0               ; r0 = usb_get_ep_reg(endpoint num)
+    17f2:   6900        ldr r0, [r0, #16]       ; r0 = [r0 + 0x10]
+    17f4:   f3c0 2089   ubfx r0, r0, #10, #10   ; r0 = (r0 >> 10) & 0x3ff
     17f8:   bd10        pop {r4, pc}
 
     17fa:   b510        push {r4, lr}
-    17fc:   f000 fb58   bl 0x1eb0               ; call function_83
+    17fc:   f000 fb58   bl 0x1eb0               ; call usb_get_ep_reg
     1800:   6901        ldr r1, [r0, #16]
     1802:   6800        ldr r0, [r0, #0]
     1804:   00c9        lsls r1, r1, #3
@@ -2808,25 +2850,28 @@ function_e_66:
     180e:   f3c0 1040   ubfx r0, r0, #5, #1
     1812:   bd10        pop {r4, pc}
     1814:   b510        push {r4, lr}
-    1816:   f000 fb4b   bl 0x1eb0               ; call function_83
+    1816:   f000 fb4b   bl 0x1eb0               ; call usb_get_ep_reg
     181a:   6841        ldr r1, [r0, #4]
     181c:   6880        ldr r0, [r0, #8]
     181e:   4008        ands r0, r1
     1820:   bd10        pop {r4, pc}
 
-function_e_69:
+usb_get_ep_tcnt:
+    ; Gets the TCNT of an endpoint, with a given right shift
+    ; r0 = endpoint num
+    ; r1 = right shift
   0x1822:   b510        push {r4, lr}
-    1824:   460c        mov r4, r1
-    1826:   f000 fb43   bl 0x1eb0               ; call function_83
-    182a:   68c0        ldr r0, [r0, #12]
-    182c:   40e0        lsrs r0, r4
-    182e:   f3c0 0008   ubfx r0, r0, #0, #9
+    1824:   460c        mov r4, r1              ; r4 = r1
+    1826:   f000 fb43   bl 0x1eb0               ; r0 = usb_get_ep_reg(endpoint num)
+    182a:   68c0        ldr r0, [r0, #12]       ; r0 = [r0 + 0xc] transfer count
+    182c:   40e0        lsrs r0, r4             ; r0 = r0 >> r4
+    182e:   f3c0 0008   ubfx r0, r0, #0, #9     ; r0 = r9 & 0x1ff
     1832:   bd10        pop {r4, pc}
 
     1834:   b570        push {r4, r5, r6, lr}
     1836:   460c        mov r4, r1
     1838:   4605        mov r5, r0
-    183a:   f000 fb39   bl 0x1eb0               ; call function_83
+    183a:   f000 fb39   bl 0x1eb0               ; call usb_get_ep_reg
     183e:   eb04 01c5   add.w r1, r4, r5, lsl #3
     1842:   684a        ldr r2, [r1, #4]
     1844:   6102        str r2, [r0, #16]
@@ -2869,7 +2914,7 @@ function_e_69:
     1898:   460f        mov r7, r1
     189a:   4615        mov r5, r2
     189c:   4606        mov r6, r0
-    189e:   f000 fb07   bl 0x1eb0               ; call function_83
+    189e:   f000 fb07   bl 0x1eb0               ; call usb_get_ep_reg
     18a2:   4604        mov r4, r0
     18a4:   2000        movs r0, #0
     18a6:   b13d        cbz r5, 0x18b8
@@ -2886,18 +2931,18 @@ function_e_69:
   0x18c0:   e8bd 81f0   ldmia.w sp!, {r4, r5, r6, r7, r8, pc}
 
     18c4:   b510        push {r4, lr}
-    18c6:   f000 faf3   bl 0x1eb0               ; call function_83
+    18c6:   f000 faf3   bl 0x1eb0               ; call usb_get_ep_reg
     18ca:   6801        ldr r1, [r0, #0]
     18cc:   f001 0119   and.w r1, r1, #25
     18d0:   6001        str r1, [r0, #0]
     18d2:   bd10        pop {r4, pc}
     18d4:   b510        push {r4, lr}
-    18d6:   f000 faeb   bl 0x1eb0               ; call function_83
+    18d6:   f000 faeb   bl 0x1eb0               ; call usb_get_ep_reg
     18da:   2104        movs r1, #4
     18dc:   6001        str r1, [r0, #0]
     18de:   bd10        pop {r4, pc}
     18e0:   b510        push {r4, lr}
-    18e2:   f000 fae5   bl 0x1eb0               ; call function_83
+    18e2:   f000 fae5   bl 0x1eb0               ; call usb_get_ep_reg
     18e6:   2140        movs r1, #64    ; 0x40
     18e8:   6081        str r1, [r0, #8]
     18ea:   6802        ldr r2, [r0, #0]
@@ -2906,54 +2951,56 @@ function_e_69:
     18f0:   6001        str r1, [r0, #0]
     18f2:   bd10        pop {r4, pc}
 
-function_e_74:
-    ; r0 = a0
+usb_copy_send:
+    ; r0 = endpoint num
     ; r1 = pointer
-    ; r2 =
+    ; r2 = length
   0x18f4:   e92d 41f0   stmdb sp!, {r4, r5, r6, r7, r8, lr}
     18f8:   4688        mov r8, r1              ; r8 = r1
     18fa:   4614        mov r4, r2              ; r4 = r2
     18fc:   4607        mov r7, r0              ; r7 = r0
 
-    18fe:   f7ff ff75   bl 0x17ec               ; r6 = function_e_66()
+    18fe:   f7ff ff75   bl 0x17ec               ; r6 = usb_get_ep_len(endpoint num)
     1902:   4606        mov r6, r0
 
     1904:   4638        mov r0, r7
-    1906:   f000 fad3   bl 0x1eb0               ; r5 = function_83(a0)
+    1906:   f000 fad3   bl 0x1eb0               ; r5 = usb_get_ep_reg(endpoint num)
     190a:   4605        mov r5, r0
 
     190c:   2100        movs r1, #0
     190e:   4638        mov r0, r7
-    1910:   f7ff ff87   bl 0x1822               ; call function_e_69(a0, 0)
+    1910:   f7ff ff87   bl 0x1822               ; call usb_get_ep_tcnt(endpoint num, 0)
 
     1914:   42b4        cmp r4, r6
-    1916:   d800        bhi.n 0x191a            ; branch if r4 > r6
-    1918:   b110        cbz r0, 0x1920          ; branch if r0 == 0
+    1916:   d800        bhi.n 0x191a            ; branch if r4 > r6 return if length > ep len
+    1918:   b110        cbz r0, 0x1920          ; branch if r0 == 0 ep tcnt is 0
 
   0x191a:   2000        movs r0, #0             ; return 0
   0x191c:   e8bd 81f0   ldmia.w sp!, {r4, r5, r6, r7, r8, pc}
 
   0x1920:   4638        mov r0, r7
-    1922:   f7ff ff45   bl 0x17b0               ; call function_e_64(a0)
-
+    1922:   f7ff ff45   bl 0x17b0               ; r1 = usb_get_ep_buff(endpoint num)
     1926:   4601        mov r1, r0
-    1928:   1ce0        adds r0, r4, #3
-    192a:   0882        lsrs r2, r0, #2
-    192c:   4640        mov r0, r8
-    192e:   f000 fab7   bl 0x1ea0               ; call function_84(a1, r0, (r4 + 3) << 2)
 
-    1932:   60ec        str r4, [r5, #12]
+    1928:   1ce0        adds r0, r4, #3
+    192a:   0882        lsrs r2, r0, #2         ; r2 = (length + 4) * 4
+    192c:   4640        mov r0, r8
+    192e:   f000 fab7   bl 0x1ea0               ; call word_copy(pointer, ep buffer, (length + 3) * 4)
+
+    ; Set TCNT and toggle NAKTX
+    1932:   60ec        str r4, [r5, #12]       ; [r5 + 0xc] = length
     1934:   2002        movs r0, #2
-    1936:   6028        str r0, [r5, #0]
+    1936:   6028        str r0, [r5 , #0]       ; [r5] = 2
     1938:   4620        mov r0, r4
     193a:   e7ef        b.n 0x191c              ; return
+
 
   0x193c:   4902        ldr r1, [pc, #8]    ; (0x1948)
     193e:   684a        ldr r2, [r1, #4]
     1940:   4302        orrs r2, r0
     1942:   604a        str r2, [r1, #4]
     1944:   4770        bx lr
-    1946:   0000        movs r0, r0
+    1946:   0000
 
   0x1948:   0x400a8000
 
@@ -3099,9 +3146,11 @@ usb_clear_csr:
 
   0x1a88:   0x400a8000
 
-    1a8c:   4801        ldr r0, [pc, #4]    ; (0x1a94)
-    1a8e:   f7ff bd08   b.w 0x14a2
-    1a92:   0000        movs r0, r0
+usb_intr:
+    ; Not sure if this is even called directly in the builtin firmware
+  0x1a8c:   4801        ldr r0, [pc, #4]        ; (0x1a94)
+    1a8e:   f7ff bd08   b.w 0x14a2              ; jump usb_entry
+    1a92:   0000
 
   0x1a94:   0x200000b8
 
@@ -3151,7 +3200,7 @@ watchdog_reload_timer:
   0x1afc:   0x5fa00001  ; Watchdog timer reload lock and set
   0x1b00:   0x40068000  ; WDT Registers
 
-crc_flash:
+flash_crc_cmd:
     ; r0 = crc
     ; r1 = start address
     ; r2 = length
@@ -3163,23 +3212,23 @@ crc_flash:
     ; Assuming this puts the crc into a response packet
     1b0c:   4601        mov r1, r0
     1b0e:   4804        ldr r0, [pc, #16]   ; r0 = (0x1b20)
-    1b10:   f7fe fc25   bl 0x35e            ; call function_14(pointer_b_1, r0)
+    1b10:   f7fe fc25   bl 0x35e            ; call function_14(pointer_b_1, crc)
 
-    1b14:   0a21        lsrs r1, r4, #8
+    1b14:   0a21        lsrs r1, r4, #8     ; r1 = r4 >> 8
     1b16:   4802        ldr r0, [pc, #8]    ; r0 = (0x1b20)
-    1b18:   f7fe fc21   bl 0x35e            ; call function_14(pointer_b_1, r0 >> 8)
+    1b18:   f7fe fc21   bl 0x35e            ; call function_14(pointer_b_1, crc >> 8)
 
     1b1c:   204f        movs r0, #79        ; return 0x4f
     1b1e:   bd10        pop {r4, pc}
 
   0x1b20:   0x200001bc  ; pointer_b_1
 
-erase_flash:
+flash_erase_cmd:
+    ; Erases pages of flash between given addresses
+    ; Only erases flash after 0x2800 (or 0xf800 in the main firmware, so prevents erasing itself)
     ; r0 = cancel if 10
     ; r1 = start address
     ; r2 = end address
-    ; Only erases flash after 0x2800 (this is 0xf800 in the main firmware, so
-    ; protects from overwriting self
     ; Return 0x4f on completion
     ; Return 0x46 on bad arguments
   0x1b24:   e92d 47f0   stmdb sp!, {r4, r5, r6, r7, r8, r9, sl, lr}
@@ -3221,15 +3270,14 @@ erase_flash:
 
   0x1b70: 0x20000048    ; byteswap_key
 
-usb_disconnect:
-    ; r0 unused
-    ; r1 unused
-    ; r2 unused
+disconnect_cmd:
+    ; This disables the USB D+ pull-up, which the PC reads as a disconnect
+    ; Then it just spins until the watchdog kills it
   0x1b74:   f7fe fab2   bl 0xdc                 ; call usb_disable_dppu()
   0x1b78:   e7fe        b.n 0x1b78              ; dead loop
     1b7a:   0000
 
-usb_read_write:
+flash_read_write_cmd:
     ; r0 =
     ; r1 = start address
     ; r2 = end address
@@ -3350,8 +3398,10 @@ usb_read_write:
     1c52:   4421        add r1, r4                  ; r1 += r4
     1c54:   2950        cmp r1, #80
     1c56:   d300        bcc.n 0x1c5a                ; allow if r1 < 0x50
+
     ; replace read word
     1c58:   2000        movs r0, #0                 ; r0 = 0
+
     ; store read word to USB SRAM
   0x1c5a:   f84b 0026   str.w r0, [fp, r6, lsl #2]  ; [fp + r6 << 2] = r0
     1c5e:   1c76        adds r6, r6, #1             ; r6++
@@ -3366,6 +3416,8 @@ usb_read_write:
     1c6e:   65c1        str r1, [r0, #92]           ; [r0 + 0x5c] = r1 = 0x40   Set ep3 count reg
     1c70:   2102        movs r1, #2
     1c72:   6501        str r1, [r0, #80]           ; [r0 + 0x50] = r1 = 2      Set ep3 control reg
+
+    ; wait loop
   0x1c74:   6d81        ldr r1, [r0, #88]           ; r1 = [r1 + 0x58]          Get ep3 status reg
     1c76:   06c9        lsls r1, r1, #27            ; r1 <<= 17
     1c78:   d5fc        bpl.n 0x1c74                ; loop until status ok
@@ -3385,16 +3437,19 @@ usb_read_write:
   0x1c98:   0xe0100000  ; end of PPB, reserved
   0x1c9c:   0x400a8000  ; USB registers
 
-function_e_77:
+update_start_cmd:
     ; r0 unused
     ; r1 unused
     ; r2 unused
   0x1ca0:   b510        push {r4, lr}
+
+    ; Write 64 bytes on endpoint 3 from pointer_b_6
     1ca2:   2240        movs r2, #64
     1ca4:   4904        ldr r1, [pc, #16]       ; r1 = (0x1cb8)
     1ca6:   2003        movs r0, #3
-    1ca8:   f7ff fe24   bl 0x18f4               ; call function_e_74(3, pointer_b_6, 64)
+    1ca8:   f7ff fe24   bl 0x18f4               ; call usb_copy_send(3, pointer_b_6, 64)
 
+    ; Resets the swap counter for firmware update decryption
     1cac:   4903        ldr r1, [pc, #12]       ; r1 = (0x1cbc) byteswap_key
     1cae:   f04f 30ff   mov.w r0, #4294967295
     1cb2:   6048        str r0, [r1, #4]        ; [r1 + 4] = 0xffffffff
@@ -3405,7 +3460,7 @@ function_e_77:
   0x1cb8:   0x20000620  ; pointer_b_6
   0x1cbc:   0x20000048  ; byteswap_key
 
-    1cc0:   b570        push {r4, r5, r6, lr}
+  0x1cc0:   b570        push {r4, r5, r6, lr}
     1cc2:   4604        mov r4, r0
     1cc4:   2000        movs r0, #0
     1cc6:   f7ff fd91   bl 0x17ec
@@ -3426,10 +3481,12 @@ function_e_77:
     1ce8:   6220        str r0, [r4, #32]
     1cea:   2002        movs r0, #2
     1cec:   f884 0024   strb.w r0, [r4, #36]    ; 0x24
+
     1cf0:   462a        mov r2, r5
     1cf2:   2000        movs r0, #0
     1cf4:   69e1        ldr r1, [r4, #28]
-    1cf6:   f7ff fdfd   bl 0x18f4               ; call function_e_74
+    1cf6:   f7ff fdfd   bl 0x18f4               ; call usb_copy_send(0, r5, [r4 + 0x1c])
+
     1cfa:   69e0        ldr r0, [r4, #28]
     1cfc:   4428        add r0, r5
     1cfe:   61e0        str r0, [r4, #28]
@@ -3604,24 +3661,27 @@ function_e_77:
     1e9a:   f7ff fc73   bl 0x1784
     1e9e:   e7e7        b.n 0x1e70
 
-function_84:
-    ; r0 =
-    ; r1 =
-    ; r2 =
+word_copy:
+    ; r0 = source
+    ; r1 = dest
+    ; r2 = length
   0x1ea0:   1e52        subs r2, r2, #1
-    1ea2:   d404        bmi.n 0x1eae
-    1ea4:   f850 3022   ldr.w r3, [r0, r2, lsl #2]
-    1ea8:   f841 3022   str.w r3, [r1, r2, lsl #2]
-    1eac:   e7f8        b.n 0x1ea0
-    1eae:   4770        bx lr
+    1ea2:   d404        bmi.n 0x1eae                ; return if r2 < 0
+    1ea4:   f850 3022   ldr.w r3, [r0, r2, lsl #2]  ; r3 = [r0 + (r2 * 4)]
+    1ea8:   f841 3022   str.w r3, [r1, r2, lsl #2]  ; [r1 + (r2 * 4)] = r3
+    1eac:   e7f8        b.n 0x1ea0                  ; loop
 
-function_83:
-  0x1eb0:   4902        ldr r1, [pc, #8]    ; (0x1ebc)
+  0x1eae:   4770        bx lr                       ; return
+
+usb_get_ep_reg:
+    ; Return the address of the registers for an endpoint
+    ; r0 = ep # (0-7)
+  0x1eb0:   4902        ldr r1, [pc, #8]            ; r1 = (0x1ebc)
     1eb2:   eb00 0080   add.w r0, r0, r0, lsl #2
-    1eb6:   eb01 0080   add.w r0, r1, r0, lsl #2
+    1eb6:   eb01 0080   add.w r0, r1, r0, lsl #2    ; r0 = r1 + (r0 * 0x14)
     1eba:   4770        bx lr
 
-  0x1ebc:   0x400a8014
+  0x1ebc:   0x400a8014  ; USB ep0 control reg
 
     1ec0:   e002        b.n 0x1ec8
     1ec2:   c808        ldmia r0!, {r3}
@@ -4107,12 +4167,12 @@ xor_key:
     21b8:   00 00 00 00
 
 update_handlers:
-  0x21bc:   25 1b 00 00     0x1b25  (erase_flash)
-    21c0:   7d 1b 00 00     0x1b7d  (usb_read_write)
-    21c4:   05 1b 00 00     0x1b05  (crc_flash)
-    21c8:   a1 1c 00 00     0x1ca1  (function_e_77)
-    21cc:   41 07 00 00     0x741   (do_soft_reset)
-    21d0:   75 1b 00 00     0x1b75  (usb_disconnect)
+  0x21bc:   25 1b 00 00     0x1b25  (flash_erase_cmd)
+    21c0:   7d 1b 00 00     0x1b7d  (flash_read_write_cmd)
+    21c4:   05 1b 00 00     0x1b05  (flash_crc_cmd)
+    21c8:   a1 1c 00 00     0x1ca1  (update_start_cmd)
+    21cc:   41 07 00 00     0x741   (reset_cmd)
+    21d0:   75 1b 00 00     0x1b75  (disconnect_cmd)
 
     21d4:   35 1e 1f 20
     21d8:   21 22 23 24
@@ -4171,16 +4231,19 @@ data_9:
     22a4:   00 40 0b 40     0x400b4000  ; GPIO C
     22a8:   00 01 00 00     0x100
 
+task_1:
   0x22ac:   cc 22 00 00
     22b0:   00 00 00 20
     22b4:   b8 00 00 00
     22b8:   c0 1e 00 00     0x1ec0
 
+task_2:
   0x22bc:   84 23 00 00
     22c0:   b8 00 00 20
     22c4:   20 0e 00 00
     22c8:   d0 1e 00 00     0x1ed0
 
+sram_init_data:
   0x22cc:   01 00 00 00
     22d0:   00 00 00 00
     22d4:   00 00 00 00

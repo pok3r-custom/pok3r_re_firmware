@@ -36,14 +36,16 @@ sram_init                           @ 0x2ddc
 sram_decode_static                  @ 0x2e00
 function_e_32                       @ 0x2e5c
 afio_exti_ssr_write                 @ 0x2f50
-function_e_1                        @ 0x2f78
+handle_update_packet                @ 0x2f78
     function_e_2
     crc16
     clear_two_words
     function_e_4
 function_e_33                       @ 0x3004
     clear_two_words_and_write_two_bytes
-enable_gpio_a_clock                 @ 0x3068
+reset_cmd                           @ 0x3068
+    ckcu_ahb_clock_enable
+    usb_disable_dppu
 function_e_99                       @ 0x30c8
 function_e_100                      @ 0x3250
     function_44
@@ -64,7 +66,7 @@ setup_afio_gpio                     @ 0x32d8
 function_e_34                       @ 0x338c
     usb_dp_pull_up
     spin_wait_maybe
-usb_disable_ddpu                    @ 0x339e
+usb_disable_dppu                    @ 0x339e
     usb_dp_pull_up
 clear_two_words                     @ 0x33a4
 clear_two_words_and_write_two_bytes @ 0x33ac
@@ -243,7 +245,7 @@ function_e_43                       @ 0x53e4
     function_13
     function_e_23
 function_e_44                       @ 0x5970
-    function_e_74
+    usb_copy_send
 function_63                         @ 0x59bc
     function_64
     ckcu_apb1_clock_enable
@@ -307,13 +309,16 @@ function_17                         @ 0x6624
     function_3
 clock_init                          @ 0x66b8
 function_e_56                       @ 0x6718
-    function_e_74
+    usb_copy_send
 function_e_57                       @ 0x6780
-    function_e_74
+    usb_copy_send
 function_68                         @ 0x6808
 function_69                         @ 0x6814
+
 function_70                         @ 0x6820
     function_71
+    handle_update_packet
+
 function_e_58                       @ 0x6854
     function_e_35
     clear_two_words
@@ -347,7 +352,7 @@ usb_entry                           @ 0x6af2
     function_e_63
     function_e_70
     function_e_72
-    function_e_74
+    usb_copy_send
     function_e_75
     function_e_79
 function_23                         @ 0x6ca8
@@ -371,26 +376,26 @@ function_e_60                       @ 0x6dcc
 function_e_61                       @ 0x6dd4
 function_e_62                       @ 0x6de4
 function_e_63                       @ 0x6df4
-function_e_64                       @ 0x6e00
+usb_get_ep_buff                       @ 0x6e00
 function_e_65                       @ 0x6e18
-    function_e_66
-function_e_66                       @ 0x6e3c
+    usb_get_ep_len
+usb_get_ep_len                       @ 0x6e3c
 function_e_67                       @ 0x6e4a
 function_e_68                       @ 0x6e64
-function_e_69                       @ 0x6e72
+usb_get_ep_tcnt                       @ 0x6e72
 function_e_70                       @ 0x6e84
 function_72                         @ 0x6eaa
-    function_e_64
+    usb_get_ep_buff
     function_e_65
-    function_e_69
+    usb_get_ep_tcnt
 function_71                         @ 0x6ee4
     function_72
 function_e_71                       @ 0x6f14
 function_e_72                       @ 0x6f24
 function_e_73                       @ 0x6f30
-function_e_74                       @ 0x6f44
-    function_e_66
-    function_e_64
+usb_copy_send                       @ 0x6f44
+    usb_get_ep_len
+    usb_get_ep_buff
 usb_enable_intr                     @ 0x6f8c
 function_e_75                       @ 0x6f9c
 usb_get_intr_flags                  @ 0x6fbc
@@ -410,18 +415,20 @@ usb_set_adrset                      @ 0x70c8
 usb_intr                            @ 0x70dc
 watchdog_init                       @ 0x70e8
 watchdog_reload_timer               @ 0x7144
-usb_disconnect                      @ 0x7154
-crc_flash                           @ 0x7158
+
+disconnect_cmd                      @ 0x7154
+flash_crc_cmd                       @ 0x7158
     crc16
     function_14
-erase_flash                         @ 0x7178
-usb_read_write                      @ 0x71b8
+flash_erase_cmd                     @ 0x7178
+flash_read_write_cmd                @ 0x71b8
     flash_get_protection_status
-function_e_77                       @ 0x729c
-    function_e_74
+update_start_cmd                    @ 0x729c
+    usb_copy_send
+
 function_e_78                       @ 0x72b0
-    function_e_66
-    function_e_74
+    usb_get_ep_len
+    usb_copy_send
     function_e_67
 function_e_79                       @ 0x7328
     usb_set_addr
@@ -430,8 +437,8 @@ function_e_80                       @ 0x7444
     function_e_73
     function_e_62
     function_e_61
-function_84                         @ 0x7490
-function_83                         @ 0x74a0
+word_copy                           @ 0x7490
+usb_get_ep_reg                      @ 0x74a0
 function_e_81_unsued                @ 0x74b0
 sram_stack_zero                     @ 0x74c0
 function_e_82                       @ 0x74d0

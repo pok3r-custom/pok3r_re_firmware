@@ -209,7 +209,8 @@ void fwDecode(ZBinary &bin){
 }
 
 void fwEncode(ZBinary &bin){
-    decode_package_scheme(bin);
+    encode_package_scheme(bin);
+    encode_firmware_scheme(bin);
 }
 
 // POK3R
@@ -223,7 +224,7 @@ void fwEncode(ZBinary &bin){
 #define V124_HASH       0x882CB0E4ECE25454
 #define V130_HASH       0x6CFF0BB4F4086C2F
 
-int decfw(ZPath exe, ZPath out){
+int decode_updater(ZPath exe, ZPath out){
     LOG("Extract from " << exe);
     ZFile file;
     if(!file.open(exe, ZFile::READ)){
@@ -380,17 +381,17 @@ int decfw(ZPath exe, ZPath out){
 
         sec_start += sec_len;
 
+        // Decode section
+        decode_package_scheme(sec);
+
         switch(type){
             case 1:
                 // Decrypt firmware
-                fwDecode(sec);
+                decode_firmware_scheme(sec);
                 break;
-
             case 2:
-                // Decode section
-                decode_package_scheme(sec);
+                // Don't know how to do this yet
                 break;
-
             default:
                 break;
         }
@@ -411,7 +412,11 @@ int decfw(ZPath exe, ZPath out){
     return 0;
 }
 
-int encfw(ZPath exein, ZPath fwin, ZPath exeout){
+int encode_image(ZPath fwin, ZPath fwout){
+
+}
+
+int encode_patch_updater(ZPath exein, ZPath fwin, ZPath exeout){
     LOG("Updater: " << exein);
     LOG("Decoded Firmware: " << fwin);
 
@@ -474,15 +479,23 @@ int main(int argc, char **argv){
         } else if(cmd == "decode"){
             // Decode firmware from updater executable
             if(argc > 3){
-                return decfw(ZString(argv[2]), ZString(argv[3]));
+                return decode_updater(ZString(argv[2]), ZString(argv[3]));
             } else {
                 LOG("Usage: pok3rtest decode <path to updater> <output>");
                 return 2;
             }
         } else if(cmd == "encode"){
-            // Encode firmware into updater executable
+            // Encode firmware to format accepted by Pok3r
             if(argc > 4){
-                return encfw(ZString(argv[2]), ZString(argv[3]), ZString(argv[4]));
+                return encode_image(ZString(argv[2]), ZString(argv[3]), ZString(argv[4]));
+            } else {
+                LOG("Usage: pok3rtest encode <path to updater> <path to firmware> <output updater>");
+                return 2;
+            }
+        } else if(cmd == "encodepatch"){
+            // Encode firmware abd patch into updater executable
+            if(argc > 4){
+                return encode_patch_updater(ZString(argv[2]), ZString(argv[3]), ZString(argv[4]));
             } else {
                 LOG("Usage: pok3rtest encode <path to updater> <path to firmware> <output updater>");
                 return 2;

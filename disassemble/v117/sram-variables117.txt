@@ -119,24 +119,42 @@ pointer_15                              @ 0x200000d8
     function_e_32
 
 pointer_20                              @ 0x200000dc
+    0x0:  w
     function_e_99
 pointer_28                              @ 0x200000e0
+    0x0:  w
     function_e_99
 pointer_17                              @ 0x200000e4
+    0x0:  w
     function_e_99
 pointer_26                              @ 0x200000fc
+    0x0:  w
     function_e_99
 pointer_6                               @ 0x20000100
-    0x0:
+    0x0:  h
     function_e_99
 pointer_8                               @ 0x20000104
+    0x0:  h
     function_e_99
 pointer_18                              @ 0x20000108
+    0x0:  w
     function_e_99
 pointer_19                              @ 0x2000010c
+    0x0:  w
     function_e_99
+
+pointer_41                              @ 0x200001cd
+    function_e_44
+pointer_42                              @ 0x200001ce
+    function_e_44
+
 pointer_27                              @ 0x200001d0
+    0x0:  w
     function_e_99
+
+pointer_40                              @ 0x200001d4
+    0x0:  b
+    function_e_44
 
 pointer_31                              @ 0x2000021c
     function_60

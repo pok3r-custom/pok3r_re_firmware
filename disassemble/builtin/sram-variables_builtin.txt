@@ -15,13 +15,15 @@ types:
     d   data address
     f   function address
 
+pointer_b_7                         @ 0x20000010
+
 pointer_b_2                         @ 0x20000024
 
 byteswap_key                        @ 0x20000048
     0x0:  w 0
         function_e_1
     0x4:  w packet counter (byteswap switch value) / 0xffffffff
-        function_e_77
+        update_start_cmd
 
 pointer_b_1                         @ 0x200001bc
     0x4:    offset
@@ -33,6 +35,8 @@ pointer_b_5                         @ 0x200001cc
     0x8:  w pointer
     0xc:  w
     pointer_e_2
+
+pointer_b_8                         @ 0x200001dc
 
 pointer_b_6                         @ 0x20000620
 
