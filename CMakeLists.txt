@@ -3,9 +3,9 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 
 PROJECT(Pok3r)
 
-ADD_SUBDIRECTORY(libchaos)
+ADD_SUBDIRECTORY(pok3rtool/libchaos)
 
-SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR})
+SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/pok3rtool)
 FIND_PACKAGE(LibUSB-1.0 REQUIRED)
 
 #FIND_PATH(LIBUSB_INCLUDE    NAMES libusb-1.0/libusb.h)
@@ -20,10 +20,12 @@ FIND_PACKAGE(LibUSB-1.0 REQUIRED)
 ### =================== SOURCES =================== ###
 
 SET(SOURCES
-    main.cpp
-    pok3r.h
-    pok3r.cpp
     README.md
+
+    pok3rtool/main.cpp
+    pok3rtool/pok3r.h
+    pok3rtool/pok3r.cpp
+
     disassemble/build.sh
     disassemble/unas.sh
 
