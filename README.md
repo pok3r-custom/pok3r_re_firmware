@@ -27,10 +27,9 @@ built-in firmware at the beginning of flash, so the main firmware can be overwri
 Since we couldn't get the firmware over USB, and we could only erase flash over JTAG, we wouldn't
 able to read it first, I looked for the firmware update in the updater program. Based loosely
 on the idea of Sprite's work [here](https://spritesmods.com/?art=rapidisnake), I extracted the
-"encrypted" firmware image from the Windows updater executable, looked like slightly patterned
-nonsense. Knowing what a vector table, ARM instructions, and blocks of zeroes should look like,
-I reverse engineered the simple byteswap and shift "encryption" that covered the firmware update
-and a chunk of strings in the updater, which really wasn't very hard.
+"encrypted" firmware image from the Windows updater executable, which looked like slightly
+patterned nonsense. Using a demo of IDA, I reverse engineered the simple byteswap and shift
+"encryption" that covered the firmware update and a chunk of strings in the updater.
 
 The resulting "decypted" firmware update had an intact vector table, and most of the later code
 looked fine, but there was a big chunk at the beginning that was trash. So, it is encrypted some
@@ -38,7 +37,7 @@ other way. This decrypted image was compared to the data send over USB during th
 they were identical, so the second decryption step is done on the keyboard.
 
 Fortuntely, I eventually came to a breakthrough. I found in the unobfuscated part of the firmware
-update code that test against the known read boundaries, 0x2800 and 0x2c00. The relevant code is at
+update code that tests against the known read boundaries, 0x2800 and 0x2c00. The relevant code is at
 0x7240 in the v117 disassembly, and the instruction that replaces forbidden bytes with zero is at
 0x725a. Replacing this single instruction with a NOP, re-"encrypting" the update with the
 reverse-engineered algorithm, patching the update back into the updater, crossing all the fingers,
@@ -50,7 +49,7 @@ submodule cloned, and libusb installed. It works on Linux, and ocassionally Wind
 
 This will attempt to read the 128K flash:
 
-    ./pok3rtest read pok3rdump_flash.bin
+    ./pok3rtest read 0x0 0x20000 pok3rdump_flash.bin
 
 Without the patch, it will read a lot of 0x00 and 0xFF. With the single-instruction patch, the
 tool will read back the entirety of flash, including the unencrypted firmware. Comparing this

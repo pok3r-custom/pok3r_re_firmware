@@ -114,6 +114,7 @@ int readfw(zu32 start, zu32 len, ZPath out){
 }
 
 /*  Decode the encryption scheme used by the updater program.
+ *  Produced from IDA disassembly in sub_401000 of v117 updater.
  *  First, swap the 1st and 4th bytes, every 5 bytes
  *  Second, reverse each pair of bytes
  *  Third, shift the bits in each byte, sub 7 from MSBs
@@ -300,7 +301,8 @@ void fwEncode(ZBinary &bin){
 #define V117_HASH       0xEA55CB190C35505F
 
 // POK3R RGB
-#define V130_HASH       0X6CFF0BB4F4086C2F
+#define V124_HASH       0x882cb0e4ece25454
+#define V130_HASH       0x6CFF0BB4F4086C2F
 
 #define FWU_START       0x1A3800
 #define STRINGS_LEN     0x4B8
@@ -313,47 +315,56 @@ int decfw(ZPath exe, ZPath out){
         return -1;
     }
 
+    zu64 exelen = file.fileSize();
     zu64 exehash = ZFile::fileHash(exe);
 
-    zu64 fw_start = FWU_START;
-    zu64 fw_len;
+    char type = 0;
+
+    zu64 strings_len;
     zu64 strings_start;
-    zu64 strings_len = STRINGS_LEN;
+    zu64 fw_len;
+
+    zu64 offset_company;
+    zu64 offset_product;
+    zu64 offset_desc;
+    zu64 offset_version;
+    zu64 offset_sig;
+
 
     switch(exehash){
         case V113_HASH:
-            fw_len = 0x5E03;
-            strings_start = 0x1A9604;
-            break;
         case V114_HASH:
-            fw_len = 0x624F;
-            strings_start = 0x1A9A50;
-            break;
         case V115_HASH:
-            fw_len = 0x645C;
-            strings_start = 0x1A9C5C;
-            break;
         case V116_HASH:
-            fw_len = 0x648C;
-            strings_start = 0x1A9C8C;
-            break;
         case V117_HASH:
-            fw_len = 0x64D4;
-            strings_start = 0x1A9CD4;
+            type = 1;
+            strings_len = 0x4B8;
+
+            offset_company = 0x10;
+            offset_product = 0x218;
+            offset_desc    = 0x424;
+            offset_version = 0x460;
+            offset_sig     = 0x4AE;
             break;
 
+        case V124_HASH:
         case V130_HASH:
-            fw_start =  0x2BE000;
-            fw_len =    39940 + 3024;
+            type = 2;
+            strings_len = 0xB24; // from IDA disassembly in sub_403830 of v130 updater
 
-            strings_start = 0x2C7C10;
-            strings_len = 3012;
+            offset_company = 0x22E;
+            offset_product = 0x436;
+            offset_desc    = 0;
+            offset_version = 0;
+            offset_sig     = 0xB19;
             break;
 
         default:
             ELOG("Unknown updater executable: " << ZString::ItoS(exehash, 16));
             return -2;
     }
+
+    strings_start = exelen - strings_len;
 
     // Read strings
     ZBinary strs;
@@ -374,43 +385,106 @@ int decfw(ZPath exe, ZPath out){
     ZString version;
 
     // Company name
-    company.parseUTF16((const zu16 *)(strs.raw() + 0x10), 0x200);
+    company.parseUTF16((const zu16 *)(strs.raw() + offset_company), 0x200);
     // Product name
-    product.parseUTF16((const zu16 *)(strs.raw() + 0x218), 0x200);
+    product.parseUTF16((const zu16 *)(strs.raw() + offset_product), 0x200);
     // Description
-    description.parseUTF16((const zu16 *)(strs.raw() + 0x424), 0x20);
+    description.parseUTF16((const zu16 *)(strs.raw() + offset_desc), 0x20);
     // Version
-    version = ZString(strs.raw() + 0x460, 12);
+    version = ZString(strs.raw() + offset_version, 12);
 
-    LOG("Company: " << company);
-    LOG("Product: " << product);
+    LOG("Company:     " << company);
+    LOG("Product:     " << product);
     LOG("Description: " << description);
-    LOG("Version: " << version);
+    LOG("Version:     " << version);
 
-    LOG("String Dump:");
-    RLOG(strs.dumpBytes(4, 8));
+    LOG("Signature:   " << ZString(strs.raw() + offset_sig, strings_len - offset_sig));
 
-    // Read firmware
-    ZBinary fw;
-    if(file.seek(fw_start) != fw_start){
-        LOG("File too short - seek");
-        return -2;
+//    LOG("String Dump:");
+//    RLOG(strs.dumpBytes(4, 8));
+
+    // Decode other encrypted sections
+
+    zu64 total = strings_len;
+    ZArray<zu64> sections;
+
+    switch(type){
+        case 1:
+            fw_len = ZBinary::decle32(strs.raw() + 0x420); // Firmware location
+            total += fw_len;
+                sections.push(fw_len);
+            break;
+
+        case 2: {
+            zu64 start = 0xAC8 - (0x50 * 8);
+            for(zu8 i = 0; i < 8; ++i){
+                zu32 fwl = ZBinary::decle32(strs.raw() + start);
+                zu32 strl = ZBinary::decle32(strs.raw() + start + 4);
+                total += fwl;
+                total += strl;
+                sections.push(fwl);
+                sections.push(strl);
+                start += 0x50;
+            }
+            break;
+        }
+
+        default:
+            return -4;
+            break;
     }
-    if(file.read(fw, fw_len) != fw_len){
-        LOG("File too short - read");
-        return -3;
+
+    zu64 sec_start = exelen - total;
+    LOG("Section Count: " << sections.size());
+
+    for(zu64 i = 0; i < sections.size(); ++i){
+        zu64 sec_len = sections[i];
+        if(sec_len == 0)
+            continue;
+
+        LOG("Section: " << i);
+        LOG("  Section Length: 0x" << ZString::ItoS(sec_len, 16));
+
+        // Read section
+        ZBinary sec;
+        if(file.seek(sec_start) != sec_start){
+            LOG("File too short - seek");
+            return -2;
+        }
+        if(file.read(sec, sec_len) != sec_len){
+            LOG("File too short - read");
+            return -3;
+        }
+
+        sec_start += sec_len;
+
+        switch(type){
+            case 1:
+                // Decrypt firmware
+                fwDecode(sec);
+                break;
+
+            case 2:
+                // Decode section
+                decode_package_scheme(sec);
+                break;
+
+            default:
+                break;
+        }
+
+//        LOG("Section Dump:");
+//        RLOG(sec.dumpBytes(4, 8, 0));
+
+        ZPath secout = out;
+        if(type == 2)
+            secout.last() = out.getName() + "-" + i + out.getExtension();
+        LOG("  Section Output: " << secout);
+
+        // Write firmware
+        ZFile fwout(secout, ZFile::WRITE);
+        fwout.write(sec);
     }
-
-    // Decrypt firmware
-    fwDecode(fw);
-    // Write firmware
-    ZFile fwout(out, ZFile::WRITE);
-    fwout.write(fw);
-
-    LOG("Firmware Dump:");
-    RLOG(fw.dumpBytes(4, 8, 0));
-
-    LOG("Output: " << out);
 
     return 0;
 }
