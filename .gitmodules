@@ -1,0 +1,4 @@
+[submodule "pok3rtool/libchaos"]
+	path = pok3rtool/libchaos
+	url = https://github.com/ChaoticConundrum/libchaos.git
+	branch = patches/pok3r
