@@ -3,39 +3,6 @@
 #include "zfile.h"
 #include "zhash.h"
 
-// XOR encryption/decryption key
-// Found at 0x2188 in Pok3r flash
-static const zbyte xor_key_bytes[] = {
-    0xaa,0x55,0xaa,0x55,
-    0x55,0xaa,0x55,0xaa,
-    0xff,0x00,0x00,0x00,
-    0x00,0xff,0x00,0x00,
-    0x00,0x00,0xff,0x00,
-    0x00,0x00,0x00,0xff,
-    0x00,0x00,0x00,0x00,
-    0xff,0xff,0xff,0xff,
-    0x0f,0x0f,0x0f,0x0f,
-    0xf0,0xf0,0xf0,0xf0,
-    0xaa,0xaa,0xaa,0xaa,
-    0x55,0x55,0x55,0x55,
-    0x00,0x00,0x00,0x00,
-};
-static const zu32 xor_key_words[] = {
-    0x55aa55aa,
-    0xaa55aa55,
-    0x000000ff,
-    0x0000ff00,
-    0x00ff0000,
-    0xff000000,
-    0x00000000,
-    0xffffffff,
-    0x0f0f0f0f,
-    0xf0f0f0f0,
-    0xaaaaaaaa,
-    0x55555555,
-    0x00000000,
-};
-
 int readver(){
     LOG("Looking for Vortex Pok3r...");
     Pok3r pok3r;
@@ -166,7 +133,28 @@ void encode_package_scheme(ZBinary &bin){
     }
 }
 
-const char frizz[] = {
+// XOR encryption/decryption key
+// Found at 0x2188 in Pok3r flash
+static const zu32 xor_key[] = {
+    0x55aa55aa,
+    0xaa55aa55,
+    0x000000ff,
+    0x0000ff00,
+    0x00ff0000,
+    0xff000000,
+    0x00000000,
+    0xffffffff,
+    0x0f0f0f0f,
+    0xf0f0f0f0,
+    0xaaaaaaaa,
+    0x55555555,
+    0x00000000,
+};
+
+// This array was painstakingly translated from a switch with a lot of shifts the firmware.
+// I noticed after the fact that it was identical to the array that Sprite used in his hack,
+// but the group of offsets were in a rotated order. Oh well.
+const zu8 swap_key[] = {
     0,1,2,3,
     1,2,3,0,
     2,1,3,0,
@@ -180,101 +168,32 @@ const char frizz[] = {
 void decode_firmware_packet(zbyte *data, zu32 num){
     zu32 *words = (zu32*)data;
 
+    // XOR decryption
     for(int i = 0; i < 13; ++i){
-        // XOR with key
-        words[i] = words[i] ^ xor_key_words[i];
+        words[i] = words[i] ^ xor_key[i];
     }
 
-    zbyte buff[52];
-    zbyte *o = buff;
-    const char *f = frizz + ((num & 7) << 2);
+    // Swap decryption
+    zu8 f = (num & 7) << 2;
+    for(int i = 0; i < 52; i+=4){
+        zbyte a = data[i + swap_key[f + 0]];
+        zbyte b = data[i + swap_key[f + 1]];
+        zbyte c = data[i + swap_key[f + 2]];
+        zbyte d = data[i + swap_key[f + 3]];
 
-    for(int i = 0; i < 13; ++i){
-        zbyte *p = data + (i << 2);
-        const char *g = f;
-
-        *o++ = p[*g++];
-        *o++ = p[*g++];
-        *o++ = p[*g++];
-        *o++ = p[*g++];
-
-        continue;
-
-
-        zu32 a = words[i] &       0xff; // lsb
-        zu32 b = words[i] &     0xff00;
-        zu32 c = words[i] &   0xff0000;
-        zu32 d = words[i] & 0xff000000; // msb
-
-        // Swap bytes on counter
-        switch(num & 7){
-            case 1:
-                a <<= 24;
-                b >>= 8;
-                c >>= 8;
-                d >>= 8;
-                o[0] = p[1];
-                o[1] = p[2];
-                o[2] = p[3];
-                o[3] = p[0];
-                break;
-            case 2:
-                a <<= 24;
-                b = b;
-                c >>= 16;
-                d >>= 8;
-                o[0] = p[2];
-                o[1] = p[1];
-                o[2] = p[3];
-                o[3] = p[0];
-                break;
-            case 3:
-                a <<= 16;
-                b <<= 8;
-                c >>= 8;
-                d >>= 24;
-                break;
-            case 4:
-                a <<= 16;
-                b = b;
-                c <<= 8;
-                d >>= 24;
-                break;
-            case 5:
-                a <<= 16;
-                b >>= 8;
-                c >>= 8;
-                d = d;
-                break;
-            case 6:
-                a <<= 24;
-                b <<= 8;
-                c >>= 16;
-                d >>= 16;
-                break;
-            case 7:
-                a = a;
-                b <<= 8;
-                c >>= 8;
-                d = d;
-                break;
-            default:
-                break;
-        }
-
-        words[i] = a | b | c | d;
+        data[i + 0] = a;
+        data[i + 1] = b;
+        data[i + 2] = c;
+        data[i + 3] = d;
     }
-
-    memcpy(data, o, 64);
 }
 
 // Decode the encryption scheme used by the firmware
 void decode_firmware_scheme(ZBinary &bin){
     zu32 count = 0;
-    zs32 swap = 1;
     for(zu32 offset = 0; offset < bin.size(); offset += 52){
         if(count >= 10 && count <= 100){
-            decode_firmware_packet(bin.raw() + offset, (zu32)(++swap));
+            decode_firmware_packet(bin.raw() + offset, count);
         }
         count++;
     }
@@ -286,7 +205,7 @@ void encode_firmware_scheme(ZBinary &bin){
 
 void fwDecode(ZBinary &bin){
     decode_package_scheme(bin);
-//    decode_firmware_scheme(bin);
+    decode_firmware_scheme(bin);
 }
 
 void fwEncode(ZBinary &bin){
@@ -301,11 +220,8 @@ void fwEncode(ZBinary &bin){
 #define V117_HASH       0xEA55CB190C35505F
 
 // POK3R RGB
-#define V124_HASH       0x882cb0e4ece25454
+#define V124_HASH       0x882CB0E4ECE25454
 #define V130_HASH       0x6CFF0BB4F4086C2F
-
-#define FWU_START       0x1A3800
-#define STRINGS_LEN     0x4B8
 
 int decfw(ZPath exe, ZPath out){
     LOG("Extract from " << exe);
@@ -326,7 +242,6 @@ int decfw(ZPath exe, ZPath out){
 
     zu64 offset_company;
     zu64 offset_product;
-    zu64 offset_desc;
     zu64 offset_version;
     zu64 offset_sig;
 
@@ -342,7 +257,6 @@ int decfw(ZPath exe, ZPath out){
 
             offset_company = 0x10;
             offset_product = 0x218;
-            offset_desc    = 0x424;
             offset_version = 0x460;
             offset_sig     = 0x4AE;
             break;
@@ -354,7 +268,6 @@ int decfw(ZPath exe, ZPath out){
 
             offset_company = 0x22E;
             offset_product = 0x436;
-            offset_desc    = 0;
             offset_version = 0;
             offset_sig     = 0xB19;
             break;
@@ -381,21 +294,17 @@ int decfw(ZPath exe, ZPath out){
 
     ZString company;
     ZString product;
-    ZString description;
     ZString version;
 
     // Company name
     company.parseUTF16((const zu16 *)(strs.raw() + offset_company), 0x200);
     // Product name
     product.parseUTF16((const zu16 *)(strs.raw() + offset_product), 0x200);
-    // Description
-    description.parseUTF16((const zu16 *)(strs.raw() + offset_desc), 0x20);
     // Version
     version = ZString(strs.raw() + offset_version, 12);
 
     LOG("Company:     " << company);
     LOG("Product:     " << product);
-    LOG("Description: " << description);
     LOG("Version:     " << version);
 
     LOG("Signature:   " << ZString(strs.raw() + offset_sig, strings_len - offset_sig));
@@ -409,21 +318,34 @@ int decfw(ZPath exe, ZPath out){
     ZArray<zu64> sections;
 
     switch(type){
-        case 1:
-            fw_len = ZBinary::decle32(strs.raw() + 0x420); // Firmware location
+        case 1: {
+            fw_len = ZBinary::decle32(strs.raw() + 0x420); // Firmware length
+
+            ZString layout;
+            layout.parseUTF16((const zu16 *)(strs.raw() + 0x424), 0x20);
+            LOG("Layout: " << layout);
+
             total += fw_len;
-                sections.push(fw_len);
+            sections.push(fw_len);
             break;
+        }
 
         case 2: {
             zu64 start = 0xAC8 - (0x50 * 8);
             for(zu8 i = 0; i < 8; ++i){
-                zu32 fwl = ZBinary::decle32(strs.raw() + start);
-                zu32 strl = ZBinary::decle32(strs.raw() + start + 4);
-                total += fwl;
-                total += strl;
-                sections.push(fwl);
-                sections.push(strl);
+                zu32 fwl = ZBinary::decle32(strs.raw() + start); // Firmware length
+                zu32 strl = ZBinary::decle32(strs.raw() + start + 4); // Info length
+
+                if(fwl){
+                    ZString layout;
+                    layout.parseUTF16((const zu16 *)(strs.raw() + start + 8), 0x20);
+                    LOG("Layout " << i << ": " << layout);
+
+                    total += fwl;
+                    total += strl;
+                    sections.push(fwl);
+                    sections.push(strl);
+                }
                 start += 0x50;
             }
             break;
@@ -511,7 +433,7 @@ int encfw(ZPath exein, ZPath fwin, ZPath exeout){
     fwEncode(fwbin);
 
     // Write encoded firmware onto exe
-    exebin.seek(FWU_START);
+    exebin.seek(0x1A3800);
     exebin.write(fwbin);
 
     ZFile exefile;
