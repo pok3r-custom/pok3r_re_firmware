@@ -42,8 +42,10 @@ bool Pok3r::findPok3r(){
 }
 
 bool Pok3r::open(){
-    if(!device)
+    if(!device){
+        ELOG("No device");
         return false;
+    }
 
     // Open device handle
     int status = libusb_open(device, &handle);
@@ -123,7 +125,10 @@ bool Pok3r::resetToLoader(){
 
     // Open new handle
     LOG("Open...");
-    open();
+    if(!open()){
+        ELOG("Open error");
+        return false;
+    }
 
     return true;
 }
@@ -211,6 +216,9 @@ bool Pok3r::sendCmd(zu8 cmd, zu8 subcmd, zu32 a1, zu32 a2, const zbyte *data, zu
     packet.seek(2);
     packet.writeleu16(crc16(packet.raw(), PKT_LEN)); // CRC
 
+    // debug
+    RLOG(packet.dumpBytes(4, 8));
+
     // Send command (interrupt write)
     int olen;
     int status = libusb_interrupt_transfer(handle,
@@ -250,6 +258,10 @@ bool Pok3r::recvDat(zbyte *data){
         ELOG("Failed to recv: length " << olen);
         return false;
     }
+
+    // debug
+    RLOG(ZBinary(data, PKT_LEN).dumpBytes(4, 8));
+
     return true;
 }
 
@@ -296,11 +308,11 @@ bool Pok3r::releaseInterface(int interface){
     if(claimed[interface]){
         // Release interface
         int status = libusb_release_interface(handle, interface);
+        claimed[interface] = false;
         if(status != 0){
-            ELOG("Failed to release interface: " << libusb_error_name(status));
+            //ELOG("Failed to release interface: " << libusb_error_name(status));
             return false;
         }
-        claimed[interface] = false;
     }
     return true;
 }

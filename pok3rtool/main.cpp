@@ -2,56 +2,49 @@
 #include "zlog.h"
 #include "zfile.h"
 #include "zhash.h"
+#include <stdio.h>
 
 int readversion(){
-    LOG("Looking for Vortex Pok3r...");
     Pok3r pok3r;
-    if(pok3r.findPok3r()){
-        if(pok3r.open()){
-            LOG("Found: " << pok3r.getVersion());
-            return 0;
-        } else {
-            LOG("Failed to Open");
-            return -2;
-        }
-    } else {
-        LOG("Not Found");
+    LOG("Looking for Vortex Pok3r...");
+    if(!pok3r.findPok3r())
         return -1;
-    }
+    LOG("Open...");
+    if(!pok3r.open())
+        return -2;
+    LOG("Found: " << pok3r.getVersion());
+    return 0;
 }
 
 int writeversion(ZString version){
     LOG("Looking for Vortex Pok3r...");
     Pok3r pok3r;
-    if(pok3r.findPok3r()){
-        if(pok3r.open()){
-            LOG("Found: " << pok3r.getVersion());
-
-            LOG("Reset to Loader");
-            if(!pok3r.resetToLoader()){
-                ELOG("Reset error");
-                return -4;
-            }
-
-            LOG("Write Version: " << version);
-            ZBinary data;
-            data.writeleu32(version.size());
-            data.write(version.bytes(), version.size());
-            if(!pok3r.writeFlash(0x2800, data)){
-                LOG("Version write error");
-                return -3;
-            }
-
-            LOG("Read Version: " << pok3r.getVersion());
-            return 0;
-        } else {
-            LOG("Failed to Open");
-            return -2;
-        }
-    } else {
-        LOG("Not Found");
+    if(!pok3r.findPok3r())
         return -1;
+    LOG("Open...");
+    if(!pok3r.open())
+        return -2;
+
+    LOG("Version: " << pok3r.getVersion());
+
+    LOG("Reset to Loader");
+    if(!pok3r.resetToLoader()){
+        ELOG("Reset error");
+        return -4;
     }
+
+    LOG("Write Version: " << version);
+    ZBinary data;
+    data.fill(0, 52);
+    data.writeleu32(version.size());
+    data.write(version.bytes(), version.size());
+    if(!pok3r.writeFlash(0x2800, data)){
+        LOG("Version write error");
+        return -3;
+    }
+
+    LOG("Read Version: " << pok3r.getVersion());
+    return 0;
 }
 
 
@@ -62,6 +55,7 @@ int bootloader(){
         ELOG("Not Found");
         return -1;
     }
+    LOG("Open...");
     if(!pok3r.open()){
         ELOG("Failed to Open");
         return -2;

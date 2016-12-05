@@ -119,6 +119,7 @@ public:
     //! Close USB device.
     void close();
 
+    //! Reset to loader and re-open device.
     bool resetToLoader();
 
     //! Read the firmware version from the keyboard.
@@ -132,10 +133,13 @@ public:
     //! Write 52 bytes at \a addr.
     bool writeFlash(zu32 addr, ZBinary bin);
 
+    //! Send CRC command.
     zu16 crcFlash(zu32 addr, zu32 len);
 
+    //! Send update start command, get response.
     bool updateStart(ZBinary &bin);
 
+    //! Send reset command.
     bool reset(zu8 subcmd);
 
 private:
@@ -144,6 +148,7 @@ private:
     //! Receive data (64 bytes)
     bool recvDat(zbyte *data);
 
+    //! Find a usb device with \a vid and \a pid.
     bool findUSBVidPid(zu16 vid, zu16 pid);
 
     bool claimInterface(int interface);
