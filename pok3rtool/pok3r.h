@@ -8,7 +8,8 @@
 using namespace LibChaos;
 
 #define HOLTEK_VID          0x04d9
-#define VORTEX_POK3R_PID    0x0141
+#define POK3R_PID           0x0141
+#define POK3R_BOOT_PID      0x1141
 
 #define SEND_EP             4
 #define RECV_EP             3
@@ -34,8 +35,8 @@ using namespace LibChaos;
 #define UPDATE_START_CMD        3   // Start update
 
 #define RESET_CMD               4   // Reset processor
-#define RESET_BUILTIN_SUBCMD    1   // Reset to builtin firmware
 #define RESET_BOOT_SUBCMD       0   // Reset to opposite firmware (main -> builtin, builtin -> main)
+#define RESET_BUILTIN_SUBCMD    1   // Reset to builtin firmware
 
 #define DISCONNECT_CMD          5   // Only in builtin firmware, disconnect USB and force reset
 
@@ -118,9 +119,17 @@ public:
     //! Close USB device.
     void close();
 
-    //! Read 64 bytes at address from the keyboard, and write into bin.
+    bool resetToLoader();
+
+    //! Read the firmware version from the keyboard.
+    ZString getVersion();
+
+    //! Erase flash pages starting at \a start, ending on the page of \a end.
+    bool eraseFlash(zu32 start, zu32 end);
+
+    //! Read 64 bytes at \a addr.
     bool readFlash(zu32 addr, ZBinary &bin);
-    //! Write 52 bytes at address to the keyboard.
+    //! Write 52 bytes at \a addr.
     bool writeFlash(zu32 addr, ZBinary bin);
 
     zu16 crcFlash(zu32 addr, zu32 len);
@@ -129,14 +138,13 @@ public:
 
     bool reset(zu8 subcmd);
 
-    //! Read the firmware version from the keyboard.
-    ZString getVersion();
-
 private:
     //! Send command
     bool sendCmd(zu8 cmd, zu8 subcmd, zu32 a1, zu32 a2, const zbyte *data, zu8 len);
     //! Receive data (64 bytes)
     bool recvDat(zbyte *data);
+
+    bool findUSBVidPid(zu16 vid, zu16 pid);
 
     bool claimInterface(int interface);
     bool releaseInterface(int interface);

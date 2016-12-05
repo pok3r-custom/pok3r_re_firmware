@@ -3716,13 +3716,14 @@ main:
     ; This firmware is mainly for updating the main firmware
     ; It looks this firmware includes a minimal fallback keyboard
 
-    ; If the SBVT1 register indicates the jump already failed, continue
+    ; If the SBVT1 register indicates intentional reset, continue
     ; The SP, PC and version strings are checked, if invalid, continue
+
   0x1ee0:   4827        ldr r0, [pc, #156]      ; r0 = (0x1f80)
     1ee2:   6800        ldr r0, [r0, #0]
     1ee4:   4927        ldr r1, [pc, #156]      ; r1 = (0x1f84)
     ; Check if SBVT1 is 0x55aafaf5
-    ; If it is, firmware did not jump to main firmware
+    ; If it is, reset was requested, so continue
     1ee6:   4288        cmp r0, r1
     1ee8:   d00f        beq.n 0x1f0a            ; branch if r0 == r1
 
@@ -3744,7 +3745,7 @@ main:
     1f06:   f7fe f89f   bl 0x48                 ; call load_jump_fw(0x2c00)
     ; never returns
 
-    ; Unable to jump to main firmware, just run here
+    ; Continue builtin firmware
   0x1f0a:   f7fe f9a7   bl 0x25c                ; call setup_afio_gpio()
     1f0e:   f7fe fcf5   bl 0x8fc                ; call function_b_1()
     1f12:   2001        movs r0, #1

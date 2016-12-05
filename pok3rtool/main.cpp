@@ -3,7 +3,7 @@
 #include "zfile.h"
 #include "zhash.h"
 
-int readver(){
+int readversion(){
     LOG("Looking for Vortex Pok3r...");
     Pok3r pok3r;
     if(pok3r.findPok3r()){
@@ -20,13 +20,29 @@ int readver(){
     }
 }
 
-int crcflash(){
+int writeversion(ZString version){
     LOG("Looking for Vortex Pok3r...");
     Pok3r pok3r;
     if(pok3r.findPok3r()){
         if(pok3r.open()){
-            zu32 len = pok3r.crcFlash(0x0, 0x100);
-            LOG(len);
+            LOG("Found: " << pok3r.getVersion());
+
+            LOG("Reset to Loader");
+            if(!pok3r.resetToLoader()){
+                ELOG("Reset error");
+                return -4;
+            }
+
+            LOG("Write Version: " << version);
+            ZBinary data;
+            data.writeleu32(version.size());
+            data.write(version.bytes(), version.size());
+            if(!pok3r.writeFlash(0x2800, data)){
+                LOG("Version write error");
+                return -3;
+            }
+
+            LOG("Read Version: " << pok3r.getVersion());
             return 0;
         } else {
             LOG("Failed to Open");
@@ -36,6 +52,28 @@ int crcflash(){
         LOG("Not Found");
         return -1;
     }
+}
+
+
+int bootloader(){
+    LOG("Looking for Vortex Pok3r...");
+    Pok3r pok3r;
+    if(!pok3r.findPok3r()){
+        ELOG("Not Found");
+        return -1;
+    }
+    if(!pok3r.open()){
+        ELOG("Failed to Open");
+        return -2;
+    }
+
+    LOG("Reset to Loader");
+    if(!pok3r.reset(RESET_BUILTIN_SUBCMD)){
+        ELOG("Send error");
+        return -3;
+    }
+
+    return 0;
 }
 
 // Flash
@@ -65,10 +103,6 @@ int readfw(zu32 start, zu32 len, ZPath out){
         if(pok3r.open()){
 
             ZBinary data;
-//            if(!pok3r.updateStart(data))
-//                ELOG("Update start error");
-//            RLOG(data.dumpBytes());
-//            data.clear();
 
             LOG("Reading 0x" << ZString::ItoS((zu64)start, 16) << ", " << len << " bytes");
             for(zu64 o = 0; o < len; o += 64){
@@ -80,6 +114,90 @@ int readfw(zu32 start, zu32 len, ZPath out){
             LOG("Size: " << data.size());
             RLOG(data.dumpBytes(4, 8, start));
             ZFile::writeBinary(out, data);
+            return 0;
+        } else {
+            LOG("Failed to Open");
+            return -2;
+        }
+    } else {
+        LOG("Not Found");
+        return -1;
+    }
+}
+
+int flashfw(ZString version, ZPath fw){
+    LOG("Looking for Vortex Pok3r...");
+    Pok3r pok3r;
+    if(!pok3r.findPok3r()){
+        ELOG("Not Found");
+        return -1;
+    }
+    if(!pok3r.open()){
+        ELOG("Failed to Open");
+        return -2;
+    }
+
+    // Read firmware
+    ZBinary fwbin;
+    if(!ZFile::readBinary(fw, fwbin)){
+        LOG("Failed to read file");
+        return -3;
+    }
+
+    // Reset to loader
+    if(!pok3r.reset(RESET_BUILTIN_SUBCMD)){
+        ELOG("Reset error");
+        return -4;
+    }
+
+    // Start update
+    ZBinary data;
+    if(!pok3r.updateStart(data)){
+        ELOG("Update start error");
+        return -5;
+    }
+    RLOG(data.dumpBytes());
+
+    // Erase firmware
+    if(!pok3r.eraseFlash(0x2800, 0xf408)){
+        ELOG("Erase flash error");
+        return -6;
+    }
+
+    // Write firmware
+    LOG("Writing " << fwbin.size() << " bytes");
+    for(zu64 o = 0; o < fwbin.size(); o += 52){
+        if(!pok3r.writeFlash(0x2c00 + o, fwbin)){
+            LOG("Error writing: 0x" << ZString::ItoS(0x2c00 + o, 16));
+            return -7;
+        }
+    }
+
+    // Write version number
+    data.clear();
+    data.writeleu32(version.size());
+    data.write(version.bytes(), version.size());
+    if(!pok3r.writeFlash(0x2800, data)){
+        LOG("Version write error");
+        return -7;
+    }
+
+    // Reset to firmware
+    if(!pok3r.reset(RESET_BOOT_SUBCMD)){
+        ELOG("Reset error");
+        return -8;
+    }
+
+    return 0;
+}
+
+int crcflash(){
+    LOG("Looking for Vortex Pok3r...");
+    Pok3r pok3r;
+    if(pok3r.findPok3r()){
+        if(pok3r.open()){
+            zu32 len = pok3r.crcFlash(0x0, 0x100);
+            LOG(len);
             return 0;
         } else {
             LOG("Failed to Open");
@@ -519,7 +637,21 @@ int main(int argc, char **argv){
         ZString cmd = argv[1];
         if(cmd == "version"){
             // Read version from Pok3r
-            return readver();
+            return readversion();
+
+        } else if(cmd == "setversion"){
+            // Write version on Pok3r
+            if(argc > 2){
+                return writeversion(argv[2]);
+            } else {
+                LOG("Usage: pok3rtest setversion <version>");
+                return 2;
+            }
+
+        } else if(cmd == "loader"){
+            // Boot to loader
+            return bootloader();
+
         } else if(cmd == "read"){
             // Read bytes from Pok3r
             if(argc > 4){
@@ -530,6 +662,7 @@ int main(int argc, char **argv){
                 LOG("Usage: pok3rtest read <start address> <length> <output.bin>");
                 return 2;
             }
+
         } else if(cmd == "decode"){
             // Decode firmware from updater executable
             if(argc > 3){
@@ -538,6 +671,7 @@ int main(int argc, char **argv){
                 LOG("Usage: pok3rtest decode <path to updater> <output>");
                 return 2;
             }
+
         } else if(cmd == "encode"){
             // Encode firmware to format accepted by Pok3r
             if(argc > 3){
@@ -546,6 +680,7 @@ int main(int argc, char **argv){
                 LOG("Usage: pok3rtest encode <path to firmware image> <output>");
                 return 2;
             }
+
         } else if(cmd == "encodepatch"){
             // Encode firmware abd patch into updater executable
             if(argc > 4){
@@ -554,9 +689,11 @@ int main(int argc, char **argv){
                 LOG("Usage: pok3rtest encodepatch <path to updater> <path to firmware> <output updater>");
                 return 2;
             }
+
         } else if(cmd == "crc"){
             // CRC
             return crcflash();
+
         } else {
             LOG("Unknown Command \"" << cmd << "\"");
             return 1;

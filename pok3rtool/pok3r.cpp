@@ -37,31 +37,8 @@ Pok3r::~Pok3r(){
 }
 
 bool Pok3r::findPok3r(){
-    if(!context)
-        return false;
-
-    // List devices
-    libusb_device **devices;
-    int status = libusb_get_device_list(context, &devices);
-    if(status < 0){
-        ELOG("Failed to get device list: " << libusb_error_name(status));
-    } else {
-        for(int i = 0; devices[i] != NULL; ++i){
-            // Get device descriptor (can't fail)
-            struct libusb_device_descriptor desc;
-            libusb_get_device_descriptor(devices[i], &desc);
-            // Check vid and pid
-            if(desc.idVendor == HOLTEK_VID && desc.idProduct == VORTEX_POK3R_PID){
-                LOG("Found Holtek ID " << ZString::ItoS((zu64)desc.idVendor, 16, 4) << ":" << ZString::ItoS((zu64)desc.idProduct, 16, 4));
-                device = devices[i];
-                // Reference device so it is not freed by libusb
-                libusb_ref_device(device);
-                break;
-            }
-        }
-    }
-    libusb_free_device_list(devices, 1);
-    return (device ? true : false);
+    // Open device with known vid and pid
+    return findUSBVidPid(HOLTEK_VID, POK3R_PID);
 }
 
 bool Pok3r::open(){
@@ -123,6 +100,49 @@ void Pok3r::close(){
     }
 }
 
+bool Pok3r::resetToLoader(){
+    // Reset
+    LOG("Reset...");
+    if(!reset(RESET_BUILTIN_SUBCMD)){
+        ELOG("Reset send error");
+        return false;
+    }
+
+    LOG("Wait...");
+    ZThread::sleep(3);
+
+    // Close old handle
+    close();
+
+    // Find device with new loader vid and pid
+    LOG("Find...");
+    if(!findUSBVidPid(HOLTEK_VID, POK3R_BOOT_PID)){
+        ELOG("Couldn't open device");
+        return false;
+    }
+
+    // Open new handle
+    LOG("Open...");
+    open();
+
+    return true;
+}
+
+ZString Pok3r::getVersion(){
+    ZBinary bin;
+    if(readFlash(VER_ADDR, bin)){
+        return ZString(bin.raw() + 4);
+    }
+    return "NONE";
+}
+
+bool Pok3r::eraseFlash(zu32 start, zu32 end){
+    // Send command
+    if(!sendCmd(ERASE_CMD, 0, start, end, nullptr, 0))
+        return false;
+    return true;
+}
+
 bool Pok3r::readFlash(zu32 addr, ZBinary &bin){
     // Send command
     if(!sendCmd(FLASH_CMD, FLASH_READ_SUBCMD, addr, addr + 64, nullptr, 0))
@@ -138,8 +158,10 @@ bool Pok3r::readFlash(zu32 addr, ZBinary &bin){
 }
 
 bool Pok3r::writeFlash(zu32 addr, ZBinary bin){
+    if(!bin.size())
+        return false;
     // Send command
-    if(!sendCmd(FLASH_CMD, FLASH_WRITE_SUBCMD, addr, addr + 52, bin.raw(), bin.size()))
+    if(!sendCmd(FLASH_CMD, FLASH_WRITE_SUBCMD, addr, addr + bin.size() - 1, bin.raw(), bin.size()))
         return false;
     return true;
 }
@@ -168,14 +190,6 @@ zu16 Pok3r::crcFlash(zu32 addr, zu32 len){
     // Send command
     sendCmd(CRC_CMD, 0, addr, len, nullptr, 0);
     return 0;
-}
-
-ZString Pok3r::getVersion(){
-    ZBinary bin;
-    if(readFlash(VER_ADDR, bin)){
-        return ZString(bin.raw() + 4);
-    }
-    return "NONE";
 }
 
 bool Pok3r::sendCmd(zu8 cmd, zu8 subcmd, zu32 a1, zu32 a2, const zbyte *data, zu8 len){
@@ -237,6 +251,34 @@ bool Pok3r::recvDat(zbyte *data){
         return false;
     }
     return true;
+}
+
+bool Pok3r::findUSBVidPid(zu16 vid, zu16 pid){
+    if(!context)
+        return false;
+
+    // List devices
+    libusb_device **devices;
+    int status = libusb_get_device_list(context, &devices);
+    if(status < 0){
+        ELOG("Failed to get device list: " << libusb_error_name(status));
+    } else {
+        for(int i = 0; devices[i] != NULL; ++i){
+            // Get device descriptor (can't fail)
+            struct libusb_device_descriptor desc;
+            libusb_get_device_descriptor(devices[i], &desc);
+            // Check vid and pid
+            if(desc.idVendor == vid && desc.idProduct == pid){
+                LOG("Found ID " << ZString::ItoS((zu64)desc.idVendor, 16, 4) << ":" << ZString::ItoS((zu64)desc.idProduct, 16, 4));
+                device = devices[i];
+                // Reference device so it is not freed by libusb
+                libusb_ref_device(device);
+                break;
+            }
+        }
+    }
+    libusb_free_device_list(devices, 1);
+    return (device ? true : false);
 }
 
 bool Pok3r::claimInterface(int interface){
