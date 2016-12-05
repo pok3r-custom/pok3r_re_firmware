@@ -123,43 +123,64 @@ void Pok3r::close(){
     }
 }
 
-zu32 Pok3r::read(zu32 addr, ZBinary &bin){
-    //LOG("Read 0x" << ZString::ItoS((zu64)addr, 16));
+bool Pok3r::readFlash(zu32 addr, ZBinary &bin){
+    // Send command
+    if(!sendCmd(FLASH_CMD, FLASH_READ_SUBCMD, addr, addr + 64, nullptr, 0))
+        return false;
 
-    zbyte data[64];
-    memset(data, 0, 64);
-    sendCmd(DATA_CMD, DATA_READ_SUBCMD, addr, addr + 64, data, 0);
+    // Get response
+    zu64 pos = bin.size();
+    bin.resize(bin.size() + 64);
+    if(!recvDat(bin.raw() + pos))
+        return false;
 
-    bin.write(data, 64);
-    return 64;
+    return true;
 }
 
-zu32 Pok3r::write(zu32 addr, ZBinary bin){
+bool Pok3r::writeFlash(zu32 addr, ZBinary bin){
+    // Send command
+    if(!sendCmd(FLASH_CMD, FLASH_WRITE_SUBCMD, addr, addr + 52, bin.raw(), bin.size()))
+        return false;
+    return true;
+}
 
-    return 0;
+bool Pok3r::updateStart(ZBinary &bin){
+    // Send command
+    if(!sendCmd(UPDATE_START_CMD, 0, 0, 0, nullptr, 0))
+        return false;
+
+    // Get response
+    bin.resize(64);
+    if(!recvDat(bin.raw()))
+        return false;
+
+    return true;
+}
+
+bool Pok3r::reset(zu8 subcmd){
+    // Send command
+    if(!sendCmd(RESET_CMD, subcmd, 0, 0, nullptr, 0))
+        return false;
+    return true;
 }
 
 zu16 Pok3r::crcFlash(zu32 addr, zu32 len){
-    zbyte data[64];
-    zu8 olen = sendCmd(CRC_CMD, 0, addr, len, data, 0);
-
-    ZBinary(data, 64).dumpBytes();
-
+    // Send command
+    sendCmd(CRC_CMD, 0, addr, len, nullptr, 0);
     return 0;
 }
 
 ZString Pok3r::getVersion(){
     ZBinary bin;
-    zu32 len = read(VER_ADDR, bin);
-    if(len == 64){
+    if(readFlash(VER_ADDR, bin)){
         return ZString(bin.raw() + 4);
     }
     return "NONE";
 }
 
-zu32 Pok3r::sendCmd(zu8 cmd, zu8 subcmd, zu32 a1, zu32 a2, zbyte *data, zu8 len){
+bool Pok3r::sendCmd(zu8 cmd, zu8 subcmd, zu32 a1, zu32 a2, const zbyte *data, zu8 len){
     if(len > 52)
-        return 0;
+        return false;
 
     ZBinary packet;
     packet.fill(0, PKT_LEN);
@@ -184,30 +205,38 @@ zu32 Pok3r::sendCmd(zu8 cmd, zu8 subcmd, zu32 a1, zu32 a2, zbyte *data, zu8 len)
                                            PKT_LEN,
                                            &olen,
                                            SEND_TIMEOUT);
-    LOG(olen);
     if(status != 0){
         ELOG("Failed to send: error " << libusb_error_name(status) << " length " << olen);
-        return 0;
+        return false;
     }
     if(olen != PKT_LEN){
         ELOG("Failed to send: length " << olen);
-        return 0;
+        return false;
     }
+    return true;
+}
+
+bool Pok3r::recvDat(zbyte *data){
+    if(!data)
+        return false;
 
     // Recv data (interrupt read)
-    status = libusb_interrupt_transfer(handle,
-                                       LIBUSB_ENDPOINT_IN | RECV_EP,
-                                       data,
-                                       PKT_LEN,
-                                       &olen,
-                                       RECV_TIMEOUT);
-    LOG(olen);
+    int olen;
+    int status = libusb_interrupt_transfer(handle,
+                                           LIBUSB_ENDPOINT_IN | RECV_EP,
+                                           data,
+                                           PKT_LEN,
+                                           &olen,
+                                           RECV_TIMEOUT);
     if(status != 0){
         ELOG("Failed to recv: error " << libusb_error_name(status) << " length " << olen);
-        return 0;
+        return false;
     }
-
-    return olen;
+    if(olen != PKT_LEN){
+        ELOG("Failed to recv: length " << olen);
+        return false;
+    }
+    return true;
 }
 
 bool Pok3r::claimInterface(int interface){

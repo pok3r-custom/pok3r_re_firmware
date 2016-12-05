@@ -38,30 +38,41 @@ int crcflash(){
     }
 }
 
+// Flash
+// start = 0x0
+// len   = 0x20000
+
+// Boot loader
+// start = 0x1F000000
+// len   = 0x2000
+
+// SRAM
+// start = 0x20000000
+// len   = 0x8000
+
+// GPIO registers
+// start = 0x400B0000
+// len   = 0xA000
+
+// VTOR
+// start = 0xE0000000
+// len   = 0x100000
+
 int readfw(zu32 start, zu32 len, ZPath out){
     LOG("Looking for Vortex Pok3r...");
     Pok3r pok3r;
     if(pok3r.findPok3r()){
         if(pok3r.open()){
-            LOG("Reading...");
+
             ZBinary data;
-            // Flash
-//            zu64 start = 0x0;
-//            zu64 len =   0x20000;
-            // Boot loader
-//            zu64 start = 0x1F000000;
-//            zu64 len =       0x2000;
-            // SRAM
-//            zu64 start = 0x20000000;
-//            zu64 len =       0x8000;
-            // GPIO registers
-//            zu64 start = 0x400B0000;
-//            zu64 len =       0xA000;
-            // VTOR
-//            zu64 start = 0xE0000000;
-//            zu64 len =     0x100000;
+//            if(!pok3r.updateStart(data))
+//                ELOG("Update start error");
+//            RLOG(data.dumpBytes());
+//            data.clear();
+
+            LOG("Reading 0x" << ZString::ItoS((zu64)start, 16) << ", " << len << " bytes");
             for(zu64 o = 0; o < len; o += 64){
-                if(pok3r.read(start + o, data) != 64){
+                if(!pok3r.readFlash(start + o, data)){
                     LOG("Failed to read: 0x" << ZString::ItoS(start + o, 16));
                     return -3;
                 }
@@ -110,6 +121,7 @@ void decode_package_scheme(ZBinary &bin){
 }
 
 // Encrypt using the encryption scheme used by the updater program
+// Reverse engineered from the above
 void encode_package_scheme(ZBinary &bin){
     // x = (y >> 4 + 7 & 0xF) | (x << 4)
     for(zu64 i = 0; i < bin.size(); ++i){
@@ -151,9 +163,9 @@ static const zu32 xor_key[] = {
     0x00000000,
 };
 
-// This array was painstakingly translated from a switch with a lot of shifts the firmware.
+// This array was painstakingly translated from a switch with a lot of shifts in the firmware.
 // I noticed after the fact that it was identical to the array that Sprite used in his hack,
-// but the group of offsets were in a rotated order. Oh well.
+// but the groups of offsets were in a rotated order. Oh well.
 const zu8 swap_key[] = {
     0,1,2,3,
     1,2,3,0,
@@ -189,6 +201,7 @@ void decode_firmware_packet(zbyte *data, zu32 num){
 }
 
 // Decode the encryption scheme used by the firmware
+// Ripped from the pok3r builtin firmware
 void decode_firmware_scheme(ZBinary &bin){
     zu32 count = 0;
     for(zu32 offset = 0; offset < bin.size(); offset += 52){
@@ -199,30 +212,51 @@ void decode_firmware_scheme(ZBinary &bin){
     }
 }
 
+void encode_firmware_packet(zbyte *data, zu32 num){
+    zu32 *words = (zu32*)data;
+
+    // Swap encryption
+    zu8 f = (num & 7) << 2;
+    for(int i = 0; i < 52; i+=4){
+        zbyte a = data[i + 0];
+        zbyte b = data[i + 1];
+        zbyte c = data[i + 2];
+        zbyte d = data[i + 3];
+
+        data[i + swap_key[f + 0]] = a;
+        data[i + swap_key[f + 1]] = b;
+        data[i + swap_key[f + 2]] = c;
+        data[i + swap_key[f + 3]] = d;
+    }
+
+    // XOR encryption
+    for(int i = 0; i < 13; ++i){
+        words[i] = words[i] ^ xor_key[i];
+    }
+}
+
+// Encode using the encryption scheme used by the firmware
+// Reverse engineered from the above
 void encode_firmware_scheme(ZBinary &bin){
-
-}
-
-void fwDecode(ZBinary &bin){
-    decode_package_scheme(bin);
-    decode_firmware_scheme(bin);
-}
-
-void fwEncode(ZBinary &bin){
-    encode_package_scheme(bin);
-    encode_firmware_scheme(bin);
+    zu32 count = 0;
+    for(zu32 offset = 0; offset < bin.size(); offset += 52){
+        if(count >= 10 && count <= 100){
+            encode_firmware_packet(bin.raw() + offset, count);
+        }
+        count++;
+    }
 }
 
 // POK3R
-#define V113_HASH       0x62FCF913A689C9AE
-#define V114_HASH       0xFE37430DB1FFCF5F
-#define V115_HASH       0x8986F7893143E9F7
-#define V116_HASH       0xA28E5EFB3F796181
-#define V117_HASH       0xEA55CB190C35505F
+#define V113_HASH   0x62FCF913A689C9AE
+#define V114_HASH   0xFE37430DB1FFCF5F
+#define V115_HASH   0x8986F7893143E9F7
+#define V116_HASH   0xA28E5EFB3F796181
+#define V117_HASH   0xEA55CB190C35505F
 
 // POK3R RGB
-#define V124_HASH       0x882CB0E4ECE25454
-#define V130_HASH       0x6CFF0BB4F4086C2F
+#define V124_HASH   0x882CB0E4ECE25454
+#define V130_HASH   0x6CFF0BB4F4086C2F
 
 int decode_updater(ZPath exe, ZPath out){
     LOG("Extract from " << exe);
@@ -413,7 +447,26 @@ int decode_updater(ZPath exe, ZPath out){
 }
 
 int encode_image(ZPath fwin, ZPath fwout){
+    LOG("Input: " << fwin);
 
+    // Read firmware
+    ZBinary fwbin;
+    if(!ZFile::readBinary(fwin, fwbin)){
+        LOG("Failed to read file");
+        return -1;
+    }
+
+    encode_firmware_scheme(fwbin);
+
+    LOG("Output: " << fwout);
+
+    // Write encoded image
+    if(!ZFile::writeBinary(fwout, fwbin)){
+        ELOG("Failed to write file");
+        return -2;
+    }
+
+    return 0;
 }
 
 int encode_patch_updater(ZPath exein, ZPath fwin, ZPath exeout){
@@ -435,7 +488,8 @@ int encode_patch_updater(ZPath exein, ZPath fwin, ZPath exeout){
     }
 
     // Encode firmware
-    fwEncode(fwbin);
+    encode_firmware_scheme(fwbin);
+    encode_package_scheme(fwbin);
 
     // Write encoded firmware onto exe
     exebin.seek(0x1A3800);
@@ -486,10 +540,10 @@ int main(int argc, char **argv){
             }
         } else if(cmd == "encode"){
             // Encode firmware to format accepted by Pok3r
-            if(argc > 4){
-                return encode_image(ZString(argv[2]), ZString(argv[3]), ZString(argv[4]));
+            if(argc > 3){
+                return encode_image(ZString(argv[2]), ZString(argv[3]));
             } else {
-                LOG("Usage: pok3rtest encode <path to updater> <path to firmware> <output updater>");
+                LOG("Usage: pok3rtest encode <path to firmware image> <output>");
                 return 2;
             }
         } else if(cmd == "encodepatch"){
@@ -497,7 +551,7 @@ int main(int argc, char **argv){
             if(argc > 4){
                 return encode_patch_updater(ZString(argv[2]), ZString(argv[3]), ZString(argv[4]));
             } else {
-                LOG("Usage: pok3rtest encode <path to updater> <path to firmware> <output updater>");
+                LOG("Usage: pok3rtest encodepatch <path to updater> <path to firmware> <output updater>");
                 return 2;
             }
         } else if(cmd == "crc"){

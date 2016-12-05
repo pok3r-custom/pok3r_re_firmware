@@ -428,7 +428,7 @@ function_14:
      384:   fb01 2113   mls r1, r1, r3, r2      ; r1 = r2 - (r1 * r3)
      388:   6041        str r1, [r0, #4]        ; [r0 + 4] = r1
      38a:   2201        movs r2, #1             ; r2 = 1
-     38c:   4610        mov r0, r2              ; r0 = r2
+   0x38c:   4610        mov r0, r2              ; r0 = r2
      38e:   bd30        pop {r4, r5, pc}
 
    0x390:   6841        ldr r1, [r0, #4]
@@ -3209,7 +3209,7 @@ flash_crc_cmd:
     1b06:   f7fe fc79   bl 0x3fc            ; call crc16(r0, r1, r2)
     1b0a:   4604        mov r4, r0          ; r4 = r0
 
-    ; Assuming this puts the crc into a response packet
+    ; This puts the crc somewhere
     1b0c:   4601        mov r1, r0
     1b0e:   4804        ldr r0, [pc, #16]   ; r0 = (0x1b20)
     1b10:   f7fe fc25   bl 0x35e            ; call function_14(pointer_b_1, crc)
@@ -3278,7 +3278,7 @@ disconnect_cmd:
     1b7a:   0000
 
 flash_read_write_cmd:
-    ; r0 =
+    ; r0 = subcmd
     ; r1 = start address
     ; r2 = end address
     ; This function is called for each write packet
@@ -3319,7 +3319,7 @@ flash_read_write_cmd:
     1bbe:   f04f 0a01   mov.w sl, #1            ; sl = 1
 
   0x1bc2:   f1b8 0f01   cmp.w r8, #1
-    1bc6:   d15a        bne.n 0x1c7e            ; branch if r8 != 1
+    1bc6:   d15a        bne.n 0x1c7e            ; branch if r8 != 1 (subcmd != write)
     1bc8:   f1ba 0f01   cmp.w sl, #1
     1bcc:   d10c        bne.n 0x1be8            ; branch if sl != 1
     1bce:   eba9 0004   sub.w r0, r9, r4        ; r0 = r9 - r4 = length of read
@@ -3335,13 +3335,13 @@ flash_read_write_cmd:
     1be0:   d8f9        bhi.n 0x1bd6            ; loop if r0 > r7 (length > offset)
 
     1be2:   f1b8 0f01   cmp.w r8, #1
-    1be6:   d14a        bne.n 0x1c7e            ; branch if r8 != 1
+    1be6:   d14a        bne.n 0x1c7e            ; branch if r8 != 1 (subcmd != write)
 
   0x1be8:   4929        ldr r1, [pc, #164]      ; r1 = (0x1c90) byteswap_key
     1bea:   2000        movs r0, #0
     1bec:   7008        strb r0, [r1, #0]       ; [r1] = r0 = 0
 
-    ; set byteswap key
+    ; increment byteswap key
     1bee:   6848        ldr r0, [r1, #4]        ; r0 = [r1 + 4]
     1bf0:   1c40        adds r0, r0, #1         ; r0++
     1bf2:   6048        str r0, [r1, #4]        ; [r1 + 4] = r0
@@ -3357,7 +3357,7 @@ flash_read_write_cmd:
   0x1c00:   4621        mov r1, r4
     1c02:   2004        movs r0, #4
     1c04:   682a        ldr r2, [r5, #0]
-    1c06:   f7fe fc2b   bl 0x460                ; call flash_write(4, r4, [r5])
+    1c06:   f7fe fc2b   bl 0x460                ; call flash_write(4, r4, [payload data])
     1c0a:   1d24        adds r4, r4, #4         ; r4 += 4
     1c0c:   1d2d        adds r5, r5, #4         ; r5 += 4
   0x1c0e:   454c        cmp r4, r9
@@ -3365,28 +3365,37 @@ flash_read_write_cmd:
 
     1c12:   e034        b.n 0x1c7e              ; jump in next loop
 
-  0x1c14:   481f        ldr r0, [pc, #124]      ; r0 = (0x1c94) option bytes
+    ; read command loop
+  0x1c14:   481f        ldr r0, [pc, #124]      ; r0 = (0x1c94)
     1c16:   4284        cmp r4, r0
-    1c18:   d901        bls.n 0x1c1e
-    1c1a:   2000        movs r0, #0
-    1c1c:   e000        b.n 0x1c20
-    1c1e:   6820        ldr r0, [r4, #0]
-    1c20:   f1b8 0f00   cmp.w r8, #0
+    1c18:   d901        bls.n 0x1c1e            ; read if r4 <= 0x1ff003fc
+    1c1a:   2000        movs r0, #0             ; r0 = 0
+    1c1c:   e000        b.n 0x1c20              ; else skip read
+
+  0x1c1e:   6820        ldr r0, [r4, #0]        ; read word from flash
+
+  0x1c20:   f1b8 0f00   cmp.w r8, #0
     1c24:   d006        beq.n 0x1c34            ; branch if r8 == 0
     1c26:   f1b8 0f03   cmp.w r8, #3
     1c2a:   d007        beq.n 0x1c3c            ; branch if r8 == 3
-    1c2c:   f1ba 0f01   cmp.w sl, #1
-    1c30:   d009        beq.n 0x1c46
-    1c32:   e012        b.n 0x1c5a
-  0x1c34:   6829        ldr r1, [r5, #0]
-    1c36:   4281        cmp r1, r0
-    1c38:   d102        bne.n 0x1c40
-    1c3a:   e01e        b.n 0x1c7a
-  0x1c3c:   1c40        adds r0, r0, #1
-    1c3e:   d01c        beq.n 0x1c7a
 
-    ; return 0x46
-  0x1c40:   2046        movs r0, #70                ; r0 = 0x46
+    ; else r8 == 2 (read)
+    1c2c:   f1ba 0f01   cmp.w sl, #1
+    1c30:   d009        beq.n 0x1c46            ; check address if sl == 1 (flash security enabled)
+    1c32:   e012        b.n 0x1c5a              ; store read word
+
+    ; if r8 == 0 (check)
+  0x1c34:   6829        ldr r1, [r5, #0]        ; r1 = [payload data]
+    1c36:   4281        cmp r1, r0
+    1c38:   d102        bne.n 0x1c40            ; return 0x46 if r1 != r0
+    1c3a:   e01e        b.n 0x1c7a              ; continue loop
+
+    ; if r8 == 3 (?)
+  0x1c3c:   1c40        adds r0, r0, #1         ; r0++
+    1c3e:   d01c        beq.n 0x1c7a            ; continue loop
+
+    ; return 0x46 (failure)
+  0x1c40:   2046        movs r0, #70            ; r0 = 0x46
     ; return
   0x1c42:   e8bd 9ff0   ldmia.w sp!, {r4, r5, r6, r7, r8, r9, sl, fp, ip, pc}
 
@@ -3406,14 +3415,14 @@ flash_read_write_cmd:
   0x1c5a:   f84b 0026   str.w r0, [fp, r6, lsl #2]  ; [fp + r6 << 2] = r0
     1c5e:   1c76        adds r6, r6, #1             ; r6++
     1c60:   2e10        cmp r6, #16
-    1c62:   d10a        bne.n 0x1c7a                ; branch if r6 != 0x10
+    1c62:   d10a        bne.n 0x1c7a                ; branch if r6 != 16
 
     1c64:   480d        ldr r0, [pc, #52]           ; r0 = (0x1c9c)
     1c66:   2600        movs r6, #0                 ; r6 = 0
     1c68:   2110        movs r1, #16
     1c6a:   6581        str r1, [r0, #88]           ; [r0 + 0x58] = r1 = 0x10   Set ep3 status reg
     1c6c:   2140        movs r1, #64
-    1c6e:   65c1        str r1, [r0, #92]           ; [r0 + 0x5c] = r1 = 0x40   Set ep3 count reg
+    1c6e:   65c1        str r1, [r0, #92]           ; [r0 + 0x5c] = r1 = 0x40   Set ep3 TCNT = 64
     1c70:   2102        movs r1, #2
     1c72:   6501        str r1, [r0, #80]           ; [r0 + 0x50] = r1 = 2      Set ep3 control reg
 
@@ -3426,8 +3435,9 @@ flash_read_write_cmd:
     1c7c:   1d2d        adds r5, r5, #4         ; r5 += 4
   0x1c7e:   454c        cmp r4, r9
     1c80:   d9c8        bls.n 0x1c14            ; loop if r4 <= r9 (address <= end address)
+
     1c82:   204f        movs r0, #79
-    1c84:   e7dd        b.n 0x1c42              ; return 0x4f
+    1c84:   e7dd        b.n 0x1c42              ; return 0x4f (success)
     1c86:   0000
 
   0x1c88:   0x2000063c  ; payload_data
