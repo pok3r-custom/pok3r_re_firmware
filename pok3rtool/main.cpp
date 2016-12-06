@@ -30,17 +30,30 @@ int writeversion(ZString version){
     LOG("Reset to Loader");
     if(!pok3r.resetToLoader()){
         ELOG("Reset error");
+        return -3;
+    }
+
+    ZBinary data;
+
+    LOG("Update Start");
+    if(!pok3r.updateStart(data)){
+        ELOG("Update start fail");
         return -4;
     }
 
     LOG("Write Version: " << version);
-    ZBinary data;
     data.fill(0, 52);
     data.writeleu32(version.size());
     data.write(version.bytes(), version.size());
     if(!pok3r.writeFlash(0x2800, data)){
         LOG("Version write error");
-        return -3;
+        return -5;
+    }
+
+    LOG("Update Start");
+    if(!pok3r.updateStart(data)){
+        ELOG("Update start fail");
+        return -4;
     }
 
     LOG("Read Version: " << pok3r.getVersion());
