@@ -25,8 +25,6 @@ int writeversion(ZString version){
     if(!pok3r.open())
         return -2;
 
-    LOG("Version: " << pok3r.getVersion());
-
     LOG("Reset to Loader");
     if(!pok3r.resetToLoader()){
         ELOG("Reset error");
@@ -41,19 +39,26 @@ int writeversion(ZString version){
         return -4;
     }
 
-    LOG("Write Version: " << version);
-    data.fill(0, 52);
-    data.writeleu32(version.size());
-    data.write(version.bytes(), version.size());
-    if(!pok3r.writeFlash(0x2800, data)){
-        LOG("Version write error");
+    LOG("Version: " << pok3r.getVersion());
+
+    LOG("Erase 0x2800");
+    if(!pok3r.eraseFlash(0x2800, 0x2808)){
         return -5;
+    }
+
+    LOG("Write Version: " << version);
+    ZBinary vdata;
+    vdata.writeleu32(version.size());
+    vdata.write(version.bytes(), version.size());
+    if(!pok3r.writeFlash(0x2800, vdata)){
+        LOG("Version write error");
+        return -6;
     }
 
     LOG("Update Start");
     if(!pok3r.updateStart(data)){
         ELOG("Update start fail");
-        return -4;
+        return -7;
     }
 
     LOG("Read Version: " << pok3r.getVersion());
@@ -83,25 +88,26 @@ int bootloader(){
     return 0;
 }
 
-// Flash
-// start = 0x0
-// len   = 0x20000
-
-// Boot loader
-// start = 0x1F000000
-// len   = 0x2000
-
-// SRAM
-// start = 0x20000000
-// len   = 0x8000
-
-// GPIO registers
-// start = 0x400B0000
-// len   = 0xA000
-
-// VTOR
-// start = 0xE0000000
-// len   = 0x100000
+/* Flash
+ * start = 0x0
+ * len   = 0x20000
+ *
+ * Boot loader
+ * start = 0x1F000000
+ * len   = 0x2000
+ *
+ * SRAM
+ * start = 0x20000000
+ * len   = 0x8000
+ *
+ * GPIO registers
+ * start = 0x400B0000
+ * len   = 0xA000
+ *
+ * VTOR
+ * start = 0xE0000000
+ * len   = 0x100000
+ */
 
 int readfw(zu32 start, zu32 len, ZPath out){
     LOG("Looking for Vortex Pok3r...");
@@ -139,12 +145,13 @@ int flashfw(ZString version, ZPath fw){
         ELOG("Not Found");
         return -1;
     }
+    LOG("Open...");
     if(!pok3r.open()){
         ELOG("Failed to Open");
         return -2;
     }
 
-    // Read firmware
+    // Read firmware file
     ZBinary fwbin;
     if(!ZFile::readBinary(fw, fwbin)){
         LOG("Failed to read file");
@@ -152,12 +159,14 @@ int flashfw(ZString version, ZPath fw){
     }
 
     // Reset to loader
-    if(!pok3r.reset(RESET_BUILTIN_SUBCMD)){
+    LOG("Reset to Loader");
+    if(!pok3r.resetToLoader()){
         ELOG("Reset error");
         return -4;
     }
 
     // Start update
+    LOG("Update Start");
     ZBinary data;
     if(!pok3r.updateStart(data)){
         ELOG("Update start error");
@@ -165,31 +174,42 @@ int flashfw(ZString version, ZPath fw){
     }
     RLOG(data.dumpBytes());
 
+    LOG("Version: " << pok3r.getVersion());
+
     // Erase firmware
+    LOG("Erase 0x2800...");
     if(!pok3r.eraseFlash(0x2800, 0xf408)){
         ELOG("Erase flash error");
         return -6;
     }
 
+    ZThread::sleep(5);
+
     // Write firmware
     LOG("Writing " << fwbin.size() << " bytes");
     for(zu64 o = 0; o < fwbin.size(); o += 52){
-        if(!pok3r.writeFlash(0x2c00 + o, fwbin)){
+        ZBinary packet;
+        packet.write(fwbin.raw() + o, 52);
+        if(!pok3r.writeFlash(0x2c00 + o, packet)){
             LOG("Error writing: 0x" << ZString::ItoS(0x2c00 + o, 16));
             return -7;
         }
     }
 
     // Write version number
-    data.clear();
-    data.writeleu32(version.size());
-    data.write(version.bytes(), version.size());
-    if(!pok3r.writeFlash(0x2800, data)){
+    LOG("Write Version: " << version);
+    ZBinary vdata;
+    vdata.writeleu32(version.size());
+    vdata.write(version.bytes(), version.size());
+    if(!pok3r.writeFlash(0x2800, vdata)){
         LOG("Version write error");
         return -7;
     }
 
+    LOG("Version: " << pok3r.getVersion());
+
     // Reset to firmware
+    LOG("Reset to Firmware");
     if(!pok3r.reset(RESET_BOOT_SUBCMD)){
         ELOG("Reset error");
         return -8;
@@ -667,6 +687,15 @@ int main(int argc, char **argv){
                 return readfw(start, len, ZString(argv[4]));
             } else {
                 LOG("Usage: pok3rtest read <start address> <length> <output.bin>");
+                return 2;
+            }
+
+        } else if(cmd == "flash"){
+            // Write firmware to Pok3r
+            if(argc > 3){
+                return flashfw(ZString(argv[2]), ZString(argv[3]));
+            } else {
+                LOG("Usage: pok3rtest flash <version> <firmware>");
                 return 2;
             }
 

@@ -37,8 +37,13 @@ Pok3r::~Pok3r(){
 }
 
 bool Pok3r::findPok3r(){
-    // Open device with known vid and pid
-    return findUSBVidPid(HOLTEK_VID, POK3R_PID);
+    // Try firmware vid and pid
+    if(findUSBVidPid(HOLTEK_VID, POK3R_PID))
+        return true;
+    // Try builtin vid and pid
+    if(findUSBVidPid(HOLTEK_VID, POK3R_BOOT_PID))
+        return true;
+    return false;
 }
 
 bool Pok3r::open(){
@@ -217,7 +222,7 @@ bool Pok3r::sendCmd(zu8 cmd, zu8 subcmd, zu32 a1, zu32 a2, const zbyte *data, zu
     packet.writeleu16(crc16(packet.raw(), PKT_LEN)); // CRC
 
     // debug
-    RLOG(packet.dumpBytes(4, 8));
+//    RLOG(packet.dumpBytes(4, 8));
 
     // Send command (interrupt write)
     int olen;
@@ -235,6 +240,7 @@ bool Pok3r::sendCmd(zu8 cmd, zu8 subcmd, zu32 a1, zu32 a2, const zbyte *data, zu
         ELOG("Failed to send: length " << olen);
         return false;
     }
+
     return true;
 }
 
@@ -260,7 +266,7 @@ bool Pok3r::recvDat(zbyte *data){
     }
 
     // debug
-    RLOG(ZBinary(data, PKT_LEN).dumpBytes(4, 8));
+//    RLOG(ZBinary(data, PKT_LEN).dumpBytes(4, 8));
 
     return true;
 }

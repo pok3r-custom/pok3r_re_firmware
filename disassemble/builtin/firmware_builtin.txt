@@ -1019,7 +1019,7 @@ check_ver_str:
     ; Read version string length
      7ec:   6801        ldr r1, [r0, #0]        ; r1 = [r0]
      7ee:   1c48        adds r0, r1, #1         ; r0 = r1 + 1
-     7f0:   d00a        beq.n 0x808             ; return if r0 == 0
+     7f0:   d00a        beq.n 0x808             ; return 0 if r0 == 0
 
      7f2:   f642 0304   movw r3, #10244         ; r3 = 0x2804
      7f6:   2000        movs r0, #0             ; r0 = 0
@@ -1035,10 +1035,10 @@ check_ver_str:
    0x802:   4288        cmp r0, r1
      804:   d3f9        bcc.n 0x7fa             ; loop if r0 < r1
 
-     806:   2001        movs r0, #1
-   0x808:   4770        bx lr                   ; return 1
-   0x80a:   2000        movs r0, #0
-     80c:   4770        bx lr                   ; return 0
+     806:   2001        movs r0, #1             ; return 1
+   0x808:   4770        bx lr
+   0x80a:   2000        movs r0, #0             ; return 0
+     80c:   4770        bx lr
      80e:   0000
 
      810:   b510        push {r4, lr}
