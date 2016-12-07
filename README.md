@@ -1,5 +1,7 @@
 # Vortex Pok3r Custom Firmware Project
 
+*Disclaimer: This project comes with no warranty, and may be used for free at your own risk.*
+
 This project is primarily for educational purposes, learning ARM and Thumb the hard way.
 A secondary goal is to reverse engineer the functions of the Pok3r firmware, for the purpose
 of creating a piece of custom firmware to replace it, ideally from scratch in C. Writing custom
