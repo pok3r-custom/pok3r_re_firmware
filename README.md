@@ -61,7 +61,7 @@ fields are "TODO: <field name in chinese characters>.
 ### PCB
 
 #### Header CN2
-- Pin 1: 3.3V?
+- Pin 1: 3.3V
 - Pin 2: SWDIO
 - Pin 3: SWCLK
 - Pin 4: nRST
@@ -70,11 +70,12 @@ fields are "TODO: <field name in chinese characters>.
 #### Boot Mode
 - BOOT_0: 0
 - BOOT_1: 0
+SRAM booting? Doesn't make sense to me. It looks like the controller actually gets the vector
+table from `0x0` in flash, boots the builtin firmware, then jumps to the main firmware at `0x2C00`.
 
 #### JTAG to SWD
 - SWDCK: TCK
 - SWDIO: TMS
-- nRST
 
 ### Firmware
 
