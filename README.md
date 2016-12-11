@@ -70,6 +70,7 @@ fields are "TODO: <field name in chinese characters>.
 #### Boot Mode
 - BOOT_0: 0
 - BOOT_1: 0
+
 SRAM booting? Doesn't make sense to me. It looks like the controller actually gets the vector
 table from `0x0` in flash, boots the builtin firmware, then jumps to the main firmware at `0x2C00`.
 
@@ -79,8 +80,7 @@ table from `0x0` in flash, boots the builtin firmware, then jumps to the main fi
 
 ### Firmware
 
-USB VID: 0x04d9
-USB PID: 0x0141
+USB VID/PID: 0x04d9/0x0141
 
 #### USB Descriptor Hierarchy
 - usb_device_desc
@@ -100,6 +100,10 @@ USB PID: 0x0141
                 - usb_report2_desc
 - usb_str0_desc
 - usb_str1_desc
+
+Interface 0 is a HID subclass 1 (Boot Interface) keyboard. Interface 1 is a vendor-defined HID
+protocol for firmware updates. Interface 2 is a HID subclass 0 keyboard, which supports NKRO,
+mouse controls, media keys and system controls.
 
 #### Firmware Updaters
 - POK3R_V113.exe
