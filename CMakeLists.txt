@@ -42,8 +42,9 @@ SET(SOURCES
 )
 
 SET(FILES
-    firmware/openocd.cfg
-    firmware/ht32f1655.cfg
+    firmware/ht32f165x.cfg
+    firmware/pok3r-jlink.cfg
+    firmware/pok3r-buspirate.cfg
     firmware/Makefile
     firmware/linker.ld
     firmware/startup_ht32f165x.s
