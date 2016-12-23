@@ -44,8 +44,11 @@ read back the entirety of flash, including the unencrypted firmware.
 ## Pok3r Notes
 
 ### General
-- Holtek MCU HT32F1655
+- Holtek HT32F1655
 - ARM Cortex M3
+- 128KB Flash
+- 32KB SRAM
+- 64LQFP
 
 ### Updater
 The updater executable contains the firmware update, encrypted twice. It is decrypted once by
@@ -116,7 +119,28 @@ mouse controls, media keys and system controls.
 ## Pok3r RGB Notes
 
 ### General
-- Unknown processor, probably HT32F1755 (I don't have a Pok3r RGB)
+- Holtek HT32F1654
+- ARM Cortex M3
+- 64KB Flash
+- 16KB SRAM
+- 64LQFP
+
+### PCB
+
+#### Header CN3
+- Pin 1: 3.3V?
+- Pin 2: SWDIO
+- Pin 3: SWCLK
+- Pin 4: nRST
+- Pin 5: GND
+
+#### Header SEL3
+- Pin 1:
+- Pin 2:
+
+#### Header SEL4
+- Pin 1:
+- Pin 2:
 
 ### Updater
 This updater will be harder to break, if even possible. The firmware and info chunks are present
