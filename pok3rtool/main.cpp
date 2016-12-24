@@ -357,6 +357,32 @@ void decode_firmware_scheme(ZBinary &bin){
     }
 }
 
+// XOR encryption/decryption key2
+static const zu32 xor_key2[] = {
+    0xe7c29474,
+    0x79084b10,
+    0x53d54b0d,
+    0xfc1e8f32,
+    0x48e81a9b,
+    0x773c808e,
+    0xb7483552,
+    0xd9cb8c76,
+    0x2a8c8bc6,
+    0x0967ada8,
+    0xd4520f5c,
+    0xd0c3279d,
+    0xeac091c5,
+};
+
+// Decode the encryption scheme used by the RGB firmware
+void decode_firmware_scheme2(ZBinary &bin){
+    // XOR decryption
+    zu32 *words = (zu32 *)bin.raw();
+    for(int i = 0; i < bin.size() / 4; ++i){
+        words[i] = words[i] ^ xor_key2[i % 13];
+    }
+}
+
 void encode_firmware_packet(zbyte *data, zu32 num){
     zu32 *words = (zu32*)data;
 
@@ -570,6 +596,7 @@ int decode_updater(ZPath exe, ZPath out){
                 break;
             case 2:
                 // Don't know how to do this yet
+                decode_firmware_scheme2(sec);
                 break;
             default:
                 break;

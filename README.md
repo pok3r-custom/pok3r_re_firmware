@@ -158,6 +158,8 @@ copyright at "Cooler Master", and also names the program "FWUpdate.exe".
 
 ### Firmware
 
+USB VID/PID: 0x04d9/0x0167
+
 #### Firmware Updaters
 - POK3R_RGB_V124.exe
 - POK3R_RGB_V130.exe
