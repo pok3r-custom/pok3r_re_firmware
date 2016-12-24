@@ -20,11 +20,13 @@ FIND_PACKAGE(LibUSB-1.0 REQUIRED)
 ### =================== SOURCES =================== ###
 
 SET(SOURCES
-    README.md
-
     pok3rtool/main.cpp
     pok3rtool/pok3r.h
     pok3rtool/pok3r.cpp
+)
+
+SET(FILES
+    README.md
 
     disassemble/build.sh
     disassemble/unas.sh
@@ -42,9 +44,8 @@ SET(SOURCES
 
     disassemble/v130/firmware_v130.bin
     disassemble/v130/firmware_v130.txt
-)
+    disassemble/v130/fw_xor_decode.c
 
-SET(FILES
     firmware/ht32f165x.cfg
     firmware/pok3r-jlink.cfg
     firmware/pok3r-buspirate.cfg
@@ -73,6 +74,7 @@ ADD_DEFINITIONS(-DBUILDING)
 ### =================== BUILD =================== ###
 
 ADD_CUSTOM_TARGET(poker-dummy SOURCES ${FILES})
+
 ADD_EXECUTABLE(pok3rtest ${SOURCES})
 LibChaos_Configure_Target(pok3rtest)
 TARGET_LINK_LIBRARIES(pok3rtest ${LIBUSB_1_LIBRARIES})

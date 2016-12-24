@@ -290,7 +290,7 @@ void encode_package_scheme(ZBinary &bin){
     }
 }
 
-// XOR encryption/decryption key
+// POK3R firmware XOR encryption/decryption key
 // Found at 0x2188 in Pok3r flash
 static const zu32 xor_key[] = {
     0x55aa55aa,
@@ -345,7 +345,7 @@ void decode_firmware_packet(zbyte *data, zu32 num){
     }
 }
 
-// Decode the encryption scheme used by the firmware
+// Decode the encryption scheme used by the POK3R firmware
 // Ripped from the pok3r builtin firmware
 void decode_firmware_scheme(ZBinary &bin){
     zu32 count = 0;
@@ -354,32 +354,6 @@ void decode_firmware_scheme(ZBinary &bin){
             decode_firmware_packet(bin.raw() + offset, count);
         }
         count++;
-    }
-}
-
-// XOR encryption/decryption key2
-static const zu32 xor_key2[] = {
-    0xe7c29474,
-    0x79084b10,
-    0x53d54b0d,
-    0xfc1e8f32,
-    0x48e81a9b,
-    0x773c808e,
-    0xb7483552,
-    0xd9cb8c76,
-    0x2a8c8bc6,
-    0x0967ada8,
-    0xd4520f5c,
-    0xd0c3279d,
-    0xeac091c5,
-};
-
-// Decode the encryption scheme used by the RGB firmware
-void decode_firmware_scheme2(ZBinary &bin){
-    // XOR decryption
-    zu32 *words = (zu32 *)bin.raw();
-    for(int i = 0; i < bin.size() / 4; ++i){
-        words[i] = words[i] ^ xor_key2[i % 13];
     }
 }
 
@@ -406,7 +380,7 @@ void encode_firmware_packet(zbyte *data, zu32 num){
     }
 }
 
-// Encode using the encryption scheme used by the firmware
+// Encode using the encryption scheme used by the POK3R firmware
 // Reverse engineered from the above
 void encode_firmware_scheme(ZBinary &bin){
     zu32 count = 0;
@@ -415,6 +389,36 @@ void encode_firmware_scheme(ZBinary &bin){
             encode_firmware_packet(bin.raw() + offset, count);
         }
         count++;
+    }
+}
+
+// POK3R RGB XOR encryption/decryption key
+// Somone somewhere thought a random XOR key was any better than the one they
+// used in the POK3R firmware. Yeah, good one.
+// See fw_xor_decode.c for the hilarious way this key was obtained.
+static const zu32 xor_key2[] = {
+    0xe7c29474,
+    0x79084b10,
+    0x53d54b0d,
+    0xfc1e8f32,
+    0x48e81a9b,
+    0x773c808e,
+    0xb7483552,
+    0xd9cb8c76,
+    0x2a8c8bc6,
+    0x0967ada8,
+    0xd4520f5c,
+    0xd0c3279d,
+    0xeac091c5,
+};
+
+// Decode the encryption scheme used by the POK3R RGB firmware
+// Just XOR encryption with 52-byte key seen above.
+void decode_firmware_scheme2(ZBinary &bin){
+    // XOR decryption
+    zu32 *words = (zu32 *)bin.raw();
+    for(int i = 0; i < bin.size() / 4; ++i){
+        words[i] = words[i] ^ xor_key2[i % 13];
     }
 }
 
