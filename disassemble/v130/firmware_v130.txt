@@ -154,17 +154,16 @@ srand:
   0x35a8:   4901        ldr r1, [pc, #4]   ; (0x35b0)
     35aa:   6008        str r0, [r1, #0]
     35ac:   4770        bx lr
+    35ae:   0000        movs r0, r0
+
+  0x35b0:   0x20000064  ; (prng_seed)
+  0x35b4:   0x41c64e6d  ; 1103515145 LCG multiplier
 
 memcpy:
     ; r0 = dest
     ; r1 = src
     ; r2 = length (in bytes)
-  0x35ae:   0000        movs r0, r0
-    35b0:   0064        lsls r4, r4, #1
-    35b2:   2000        movs r0, #0
-    35b4:   4e6d        ldr r6, [pc, #436]   ; (0x376c)
-    35b6:   41c6        rors r6, r0
-    35b8:   ea40 0301   orr.w r3, r0, r1
+  0x35b8:   ea40 0301   orr.w r3, r0, r1
     35bc:   079b        lsls r3, r3, #30
     35be:   d003        beq.n 0x35c8
     35c0:   e009        b.n 0x35d6
@@ -215,19 +214,25 @@ sram_init:
   0x361c:   4c06        ldr r4, [pc, #24]   ; (0x3638)
     361e:   4d07        ldr r5, [pc, #28]   ; (0x363c)
     3620:   e006        b.n 0x3630
+
     3622:   68e0        ldr r0, [r4, #12]
     3624:   f040 0301   orr.w r3, r0, #1
     3628:   e894 0007   ldmia.w r4, {r0, r1, r2}
     362c:   4798        blx r3
     362e:   3410        adds r4, #16
+
     3630:   42ac        cmp r4, r5
     3632:   d3f6        bcc.n 0x3622
     3634:   f7ff ffa8   bl 0x3588
-    3638:   811c        strh r4, [r3, #8]
-    363a:   0000        movs r0, r0
-    363c:   813c        strh r4, [r7, #8]
-    363e:   0000        movs r0, r0
-    3640:   b510        push {r4, lr}
+
+  0x3638:   0x811c      ; task_1
+  0x363c:   0x813c
+
+afio_exti_ssr_write:
+    ; this writes to the EXTI source selection register 0 or 1 (ESSR0, ESSR1) in the AFIO control registers
+    ; r0 = some notion of which bit to set. this also controls which register to set it in.
+    ; r1 = ? value to be put into the 4 bit EXTnPIN field (n is controlled by r0)
+  0x3640:   b510        push {r4, lr}
     3642:   2200        movs r2, #0
     3644:   2807        cmp r0, #7
     3646:   d902        bls.n 0x364e
@@ -246,14 +251,15 @@ sram_init:
     3660:   4319        orrs r1, r3
     3662:   6011        str r1, [r2, #0]
     3664:   bd10        pop {r4, pc}
-    3666:   0000        movs r0, r0
-    3668:   2000        movs r0, #0
-    366a:   4002        ands r2, r0
-    366c:   b510        push {r4, lr}
-    366e:   481b        ldr r0, [pc, #108]   ; (0x36dc)
-    3670:   f000 f874   bl 0x375c
+    3666:   0000
+
+  0x3668:   0x40022000  ; AFIO
+
+  0x366c:   b510        push {r4, lr}
+    366e:   481b        ldr r0, [pc, #108]      ; (0x36dc)
+    3670:   f000 f874   bl 0x375c               ; call bftm_clear(BFTM0)
     3674:   f002 fca8   bl 0x5fc8
-    3678:   4819        ldr r0, [pc, #100]   ; (0x36e0)
+    3678:   4819        ldr r0, [pc, #100]      ; (0x36e0)
     367a:   6801        ldr r1, [r0, #0]
     367c:   b111        cbz r1, 0x3684
     367e:   6801        ldr r1, [r0, #0]
@@ -301,24 +307,18 @@ sram_init:
     36d4:   1c49        adds r1, r1, #1
     36d6:   8001        strh r1, [r0, #0]
     36d8:   bd10        pop {r4, pc}
-    36da:   0000        movs r0, r0
-    36dc:   6000        str r0, [r0, #0]
-    36de:   4007        ands r7, r0
-    36e0:   06bc        lsls r4, r7, #26
-    36e2:   2000        movs r0, #0
-    36e4:   000e        movs r6, r1
-    36e6:   2000        movs r0, #0
-    36e8:   0008        movs r0, r1
-    36ea:   2000        movs r0, #0
-    36ec:   0060        lsls r0, r4, #1
-    36ee:   2000        movs r0, #0
-    36f0:   002a        movs r2, r5
-    36f2:   2000        movs r0, #0
-    36f4:   0002        movs r2, r0
-    36f6:   2000        movs r0, #0
-    36f8:   001c        movs r4, r3
-    36fa:   2000        movs r0, #0
-    36fc:   b510        push {r4, lr}
+    36da:   0000
+
+  0x36dc:   0x40076000  ; BFTM0
+  0x36e0:   0x200006bc
+  0x36e4:   0x2000000e
+  0x36e8:   0x20000008
+  0x36ec:   0x20000060
+  0x36f0:   0x2000002a
+  0x36f4:   0x20000002
+  0x36f8:   0x2000001c
+
+  0x36fc:   b510        push {r4, lr}
     36fe:   4813        ldr r0, [pc, #76]   ; (0x374c)
     3700:   f000 f82c   bl 0x375c
     3704:   4c12        ldr r4, [pc, #72]   ; (0x3750)
@@ -348,19 +348,22 @@ sram_init:
     3742:   7060        strb r0, [r4, #1]
     3744:   e8bd 4010   ldmia.w sp!, {r4, lr}
     3748:   f002 be8e   b.w 0x6468
-    374c:   7000        strb r0, [r0, #0]
-    374e:   4007        ands r7, r0
-    3750:   0020        movs r0, r4
-    3752:   2000        movs r0, #0
-    3754:   0000        movs r0, r0
-    3756:   400b        ands r3, r1
-    3758:   7d24        ldrb r4, [r4, #20]
-    375a:   0000        movs r0, r0
-    375c:   6841        ldr r1, [r0, #4]
+
+  0x374c:   0x40077000  ; BFTM1
+  0x3750:   0x20000020
+  0x3754:   0x400b0000
+  0x3758:   0x7d24
+
+bftm_clear:
+    ; r0 = pointer
+    ; Clear the function timer compare match flag
+    ; This will stop repetitive timers, or cancel one-shot timers
+  0x375c:   6841        ldr r1, [r0, #4]
     375e:   f021 0101   bic.w r1, r1, #1
     3762:   6041        str r1, [r0, #4]
     3764:   f3bf 8f4f   dsb sy
     3768:   4770        bx lr
+
     376a:   2900        cmp r1, #0
     376c:   6801        ldr r1, [r0, #0]
     376e:   d002        beq.n 0x3776
@@ -470,18 +473,21 @@ sram_init:
     3866:   210f        movs r1, #15
     3868:   4610        mov r0, r2
     386a:   f7ff ff97   bl 0x379c
+
     386e:   4621        mov r1, r4
     3870:   2300        movs r3, #0
     3872:   4622        mov r2, r4
     3874:   4640        mov r0, r8
     3876:   f000 f807   bl 0x3888
+
     387a:   2001        movs r0, #1
     387c:   e8bd 81f0   ldmia.w sp!, {r4, r5, r6, r7, r8, pc}
     3880:   0000        movs r0, r0
     3882:   400b        ands r3, r1
     3884:   8000        strh r0, [r0, #0]
     3886:   4008        ands r0, r1
-    3888:   b5f0        push {r4, r5, r6, r7, lr}
+
+  0x3888:   b5f0        push {r4, r5, r6, r7, lr}
     388a:   4f07        ldr r7, [pc, #28]   ; (0x38a8)
     388c:   6a7c        ldr r4, [r7, #36]   ; 0x24
     388e:   6afd        ldr r5, [r7, #44]   ; 0x2c
@@ -497,16 +503,20 @@ sram_init:
     38a2:   62fd        str r5, [r7, #44]   ; 0x2c
     38a4:   633e        str r6, [r7, #48]   ; 0x30
     38a6:   bdf0        pop {r4, r5, r6, r7, pc}
-    38a8:   8000        strh r0, [r0, #0]
-    38aa:   4008        ands r0, r1
-    38ac:   4903        ldr r1, [pc, #12]   ; (0x38bc)
+
+  0x38a8:   0x40088000
+
+ckcu_set_usb_prescaler:
+    ; r0 = usb clock prescaler 0/1/2
+  0x38ac:   4903        ldr r1, [pc, #12]   ; (0x38bc)
     38ae:   680a        ldr r2, [r1, #0]
     38b0:   f422 0240   bic.w r2, r2, #12582912   ; 0xc00000
     38b4:   ea42 5080   orr.w r0, r2, r0, lsl #22
     38b8:   6008        str r0, [r1, #0]
     38ba:   4770        bx lr
-    38bc:   8000        strh r0, [r0, #0]
-    38be:   4008        ands r0, r1
+
+  0x38bc:   0x40088000  ; CKCU
+
     38c0:   b570        push {r4, r5, r6, lr}
     38c2:   4910        ldr r1, [pc, #64]   ; (0x3904)
     38c4:   2501        movs r5, #1
@@ -3711,51 +3721,67 @@ sram_init:
     55fa:   7060        strb r0, [r4, #1]
     55fc:   bd10        pop {r4, pc}
     55fe:   0000        movs r0, r0
-    5600:   0648        lsls r0, r1, #25
-    5602:   2000        movs r0, #0
-    5604:   000c        movs r4, r1
-    5606:   2000        movs r0, #0
-    5608:   b510        push {r4, lr}
+
+  0x5600:   0x20000648
+  0x5604:   0x2000000c
+
+  0x5608:   b510        push {r4, lr}
     560a:   4c1a        ldr r4, [pc, #104]   ; (0x5674)
     560c:   b1c0        cbz r0, 0x5640
+
     560e:   2100        movs r1, #0
     5610:   4620        mov r0, r4
     5612:   f7fe f8b4   bl 0x377e
+
     5616:   2100        movs r1, #0
     5618:   4620        mov r0, r4
     561a:   f7fe f8a6   bl 0x376a
+
     561e:   4620        mov r0, r4
     5620:   f7fe f89c   bl 0x375c
+
     5624:   2029        movs r0, #41   ; 0x29
     5626:   f000 f899   bl 0x575c
+
     562a:   f000 fb01   bl 0x5c30
+
     562e:   f000 f8e1   bl 0x57f4
+
     5632:   2001        movs r0, #1
     5634:   f000 fd70   bl 0x6118
+
     5638:   e8bd 4010   ldmia.w sp!, {r4, lr}
     563c:   f000 be5c   b.w 0x62f8
+
     5640:   f000 f8da   bl 0x57f8
+
     5644:   2000        movs r0, #0
     5646:   f000 fd67   bl 0x6118
+
     564a:   2100        movs r1, #0
     564c:   4620        mov r0, r4
     564e:   f7fe f8a2   bl 0x3796
+
     5652:   4620        mov r0, r4
     5654:   f7fe f882   bl 0x375c
+
     5658:   2101        movs r1, #1
     565a:   4620        mov r0, r4
     565c:   f7fe f885   bl 0x376a
+
     5660:   2101        movs r1, #1
     5662:   4620        mov r0, r4
     5664:   f7fe f88b   bl 0x377e
-    5668:   4903        ldr r1, [pc, #12]   ; (0x5678)
-    566a:   f44f 7000   mov.w r0, #512   ; 0x200
-    566e:   f8c1 0100   str.w r0, [r1, #256]   ; 0x100
+
+    5668:   4903        ldr r1, [pc, #12]       ; (0x5678)
+    566a:   f44f 7000   mov.w r0, #512          ; 0x200
+    566e:   f8c1 0100   str.w r0, [r1, #256]    ; 0x100
+
     5672:   bd10        pop {r4, pc}
-    5674:   6000        str r0, [r0, #0]
-    5676:   4007        ands r7, r0
-    5678:   e004        b.n 0x5684
-    567a:   e000        b.n 0x567e
+
+  0x5674:   0x40076000
+  0x5678:   0xe000e004
+
     567c:   b510        push {r4, lr}
     567e:   2400        movs r4, #0
     5680:   2802        cmp r0, #2
@@ -5065,7 +5091,8 @@ sram_init:
     62f2:   400b        ands r3, r1
     62f4:   2000        movs r0, #0
     62f6:   400b        ands r3, r1
-    62f8:   b570        push {r4, r5, r6, lr}
+
+  0x62f8:   b570        push {r4, r5, r6, lr}
     62fa:   4c18        ldr r4, [pc, #96]   ; (0x635c)
     62fc:   2100        movs r1, #0
     62fe:   4620        mov r0, r4
@@ -5107,10 +5134,10 @@ sram_init:
     6356:   b2ed        uxtb r5, r5
     6358:   d2e9        bcs.n 0x632e
     635a:   bd70        pop {r4, r5, r6, pc}
-    635c:   7000        strb r0, [r0, #0]
-    635e:   4007        ands r7, r0
-    6360:   e004        b.n 0x636c
-    6362:   e000        b.n 0x6366
+
+  0x635c:   0x40077000
+  0x6360:   0xe000e004
+
     6364:   f000 4006   and.w r0, r0, #2248146944   ; 0x86000000
     6368:   4000        ands r0, r0
     636a:   400b        ands r3, r1
@@ -5570,9 +5597,10 @@ usb_entry:
     67d2:   f880 1032   strb.w r1, [r0, #50]   ; 0x32
     67d6:   4801        ldr r0, [pc, #4]   ; (0x67dc)
     67d8:   f000 b96c   b.w 0x6ab4
-    67dc:   0168        lsls r0, r5, #5
-    67de:   2000        movs r0, #0
-    67e0:   f890 0032   ldrb.w r0, [r0, #50]   ; 0x32
+
+  0x67dc:   0x20000168
+
+  0x67e0:   f890 0032   ldrb.w r0, [r0, #50]   ; 0x32
     67e4:   2803        cmp r0, #3
     67e6:   d001        beq.n 0x67ec
     67e8:   2000        movs r0, #0
@@ -5583,8 +5611,11 @@ usb_entry:
     67f2:   f000 f969   bl 0x6ac8
     67f6:   e8bd 4010   ldmia.w sp!, {r4, lr}
     67fa:   f000 b9fd   b.w 0x6bf8
-    67fe:   0000        movs r0, r0
+    67fe:   0000
 
+usb_set_intr_flags:
+    ; r0 = new value of USBISR
+    ; Set USBISR to r0
   0x6800:   4901        ldr r1, [pc, #4]   ; (0x6808)
     6802:   6088        str r0, [r1, #8]
     6804:   4770        bx lr
@@ -5592,14 +5623,18 @@ usb_entry:
 
   0x6808:   0x400a8000
 
-    680c:   b510        push {r4, lr}
+usb_init:
+  0x680c:   b510        push {r4, lr}
     680e:   2100        movs r1, #0
     6810:   f44f 6080   mov.w r0, #1024   ; 0x400
     6814:   2240        movs r2, #64   ; 0x40
     6816:   2301        movs r3, #1
     6818:   f7fd f836   bl 0x3888
+
+    ; Set USB clock speed
     681c:   2002        movs r0, #2
-    681e:   f7fd f845   bl 0x38ac
+    681e:   f7fd f845   bl 0x38ac               ; call ckcu_set_usb_prescaler(2)
+
     6822:   4c12        ldr r4, [pc, #72]   ; (0x686c)
     6824:   4810        ldr r0, [pc, #64]   ; (0x6868)
     6826:   60a0        str r0, [r4, #8]
@@ -5609,30 +5644,37 @@ usb_entry:
     682e:   6120        str r0, [r4, #16]
     6830:   2002        movs r0, #2
     6832:   6160        str r0, [r4, #20]
+
     6834:   f7ff fef8   bl 0x6628
+
     6838:   4620        mov r0, r4
     683a:   f7ff ffc9   bl 0x67d0
-    683e:   490c        ldr r1, [pc, #48]   ; (0x6870)
-    6840:   f44f 1000   mov.w r0, #2097152   ; 0x200000
-    6844:   f8c1 0100   str.w r0, [r1, #256]   ; 0x100
+
+    ; Enable interrupt 53 (USB)
+    ; Write 0x200000 to 0xe000e104
+    ; Set NVIC_ISER1 to 0x200000
+    683e:   490c        ldr r1, [pc, #48]       ; (0x6870)
+    6840:   f44f 1000   mov.w r0, #2097152      ; 0x200000
+    6844:   f8c1 0100   str.w r0, [r1, #256]    ; 0x100
+
     6848:   2001        movs r0, #1
     684a:   f000 f823   bl 0x6894
+
     684e:   20fa        movs r0, #250   ; 0xfa
     6850:   f7fc ffb8   bl 0x37c4
+
     6854:   f894 0034   ldrb.w r0, [r4, #52]   ; 0x34
     6858:   e8bd 4010   ldmia.w sp!, {r4, lr}
     685c:   f000 0101   and.w r1, r0, #1
     6860:   4804        ldr r0, [pc, #16]   ; (0x6874)
     6862:   f000 b939   b.w 0x6ad8
-    6866:   0000        movs r0, r0
-    6868:   80bc        strh r4, [r7, #4]
-    686a:   0000        movs r0, r0
-    686c:   06f4        lsls r4, r6, #27
-    686e:   2000        movs r0, #0
-    6870:   e004        b.n 0x687c
-    6872:   e000        b.n 0x6876
-    6874:   0168        lsls r0, r5, #5
-    6876:   2000        movs r0, #0
+    6866:   0000
+
+  0x6868:   0x80bc      ; usb_device_desc
+  0x686c:   0x200006f4
+  0x6870:   0xe000e004
+  0x6874:   0x20000168
+
     6878:   4905        ldr r1, [pc, #20]   ; (0x6890)
     687a:   2801        cmp r0, #1
     687c:   6808        ldr r0, [r1, #0]
@@ -7364,22 +7406,29 @@ watchdog_reload_timer:
     7846:   400a        ands r2, r1
     7848:   0034        movs r4, r6
     784a:   2000        movs r0, #0
-    784c:   e002        b.n 0x7854
-    784e:   c808        ldmia r0!, {r3}
+
+sram_init_func_1:
+  0x784c:   e002        b.n 0x7854
+
+  0x784e:   c808        ldmia r0!, {r3}
     7850:   1f12        subs r2, r2, #4
     7852:   c108        stmia r1!, {r3}
-    7854:   2a00        cmp r2, #0
+  0x7854:   2a00        cmp r2, #0
     7856:   d1fa        bne.n 0x784e
     7858:   4770        bx lr
+
     785a:   4770        bx lr
-    785c:   2000        movs r0, #0
+
+sram_init_func_2:
+  0x785c:   2000        movs r0, #0
     785e:   e001        b.n 0x7864
-    7860:   c101        stmia r1!, {r0}
+
+  0x7860:   c101        stmia r1!, {r0}
     7862:   1f12        subs r2, r2, #4
-    7864:   2a00        cmp r2, #0
+  0x7864:   2a00        cmp r2, #0
     7866:   d1fb        bne.n 0x7860
     7868:   4770        bx lr
-    786a:   0000        movs r0, r0
+    786a:   0000
 
 main:
   0x786c:   f7fd ff32   bl 0x56d4
@@ -7415,7 +7464,8 @@ main:
     78c8:   f7fe f9b7   bl 0x5c3a
     78cc:   2000        movs r0, #0
     78ce:   f7fe fb45   bl 0x5f5c
-    78d2:   88a0        ldrh r0, [r4, #4]
+
+  0x78d2:   88a0        ldrh r0, [r4, #4]
     78d4:   1c40        adds r0, r0, #1
     78d6:   80a0        strh r0, [r4, #4]
     78d8:   f000 f844   bl 0x7964
@@ -7423,12 +7473,15 @@ main:
     78de:   f7fe f9f9   bl 0x5cd4
     78e2:   f7ff f9b9   bl 0x6c58
     78e6:   e7f4        b.n 0x78d2
-    78e8:   2001        movs r0, #1
+
+  0x78e8:   2001        movs r0, #1
     78ea:   f7fd fe8d   bl 0x5608
-    78ee:   f7fe ff8d   bl 0x680c
+    78ee:   f7fe ff8d   bl 0x680c               ; call usb_init()
+
     78f2:   4e1a        ldr r6, [pc, #104]   ; (0x795c)
     78f4:   4d1a        ldr r5, [pc, #104]   ; (0x7960)
-    78f6:   f7ff f94d   bl 0x6b94
+
+  0x78f6:   f7ff f94d   bl 0x6b94
     78fa:   2801        cmp r0, #1
     78fc:   d007        beq.n 0x790e
     78fe:   2802        cmp r0, #2
@@ -7464,7 +7517,7 @@ main:
     7948:   f7fe f9c4   bl 0x5cd4
     794c:   f7ff f984   bl 0x6c58
     7950:   e7d1        b.n 0x78f6
-    7952:   0000        movs r0, r0
+    7952:   0000
 
   0x7954:   0x20000030
   0x7958:   0x20000028
@@ -8497,7 +8550,8 @@ usb_str1_desc:
     ; 0x6F, 0x00, 0x61, 0x00, 0x72, 0x00, 0x64, 0x00,
 
     80f6:   00 00
-    80f8:   29 66
+
+  0x80f8:   29 66
     80fa:   00 00
     80fc:   00 00
     80fe:   00 00
@@ -8516,23 +8570,21 @@ usb_str1_desc:
 
     8118:   0003
     811a:   0000
-    811c:   813c
-    811e:   0000
-    8120:   0000
-    8122:   2000
-    8124:   0068
-    8126:   0000
-    8128:   784c
-    812a:   0000
-    812c:   81a4
-    812e:   0000
-    8130:   0068
-    8132:   2000
-    8134:   2178
-    8136:   0000
-    8138:   785c
-    813a:   0000
-    813c:   0000
+
+task_1:
+  0x811c:   0x813c
+    8120:   0x20000000
+    8124:   0x68
+    8128:   0x784c  (sram_init_func_1)
+
+task_2:
+  0x812c:   0x81a4
+    8130:   0x20000068
+    8134:   0x2178
+    8138:   0x785c  (sram_init_func_2)
+
+sram_init_data:
+  0x813c:   0000
     813e:   0000
     8140:   0000
     8142:   0000

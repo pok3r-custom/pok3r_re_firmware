@@ -7242,8 +7242,8 @@ usb_set_intr_flags:
   0x6d30:   4901        ldr r1, [pc, #4]        ; r1 = (0x6d38) USB Registers
     6d32:   6088        str r0, [r1, #8]        ; [r1 + 8] = r0
     6d34:   4770        bx lr
-
     6d36:   0000
+
   0x6d38:   0x400a8000  ; USB Registers
 
 usb_init:
