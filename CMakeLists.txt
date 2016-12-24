@@ -34,11 +34,14 @@ SET(SOURCES
     disassemble/builtin/symbols_builtin.txt
     disassemble/builtin/sram-variables_builtin.txt
 
-    disassemble/v117/firmware117.bin
-    disassemble/v117/firmware117.txt
-    disassemble/v117/symbols117.txt
-    disassemble/v117/sram-variables117.txt
+    disassemble/v117/firmware_v117.bin
+    disassemble/v117/firmware_v117.txt
+    disassemble/v117/symbols_v117.txt
+    disassemble/v117/sram-variables_v117.txt
     disassemble/v117/descriptors.h
+
+    disassemble/v130/firmware_v130.bin
+    disassemble/v130/firmware_v130.txt
 )
 
 SET(FILES
