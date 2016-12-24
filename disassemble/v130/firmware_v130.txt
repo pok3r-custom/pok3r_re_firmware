@@ -3817,10 +3817,14 @@ ckcu_set_usb_prescaler:
     56ce:   0000        movs r0, r0
     56d0:   6000        str r0, [r0, #0]
     56d2:   4007        ands r7, r0
-    56d4:   b510        push {r4, lr}
+
+setup_intr_priority:
+  0x56d4:   b510        push {r4, lr}
+
     56d6:   f44f 5150   mov.w r1, #13312   ; 0x3400
     56da:   2000        movs r0, #0
-    56dc:   f000 f872   bl 0x57c4
+    56dc:   f000 f872   bl 0x57c4               ; call nvic_set_vtor(0, 0x3400)
+
     56e0:   491c        ldr r1, [pc, #112]   ; (0x5754)
     56e2:   6808        ldr r0, [r1, #0]
     56e4:   f64f 02ff   movw r2, #63743   ; 0xf8ff
@@ -3829,46 +3833,57 @@ ckcu_set_usb_prescaler:
     56ec:   f440 7040   orr.w r0, r0, #768   ; 0x300
     56f0:   4310        orrs r0, r2
     56f2:   6008        str r0, [r1, #0]
+
     56f4:   2200        movs r2, #0
     56f6:   4611        mov r1, r2
     56f8:   2003        movs r0, #3
     56fa:   f000 f83a   bl 0x5772
+
     56fe:   4601        mov r1, r0
     5700:   202b        movs r0, #43   ; 0x2b
     5702:   f000 f84f   bl 0x57a4
+
     5706:   2200        movs r2, #0
     5708:   4611        mov r1, r2
     570a:   2003        movs r0, #3
     570c:   f000 f831   bl 0x5772
+
     5710:   4601        mov r1, r0
     5712:   202c        movs r0, #44   ; 0x2c
     5714:   f000 f846   bl 0x57a4
+
     5718:   2200        movs r2, #0
     571a:   2101        movs r1, #1
     571c:   2003        movs r0, #3
     571e:   f000 f828   bl 0x5772
+
     5722:   4601        mov r1, r0
     5724:   202a        movs r0, #42   ; 0x2a
     5726:   f000 f83d   bl 0x57a4
+
     572a:   2200        movs r2, #0
     572c:   2102        movs r1, #2
     572e:   2003        movs r0, #3
     5730:   f000 f81f   bl 0x5772
+
     5734:   4601        mov r1, r0
     5736:   2029        movs r0, #41   ; 0x29
     5738:   f000 f834   bl 0x57a4
+
     573c:   2200        movs r2, #0
     573e:   2102        movs r1, #2
     5740:   2003        movs r0, #3
     5742:   f000 f816   bl 0x5772
+
     5746:   4601        mov r1, r0
     5748:   e8bd 4010   ldmia.w sp!, {r4, lr}
     574c:   2035        movs r0, #53   ; 0x35
     574e:   f000 b829   b.w 0x57a4
-    5752:   0000        movs r0, r0
-    5754:   ed0c e000   stc 0, cr14, [ip, #-0]
-    5758:   0000        movs r0, r0
-    575a:   05fa        lsls r2, r7, #23
+    5752:   0000
+
+  0x5754:   0xe000ed0c  ; NVIC AIRCR register
+  0x5758:   0x05fa0000  ; VECTKEY (needed to write AIRCR)
+
     575c:   f000 021f   and.w r2, r0, #31
     5760:   2101        movs r1, #1
     5762:   4091        lsls r1, r2
@@ -3877,7 +3892,15 @@ ckcu_set_usb_prescaler:
     5768:   f100 20e0   add.w r0, r0, #3758153728   ; 0xe000e000
     576c:   f8c0 1180   str.w r1, [r0, #384]   ; 0x180
     5770:   4770        bx lr
-    5772:   b530        push {r4, r5, lr}
+
+calc_nvic_priority:
+    ; r0 = 3
+    ; r1 = 2
+    ; r2 = 0
+    ; return r0 = 2
+    ; I still have no idea what this really does
+    ; Best I can see, calculates interrupt priorities for ppb_set_nvic_priority
+  0x5772:   b530        push {r4, r5, lr}
     5774:   f000 0307   and.w r3, r0, #7
     5778:   f1c3 0407   rsb r4, r3, #7
     577c:   2c04        cmp r4, #4
@@ -3899,7 +3922,12 @@ ckcu_set_usb_prescaler:
     579e:   4015        ands r5, r2
     57a0:   4328        orrs r0, r5
     57a2:   bd30        pop {r4, r5, pc}
-    57a4:   0709        lsls r1, r1, #28
+
+ppb_set_nvic_priority:
+    ; r0 = 0x35
+    ; r1 = 2
+    ; Set some values in the PPB NVIC interrupt priority registers
+  0x57a4:   0709        lsls r1, r1, #28
     57a6:   0e09        lsrs r1, r1, #24
     57a8:   2800        cmp r0, #0
     57aa:   da06        bge.n 0x57ba
@@ -3907,18 +3935,25 @@ ckcu_set_usb_prescaler:
     57b0:   f100 20e0   add.w r0, r0, #3758153728   ; 0xe000e000
     57b4:   f880 1d14   strb.w r1, [r0, #3348]   ; 0xd14
     57b8:   4770        bx lr
-    57ba:   f100 20e0   add.w r0, r0, #3758153728   ; 0xe000e000
+  0x57ba:   f100 20e0   add.w r0, r0, #3758153728   ; 0xe000e000
     57be:   f880 1400   strb.w r1, [r0, #1024]   ; 0x400
     57c2:   4770        bx lr
-    57c4:   4a02        ldr r2, [pc, #8]   ; (0x57d0)
+
+nvic_set_vtor:
+    ; r0 = OR with VTOR offset
+    ; r1 = VTOR offset
+    ; Set vetor table offset register
+  0x57c4:   4a02        ldr r2, [pc, #8]   ; (0x57d0)
     57c6:   4011        ands r1, r2
     57c8:   4301        orrs r1, r0
     57ca:   4802        ldr r0, [pc, #8]   ; (0x57d4)
     57cc:   6001        str r1, [r0, #0]
     57ce:   4770        bx lr
-    57d0:   ff80 1fff       ; <UNDEFINED> instruction: 0xff801fff
-    57d4:   ed08 e000   stc 0, cr14, [r8, #-0]
-    57d8:   b510        push {r4, lr}
+
+  0x57d0:   0x1fffff80  ; Address mask
+  0x57d4:   0xe000ed08  ; NVIC VTOR register
+
+  0x57d8:   b510        push {r4, lr}
     57da:   f7fe fcdd   bl 0x4198
     57de:   f7fe fc99   bl 0x4114
     57e2:   2801        cmp r0, #1
@@ -3929,9 +3964,12 @@ ckcu_set_usb_prescaler:
     57ee:   d000        beq.n 0x57f2
     57f0:   2000        movs r0, #0
     57f2:   bd10        pop {r4, pc}
-    57f4:   f7fe bcfa   b.w 0x41ec
-    57f8:   f7fe bd1c   b.w 0x4234
-    57fc:   b570        push {r4, r5, r6, lr}
+
+  0x57f4:   f7fe bcfa   b.w 0x41ec
+
+  0x57f8:   f7fe bd1c   b.w 0x4234
+
+  0x57fc:   b570        push {r4, r5, r6, lr}
     57fe:   4c29        ldr r4, [pc, #164]   ; (0x58a4)
     5800:   2500        movs r5, #0
     5802:   79a0        ldrb r0, [r4, #6]
@@ -4001,16 +4039,13 @@ ckcu_set_usb_prescaler:
     589a:   e8bd 4070   ldmia.w sp!, {r4, r5, r6, lr}
     589e:   f000 b90f   b.w 0x5ac0
     58a2:   bd70        pop {r4, r5, r6, pc}
-    58a4:   19d0        adds r0, r2, r7
-    58a6:   2000        movs r0, #0
-    58a8:   0060        lsls r0, r4, #1
-    58aa:   2000        movs r0, #0
-    58ac:   0058        lsls r0, r3, #1
-    58ae:   2000        movs r0, #0
-    58b0:   0030        movs r0, r6
-    58b2:   2000        movs r0, #0
-    58b4:   001c        movs r4, r3
-    58b6:   2000        movs r0, #0
+
+  0x58a4:   0x200019d0
+  0x58a8:   0x20000060
+  0x58ac:   0x20000058
+  0x58b0:   0x20000030
+  0x58b4:   0x2000001c
+
     58b8:   480a        ldr r0, [pc, #40]   ; (0x58e4)
     58ba:   b510        push {r4, lr}
     58bc:   7980        ldrb r0, [r0, #6]
@@ -5135,7 +5170,7 @@ ckcu_set_usb_prescaler:
     6358:   d2e9        bcs.n 0x632e
     635a:   bd70        pop {r4, r5, r6, pc}
 
-  0x635c:   0x40077000
+  0x635c:   0x40077000  ; BFTM1
   0x6360:   0xe000e004
 
     6364:   f000 4006   and.w r0, r0, #2248146944   ; 0x86000000
@@ -7431,7 +7466,7 @@ sram_init_func_2:
     786a:   0000
 
 main:
-  0x786c:   f7fd ff32   bl 0x56d4
+  0x786c:   f7fd ff32   bl 0x56d4               ; call setup_intr_priority()
     7870:   f7fb ffae   bl 0x37d0
     7874:   f7fd ffb0   bl 0x57d8
     7878:   20ff        movs r0, #255   ; 0xff
