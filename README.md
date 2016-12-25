@@ -1,4 +1,4 @@
-# Vortex Pok3r (RGB) Custom Firmware Project
+# Vortex POK3R (RGB) Custom Firmware Project
 
 *Disclaimer: This project comes with no warranty, and may be used for free at your own risk. I do
 this in my free time for fun, as such there are no guarantees of progress or success.*
@@ -43,7 +43,7 @@ This will attempt to read the 128K flash:
 Without the patch, it will read a lot of 0x00. With the single-instruction patch, the tool will
 read back the entirety of flash, including the unencrypted firmware.
 
-## Pok3r Notes
+## POK3R Notes
 
 ### General
 - Holtek HT32F1655
@@ -118,7 +118,7 @@ mouse controls, media keys and system controls.
 - POK3R_V117.exe
 
 
-## Pok3r RGB Notes
+## POK3R RGB Notes
 
 ### General
 - Holtek HT32F1654
@@ -145,18 +145,17 @@ mouse controls, media keys and system controls.
 - Pin 2:
 
 ### Updater
-This updater will be harder to break, if even possible. The firmware and info chunks are present
-as in the Pok3r updater, and seem to be encrypted with the same scheme (package encryption). It
-also seems that there are two firmware chunks. Based on the strings in the file, the first is for
-US Layout, and the second is for EU Layout.
+The updater contains two firmware updates, US and EU layouts, again encrypted twice. The firmware
+encryption now spans the entire update, rather than just part like the pok3r updater. This
+encryption is a simple XOR with a 52-byte key.
 
-However, the updates do not look like firmware at all. I cannot see a vector table or a data region,
-like was visible in the Pok3r updates. An encryption scheme that encrypts words in-place, even with
-a rotating key, should leave some pattern behind, so my guess is the encryption is a lot better on
-this firmware.
+I thought this encryption would be harder to break, but it took longer to reverse the format of
+the updater data than to crack the key. The key was upgraded from the previous updater, to a
+random 52-byte key. Since parts of the firmware are predictable, and XOR is easily reversible,
+the key was easy to determine.
 
-Also, it is worth noting that the Windows program version string info identifies the company and
-copyright at "Cooler Master", and also names the program "FWUpdate.exe".
+The Windows program version string info identifies the company and copyright as "Cooler Master",
+and also names the program "FWUpdate.exe".
 
 ### Firmware
 
