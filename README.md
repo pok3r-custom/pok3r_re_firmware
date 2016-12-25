@@ -1,16 +1,18 @@
-# Vortex Pok3r Custom Firmware Project
+# Vortex Pok3r (RGB) Custom Firmware Project
 
 *Disclaimer: This project comes with no warranty, and may be used for free at your own risk. I do
 this in my free time for fun, as such there are no guarantees of progress or success.*
 
 ### Goals / Progress
-- Reverse engineer the Pok3r firmware and update procedure. **DONE**
-- Application to write new firmware to Pok3r over USB. **WIP, Mostly Done**
-- Open-source firmware compatible with Pok3r. *Not Started*
+- Reverse engineer the POK3R firmware and update procedure. **DONE**
+- Reverse engineer the POK3R RGB firmware and update procedure. **WIP**
+- Application to write new firmware to POK3R over USB. **WIP**
+- Application to write new firmware to POK3R RGB over USB. *Not Started*
+- Open-source firmware compatible with POK3R and POK3R RGB. *Not Started*
     - Firmware can be installed from Vortex firmware over USB (no hardware required).
     - Firmware can be rolled back with Votex firmware update application.
 
-### Firmware Patch
+### POK3R Firmware Patch
 A very small firmware patch will allow the contents of the flash storage to be read out over USB,
 with the protocol used to read the version number during an update. This is effectively
 accomplished by changing a single byte in the Vortex firmware updater. In the v117 updater,
