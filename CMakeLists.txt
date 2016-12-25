@@ -44,6 +44,7 @@ SET(FILES
 
     disassemble/v130/firmware_v130.bin
     disassemble/v130/firmware_v130.txt
+    disassemble/v130/symbols_v130.txt
     disassemble/v130/fw_xor_decode.c
 
     firmware/ht32f165x.cfg

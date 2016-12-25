@@ -569,7 +569,7 @@ reset_cmd:
   0x30b8:   0x55aafaf5
   0x30bc:   0x40080000  ; FMC
   0x30c0:   0x61a80
-  0x30c4:   0x5fa0004
+  0x30c4:   0x05fa0004  ; AIRCR key and reset
 
 function_e_99:
   0x30c8:   b570        push {r4, r5, r6, lr}
@@ -3812,18 +3812,20 @@ function_29:
     4dc4:   b00c        add sp, #48   ; 0x30
     4dc6:   2001        movs r0, #1
     4dc8:   bd70        pop {r4, r5, r6, pc}
-    4dca:   0000        movs r0, r0
+    4dca:   0000
 
   0x4dcc:   0x20000220
-  0x4dd0:   0x40044000
-  0x4dd4:   0x400b2000
+  0x4dd0:   0x40044000  ; SPI 1
+  0x4dd4:   0x400b2000  ; GPIO B
 
 function_10:
   0x4dd8:   b510        push {r4, lr}
     4dda:   f7ff ffaf   bl 0x4d3c               ; call function_11
     4dde:   f3c0 0000   ubfx r0, r0, #0, #1
     4de2:   bd10        pop {r4, pc}
-    4de4:   b570        push {r4, r5, r6, lr}
+
+function_82:
+  0x4de4:   b570        push {r4, r5, r6, lr}
     4de6:   4c11        ldr r4, [pc, #68]       ; (0x4e2c)
     4de8:   7820        ldrb r0, [r4, #0]
     4dea:   b9e0        cbnz r0, 0x4e26
@@ -3852,11 +3854,10 @@ function_10:
     4e24:   7020        strb r0, [r4, #0]
     4e26:   2001        movs r0, #1
     4e28:   bd70        pop {r4, r5, r6, pc}
-    4e2a:   0000        movs r0, r0
-    4e2c:   0220        lsls r0, r4, #8
-    4e2e:   2000        movs r0, #0
-    4e30:   2000        movs r0, #0
-    4e32:   400b        ands r3, r1
+    4e2a:   0000
+
+  0x4e2c:   0x20000220
+  0x4e30:   0x400b2000  ; GPIO B
 
 function_39:
   0x4e34:   b108        cbz r0, 0x4e3a

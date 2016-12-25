@@ -35,7 +35,9 @@ sram_init                           @ 0x2ddc
     sram_stack_zero
 sram_decode_static                  @ 0x2e00
 function_e_32                       @ 0x2e5c
+
 afio_exti_ssr_write                 @ 0x2f50
+
 handle_update_packet                @ 0x2f78
     function_e_2
     crc16
@@ -54,6 +56,7 @@ function_45                         @ 0x3272
 function_46                         @ 0x3286
 function_47                         @ 0x329a
 function_48                         @ 0x329e
+
 afio_pin_config                     @ 0x32a4
 spin_wait_maybe                     @ 0x32cc
 setup_afio_gpio                     @ 0x32d8
@@ -73,11 +76,13 @@ clear_two_words_and_write_two_bytes @ 0x33ac
 function_e_2                        @ 0x33b8
 function_14                         @ 0x33e0
 function_e_35                       @ 0x3412
+
 ckcu_ahb_clock_enable               @ 0x3424
 ckcu_apb0_clock_enable              @ 0x343c
 ckcu_apb1_clock_enable              @ 0x3454
-function_20                         @ 0x346c
-crc16                         @ 0x3480
+ckcu_set_usb_prescaler              @ 0x346c
+
+crc16                               @ 0x3480
 flash_page_erase                    @ 0x34c4
 
 flash_get_protection_status         @ 0x34d8
@@ -91,6 +96,7 @@ gpio_set_pin_pull_up_down           @ 0x355c
 gpio_set_pin                        @ 0x3584
 gpio_set_reset_pin                  @ 0x3588
 gptm_enable_disable                 @ 0x3592
+
 function_62                         @ 0x35a6
 function_e_36                       @ 0x35fc
 function_e_37                       @ 0x364c
@@ -179,6 +185,7 @@ function_29                         @ 0x4d64
     function_e_53
 function_10                         @ 0x4dd8
     function_11
+function_82                         @ 0x4de4
     ckcu_ahb_clock_enable
 function_39                         @ 0x4e34
 function_40                         @ 0x4e40

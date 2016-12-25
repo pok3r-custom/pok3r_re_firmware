@@ -385,7 +385,12 @@ bftm_clear:
     3796:   6081        str r1, [r0, #8]
     3798:   4770        bx lr
     379a:   0000        movs r0, r0
-    379c:   00c0        lsls r0, r0, #3
+
+afio_pin_config:
+    ; r0 = GPIO # 0/1/2/3/4 A/B/C/D/E
+    ; r1 = Pin #
+    ; r2 = Alternate function #
+  0x379c:   00c0        lsls r0, r0, #3
     379e:   08cb        lsrs r3, r1, #3
     37a0:   eb00 0083   add.w r0, r0, r3, lsl #2
     37a4:   4b06        ldr r3, [pc, #24]   ; (0x37c0)
@@ -401,23 +406,34 @@ bftm_clear:
     37b8:   4313        orrs r3, r2
     37ba:   6003        str r3, [r0, #0]
     37bc:   bd10        pop {r4, pc}
-    37be:   0000        movs r0, r0
-    37c0:   2020        movs r0, #32
-    37c2:   4002        ands r2, r0
-    37c4:   eb00 0080   add.w r0, r0, r0, lsl #2
+    37be:   0000
+
+  0x37c0:   0x40022020  ; AFIO.GPACFGLR GPIO Port A Configuration 0
+
+spin_wait_maybe:
+    ; Seems to spin and wait for (r0 * 20 * 2) instructions
+    ; At 8MHz and 5 cycles / instruction, r0 = 10 should take around 250 us
+    ; r0 = "time"
+  0x37c4:   eb00 0080   add.w r0, r0, r0, lsl #2
     37c8:   0080        lsls r0, r0, #2
     37ca:   1e40        subs r0, r0, #1
     37cc:   d2fd        bcs.n 0x37ca
     37ce:   4770        bx lr
-    37d0:   e92d 41f0   stmdb sp!, {r4, r5, r6, r7, r8, lr}
+
+setup_afio_gpio:
+  0x37d0:   e92d 41f0   stmdb sp!, {r4, r5, r6, r7, r8, lr}
     37d4:   f44f 4580   mov.w r5, #16384   ; 0x4000
     37d8:   2400        movs r4, #0
     37da:   00a8        lsls r0, r5, #2
+
+    ; Enable AFIO clock
+    ; Enable GPIO A clock
     37dc:   4622        mov r2, r4
     37de:   4680        mov r8, r0
     37e0:   2301        movs r3, #1
     37e2:   4629        mov r1, r5
-    37e4:   f000 f850   bl 0x3888
+    37e4:   f000 f850   bl 0x3888           ; call ckcu_clocks_enable(0x10000, 0x4000, 0, 1)
+
     37e8:   4e25        ldr r6, [pc, #148]   ; (0x3880)
     37ea:   2200        movs r2, #0
     37ec:   4629        mov r1, r5
@@ -461,10 +477,13 @@ bftm_clear:
     384a:   210f        movs r1, #15
     384c:   2002        movs r0, #2
     384e:   f7ff ffa5   bl 0x379c
+
+    ; Check if CKCU.HSEEN set (external high-speed oscillator)
     3852:   480c        ldr r0, [pc, #48]   ; (0x3884)
     3854:   6840        ldr r0, [r0, #4]
     3856:   0540        lsls r0, r0, #21
     3858:   d409        bmi.n 0x386e
+
     385a:   2201        movs r2, #1
     385c:   210e        movs r1, #14
     385e:   4610        mov r0, r2
@@ -474,24 +493,30 @@ bftm_clear:
     3868:   4610        mov r0, r2
     386a:   f7ff ff97   bl 0x379c
 
+    ; Disable GPIO A clock
     386e:   4621        mov r1, r4
     3870:   2300        movs r3, #0
     3872:   4622        mov r2, r4
     3874:   4640        mov r0, r8
-    3876:   f000 f807   bl 0x3888
+    3876:   f000 f807   bl 0x3888               ; call ckcu_clocks_enable(0x10000, 0, 0, 0)
 
     387a:   2001        movs r0, #1
     387c:   e8bd 81f0   ldmia.w sp!, {r4, r5, r6, r7, r8, pc}
-    3880:   0000        movs r0, r0
-    3882:   400b        ands r3, r1
-    3884:   8000        strh r0, [r0, #0]
-    3886:   4008        ands r0, r1
 
+  0x3880:   0x400b0000  ; GPIO A
+  0x3884:   0x40088000  ; CKCU
+
+ckcu_clocks_enable:
+    ; Enable AHB, APB0, or APB1 clocks
+    ; r0 = AHB clock mask
+    ; r1 = APB0 clock mask
+    ; r2 = APB1 clock mask
+    ; r3 = enable/disable
   0x3888:   b5f0        push {r4, r5, r6, r7, lr}
     388a:   4f07        ldr r7, [pc, #28]   ; (0x38a8)
-    388c:   6a7c        ldr r4, [r7, #36]   ; 0x24
-    388e:   6afd        ldr r5, [r7, #44]   ; 0x2c
-    3890:   6b3e        ldr r6, [r7, #48]   ; 0x30
+    388c:   6a7c        ldr r4, [r7, #36]   ; 0x24 AHB clock control
+    388e:   6afd        ldr r5, [r7, #44]   ; 0x2c APB clock control 0
+    3890:   6b3e        ldr r6, [r7, #48]   ; 0x30 APB clock control 1
     3892:   4384        bics r4, r0
     3894:   438d        bics r5, r1
     3896:   4396        bics r6, r2
@@ -504,7 +529,7 @@ bftm_clear:
     38a4:   633e        str r6, [r7, #48]   ; 0x30
     38a6:   bdf0        pop {r4, r5, r6, r7, pc}
 
-  0x38a8:   0x40088000
+  0x38a8:   0x40088000  ; CKCU
 
 ckcu_set_usb_prescaler:
     ; r0 = usb clock prescaler 0/1/2
@@ -549,15 +574,13 @@ ckcu_set_usb_prescaler:
     38fe:   2003        movs r0, #3
     3900:   7120        strb r0, [r4, #4]
     3902:   bd70        pop {r4, r5, r6, pc}
-    3904:   0030        movs r0, r6
-    3906:   2000        movs r0, #0
-    3908:   005c        lsls r4, r3, #1
-    390a:   2000        movs r0, #0
-    390c:   0000        movs r0, r0
-    390e:   2000        movs r0, #0
-    3910:   0648        lsls r0, r1, #25
-    3912:   2000        movs r0, #0
-    3914:   b570        push {r4, r5, r6, lr}
+
+  0x3904:   0x20000030
+  0x3908:   0x2000005c
+  0x390c:   0x20000000
+  0x3910:   0x20000648
+
+  0x3914:   b570        push {r4, r5, r6, lr}
     3916:   492b        ldr r1, [pc, #172]   ; (0x39c4)
     3918:   7988        ldrb r0, [r1, #6]
     391a:   2800        cmp r0, #0
@@ -585,17 +608,18 @@ ckcu_set_usb_prescaler:
     3946:   2826        cmp r0, #38   ; 0x26
     3948:   d10b        bne.n 0x3962
     394a:   e005        b.n 0x3958
-    394c:   2829        cmp r0, #41   ; 0x29
+  0x394c:   2829        cmp r0, #41   ; 0x29
     394e:   d007        beq.n 0x3960
     3950:   282d        cmp r0, #45   ; 0x2d
     3952:   d001        beq.n 0x3958
     3954:   282e        cmp r0, #46   ; 0x2e
     3956:   d104        bne.n 0x3962
-    3958:   e8bd 4070   ldmia.w sp!, {r4, r5, r6, lr}
+  0x3958:   e8bd 4070   ldmia.w sp!, {r4, r5, r6, lr}
     395c:   f003 b984   b.w 0x6c68
-    3960:   708a        strb r2, [r1, #2]
-    3962:   bd70        pop {r4, r5, r6, pc}
-    3964:   381e        subs r0, #30
+  0x3960:   708a        strb r2, [r1, #2]
+  0x3962:   bd70        pop {r4, r5, r6, pc}
+
+  0x3964:   381e        subs r0, #30
     3966:   b2c1        uxtb r1, r0
     3968:   4817        ldr r0, [pc, #92]   ; (0x39c8)
     396a:   2201        movs r2, #1
@@ -604,7 +628,8 @@ ckcu_set_usb_prescaler:
     3970:   f001 fc42   bl 0x51f8
     3974:   7020        strb r0, [r4, #0]
     3976:   bd70        pop {r4, r5, r6, pc}
-    3978:   28cf        cmp r0, #207   ; 0xcf
+
+  0x3978:   28cf        cmp r0, #207   ; 0xcf
     397a:   d0fc        beq.n 0x3976
     397c:   4914        ldr r1, [pc, #80]   ; (0x39d0)
     397e:   4a15        ldr r2, [pc, #84]   ; (0x39d4)
@@ -625,30 +650,27 @@ ckcu_set_usb_prescaler:
     39a2:   78a8        ldrb r0, [r5, #2]
     39a4:   70a0        strb r0, [r4, #2]
     39a6:   bd70        pop {r4, r5, r6, pc}
-    39a8:   4a0b        ldr r2, [pc, #44]   ; (0x39d8)
+
+  0x39a8:   4a0b        ldr r2, [pc, #44]   ; (0x39d8)
     39aa:   5c10        ldrb r0, [r2, r0]
     39ac:   f000 0007   and.w r0, r0, #7
     39b0:   eb00 0040   add.w r0, r0, r0, lsl #1
     39b4:   1844        adds r4, r0, r1
     39b6:   f204 248a   addw r4, r4, #650   ; 0x28a
     39ba:   e7ea        b.n 0x3992
-    39bc:   2000        movs r0, #0
+  0x39bc:   2000        movs r0, #0
     39be:   8020        strh r0, [r4, #0]
     39c0:   e7f0        b.n 0x39a4
     39c2:   0000        movs r0, r0
-    39c4:   0648        lsls r0, r1, #25
-    39c6:   2000        movs r0, #0
-    39c8:   0004        movs r4, r0
-    39ca:   2000        movs r0, #0
-    39cc:   0030        movs r0, r6
-    39ce:   2000        movs r0, #0
-    39d0:   0730        lsls r0, r6, #28
-    39d2:   2000        movs r0, #0
-    39d4:   01c0        lsls r0, r0, #7
-    39d6:   2000        movs r0, #0
-    39d8:   7b73        ldrb r3, [r6, #13]
-    39da:   0000        movs r0, r0
-    39dc:   2103        movs r1, #3
+
+  0x39c4:   0x20000648
+  0x39c8:   0x20000004
+  0x39cc:   0x20000030
+  0x39d0:   0x20000730
+  0x39d4:   0x200001c0
+  0x39d8:   0x7b73
+
+  0x39dc:   2103        movs r1, #3
     39de:   4a04        ldr r2, [pc, #16]   ; (0x39f0)
     39e0:   e001        b.n 0x39e6
     39e2:   5c43        ldrb r3, [r0, r1]
@@ -658,9 +680,10 @@ ckcu_set_usb_prescaler:
     39ea:   d2fa        bcs.n 0x39e2
     39ec:   4770        bx lr
     39ee:   0000        movs r0, r0
-    39f0:   0004        movs r4, r0
-    39f2:   2000        movs r0, #0
-    39f4:   4806        ldr r0, [pc, #24]   ; (0x3a10)
+
+    39f0:   0x20000004
+
+  0x39f4:   4806        ldr r0, [pc, #24]   ; (0x3a10)
     39f6:   7980        ldrb r0, [r0, #6]
     39f8:   2800        cmp r0, #0
     39fa:   d007        beq.n 0x3a0c
@@ -671,12 +694,12 @@ ckcu_set_usb_prescaler:
     3a06:   d301        bcc.n 0x3a0c
     3a08:   f003 b92e   b.w 0x6c68
     3a0c:   4770        bx lr
-    3a0e:   0000        movs r0, r0
-    3a10:   0648        lsls r0, r1, #25
-    3a12:   2000        movs r0, #0
-    3a14:   0004        movs r4, r0
-    3a16:   2000        movs r0, #0
-    3a18:   b570        push {r4, r5, r6, lr}
+    3a0e:   0000
+
+  0x3a10:   0x20000648
+  0x3a14:   0x20000004
+
+  0x3a18:   b570        push {r4, r5, r6, lr}
     3a1a:   b198        cbz r0, 0x3a44
     3a1c:   4d0f        ldr r5, [pc, #60]   ; (0x3a5c)
     3a1e:   2448        movs r4, #72   ; 0x48
@@ -689,22 +712,24 @@ ckcu_set_usb_prescaler:
     3a32:   4620        mov r0, r4
     3a34:   f201 218a   addw r1, r1, #650   ; 0x28a
     3a38:   f000 fb28   bl 0x408c
-    3a3c:   1e64        subs r4, r4, #1
+  0x3a3c:   1e64        subs r4, r4, #1
     3a3e:   b2e4        uxtb r4, r4
     3a40:   d2f0        bcs.n 0x3a24
     3a42:   bd70        pop {r4, r5, r6, pc}
-    3a44:   4d07        ldr r5, [pc, #28]   ; (0x3a64)
+
+  0x3a44:   4d07        ldr r5, [pc, #28]   ; (0x3a64)
     3a46:   2448        movs r4, #72   ; 0x48
     3a48:   e004        b.n 0x3a54
-    3a4a:   4629        mov r1, r5
+  0x3a4a:   4629        mov r1, r5
     3a4c:   4620        mov r0, r4
     3a4e:   f000 fb1d   bl 0x408c
     3a52:   1eed        subs r5, r5, #3
-    3a54:   1e64        subs r4, r4, #1
+  0x3a54:   1e64        subs r4, r4, #1
     3a56:   b2e4        uxtb r4, r4
     3a58:   d2f7        bcs.n 0x3a4a
     3a5a:   bd70        pop {r4, r5, r6, pc}
-    3a5c:   7bba        ldrb r2, [r7, #14]
+
+  0x3a5c:   7bba        ldrb r2, [r7, #14]
     3a5e:   0000        movs r0, r0
     3a60:   0730        lsls r0, r6, #28
     3a62:   2000        movs r0, #0
@@ -718,10 +743,11 @@ ckcu_set_usb_prescaler:
     3a72:   f000 b8bb   b.w 0x3bec
     3a76:   2004        movs r0, #4
     3a78:   e7f9        b.n 0x3a6e
-    3a7a:   0000        movs r0, r0
-    3a7c:   0730        lsls r0, r6, #28
-    3a7e:   2000        movs r0, #0
-    3a80:   b510        push {r4, lr}
+    3a7a:   0000
+
+  0x3a7c:   0x20000730
+
+  0x3a80:   b510        push {r4, lr}
     3a82:   f7ff fff1   bl 0x3a68
     3a86:   4805        ldr r0, [pc, #20]   ; (0x3a9c)
     3a88:   2101        movs r1, #1
@@ -734,13 +760,12 @@ ckcu_set_usb_prescaler:
     3a96:   7889        ldrb r1, [r1, #2]
     3a98:   7081        strb r1, [r0, #2]
     3a9a:   bd10        pop {r4, pc}
-    3a9c:   0648        lsls r0, r1, #25
-    3a9e:   2000        movs r0, #0
-    3aa0:   0004        movs r4, r0
-    3aa2:   2000        movs r0, #0
-    3aa4:   7aa2        ldrb r2, [r4, #10]
-    3aa6:   0000        movs r0, r0
-    3aa8:   b570        push {r4, r5, r6, lr}
+
+  0x3a9c:   0x20000648
+  0x3aa0:   0x20000004
+  0x3aa4:   0x7aa2
+
+  0x3aa8:   b570        push {r4, r5, r6, lr}
     3aaa:   4c17        ldr r4, [pc, #92]   ; (0x3b08)
     3aac:   7aa0        ldrb r0, [r4, #10]
     3aae:   2801        cmp r0, #1
@@ -782,21 +807,16 @@ ckcu_set_usb_prescaler:
     3b02:   5442        strb r2, [r0, r1]
     3b04:   bd70        pop {r4, r5, r6, pc}
     3b06:   0000        movs r0, r0
-    3b08:   0648        lsls r0, r1, #25
-    3b0a:   2000        movs r0, #0
-    3b0c:   7aa5        ldrb r5, [r4, #10]
-    3b0e:   0000        movs r0, r0
-    3b10:   03be        lsls r6, r7, #14
-    3b12:   2000        movs r0, #0
-    3b14:   7a48        ldrb r0, [r1, #9]
-    3b16:   0000        movs r0, r0
-    3b18:   01c0        lsls r0, r0, #7
-    3b1a:   2000        movs r0, #0
-    3b1c:   0730        lsls r0, r6, #28
-    3b1e:   2000        movs r0, #0
-    3b20:   7a3a        ldrb r2, [r7, #8]
-    3b22:   0000        movs r0, r0
-    3b24:   e92d 41f0   stmdb sp!, {r4, r5, r6, r7, r8, lr}
+
+  0x3b08:   0x20000648
+  0x3b0c:   0x7aa5
+  0x3b10:   0x200003be
+  0x3b14:   0x7a48
+  0x3b18:   0x200001c0
+  0x3b1c:   0x20000730
+  0x3b20:   0x7a3a
+
+  0x3b24:   e92d 41f0   stmdb sp!, {r4, r5, r6, r7, r8, lr}
     3b28:   f003 f8d4   bl 0x6cd4
     3b2c:   4c27        ldr r4, [pc, #156]   ; (0x3bcc)
     3b2e:   4d28        ldr r5, [pc, #160]   ; (0x3bd0)
@@ -864,27 +884,22 @@ ckcu_set_usb_prescaler:
     3bc4:   2042        movs r0, #66   ; 0x42
     3bc6:   f000 ba83   b.w 0x40d0
     3bca:   0000        movs r0, r0
-    3bcc:   0648        lsls r0, r1, #25
-    3bce:   2000        movs r0, #0
-    3bd0:   032e        lsls r6, r5, #12
-    3bd2:   2000        movs r0, #0
-    3bd4:   0004        movs r4, r0
-    3bd6:   2000        movs r0, #0
-    3bd8:   008c        lsls r4, r1, #2
-    3bda:   2000        movs r0, #0
-    3bdc:   01c0        lsls r0, r0, #7
-    3bde:   2000        movs r0, #0
-    3be0:   0730        lsls r0, r6, #28
-    3be2:   2000        movs r0, #0
-    3be4:   001c        movs r4, r3
-    3be6:   2000        movs r0, #0
-    3be8:   005c        lsls r4, r3, #1
-    3bea:   2000        movs r0, #0
-    3bec:   4801        ldr r0, [pc, #4]   ; (0x3bf4)
+
+  0x3bcc:   0x20000648
+  0x3bd0:   0x2000032e
+  0x3bd4:   0x20000004
+  0x3bd8:   0x2000008c
+  0x3bdc:   0x200001c0
+  0x3be0:   0x20000730
+  0x3be4:   0x2000001c
+  0x3be8:   0x2000005c
+
+  0x3bec:   4801        ldr r0, [pc, #4]   ; (0x3bf4)
     3bee:   7880        ldrb r0, [r0, #2]
     3bf0:   f000 b9c8   b.w 0x3f84
-    3bf4:   005c        lsls r4, r3, #1
-    3bf6:   2000        movs r0, #0
+
+  0x3bf4:   0x2000005c
+
     3bf8:   0000        movs r0, r0
     3bfa:   0304        lsls r4, r0, #12
     3bfc:   0001        movs r1, r0
@@ -1186,9 +1201,10 @@ ckcu_set_usb_prescaler:
     3ec0:   f000 f82c   bl 0x3f1c
     3ec4:   e8bd 4010   ldmia.w sp!, {r4, lr}
     3ec8:   f7ff be90   b.w 0x3bec
-    3ecc:   0730        lsls r0, r6, #28
-    3ece:   2000        movs r0, #0
-    3ed0:   b510        push {r4, lr}
+
+  0x3ecc:   0x20000730
+
+  0x3ed0:   b510        push {r4, lr}
     3ed2:   4c0b        ldr r4, [pc, #44]   ; (0x3f00)
     3ed4:   2000        movs r0, #0
     3ed6:   70a0        strb r0, [r4, #2]
@@ -1207,19 +1223,21 @@ ckcu_set_usb_prescaler:
     3ef8:   20ff        movs r0, #255   ; 0xff
     3efa:   f7ff bf91   b.w 0x3e20
     3efe:   0000        movs r0, r0
-    3f00:   005c        lsls r4, r3, #1
-    3f02:   2000        movs r0, #0
-    3f04:   4904        ldr r1, [pc, #16]   ; (0x3f18)
+
+    3f00:   0x2000005c
+
+  0x3f04:   4904        ldr r1, [pc, #16]   ; (0x3f18)
     3f06:   f248 0201   movw r2, #32769   ; 0x8001
     3f0a:   800a        strh r2, [r1, #0]
     3f0c:   7088        strb r0, [r1, #2]
     3f0e:   20ff        movs r0, #255   ; 0xff
     3f10:   70c8        strb r0, [r1, #3]
     3f12:   f000 b841   b.w 0x3f98
-    3f16:   0000        movs r0, r0
-    3f18:   005c        lsls r4, r3, #1
-    3f1a:   2000        movs r0, #0
-    3f1c:   b570        push {r4, r5, r6, lr}
+    3f16:   0000
+
+  0x3f18:   0x2000005c
+
+  0x3f1c:   b570        push {r4, r5, r6, lr}
     3f1e:   4d15        ldr r5, [pc, #84]   ; (0x3f74)
     3f20:   2000        movs r0, #0
     3f22:   70a8        strb r0, [r5, #2]
@@ -1260,24 +1278,25 @@ ckcu_set_usb_prescaler:
   0x3f74:   0x20000730
   0x3f78:   0x8114
   0x3f7c:   0x7a3c
+  0x3f80:   0x200008e2
 
-    3f80:   08e2        lsrs r2, r4, #3
-    3f82:   2000        movs r0, #0
-    3f84:   0301        lsls r1, r0, #12
+  0x3f84:   0301        lsls r1, r0, #12
     3f86:   f240 229a   movw r2, #666   ; 0x29a
     3f8a:   4802        ldr r0, [pc, #8]   ; (0x3f94)
     3f8c:   f501 5180   add.w r1, r1, #4096   ; 0x1000
     3f90:   f002 be7a   b.w 0x6c88
-    3f94:   0730        lsls r0, r6, #28
+
+  0x3f94:   0730        lsls r0, r6, #28
     3f96:   2000        movs r0, #0
     3f98:   2204        movs r2, #4
     3f9a:   2100        movs r1, #0
     3f9c:   4801        ldr r0, [pc, #4]   ; (0x3fa4)
     3f9e:   f002 be73   b.w 0x6c88
-    3fa2:   0000        movs r0, r0
-    3fa4:   005c        lsls r4, r3, #1
-    3fa6:   2000        movs r0, #0
-    3fa8:   eb00 00d1   add.w r0, r0, r1, lsr #3
+    3fa2:   0000
+
+  0x3fa4:   0x2000005c
+
+  0x3fa8:   eb00 00d1   add.w r0, r0, r1, lsr #3
     3fac:   f001 0307   and.w r3, r1, #7
     3fb0:   2101        movs r1, #1
     3fb2:   4099        lsls r1, r3
@@ -1287,10 +1306,11 @@ ckcu_set_usb_prescaler:
     3fba:   d001        beq.n 0x3fc0
     3fbc:   430a        orrs r2, r1
     3fbe:   e000        b.n 0x3fc2
-    3fc0:   438a        bics r2, r1
+  0x3fc0:   438a        bics r2, r1
     3fc2:   7002        strb r2, [r0, #0]
     3fc4:   4770        bx lr
-    3fc6:   b570        push {r4, r5, r6, lr}
+
+  0x3fc6:   b570        push {r4, r5, r6, lr}
     3fc8:   4606        mov r6, r0
     3fca:   2500        movs r5, #0
     3fcc:   2403        movs r4, #3
@@ -1306,7 +1326,8 @@ ckcu_set_usb_prescaler:
     3fe2:   2de0        cmp r5, #224   ; 0xe0
     3fe4:   d3f1        bcc.n 0x3fca
     3fe6:   bd70        pop {r4, r5, r6, pc}
-    3fe8:   b530        push {r4, r5, lr}
+
+  0x3fe8:   b530        push {r4, r5, lr}
     3fea:   004b        lsls r3, r1, #1
     3fec:   2bff        cmp r3, #255   ; 0xff
     3fee:   d902        bls.n 0x3ff6
@@ -1356,11 +1377,13 @@ ckcu_set_usb_prescaler:
     4056:   18c8        adds r0, r1, r3
     4058:   7090        strb r0, [r2, #2]
     405a:   bd30        pop {r4, r5, pc}
-    405c:   440b        add r3, r1
+
+  0x405c:   440b        add r3, r1
     405e:   7013        strb r3, [r2, #0]
     4060:   e7f2        b.n 0x4048
-    4062:   0000        movs r0, r0
-    4064:   b510        push {r4, lr}
+    4062:   0000
+
+  0x4064:   b510        push {r4, lr}
     4066:   4908        ldr r1, [pc, #32]   ; (0x4088)
     4068:   2348        movs r3, #72   ; 0x48
     406a:   e009        b.n 0x4080
@@ -1376,9 +1399,10 @@ ckcu_set_usb_prescaler:
     4082:   b2db        uxtb r3, r3
     4084:   d2f2        bcs.n 0x406c
     4086:   bd10        pop {r4, pc}
-    4088:   032e        lsls r6, r5, #12
-    408a:   2000        movs r0, #0
-    408c:   28ff        cmp r0, #255   ; 0xff
+
+  0x4088:   0x2000032e
+
+  0x408c:   28ff        cmp r0, #255   ; 0xff
     408e:   d00a        beq.n 0x40a6
     4090:   4a05        ldr r2, [pc, #20]   ; (0x40a8)
     4092:   4402        add r2, r0
@@ -1390,9 +1414,10 @@ ckcu_set_usb_prescaler:
     40a2:   2803        cmp r0, #3
     40a4:   d3f7        bcc.n 0x4096
     40a6:   4770        bx lr
-    40a8:   032e        lsls r6, r5, #12
-    40aa:   2000        movs r0, #0
-    40ac:   b570        push {r4, r5, r6, lr}
+
+  0x40a8:   0x2000032e
+
+  0x40ac:   b570        push {r4, r5, r6, lr}
     40ae:   4605        mov r5, r0
     40b0:   4e06        ldr r6, [pc, #24]   ; (0x40cc)
     40b2:   2403        movs r4, #3
@@ -1407,9 +1432,10 @@ ckcu_set_usb_prescaler:
     40c6:   b2e4        uxtb r4, r4
     40c8:   d2f5        bcs.n 0x40b6
     40ca:   bd70        pop {r4, r5, r6, pc}
-    40cc:   032e        lsls r6, r5, #12
-    40ce:   2000        movs r0, #0
-    40d0:   28ff        cmp r0, #255   ; 0xff
+
+  0x40cc:   0x2000032e
+
+  0x40d0:   28ff        cmp r0, #255   ; 0xff
     40d2:   d008        beq.n 0x40e6
     40d4:   4a04        ldr r2, [pc, #16]   ; (0x40e8)
     40d6:   4410        add r0, r2
@@ -1420,9 +1446,11 @@ ckcu_set_usb_prescaler:
     40e2:   b2d2        uxtb r2, r2
     40e4:   d2fa        bcs.n 0x40dc
     40e6:   4770        bx lr
-    40e8:   032e        lsls r6, r5, #12
-    40ea:   2000        movs r0, #0
-    40ec:   b57c        push {r2, r3, r4, r5, r6, lr}
+
+  0x40e8:   0x2000032e
+
+function_11:
+  0x40ec:   b57c        push {r2, r3, r4, r5, r6, lr}
     40ee:   4c08        ldr r4, [pc, #32]   ; (0x4110)
     40f0:   2005        movs r0, #5
     40f2:   f8ad 0000   strh.w r0, [sp]
@@ -1435,10 +1463,12 @@ ckcu_set_usb_prescaler:
     4106:   6265        str r5, [r4, #36]   ; 0x24
     4108:   f89d 0005   ldrb.w r0, [sp, #5]
     410c:   bd7c        pop {r2, r3, r4, r5, r6, pc}
-    410e:   0000        movs r0, r0
-    4110:   2000        movs r0, #0
-    4112:   400b        ands r3, r1
-    4114:   b570        push {r4, r5, r6, lr}
+    410e:   0000
+
+  0x4110:   0x400b2000  ; GPIO B
+
+function_29:
+  0x4114:   b570        push {r4, r5, r6, lr}
     4116:   b08c        sub sp, #48   ; 0x30
     4118:   f000 f83e   bl 0x4198
     411c:   4e18        ldr r6, [pc, #96]   ; (0x4180)
@@ -1481,26 +1511,30 @@ ckcu_set_usb_prescaler:
     4178:   b00c        add sp, #48   ; 0x30
     417a:   2001        movs r0, #1
     417c:   bd70        pop {r4, r5, r6, pc}
-    417e:   0000        movs r0, r0
-    4180:   0018        movs r0, r3
-    4182:   2000        movs r0, #0
-    4184:   4000        ands r0, r0
-    4186:   4004        ands r4, r0
-    4188:   2000        movs r0, #0
-    418a:   400b        ands r3, r1
-    418c:   b510        push {r4, lr}
-    418e:   f7ff ffad   bl 0x40ec
+    417e:   0000
+
+  0x4180:   0x20000018
+  0x4184:   0x40044000  ; SPI 1
+  0x4188:   0x400b2000  ; GPIO B
+
+function_10:
+  0x418c:   b510        push {r4, lr}
+    418e:   f7ff ffad   bl 0x40ec           ; call function_11
     4192:   f3c0 0000   ubfx r0, r0, #0, #1
     4196:   bd10        pop {r4, pc}
-    4198:   b570        push {r4, r5, r6, lr}
+
+function_82:
+  0x4198:   b570        push {r4, r5, r6, lr}
     419a:   4c12        ldr r4, [pc, #72]   ; (0x41e4)
     419c:   7820        ldrb r0, [r4, #0]
     419e:   b9f8        cbnz r0, 0x41e0
+
     41a0:   2100        movs r1, #0
     41a2:   f44f 3000   mov.w r0, #131072   ; 0x20000
     41a6:   2301        movs r3, #1
     41a8:   460a        mov r2, r1
-    41aa:   f7ff fb6d   bl 0x3888
+    41aa:   f7ff fb6d   bl 0x3888           ; call ckcu_clocks_enable(0x20000, 0, 0, 1)
+
     41ae:   4e0e        ldr r6, [pc, #56]   ; (0x41e8)
     41b0:   f44f 6580   mov.w r5, #1024   ; 0x400
     41b4:   2200        movs r2, #0
@@ -1523,10 +1557,10 @@ ckcu_set_usb_prescaler:
     41de:   7020        strb r0, [r4, #0]
     41e0:   2001        movs r0, #1
     41e2:   bd70        pop {r4, r5, r6, pc}
-    41e4:   0018        movs r0, r3
-    41e6:   2000        movs r0, #0
-    41e8:   2000        movs r0, #0
-    41ea:   400b        ands r3, r1
+
+  0x41e4:   0x20000018
+  0x41e8:   0x400b2000  ; GPIO B
+
     41ec:   b570        push {r4, r5, r6, lr}
     41ee:   f000 f8ad   bl 0x434c
     41f2:   4d0f        ldr r5, [pc, #60]   ; (0x4230)
@@ -1834,8 +1868,9 @@ ckcu_set_usb_prescaler:
     44e2:   e8bd 87f0   ldmia.w sp!, {r4, r5, r6, r7, r8, r9, sl, pc}
     44e6:   2001        movs r0, #1
     44e8:   e7fb        b.n 0x44e2
-    44ea:   0000        movs r0, r0
-    44ec:   b538        push {r3, r4, r5, lr}
+    44ea:   0000
+
+  0x44ec:   b538        push {r3, r4, r5, lr}
     44ee:   4c07        ldr r4, [pc, #28]   ; (0x450c)
     44f0:   2006        movs r0, #6
     44f2:   f88d 0000   strb.w r0, [sp]
@@ -1847,10 +1882,11 @@ ckcu_set_usb_prescaler:
     4502:   f7ff ff57   bl 0x43b4
     4506:   6265        str r5, [r4, #36]   ; 0x24
     4508:   bd38        pop {r3, r4, r5, pc}
-    450a:   0000        movs r0, r0
-    450c:   2000        movs r0, #0
-    450e:   400b        ands r3, r1
-    4510:   b510        push {r4, lr}
+    450a:   0000
+
+  0x450c:   0x400b2000
+
+  0x4510:   b510        push {r4, lr}
     4512:   f44f 74cd   mov.w r4, #410   ; 0x19a
     4516:   f7ff fef1   bl 0x42fc
     451a:   e005        b.n 0x4528
@@ -1864,9 +1900,15 @@ ckcu_set_usb_prescaler:
     452e:   bd10        pop {r4, pc}
     4530:   2001        movs r0, #1
     4532:   bd10        pop {r4, pc}
-    4534:   6281        str r1, [r0, #40]   ; 0x28
+
+  0x4534:   6281        str r1, [r0, #40]   ; 0x28
     4536:   4770        bx lr
-    4538:   2a00        cmp r2, #0
+
+gpio_set_input_output:
+    ; r0 = GPIO reg base
+    ; r1 = pin bit
+    ; r2 = 0/1 input/output
+  0x4538:   2a00        cmp r2, #0
     453a:   6802        ldr r2, [r0, #0]
     453c:   d001        beq.n 0x4542
     453e:   430a        orrs r2, r1
@@ -1874,7 +1916,12 @@ ckcu_set_usb_prescaler:
     4542:   438a        bics r2, r1
     4544:   6002        str r2, [r0, #0]
     4546:   4770        bx lr
-    4548:   2a00        cmp r2, #0
+
+gpio_set_output_current:
+    ; r0 = GPIO reg base
+    ; r1 = pin bit
+    ; r2 = 0/1 4mA/8mA
+  0x4548:   2a00        cmp r2, #0
     454a:   6942        ldr r2, [r0, #20]
     454c:   d001        beq.n 0x4552
     454e:   430a        orrs r2, r1
@@ -1882,7 +1929,12 @@ ckcu_set_usb_prescaler:
     4552:   438a        bics r2, r1
     4554:   6142        str r2, [r0, #20]
     4556:   4770        bx lr
-    4558:   2a00        cmp r2, #0
+
+gpio_set_input_enable:
+    ; r0 = GPIO reg base
+    ; r1 = pin bit
+    ; r2 = 0/1 disable/enable
+  0x4558:   2a00        cmp r2, #0
     455a:   6842        ldr r2, [r0, #4]
     455c:   d001        beq.n 0x4562
     455e:   430a        orrs r2, r1
@@ -1890,7 +1942,12 @@ ckcu_set_usb_prescaler:
     4562:   438a        bics r2, r1
     4564:   6042        str r2, [r0, #4]
     4566:   4770        bx lr
-    4568:   2a00        cmp r2, #0
+
+gpio_set_open_drain:
+    ; r0 = GPIO reg base
+    ; r1 = pin bit
+    ; r2 = enable/disable
+  0x4568:   2a00        cmp r2, #0
     456a:   6902        ldr r2, [r0, #16]
     456c:   d001        beq.n 0x4572
     456e:   430a        orrs r2, r1
@@ -1898,9 +1955,15 @@ ckcu_set_usb_prescaler:
     4572:   438a        bics r2, r1
     4574:   6102        str r2, [r0, #16]
     4576:   4770        bx lr
-    4578:   b142        cbz r2, 0x458c
+
+gpio_set_pin_pull_up_down:
+    ; r0 = GPIO reg base
+    ; r1 = pin bit
+    ; r2 = 0/1/2 pull-up/pull-down/none
+  0x4578:   b142        cbz r2, 0x458c
     457a:   2a01        cmp r2, #1
     457c:   d009        beq.n 0x4592
+
     457e:   6882        ldr r2, [r0, #8]
     4580:   438a        bics r2, r1
     4582:   6082        str r2, [r0, #8]
@@ -1908,6 +1971,7 @@ ckcu_set_usb_prescaler:
     4586:   438a        bics r2, r1
     4588:   60c2        str r2, [r0, #12]
     458a:   4770        bx lr
+
     458c:   6882        ldr r2, [r0, #8]
     458e:   430a        orrs r2, r1
     4590:   e7f7        b.n 0x4582
@@ -1918,14 +1982,27 @@ ckcu_set_usb_prescaler:
     459a:   438a        bics r2, r1
     459c:   6082        str r2, [r0, #8]
     459e:   4770        bx lr
-    45a0:   6241        str r1, [r0, #36]   ; 0x24
+
+gpio_set_pin:
+    ; r0 = GPIO reg base
+    ; r1 = pin bit
+  0x45a0:   6241        str r1, [r0, #36]   ; 0x24
     45a2:   4770        bx lr
-    45a4:   b10a        cbz r2, 0x45aa
+
+gpio_set_reset_pin:
+    ; r0 = GPIO reg base
+    ; r1 = pin bit
+    ; r2 = 0/1 reset/set
+  0x45a4:   b10a        cbz r2, 0x45aa
     45a6:   6241        str r1, [r0, #36]   ; 0x24
     45a8:   4770        bx lr
     45aa:   6281        str r1, [r0, #40]   ; 0x28
     45ac:   4770        bx lr
-    45ae:   2900        cmp r1, #0
+
+gptm_enable_disable:
+    ; r0 = GPTM reg base
+    ; r1 = 0/1 enable/disable
+  0x45ae:   2900        cmp r1, #0
     45b0:   6901        ldr r1, [r0, #16]
     45b2:   d002        beq.n 0x45ba
     45b4:   f041 0101   orr.w r1, r1, #1
@@ -1933,6 +2010,7 @@ ckcu_set_usb_prescaler:
     45ba:   f021 0101   bic.w r1, r1, #1
     45be:   6101        str r1, [r0, #16]
     45c0:   4770        bx lr
+
     45c2:   b5f0        push {r4, r5, r6, r7, lr}
     45c4:   780b        ldrb r3, [r1, #0]
     45c6:   6d07        ldr r7, [r0, #80]   ; 0x50
@@ -3740,8 +3818,8 @@ ckcu_set_usb_prescaler:
     561e:   4620        mov r0, r4
     5620:   f7fe f89c   bl 0x375c
 
-    5624:   2029        movs r0, #41   ; 0x29
-    5626:   f000 f899   bl 0x575c
+    5624:   2029        movs r0, #41
+    5626:   f000 f899   bl 0x575c           ; call nvic_disable_intr(41)
 
     562a:   f000 fb01   bl 0x5c30
 
@@ -3884,7 +3962,9 @@ setup_intr_priority:
   0x5754:   0xe000ed0c  ; NVIC AIRCR register
   0x5758:   0x05fa0000  ; VECTKEY (needed to write AIRCR)
 
-    575c:   f000 021f   and.w r2, r0, #31
+nvic_disable_intr:
+    ; r0 = interrupt number
+  0x575c:   f000 021f   and.w r2, r0, #31
     5760:   2101        movs r1, #1
     5762:   4091        lsls r1, r2
     5764:   0940        lsrs r0, r0, #5
@@ -4456,7 +4536,8 @@ nvic_set_vtor:
     5c80:   2000        movs r0, #0
     5c82:   42d4        cmn r4, r2
     5c84:   ed10 e000   ldc 0, cr14, [r0, #-0]
-    5c88:   e92d 47f0   stmdb sp!, {r4, r5, r6, r7, r8, r9, sl, lr}
+
+  0x5c88:   e92d 47f0   stmdb sp!, {r4, r5, r6, r7, r8, r9, sl, lr}
     5c8c:   4c0e        ldr r4, [pc, #56]   ; (0x5cc8)
     5c8e:   6827        ldr r7, [r4, #0]
     5c90:   4d0d        ldr r5, [pc, #52]   ; (0x5cc8)
@@ -4585,62 +4666,80 @@ nvic_set_vtor:
     5dbe:   2138        movs r1, #56   ; 0x38
     5dc0:   3008        adds r0, #8
     5dc2:   e7f1        b.n 0x5da8
-    5dc4:   0028        movs r0, r5
-    5dc6:   2000        movs r0, #0
-    5dc8:   0608        lsls r0, r1, #24
-    5dca:   2000        movs r0, #0
-    5dcc:   0000        movs r0, r0
-    5dce:   4008        ands r0, r1
-    5dd0:   b510        push {r4, lr}
+
+  0x5dc4:   0x20000028
+  0x5dc8:   0x20000608
+  0x5dcc:   0x40080000  ; FMC
+
+reset_builtin:
+  0x5dd0:   b510        push {r4, lr}
     5dd2:   491b        ldr r1, [pc, #108]   ; (0x5e40)
     5dd4:   b168        cbz r0, 0x5df2
     5dd6:   2801        cmp r0, #1
     5dd8:   d00d        beq.n 0x5df6
+
     5dda:   2802        cmp r0, #2
     5ddc:   d12f        bne.n 0x5e3e
-    5dde:   2035        movs r0, #53   ; 0x35
-    5de0:   f7ff fcbc   bl 0x575c
+
+    ; Disable USB interrupt
+    5dde:   2035        movs r0, #53
+    5de0:   f7ff fcbc   bl 0x575c           ; call nvic_disable_intr(53)
+
     5de4:   2000        movs r0, #0
     5de6:   f000 fd55   bl 0x6894
+
     5dea:   e8bd 4010   ldmia.w sp!, {r4, lr}
     5dee:   f7ff bf4b   b.w 0x5c88
-    5df2:   4814        ldr r0, [pc, #80]   ; (0x5e44)
+
+  0x5df2:   4814        ldr r0, [pc, #80]   ; (0x5e44)
     5df4:   e001        b.n 0x5dfa
-    5df6:   4813        ldr r0, [pc, #76]   ; (0x5e44)
+
+  0x5df6:   4813        ldr r0, [pc, #76]   ; (0x5e44)
     5df8:   1f40        subs r0, r0, #5
-    5dfa:   6008        str r0, [r1, #0]
+  0x5dfa:   6008        str r0, [r1, #0]
+
     5dfc:   2100        movs r1, #0
-    5dfe:   f44f 3080   mov.w r0, #65536   ; 0x10000
+    5dfe:   f44f 3080   mov.w r0, #65536
     5e02:   2301        movs r3, #1
     5e04:   460a        mov r2, r1
-    5e06:   f7fd fd3f   bl 0x3888
+    5e06:   f7fd fd3f   bl 0x3888           ; call ckcu_clocks_enable(0x10000, 0, 0, 1)
+
     5e0a:   490f        ldr r1, [pc, #60]   ; (0x5e48)
     5e0c:   f44f 7000   mov.w r0, #512   ; 0x200
     5e10:   6248        str r0, [r1, #36]   ; 0x24
-    5e12:   2035        movs r0, #53   ; 0x35
-    5e14:   f7ff fca2   bl 0x575c
+
+    ; Disable USB interrupt
+    5e12:   2035        movs r0, #53
+    5e14:   f7ff fca2   bl 0x575c           ; call nvic_disable_intr(53)
+
     5e18:   2000        movs r0, #0
     5e1a:   f000 fd3b   bl 0x6894
-    5e1e:   f644 6020   movw r0, #20000   ; 0x4e20
-    5e22:   f7fd fccf   bl 0x37c4
+
+    5e1e:   f644 6020   movw r0, #20000
+    5e22:   f7fd fccf   bl 0x37c4           ; call spin_wait_maybe(20000)
+
     5e26:   f3bf 8f4f   dsb sy
+
+    ; Request system reset
+    ; Write 0x5fa0004 to AIRCR
+    ; Set SYSRESETREQ
     5e2a:   4808        ldr r0, [pc, #32]   ; (0x5e4c)
     5e2c:   6801        ldr r1, [r0, #0]
     5e2e:   4a08        ldr r2, [pc, #32]   ; (0x5e50)
     5e30:   f401 61e0   and.w r1, r1, #1792   ; 0x700
     5e34:   4311        orrs r1, r2
     5e36:   6001        str r1, [r0, #0]
+
     5e38:   f3bf 8f4f   dsb sy
-    5e3c:   e7fe        b.n 0x5e3c
+  0x5e3c:   e7fe        b.n 0x5e3c          ; dead loop
     5e3e:   bd10        pop {r4, pc}
-    5e40:   3ffc        subs r7, #252   ; 0xfc
-    5e42:   2000        movs r0, #0
-    5e44:   faf5 55aa       ; <UNDEFINED> instruction: 0xfaf555aa
-    5e48:   0000        movs r0, r0
-    5e4a:   400b        ands r3, r1
-    5e4c:   ed0c e000   stc 0, cr14, [ip, #-0]
-    5e50:   0004        movs r4, r0
-    5e52:   05fa        lsls r2, r7, #23
+
+  0x5e40:   0x20003ffc
+  0x5e44:   0x55aafaf5
+  0x5e48:   0x400b0000  ; GPIO A
+  0x5e4c:   0xe000ed0c
+  0x5e50:   0x05fa0004  ; AIRCR key and reset
+
     5e54:   b570        push {r4, r5, r6, lr}
     5e56:   460c        mov r4, r1
     5e58:   4a09        ldr r2, [pc, #36]   ; (0x5e80)
@@ -5710,65 +5809,83 @@ usb_init:
   0x6870:   0xe000e004
   0x6874:   0x20000168
 
-    6878:   4905        ldr r1, [pc, #20]   ; (0x6890)
+function_29:
+  0x6878:   4905        ldr r1, [pc, #20]   ; (0x6890)
     687a:   2801        cmp r0, #1
     687c:   6808        ldr r0, [r1, #0]
     687e:   d003        beq.n 0x6888
     6880:   f420 6000   bic.w r0, r0, #2048   ; 0x800
     6884:   6008        str r0, [r1, #0]
     6886:   4770        bx lr
-    6888:   f440 6000   orr.w r0, r0, #2048   ; 0x800
+  0x6888:   f440 6000   orr.w r0, r0, #2048   ; 0x800
     688c:   e7fa        b.n 0x6884
-    688e:   0000        movs r0, r0
-    6890:   8000        strh r0, [r0, #0]
-    6892:   400a        ands r2, r1
-    6894:   4905        ldr r1, [pc, #20]   ; (0x68ac)
+    688e:   0000
+
+  0x6890:   0x400a8000  ; USB
+
+usb_dp_pull_up:
+    ; r0 = 0/1 disable/enable
+    ; Set USBCSR.DPPUEN
+    : Enable/Disable USB DP pull up
+  0x6894:   4905        ldr r1, [pc, #20]   ; (0x68ac)
     6896:   2801        cmp r0, #1
     6898:   6808        ldr r0, [r1, #0]
     689a:   d003        beq.n 0x68a4
     689c:   f420 6080   bic.w r0, r0, #1024   ; 0x400
     68a0:   6008        str r0, [r1, #0]
     68a2:   4770        bx lr
-    68a4:   f440 6080   orr.w r0, r0, #1024   ; 0x400
+  0x68a4:   f440 6080   orr.w r0, r0, #1024   ; 0x400
     68a8:   e7fa        b.n 0x68a0
-    68aa:   0000        movs r0, r0
-    68ac:   8000        strh r0, [r0, #0]
-    68ae:   400a        ands r2, r1
-    68b0:   2100        movs r1, #0
+    68aa:   0000
+
+  0x68ac:   0x400a8000  ; USB
+
+function_e_60:
+  0x68b0:   2100        movs r1, #0
     68b2:   2020        movs r0, #32
     68b4:   2301        movs r3, #1
     68b6:   460a        mov r2, r1
     68b8:   f7ff bae6   b.w 0x5e88
-    68bc:   b510        push {r4, lr}
-    68be:   f000 ff61   bl 0x7784
+
+function_e_61:
+  0x68bc:   b510        push {r4, lr}
+    68be:   f000 ff61   bl 0x7784           ; call usb_get_ep_reg
     68c2:   6801        ldr r1, [r0, #0]
     68c4:   f001 0109   and.w r1, r1, #9
     68c8:   6001        str r1, [r0, #0]
     68ca:   bd10        pop {r4, pc}
-    68cc:   b510        push {r4, lr}
-    68ce:   f000 ff59   bl 0x7784
+
+function_e_62:
+  0x68cc:   b510        push {r4, lr}
+    68ce:   f000 ff59   bl 0x7784           ; call usb_get_ep_reg
     68d2:   6801        ldr r1, [r0, #0]
     68d4:   f001 0124   and.w r1, r1, #36   ; 0x24
     68d8:   6001        str r1, [r0, #0]
     68da:   bd10        pop {r4, pc}
-    68dc:   b510        push {r4, lr}
+
+function_e_63:
+  0x68dc:   b510        push {r4, lr}
     68de:   460c        mov r4, r1
-    68e0:   f000 ff50   bl 0x7784
+    68e0:   f000 ff50   bl 0x7784           ; call usb_get_ep_reg
     68e4:   6084        str r4, [r0, #8]
     68e6:   bd10        pop {r4, pc}
-    68e8:   b510        push {r4, lr}
-    68ea:   f000 ff4b   bl 0x7784
+
+usb_get_ep_buff:
+  0x68e8:   b510        push {r4, lr}
+    68ea:   f000 ff4b   bl 0x7784           ; call usb_get_ep_reg
     68ee:   6900        ldr r0, [r0, #16]
     68f0:   4902        ldr r1, [pc, #8]   ; (0x68fc)
     68f2:   f3c0 0009   ubfx r0, r0, #0, #10
     68f6:   4408        add r0, r1
     68f8:   bd10        pop {r4, pc}
-    68fa:   0000        movs r0, r0
-    68fc:   a000        add r0, pc, #0   ; (adr r0, 0x6900)
-    68fe:   400a        ands r2, r1
-    6900:   b570        push {r4, r5, r6, lr}
+    68fa:   0000
+
+  0x68fc:   0x400aa000
+
+function_e_65:
+  0x6900:   b570        push {r4, r5, r6, lr}
     6902:   4605        mov r5, r0
-    6904:   f000 ff3e   bl 0x7784
+    6904:   f000 ff3e   bl 0x7784           ; call usb_get_ep_reg
     6908:   4604        mov r4, r0
     690a:   4628        mov r0, r5
     690c:   f000 f80a   bl 0x6924
@@ -5779,15 +5896,20 @@ usb_init:
     691a:   4408        add r0, r1
     691c:   bd70        pop {r4, r5, r6, pc}
     691e:   0000        movs r0, r0
+
     6920:   a000        add r0, pc, #0   ; (adr r0, 0x6924)
     6922:   400a        ands r2, r1
-    6924:   b510        push {r4, lr}
-    6926:   f000 ff2d   bl 0x7784
+
+usb_get_ep_len:
+  0x6924:   b510        push {r4, lr}
+    6926:   f000 ff2d   bl 0x7784           ; call usb_get_ep_reg
     692a:   6900        ldr r0, [r0, #16]
     692c:   f3c0 2089   ubfx r0, r0, #10, #10
     6930:   bd10        pop {r4, pc}
-    6932:   b510        push {r4, lr}
-    6934:   f000 ff26   bl 0x7784
+
+function_e_67:
+  0x6932:   b510        push {r4, lr}
+    6934:   f000 ff26   bl 0x7784           ; call usb_get_ep_reg
     6938:   6901        ldr r1, [r0, #16]
     693a:   6800        ldr r0, [r0, #0]
     693c:   00c9        lsls r1, r1, #3
@@ -5796,23 +5918,29 @@ usb_init:
     6944:   bd10        pop {r4, pc}
     6946:   f3c0 1040   ubfx r0, r0, #5, #1
     694a:   bd10        pop {r4, pc}
-    694c:   b510        push {r4, lr}
-    694e:   f000 ff19   bl 0x7784
+
+function_e_68:
+  0x694c:   b510        push {r4, lr}
+    694e:   f000 ff19   bl 0x7784           ; call usb_get_ep_reg
     6952:   6841        ldr r1, [r0, #4]
     6954:   6880        ldr r0, [r0, #8]
     6956:   4008        ands r0, r1
     6958:   bd10        pop {r4, pc}
-    695a:   b510        push {r4, lr}
+
+usb_get_ep_tcnt:
+  0x695a:   b510        push {r4, lr}
     695c:   460c        mov r4, r1
-    695e:   f000 ff11   bl 0x7784
+    695e:   f000 ff11   bl 0x7784           ; call usb_get_ep_reg
     6962:   68c0        ldr r0, [r0, #12]
     6964:   40e0        lsrs r0, r4
     6966:   f3c0 0008   ubfx r0, r0, #0, #9
     696a:   bd10        pop {r4, pc}
-    696c:   b570        push {r4, r5, r6, lr}
+
+function_e_70:
+  0x696c:   b570        push {r4, r5, r6, lr}
     696e:   460c        mov r4, r1
     6970:   4605        mov r5, r0
-    6972:   f000 ff07   bl 0x7784
+    6972:   f000 ff07   bl 0x7784           ; call usb_get_ep_reg
     6976:   eb04 01c5   add.w r1, r4, r5, lsl #3
     697a:   684a        ldr r2, [r1, #4]
     697c:   6102        str r2, [r0, #16]
@@ -5822,20 +5950,23 @@ usb_init:
     6986:   6081        str r1, [r0, #8]
     6988:   4628        mov r0, r5
     698a:   e8bd 4070   ldmia.w sp!, {r4, r5, r6, lr}
+
     698e:   f000 b835   b.w 0x69fc
-    6992:   e92d 41f0   stmdb sp!, {r4, r5, r6, r7, r8, lr}
+
+function_72:
+  0x6992:   e92d 41f0   stmdb sp!, {r4, r5, r6, r7, r8, lr}
     6996:   4616        mov r6, r2
     6998:   460f        mov r7, r1
     699a:   0005        movs r5, r0
     699c:   d011        beq.n 0x69c2
     699e:   2100        movs r1, #0
-    69a0:   f7ff ffdb   bl 0x695a
+    69a0:   f7ff ffdb   bl 0x695a           ; call usb_get_ep_tcnt
     69a4:   4604        mov r4, r0
     69a6:   42b0        cmp r0, r6
     69a8:   d808        bhi.n 0x69bc
     69aa:   4628        mov r0, r5
     69ac:   b15d        cbz r5, 0x69c6
-    69ae:   f7ff ff9b   bl 0x68e8
+    69ae:   f7ff ff9b   bl 0x68e8           ; call usb_get_ep_buff
     69b2:   1ce1        adds r1, r4, #3
     69b4:   088a        lsrs r2, r1, #2
     69b6:   4639        mov r1, r7
@@ -5846,11 +5977,13 @@ usb_init:
     69c4:   e7ec        b.n 0x69a0
     69c6:   f7ff ff9b   bl 0x6900
     69ca:   e7f2        b.n 0x69b2
-    69cc:   e92d 41f0   stmdb sp!, {r4, r5, r6, r7, r8, lr}
+
+function_71:
+  0x69cc:   e92d 41f0   stmdb sp!, {r4, r5, r6, r7, r8, lr}
     69d0:   4615        mov r5, r2
     69d2:   460e        mov r6, r1
     69d4:   4607        mov r7, r0
-    69d6:   f000 fed5   bl 0x7784
+    69d6:   f000 fed5   bl 0x7784           ; call usb_get_ep_reg
     69da:   4604        mov r4, r0
     69dc:   2000        movs r0, #0
     69de:   b13d        cbz r5, 0x69f0
@@ -5865,19 +5998,25 @@ usb_init:
     69f2:   f001 0110   and.w r1, r1, #16
     69f6:   6021        str r1, [r4, #0]
     69f8:   e8bd 81f0   ldmia.w sp!, {r4, r5, r6, r7, r8, pc}
-    69fc:   b510        push {r4, lr}
-    69fe:   f000 fec1   bl 0x7784
+
+function_e_71:
+  0x69fc:   b510        push {r4, lr}
+    69fe:   f000 fec1   bl 0x7784           ; call usb_get_ep_reg
     6a02:   6801        ldr r1, [r0, #0]
     6a04:   f001 0119   and.w r1, r1, #25
     6a08:   6001        str r1, [r0, #0]
     6a0a:   bd10        pop {r4, pc}
-    6a0c:   b510        push {r4, lr}
-    6a0e:   f000 feb9   bl 0x7784
+
+function_e_72:
+  0x6a0c:   b510        push {r4, lr}
+    6a0e:   f000 feb9   bl 0x7784           ; call usb_get_ep_reg
     6a12:   2104        movs r1, #4
     6a14:   6001        str r1, [r0, #0]
     6a16:   bd10        pop {r4, pc}
-    6a18:   b510        push {r4, lr}
-    6a1a:   f000 feb3   bl 0x7784
+
+function_e_73:
+  0x6a18:   b510        push {r4, lr}
+    6a1a:   f000 feb3   bl 0x7784           ; call usb_get_ep_reg
     6a1e:   2140        movs r1, #64   ; 0x40
     6a20:   6081        str r1, [r0, #8]
     6a22:   6802        ldr r2, [r0, #0]
@@ -5885,14 +6024,16 @@ usb_init:
     6a26:   4391        bics r1, r2
     6a28:   6001        str r1, [r0, #0]
     6a2a:   bd10        pop {r4, pc}
-    6a2c:   e92d 41f0   stmdb sp!, {r4, r5, r6, r7, r8, lr}
+
+usb_copy_send:
+  0x6a2c:   e92d 41f0   stmdb sp!, {r4, r5, r6, r7, r8, lr}
     6a30:   4614        mov r4, r2
     6a32:   4688        mov r8, r1
     6a34:   4607        mov r7, r0
     6a36:   f7ff ff75   bl 0x6924
     6a3a:   4606        mov r6, r0
     6a3c:   4638        mov r0, r7
-    6a3e:   f000 fea1   bl 0x7784
+    6a3e:   f000 fea1   bl 0x7784           ; call usb_get_ep_reg
     6a42:   4605        mov r5, r0
     6a44:   2100        movs r1, #0
     6a46:   4638        mov r0, r7
@@ -5902,8 +6043,9 @@ usb_init:
     6a50:   b110        cbz r0, 0x6a58
     6a52:   2000        movs r0, #0
     6a54:   e8bd 81f0   ldmia.w sp!, {r4, r5, r6, r7, r8, pc}
+
     6a58:   4638        mov r0, r7
-    6a5a:   f7ff ff45   bl 0x68e8
+    6a5a:   f7ff ff45   bl 0x68e8           ; call usb_get_ep_buff
     6a5e:   4601        mov r1, r0
     6a60:   1ce0        adds r0, r4, #3
     6a62:   0882        lsrs r2, r0, #2
@@ -5914,13 +6056,19 @@ usb_init:
     6a6e:   6028        str r0, [r5, #0]
     6a70:   4620        mov r0, r4
     6a72:   e7ef        b.n 0x6a54
-    6a74:   4902        ldr r1, [pc, #8]   ; (0x6a80)
+
+usb_enable_intr:
+    ; r0 =
+  0x6a74:   4902        ldr r1, [pc, #8]   ; (0x6a80)
     6a76:   684a        ldr r2, [r1, #4]
     6a78:   4302        orrs r2, r0
     6a7a:   604a        str r2, [r1, #4]
     6a7c:   4770        bx lr
-    6a7e:   0000        movs r0, r0
-    6a80:   8000        strh r0, [r0, #0]
+    6a7e:   0000
+
+function_e_75:
+    ; r0 =
+  0x6a80:   8000        strh r0, [r0, #0]
     6a82:   400a        ands r2, r1
     6a84:   4603        mov r3, r0
     6a86:   2107        movs r1, #7
@@ -5935,30 +6083,46 @@ usb_init:
     6a9c:   dcf4        bgt.n 0x6a88
     6a9e:   f04f 30ff   mov.w r0, #4294967295   ; 0xffffffff
     6aa2:   4770        bx lr
-    6aa4:   4802        ldr r0, [pc, #8]   ; (0x6ab0)
+
+usb_get_intr_flags:
+    ; return (USBIER & USBISR)
+  0x6aa4:   4802        ldr r0, [pc, #8]   ; (0x6ab0)
     6aa6:   6841        ldr r1, [r0, #4]
     6aa8:   6880        ldr r0, [r0, #8]
     6aaa:   4008        ands r0, r1
     6aac:   4770        bx lr
-    6aae:   0000        movs r0, r0
-    6ab0:   8000        strh r0, [r0, #0]
-    6ab2:   400a        ands r2, r1
-    6ab4:   f000 b84c   b.w 0x6b50
-    6ab8:   4802        ldr r0, [pc, #8]   ; (0x6ac4)
+    6aae:   0000
+
+  0x6ab0:   0x400a8000  ; SUB
+
+jump_1:
+  0x6ab4:   f000 b84c   b.w 0x6b50
+
+usb_set_lpmode_pdwn:
+    ; Set USBCSR.LPMODE and USBCSR.PDWN
+    ; Enter USB low-power mode
+    ; Enter USB power-down mode
+  0x6ab8:   4802        ldr r0, [pc, #8]   ; (0x6ac4)
     6aba:   6801        ldr r1, [r0, #0]
     6abc:   f041 010c   orr.w r1, r1, #12
     6ac0:   6001        str r1, [r0, #0]
     6ac2:   4770        bx lr
-    6ac4:   8000        strh r0, [r0, #0]
-    6ac6:   400a        ands r2, r1
-    6ac8:   4802        ldr r0, [pc, #8]   ; (0x6ad4)
+
+  0x6ac4:   0x400a8000  ; USB
+
+usb_clear_csr:
+    ; Clear USBCSR (control and status)
+    ; Keep the value of USBCSR.DPPUEN
+  0x6ac8:   4802        ldr r0, [pc, #8]   ; (0x6ad4)
     6aca:   6801        ldr r1, [r0, #0]
     6acc:   f401 6180   and.w r1, r1, #1024   ; 0x400
     6ad0:   6001        str r1, [r0, #0]
     6ad2:   4770        bx lr
-    6ad4:   8000        strh r0, [r0, #0]
-    6ad6:   400a        ands r2, r1
-    6ad8:   b510        push {r4, lr}
+
+  0x6ad4:   0x400a8000  ; USB
+
+function_28:
+  0x6ad8:   b510        push {r4, lr}
     6ada:   4604        mov r4, r0
     6adc:   481a        ldr r0, [pc, #104]   ; (0x6b48)
     6ade:   6802        ldr r2, [r0, #0]
@@ -6002,11 +6166,13 @@ usb_init:
     6b40:   f7ff bea8   b.w 0x6894
     6b44:   bd10        pop {r4, pc}
     6b46:   0000        movs r0, r0
-    6b48:   0014        movs r4, r2
-    6b4a:   2000        movs r0, #0
-    6b4c:   8000        strh r0, [r0, #0]
-    6b4e:   400a        ands r2, r1
-    6b50:   f241 111d   movw r1, #4381   ; 0x111d
+
+  0x6b48:   0x20000014
+  0x6b4c:   0x400a8000  ; USB
+
+ptr_write_data:
+    ; r0 = pointer = 0x200002c4 (pointer_39)
+  0x6b50:   f241 111d   movw r1, #4381   ; 0x111d
     6b54:   6001        str r1, [r0, #0]
     6b56:   490a        ldr r1, [pc, #40]   ; (0x6b80)
     6b58:   6041        str r1, [r0, #4]
@@ -6027,17 +6193,14 @@ usb_init:
     6b7a:   2102        movs r1, #2
     6b7c:   6281        str r1, [r0, #40]   ; 0x28
     6b7e:   4770        bx lr
-    6b80:   0008        movs r0, r1
-    6b82:   8001        strh r1, [r0, #0]
-    6b84:   2088        movs r0, #136   ; 0x88
-    6b86:   9100        str r1, [sp, #0]
-    6b88:   0090        lsls r0, r2, #2
-    6b8a:   9201        str r2, [sp, #4]
-    6b8c:   00d0        lsls r0, r2, #3
-    6b8e:   9301        str r3, [sp, #4]
-    6b90:   0110        lsls r0, r2, #4
-    6b92:   8401        strh r1, [r0, #32]
-    6b94:   b510        push {r4, lr}
+
+  0x6b80:   0x80010008
+  0x6b84:   0x91002088
+  0x6b88:   0x92010090
+  0x6b8c:   0x930100d0
+  0x6b90:   0x84010110
+
+  0x6b94:   b510        push {r4, lr}
     6b96:   4c12        ldr r4, [pc, #72]   ; (0x6be0)
     6b98:   f894 0032   ldrb.w r0, [r4, #50]   ; 0x32
     6b9c:   2803        cmp r0, #3
@@ -7365,10 +7528,14 @@ watchdog_reload_timer:
     777c:   f841 3022   str.w r3, [r1, r2, lsl #2]
     7780:   e7f8        b.n 0x7774
     7782:   4770        bx lr
-    7784:   4902        ldr r1, [pc, #8]   ; (0x7790)
+
+usb_get_ep_reg:
+    ; r0 =
+  0x7784:   4902        ldr r1, [pc, #8]   ; (0x7790)
     7786:   eb00 0080   add.w r0, r0, r0, lsl #2
     778a:   eb01 0080   add.w r0, r1, r0, lsl #2
     778e:   4770        bx lr
+
     7790:   8014        strh r4, [r2, #0]
     7792:   400a        ands r2, r1
     7794:   e92d 47f0   stmdb sp!, {r4, r5, r6, r7, r8, r9, sl, lr}
@@ -7466,8 +7633,8 @@ sram_init_func_2:
     786a:   0000
 
 main:
-  0x786c:   f7fd ff32   bl 0x56d4               ; call setup_intr_priority()
-    7870:   f7fb ffae   bl 0x37d0
+  0x786c:   f7fd ff32   bl 0x56d4           ; call setup_intr_priority
+    7870:   f7fb ffae   bl 0x37d0           ; call setup_afio_gpio
     7874:   f7fd ffb0   bl 0x57d8
     7878:   20ff        movs r0, #255   ; 0xff
     787a:   f7fc fad1   bl 0x3e20
@@ -7484,8 +7651,10 @@ main:
     789e:   f7fd ff07   bl 0x56b0
     78a2:   2000        movs r0, #0
     78a4:   f7fd feb0   bl 0x5608
+
     78a8:   200a        movs r0, #10
-    78aa:   f7fb ff8b   bl 0x37c4
+    78aa:   f7fb ff8b   bl 0x37c4           ; call spin_wait_maybe
+
     78ae:   2001        movs r0, #1
     78b0:   f7fe fb54   bl 0x5f5c
     78b4:   f7fd fac2   bl 0x4e3c
@@ -7506,15 +7675,15 @@ main:
     78d8:   f000 f844   bl 0x7964
     78dc:   2001        movs r0, #1
     78de:   f7fe f9f9   bl 0x5cd4
-    78e2:   f7ff f9b9   bl 0x6c58
+    78e2:   f7ff f9b9   bl 0x6c58           ; call watchdog_reload_timer
     78e6:   e7f4        b.n 0x78d2
 
   0x78e8:   2001        movs r0, #1
     78ea:   f7fd fe8d   bl 0x5608
-    78ee:   f7fe ff8d   bl 0x680c               ; call usb_init()
+    78ee:   f7fe ff8d   bl 0x680c           ; call usb_init
 
-    78f2:   4e1a        ldr r6, [pc, #104]   ; (0x795c)
-    78f4:   4d1a        ldr r5, [pc, #104]   ; (0x7960)
+    78f2:   4e1a        ldr r6, [pc, #104]  ; (0x795c)
+    78f4:   4d1a        ldr r5, [pc, #104]  ; (0x7960)
 
   0x78f6:   f7ff f94d   bl 0x6b94
     78fa:   2801        cmp r0, #1
@@ -7656,7 +7825,8 @@ main:
     7a42:   1a14
     7a44:   0100
     7a46:   0200
-    7a48:   e539
+
+  0x7a48:   e539
     7a4a:   65e4
     7a4c:   1fe7
     7a4e:   0110
@@ -7790,6 +7960,7 @@ main:
     7b6a:   ffff ffff
     7b6e:   0606
     7b70:   ff05 0005
+
     7b74:   1008
     7b76:   2018
     7b78:   3028

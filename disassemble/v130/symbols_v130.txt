@@ -1,0 +1,112 @@
+Firmware v130 Symbol Map:
+
+Functions:
+
+<function_name>                     @ 0x<offset>
+    <called function>
+    *<function referenced by pointer>
+
+reset                               @ 0x3554
+    watchdog_init
+    clock_init
+    entry
+
+nmi                                 @ 0x3560
+hard_fault                          @ 0x3562
+mcu_fault                           @ 0x3564
+bus_fault                           @ 0x3566
+usage_fault                         @ 0x3568
+svccall_intr                        @ 0x356a
+debug_intr                          @ 0x356c
+pendsv_intr                         @ 0x356e
+systick_intr                        @ 0x3570
+generic_intr                        @ 0x3572
+
+entry                               @ 0x3580
+    sram_init
+    main
+
+rand                                @ 0x3594
+srand                               @ 0x35a8
+memcpy                              @ 0x35b8
+
+sram_init                           @ 0x361c
+
+afio_exti_ssr_write                 @ 0x3640
+
+bftm_clear                          @ 0x375c
+
+afio_pin_config                     @ 0x379c
+spin_wait_maybe                     @ 0x37c4
+setup_afio_gpio                     @ 0x37d0
+    ckcu_clocks_enable
+    gpio_set_input_enable
+    gpio_set_pin_pull_up_down
+    afio_pin_config
+
+ckcu_clocks_enable                  @ 0x3888
+ckcu_set_usb_prescaler              @ 0x38ac
+
+function_11                         @ 0x40ec
+function_29                         @ 0x4114
+function_10                         @ 0x418c
+    function_11
+function_82                         @ 0x4198
+    ckcu_clocks_enable
+
+gpio_set_input_output               @ 0x4538
+gpio_set_output_current             @ 0x4548
+gpio_set_input_enable               @ 0x4558
+gpio_set_open_drain                 @ 0x4569
+gpio_set_pin_pull_up_down           @ 0x4578
+gpio_set_pin                        @ 0x45a0
+gpio_set_reset_pin                  @ 0x45a4
+gptm_enable_disable                 @ 0x45ae
+
+setup_intr_priority                 @ 0x56d4
+nvic_disable_intr                   @ 0x575c
+calc_nvic_priority                  @ 0x5772
+
+reset_builtin                       @ 0x5dd0
+
+usb_set_intr_flags                  @ 0x6800
+usb_init                            @ 0x680c
+function_29                         @ 0x6878
+usb_dp_pull_up                      @ 0x6894
+
+function_e_60                       @ 0x68b0
+function_e_61                       @ 0x68bc
+function_e_62                       @ 0x68cc
+function_e_63                       @ 0x68dc
+usb_get_ep_buff                     @ 0x68e8
+function_e_65                       @ 0x6900
+usb_get_ep_len                      @ 0x6924
+function_e_67                       @ 0x6932
+function_e_68                       @ 0x694c
+usb_get_ep_tcnt                     @ 0x695a
+function_e_70                       @ 0x696c
+function_72                         @ 0x6992
+function_71                         @ 0x69cc
+function_e_71                       @ 0x69fc
+function_e_72                       @ 0x6a0c
+function_e_73                       @ 0x6a18
+usb_copy_send                       @ 0x6a2c
+usb_enable_intr                     @ 0x6a74
+function_e_75                       @ 0x6a80
+usb_get_intr_flags                  @ 0x6aa4
+usb_set_lpmode_pdwn                 @ 0x6ab8
+usb_clear_csr                       @ 0x68c8
+function_28                         @ 0x6ad8
+
+ptr_write_data                      @ 0x6b50
+
+usb_intr                            @ 0x6c1c
+watchdog_init                       @ 0x6c28
+watchdog_reload_timer               @ 0x6c58
+
+usb_get_ep_reg                      @ 0x7784
+
+sram_init_func_1                    @ 0x784c
+sram_init_func_2                    @ 0x785c
+
+main                                @ 0x786c
