@@ -30,6 +30,10 @@ rand                                @ 0x3594
 srand                               @ 0x35a8
 memcpy                              @ 0x35b8
 
+function_130_4                      @ 0x35dc
+function_130_5                      @ 0x35ea
+    function_130_4
+
 sram_init                           @ 0x361c
 
 afio_exti_ssr_write                 @ 0x3640
@@ -47,12 +51,42 @@ setup_afio_gpio                     @ 0x37d0
 ckcu_clocks_enable                  @ 0x3888
 ckcu_set_usb_prescaler              @ 0x38ac
 
+function_130_6                      @ 0x3aa8
+    function_130_5
+
+function_130_7                      @ 0x40ac
+    function_130_6
+
 function_11                         @ 0x40ec
 function_29                         @ 0x4114
 function_10                         @ 0x418c
     function_11
 function_82                         @ 0x4198
     ckcu_clocks_enable
+
+pinmux_b789_gpio                    @ 0x41ec
+    gpio_set_input_output
+    gpio_set_pin_pull_up_down
+    afio_pin_config
+pinmux_b789_spi                     @ 0x4234
+    gpio_set_input_output
+    gpio_set_pin_pull_up_down
+    afio_pin_config
+
+function_e_38                       @ 0x4278
+function_e_39                       @ 0x42c4
+function_76                         @ 0x42fc
+function_78                         @ 0x4328
+function_42                         @ 0x434c
+function_25                         @ 0x4374
+    spi_write_read
+spi_write_read                      @ 0x43b4
+function_e_40                       @ 0x4424
+    spi_write_read
+    spin_wait_maybe
+function_27                         @ 0x4474
+function_77                         @ 0x44ec
+function_28                         @ 0x4510
 
 gpio_set_input_output               @ 0x4538
 gpio_set_output_current             @ 0x4548
@@ -63,36 +97,53 @@ gpio_set_pin                        @ 0x45a0
 gpio_set_reset_pin                  @ 0x45a4
 gptm_enable_disable                 @ 0x45ae
 
+function_130_10                     @ 0x5608
+    nvic_disable_intr
+
 setup_intr_priority                 @ 0x56d4
 nvic_disable_intr                   @ 0x575c
 calc_nvic_priority                  @ 0x5772
 
+jump_130_1                          @ 0x57f4
+jump_130_2                          @ 0x57f8
+
+ckcu_voodoo1                        @ 0x5e88
+
 reset_builtin                       @ 0x5dd0
+
+function_e_54                       @ 0x6508
+
+clock_init                          @ 0x65a4
 
 usb_set_intr_flags                  @ 0x6800
 usb_init                            @ 0x680c
-function_29                         @ 0x6878
+usb_dp_wake_up                      @ 0x6878
 usb_dp_pull_up                      @ 0x6894
-
-function_e_60                       @ 0x68b0
-function_e_61                       @ 0x68bc
-function_e_62                       @ 0x68cc
-function_e_63                       @ 0x68dc
+usb_ckcu_voodoo                     @ 0x68b0
+    ckcu_voodoo1
+usb_ep_data_toggle                  @ 0x68bc
+usb_ep_stall                        @ 0x68cc
+usb_set_ep_intr                     @ 0x68dc
 usb_get_ep_buff                     @ 0x68e8
-function_e_65                       @ 0x6900
+usb_get_ep_buff_end                 @ 0x6900
 usb_get_ep_len                      @ 0x6924
 function_e_67                       @ 0x6932
-function_e_68                       @ 0x694c
+usb_get_ep_intr                     @ 0x694c
 usb_get_ep_tcnt                     @ 0x695a
 function_e_70                       @ 0x696c
 function_72                         @ 0x6992
+    usb_get_ep_tcnt
+    usb_get_ep_buff
+    usb_get_ep_buff_end
 function_71                         @ 0x69cc
+    usb_get_ep_reg
+    function_72
 function_e_71                       @ 0x69fc
 function_e_72                       @ 0x6a0c
 function_e_73                       @ 0x6a18
 usb_copy_send                       @ 0x6a2c
 usb_enable_intr                     @ 0x6a74
-function_e_75                       @ 0x6a80
+function_e_75                       @ 0x6a84
 usb_get_intr_flags                  @ 0x6aa4
 usb_set_lpmode_pdwn                 @ 0x6ab8
 usb_clear_csr                       @ 0x68c8
@@ -100,13 +151,26 @@ function_28                         @ 0x6ad8
 
 ptr_write_data                      @ 0x6b50
 
+function_130_2                      @ 0x6b94
+    function_130_1
+
 usb_intr                            @ 0x6c1c
 watchdog_init                       @ 0x6c28
 watchdog_reload_timer               @ 0x6c58
 
+function_130_1                      @ 0x72c0
+    function_71
+
+copy_ptr                            @ 0x7774
+
 usb_get_ep_reg                      @ 0x7784
+
+function_130_9                      @ 0x7794
 
 sram_init_func_1                    @ 0x784c
 sram_init_func_2                    @ 0x785c
 
 main                                @ 0x786c
+
+function_130_3                      @ 0x78f6
+    function_130_2

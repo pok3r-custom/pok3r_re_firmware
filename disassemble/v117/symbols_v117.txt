@@ -187,15 +187,19 @@ function_10                         @ 0x4dd8
     function_11
 function_82                         @ 0x4de4
     ckcu_ahb_clock_enable
-function_39                         @ 0x4e34
-function_40                         @ 0x4e40
+pinmux_select_b789                         @ 0x4e34
+    pinmux_b789_spi
+    pinmux_b789_gpio
+
+pinmux_b789_spi                     @ 0x4e40
     gpio_set_input_output
     gpio_set_pin_pull_up_down
     afio_pin_config
-function_41                         @ 0x4e84
+pinmux_b789_gpio                    @ 0x4e84
     gpio_set_input_output
     gpio_set_pin_pull_up_down
     afio_pin_config
+
 function_e_38                       @ 0x4ecc
     spi_write_read
 function_e_39                       @ 0x4f18
@@ -236,7 +240,7 @@ function_12                         @ 0x52a8
     function_11
     function_28
 jump_2                              @ 0x5308
-    function_39
+    pinmux_select_b789
 function_e_41                       @ 0x530c
 function_e_42                       @ 0x5380
 function_e_43                       @ 0x53e4
@@ -276,7 +280,7 @@ function_50                         @ 0x5db0
     gpio_set_pin_pull_up_down
     afio_pin_config
 function_3                          @ 0x5eb8
-function_e_45                       @ 0x5efc
+ckcu_voodoo1                        @ 0x5efc
 function_e_46                       @ 0x5f18
 function_e_47                       @ 0x5f88
     function_e_50
@@ -352,11 +356,11 @@ usb_get_descriptor                  @ 0x6a84
 function_6                          @ 0x6ae8
 usb_entry                           @ 0x6af2
     usb_get_intr_flags
-    function_e_60
-    function_e_68
+    usb_ckcu_voodoo
+    usb_get_ep_intr
     usb_copy_ep_setup
     function_e_78
-    function_e_63
+    usb_set_ep_intr
     function_e_70
     function_e_72
     usb_copy_send
@@ -370,6 +374,7 @@ function_7                          @ 0x6d06
     usb_clear_csr
     usb_set_genrsm
 ptr_set_desc_ptr                    @ 0x6d14
+
 usb_set_intr_flags                  @ 0x6d30
 usb_init                            @ 0x6d3c
     ckcu_apb1_clock_enable
@@ -377,23 +382,24 @@ usb_init                            @ 0x6d3c
     function_20
     ptr_write_func_ptrs
     function_23
+usb_dp_wake_up                      @ 0x6d94
 usb_dp_pull_up                      @ 0x6db0
-function_e_60                       @ 0x6dcc
-    function_e_45
-function_e_61                       @ 0x6dd4
-function_e_62                       @ 0x6de4
-function_e_63                       @ 0x6df4
-usb_get_ep_buff                       @ 0x6e00
-function_e_65                       @ 0x6e18
+usb_ckcu_voodoo                     @ 0x6dcc
+    ckcu_voodoo1
+usb_ep_data_toggle                  @ 0x6dd4
+usb_ep_stall                        @ 0x6de4
+usb_set_ep_intr                     @ 0x6df4
+usb_get_ep_buff                     @ 0x6e00
+usb_get_ep_buff_end                 @ 0x6e18
     usb_get_ep_len
-usb_get_ep_len                       @ 0x6e3c
+usb_get_ep_len                      @ 0x6e3c
 function_e_67                       @ 0x6e4a
-function_e_68                       @ 0x6e64
-usb_get_ep_tcnt                       @ 0x6e72
+usb_get_ep_intr                     @ 0x6e64
+usb_get_ep_tcnt                     @ 0x6e72
 function_e_70                       @ 0x6e84
 function_72                         @ 0x6eaa
     usb_get_ep_buff
-    function_e_65
+    usb_get_ep_buff_end
     usb_get_ep_tcnt
 function_71                         @ 0x6ee4
     function_72
@@ -442,8 +448,8 @@ function_e_79                       @ 0x7328
     function_e_70
 function_e_80                       @ 0x7444
     function_e_73
-    function_e_62
-    function_e_61
+    usb_ep_stall
+    usb_ep_data_toggle
 word_copy                           @ 0x7490
 usb_get_ep_reg                      @ 0x74a0
 function_e_81_unsued                @ 0x74b0
