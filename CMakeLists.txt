@@ -23,6 +23,10 @@ SET(SOURCES
     pok3rtool/main.cpp
     pok3rtool/pok3r.h
     pok3rtool/pok3r.cpp
+    pok3rtool/pok3r_rgb.h
+    pok3rtool/pok3r_rgb.cpp
+    pok3rtool/usbdevice.h
+    pok3rtool/usbdevice.cpp
 )
 
 SET(FILES

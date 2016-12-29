@@ -80,7 +80,7 @@ int bootloader(){
     }
 
     LOG("Reset to Loader");
-    if(!pok3r.reset(RESET_BUILTIN_SUBCMD)){
+    if(!pok3r.reset(Pok3r::RESET_BUILTIN_SUBCMD)){
         ELOG("Send error");
         return -3;
     }
@@ -210,7 +210,7 @@ int flashfw(ZString version, ZPath fw){
 
     // Reset to firmware
     LOG("Reset to Firmware");
-    if(!pok3r.reset(RESET_BOOT_SUBCMD)){
+    if(!pok3r.reset(Pok3r::RESET_BOOT_SUBCMD)){
         ELOG("Reset error");
         return -8;
     }

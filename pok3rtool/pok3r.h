@@ -1,6 +1,8 @@
 #ifndef POK3R_H
 #define POK3R_H
 
+#include "usbdevice.h"
+
 #include "libusb.h"
 
 #include "zstring.h"
@@ -10,23 +12,13 @@ using namespace LibChaos;
 #define HOLTEK_VID          0x04d9
 #define POK3R_PID           0x0141
 #define POK3R_BOOT_PID      0x1141
-#define POK3R_RGB_PID       0x0167
 
 #define RECV_EP             3
 #define SEND_EP             4
 #define PKT_LEN             64
-#define SEND_TIMEOUT        1000
-#define RECV_TIMEOUT        100
 
 #define POK3R_VER_ADDR      0x2800
 #define POK3R_FW_ADDR       0x2c00
-#define POK3R_RGB_FW_ADDR   0x3400
-
-enum pok3r_rgb_cmd {
-    CMD_16      = 0x10,
-    RESET_CMD   = 0x11,
-    CMD_18      = 0x12,
-};
 
 // Pok3r Update Protocol
 
@@ -87,7 +79,7 @@ enum pok3r_rgb_cmd {
 //   0x03
 //   Zero Padding
 
-class Pok3r {
+class Pok3r : public USBDevice {
 public:
     enum pok3r_cmd {
         ERASE_CMD               = 0,    // Erase pages of flash
@@ -119,15 +111,8 @@ public:
     };
 
 public:
-    Pok3r();
-    ~Pok3r();
-
     //! Find a Pok3r keyboard.
     bool findPok3r();
-    //! Open USB device.
-    bool open();
-    //! Close USB device.
-    void close();
 
     //! Reset to loader and re-open device.
     bool resetToLoader();
@@ -157,21 +142,6 @@ private:
     bool sendCmd(zu8 cmd, zu8 subcmd, zu32 a1, zu32 a2, const zbyte *data, zu8 len);
     //! Receive data (64 bytes)
     bool recvDat(zbyte *data);
-
-    //! Find a usb device with \a vid and \a pid.
-    bool findUSBVidPid(zu16 vid, zu16 pid);
-
-    bool claimInterface(int interface);
-    bool releaseInterface(int interface);
-    bool detachKernel(int interface);
-    bool attachKernel(int interface);
-
-private:
-    libusb_context *context;
-    libusb_device *device;
-    libusb_device_handle *handle;
-    bool claimed[3];
-    bool kernel[3];
 };
 
 #endif // POK3R_H
