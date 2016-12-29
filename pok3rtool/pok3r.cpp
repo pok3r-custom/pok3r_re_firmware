@@ -140,7 +140,7 @@ bool Pok3r::resetToLoader(){
 
 ZString Pok3r::getVersion(){
     ZBinary bin;
-    if(readFlash(VER_ADDR, bin)){
+    if(readFlash(POK3R_VER_ADDR, bin)){
         return ZString(bin.raw() + 4);
     }
     return "NONE";

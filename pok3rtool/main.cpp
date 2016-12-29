@@ -42,7 +42,7 @@ int writeversion(ZString version){
     LOG("Version: " << pok3r.getVersion());
 
     LOG("Erase 0x2800");
-    if(!pok3r.eraseFlash(0x2800, 0x2808)){
+    if(!pok3r.eraseFlash(POK3R_VER_ADDR, POK3R_VER_ADDR + 8)){
         return -5;
     }
 
@@ -50,7 +50,7 @@ int writeversion(ZString version){
     ZBinary vdata;
     vdata.writeleu32(version.size());
     vdata.write(version.bytes(), version.size());
-    if(!pok3r.writeFlash(0x2800, vdata)){
+    if(!pok3r.writeFlash(POK3R_VER_ADDR, vdata)){
         LOG("Version write error");
         return -6;
     }
@@ -178,7 +178,7 @@ int flashfw(ZString version, ZPath fw){
 
     // Erase firmware
     LOG("Erase 0x2800...");
-    if(!pok3r.eraseFlash(0x2800, 0xf408)){
+    if(!pok3r.eraseFlash(POK3R_VER_ADDR, 0xf408)){
         ELOG("Erase flash error");
         return -6;
     }
@@ -190,8 +190,8 @@ int flashfw(ZString version, ZPath fw){
     for(zu64 o = 0; o < fwbin.size(); o += 52){
         ZBinary packet;
         packet.write(fwbin.raw() + o, 52);
-        if(!pok3r.writeFlash(0x2c00 + o, packet)){
-            LOG("Error writing: 0x" << ZString::ItoS(0x2c00 + o, 16));
+        if(!pok3r.writeFlash(POK3R_FW_ADDR + o, packet)){
+            LOG("Error writing: 0x" << ZString::ItoS(POK3R_FW_ADDR + o, 16));
             return -7;
         }
     }
@@ -201,7 +201,7 @@ int flashfw(ZString version, ZPath fw){
     ZBinary vdata;
     vdata.writeleu32(version.size());
     vdata.write(version.bytes(), version.size());
-    if(!pok3r.writeFlash(0x2800, vdata)){
+    if(!pok3r.writeFlash(POK3R_VER_ADDR, vdata)){
         LOG("Version write error");
         return -7;
     }

@@ -327,7 +327,7 @@ function_68                         @ 0x6808
 function_69                         @ 0x6814
 
 function_70                         @ 0x6820
-    function_71
+    usb_recv
     handle_update_packet
 
 function_e_58                       @ 0x6854
@@ -397,12 +397,12 @@ function_e_67                       @ 0x6e4a
 usb_get_ep_intr                     @ 0x6e64
 usb_get_ep_tcnt                     @ 0x6e72
 function_e_70                       @ 0x6e84
-function_72                         @ 0x6eaa
+usb_read_ep_buff                    @ 0x6eaa
     usb_get_ep_buff
     usb_get_ep_buff_end
     usb_get_ep_tcnt
-function_71                         @ 0x6ee4
-    function_72
+usb_recv                            @ 0x6ee4
+    usb_read_ep_buff
 function_e_71                       @ 0x6f14
 function_e_72                       @ 0x6f24
 function_e_73                       @ 0x6f30

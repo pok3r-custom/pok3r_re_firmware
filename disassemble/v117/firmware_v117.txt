@@ -6651,7 +6651,7 @@ function_70:
     6828:   4401        add r1, r0
     682a:   2240        movs r2, #64   ; 0x40
     682c:   2004        movs r0, #4
-    682e:   f000 fb59   bl 0x6ee4               ; call function_71(4, , 0x40)
+    682e:   f000 fb59   bl 0x6ee4               ; call usb_recv(4, , 0x40)
 
     6832:   6861        ldr r1, [r4, #4]
     6834:   4408        add r0, r1
@@ -7136,7 +7136,7 @@ usb_entry:
     6c2c:   2240        movs r2, #64            ; 0x40
     6c2e:   2000        movs r0, #0
     6c30:   69e1        ldr r1, [r4, #28]
-    6c32:   f000 f957   bl 0x6ee4               ; call function_71
+    6c32:   f000 f957   bl 0x6ee4               ; call usb_recv
     6c36:   69e1        ldr r1, [r4, #28]
     6c38:   4401        add r1, r0
     6c3a:   61e1        str r1, [r4, #28]
@@ -7452,7 +7452,7 @@ function_e_70:
     ; ????
     6ea6:   f000 b835   b.w 0x6f14                  ; call function_e_71
 
-function_72:
+usb_read_ep_buff:
   0x6eaa:   e92d 41f0   stmdb sp!, {r4, r5, r6, r7, r8, lr}
     6eae:   460f        mov r7, r1
     6eb0:   4616        mov r6, r2
@@ -7477,7 +7477,7 @@ function_72:
     6ede:   f7ff ff9b   bl 0x6e18                   ; call usb_get_ep_buff_end
     6ee2:   e7f2        b.n 0x6eca
 
-function_71:
+usb_recv:
   0x6ee4:   e92d 41f0   stmdb sp!, {r4, r5, r6, r7, r8, lr}
     6ee8:   460f        mov r7, r1
     6eea:   4615        mov r5, r2
@@ -7489,7 +7489,7 @@ function_71:
     6ef8:   462a        mov r2, r5
     6efa:   4639        mov r1, r7
     6efc:   4630        mov r0, r6
-    6efe:   f7ff ffd4   bl 0x6eaa               ; call function_72
+    6efe:   f7ff ffd4   bl 0x6eaa               ; call usb_read_ep_buff
     6f02:   b908        cbnz r0, 0x6f08
     6f04:   2d00        cmp r5, #0
     6f06:   d103        bne.n 0x6f10

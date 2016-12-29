@@ -10,43 +10,23 @@ using namespace LibChaos;
 #define HOLTEK_VID          0x04d9
 #define POK3R_PID           0x0141
 #define POK3R_BOOT_PID      0x1141
+#define POK3R_RGB_PID       0x0167
 
-#define SEND_EP             4
 #define RECV_EP             3
+#define SEND_EP             4
 #define PKT_LEN             64
 #define SEND_TIMEOUT        1000
 #define RECV_TIMEOUT        100
 
-#define VER_ADDR            0x2800
-#define FW_ADDR             0x2c00
-#define FW_LEN              0xcc00
+#define POK3R_VER_ADDR      0x2800
+#define POK3R_FW_ADDR       0x2c00
+#define POK3R_RGB_FW_ADDR   0x3400
 
-#define ERASE_CMD               0   // Erase pages of flash
-#define ERASE_NOP_SUBCMD        10  // Cancel erase
-
-#define FLASH_CMD               1   // Read/write flash
-#define FLASH_CHECK_SUBCMD      0   // Compare bytes in flash with sent bytes
-#define FLASH_WRITE_SUBCMD      1   // Write 52 bytes to flash
-#define FLASH_READ_SUBCMD       2   // Read 64 bytes from flash
-#define FLASH_3_SUBCMD          3   // ?
-
-#define CRC_CMD                 2   // CRC part of flash
-
-#define UPDATE_START_CMD        3   // Start update
-
-#define RESET_CMD               4   // Reset processor
-#define RESET_BOOT_SUBCMD       0   // Reset to opposite firmware (main -> builtin, builtin -> main)
-#define RESET_BUILTIN_SUBCMD    1   // Reset to builtin firmware
-
-#define DISCONNECT_CMD          5   // Only in builtin firmware, disconnect USB and force reset
-
-#define DEBUG_CMD               6   // Collection of debug commands
-#define DEBUG_0_SUBCMD          0   // ?
-#define DEBUG_1_SUBCMD          1   // ?
-#define DEBUG_2_SUBCMD          2   // ?
-#define DEBUG_3_SUBCMD          3   // ?
-#define DEBUG_4_SUBCMD          4   // ?
-#define DEBUG_5_SUBCMD          5   // ?
+enum pok3r_rgb_cmd {
+    CMD_16      = 0x10,
+    RESET_CMD   = 0x11,
+    CMD_18      = 0x12,
+};
 
 // Pok3r Update Protocol
 
@@ -108,6 +88,36 @@ using namespace LibChaos;
 //   Zero Padding
 
 class Pok3r {
+public:
+    enum pok3r_cmd {
+        ERASE_CMD               = 0,    // Erase pages of flash
+        ERASE_NOP               = 10,   // Cancel erase
+
+        FLASH_CMD               = 1,    // Read/write flash
+        FLASH_CHECK_SUBCMD      = 0,    // Compare bytes in flash with sent bytes
+        FLASH_WRITE_SUBCMD      = 1,    // Write 52 bytes to flash
+        FLASH_READ_SUBCMD       = 2,    // Read 64 bytes from flash
+        FLASH_3_SUBCMD          = 3,    // ?
+
+        CRC_CMD                 = 2,    // CRC part of flash
+
+        UPDATE_START_CMD        = 3,    // Start update
+
+        RESET_CMD               = 4,    // Reset processor
+        RESET_BOOT_SUBCMD       = 0,    // Reset to opposite firmware (main -> builtin, builtin -> main)
+        RESET_BUILTIN_SUBCMD    = 1,    // Reset to builtin firmware
+
+        DISCONNECT_CMD          = 5,    // Only in builtin firmware, disconnect USB and force reset
+
+        DEBUG_CMD               = 6,    // Collection of debug commands
+        DEBUG_0_SUBCMD          = 0,    // ?
+        DEBUG_1_SUBCMD          = 1,    // ?
+        DEBUG_2_SUBCMD          = 2,    // ?
+        DEBUG_3_SUBCMD          = 3,    // ?
+        DEBUG_4_SUBCMD          = 4,    // ?
+        DEBUG_5_SUBCMD          = 5,    // ?
+    };
+
 public:
     Pok3r();
     ~Pok3r();

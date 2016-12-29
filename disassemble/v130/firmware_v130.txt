@@ -179,10 +179,10 @@ memcpy:
     35d8:   d2f9        bcs.n 0x35ce
     35da:   4770        bx lr
 
-function_130_4:
-    ; r0 =
-    ; r1 =
-    ; r2 =
+mem_set:
+    ; r0 = dest
+    ; r1 = len
+    ; r2 = byte
   0x35dc:   b2d2        uxtb r2, r2
     35de:   e001        b.n 0x35e4
 
@@ -191,34 +191,44 @@ function_130_4:
     35e6:   d2fb        bcs.n 0x35e0
     35e8:   4770        bx lr
 
-function_130_5:
-    ; r0 =
-    ; r1 =
+mem_zero:
+    ; r0 = dest
+    ; r1 = len
   0x35ea:   2200        movs r2, #0
-    35ec:   e7f6        b.n 0x35dc      ; call function_130_4(r0, r1, 0)
+    35ec:   e7f6        b.n 0x35dc      ; call mem_set(r0, r1, 0)
 
-    35ee:   b510        push {r4, lr}
+mem_set2:
+    ; r0 = dest
+    ; r1 = byte
+    ; r2 = len
+  0x35ee:   b510        push {r4, lr}
     35f0:   4613        mov r3, r2
     35f2:   460a        mov r2, r1
     35f4:   4604        mov r4, r0
     35f6:   4619        mov r1, r3
-    35f8:   f7ff fff0   bl 0x35dc
+    35f8:   f7ff fff0   bl 0x35dc       ; call mem_set(r0, r2, r1)
     35fc:   4620        mov r0, r4
     35fe:   bd10        pop {r4, pc}
-    3600:   b530        push {r4, r5, lr}
+
+memcmp:
+    ; r0 = ptr
+    ; r1 = ptr
+    ; r2 = len
+  0x3600:   b530        push {r4, r5, lr}
     3602:   4604        mov r4, r0
     3604:   2000        movs r0, #0
     3606:   4603        mov r3, r0
     3608:   e000        b.n 0x360c
-    360a:   1c5b        adds r3, r3, #1
-    360c:   4293        cmp r3, r2
+
+  0x360a:   1c5b        adds r3, r3, #1
+  0x360c:   4293        cmp r3, r2
     360e:   d203        bcs.n 0x3618
     3610:   5ce0        ldrb r0, [r4, r3]
     3612:   5ccd        ldrb r5, [r1, r3]
     3614:   1b40        subs r0, r0, r5
     3616:   d0f8        beq.n 0x360a
     3618:   bd30        pop {r4, r5, pc}
-    361a:   0000        movs r0, r0
+    361a:   0000
 
 sram_init:
   0x361c:   4c06        ldr r4, [pc, #24]   ; (0x3638)
@@ -362,7 +372,7 @@ afio_exti_ssr_write:
   0x374c:   0x40077000  ; BFTM1
   0x3750:   0x20000020
   0x3754:   0x400b0000
-  0x3758:   0x7d24
+  0x3758:   0x7d24      ; gpio_map_1
 
 bftm_clear:
     ; r0 = pointer
@@ -472,7 +482,7 @@ setup_afio_gpio:
     3824:   4630        mov r0, r6
     3826:   f000 fea7   bl 0x4578           ; call gpio_set_pin_pull_up_down
 
-    ; Select AF1 (GPIO) for GPIO A pin 11, GPIO C pins 13,14,15
+    ; Select AF1 (GPIO) for GPIO A pin 11, GPIO C pins 13,14,15 (pins 37, 22,23,24)
     382a:   2201        movs r2, #1
     382c:   210b        movs r1, #11
     382e:   2000        movs r0, #0
@@ -496,7 +506,7 @@ setup_afio_gpio:
     3856:   0540        lsls r0, r0, #21
     3858:   d409        bmi.n 0x386e
 
-    ; Select AF1 (GPIO) for GPIO B pins 14,15
+    ; Select AF1 (GPIO) for GPIO B pins 14,15 (pins 26,27)
     385a:   2201        movs r2, #1
     385c:   210e        movs r1, #14
     385e:   4610        mov r0, r2
@@ -798,7 +808,7 @@ function_130_6:
     3ac4:   4812        ldr r0, [pc, #72]   ; (0x3b10)
     3ac6:   21d8        movs r1, #216   ; 0xd8
     3ac8:   3890        subs r0, #144   ; 0x90
-    3aca:   f7ff fd8e   bl 0x35ea               ; call function_130_5(ptr, 0xd8)
+    3aca:   f7ff fd8e   bl 0x35ea               ; call mem_zero(ptr, 0xd8)
 
     3ace:   4c13        ldr r4, [pc, #76]   ; (0x3b1c)
     3ad0:   490e        ldr r1, [pc, #56]   ; (0x3b0c)
@@ -1445,7 +1455,7 @@ function_130_7:
   0x40b6:   782a        ldrb r2, [r5, #0]
     40b8:   2148        movs r1, #72   ; 0x48
     40ba:   4630        mov r0, r6
-    40bc:   f7ff fa8e   bl 0x35dc           ; call function_130_4(ptr, 0x48, )
+    40bc:   f7ff fa8e   bl 0x35dc           ; call mem_set(ptr, 0x48, )
 
     40c0:   1c6d        adds r5, r5, #1
     40c2:   3648        adds r6, #72   ; 0x48
@@ -1598,7 +1608,7 @@ pinmux_b789_gpio:
     4206:   4628        mov r0, r5
     4208:   f000 f996   bl 0x4538           ; call gpio_set_input_output(GPIO B, 0x400, 0)
 
-    ; Select AF0 (default) for GPIO B pins 7,8,9
+    ; Select AF0 (default) for GPIO B pins 7,8,9 (pins 58,59,60)
     420c:   2200        movs r2, #0
     420e:   2107        movs r1, #7
     4210:   2001        movs r0, #1
@@ -1631,7 +1641,7 @@ pinmux_b789_spi:
     4248:   4628        mov r0, r5
     424a:   f000 f995   bl 0x4578           ; call gpio_set_pin_pull_up_down(GPIO B, 0x400, 2)
 
-    ; Select AF5 (SPI) for GPIO B pins 7,8,9
+    ; Select AF5 (SPI) for GPIO B pins 7,8,9 (pins 58,59,60)
     424e:   2205        movs r2, #5
     4250:   2107        movs r1, #7
     4252:   2001        movs r0, #1
@@ -3884,14 +3894,15 @@ function_130_10:
     561a:   f7fe f8a6   bl 0x376a
 
     561e:   4620        mov r0, r4
-    5620:   f7fe f89c   bl 0x375c
+    5620:   f7fe f89c   bl 0x375c           ; call bftm_clear(BFTM0)
 
+    ; Disable BFTM0 interrupt (41)
     5624:   2029        movs r0, #41
     5626:   f000 f899   bl 0x575c           ; call nvic_disable_intr(41)
 
-    562a:   f000 fb01   bl 0x5c30
+    562a:   f000 fb01   bl 0x5c30           ; call pinmux_c0_gpio()
 
-    562e:   f000 f8e1   bl 0x57f4
+    562e:   f000 f8e1   bl 0x57f4           ; call jump_pinmux_b789_gpio()
 
     5632:   2001        movs r0, #1
     5634:   f000 fd70   bl 0x6118
@@ -3899,7 +3910,7 @@ function_130_10:
     5638:   e8bd 4010   ldmia.w sp!, {r4, lr}
     563c:   f000 be5c   b.w 0x62f8
 
-    5640:   f000 f8da   bl 0x57f8
+    5640:   f000 f8da   bl 0x57f8           ; call jump_pinmux_b789_spi()
 
     5644:   2000        movs r0, #0
     5646:   f000 fd67   bl 0x6118
@@ -3909,7 +3920,7 @@ function_130_10:
     564e:   f7fe f8a2   bl 0x3796
 
     5652:   4620        mov r0, r4
-    5654:   f7fe f882   bl 0x375c
+    5654:   f7fe f882   bl 0x375c           ; call bftm_clear(BFTM0)
 
     5658:   2101        movs r1, #1
     565a:   4620        mov r0, r4
@@ -3925,7 +3936,7 @@ function_130_10:
 
     5672:   bd10        pop {r4, pc}
 
-  0x5674:   0x40076000
+  0x5674:   0x40076000  ; BFTM0
   0x5678:   0xe000e004
 
     567c:   b510        push {r4, lr}
@@ -4113,10 +4124,10 @@ nvic_set_vtor:
     57f0:   2000        movs r0, #0
     57f2:   bd10        pop {r4, pc}
 
-jump_130_1:
+jump_pinmux_b789_gpio:
   0x57f4:   f7fe bcfa   b.w 0x41ec          ; return pinmux_b789_gpio
 
-jump_130_2:
+jump_pinmux_b789_spi:
   0x57f8:   f7fe bd1c   b.w 0x4234          ; return pinmux_b789_spi
 
   0x57fc:   b570        push {r4, r5, r6, lr}
@@ -4569,17 +4580,21 @@ jump_130_2:
     5c26:   f7fe bc9f   b.w 0x4568
     5c2a:   0000        movs r0, r0
 
-  0x5c2c:   0x400b4000
+  0x5c2c:   0x400b4000  ; GPIO C
 
+pinmux_c0_gpio:
+    ; Select AF0 (default) for GPIO C pin 0 (pin 30)
   0x5c30:   2200        movs r2, #0
     5c32:   4611        mov r1, r2
     5c34:   2002        movs r0, #2
-    5c36:   f7fd bdb1   b.w 0x379c           ; call afio_pin_config(2, 0, 0)
+    5c36:   f7fd bdb1   b.w 0x379c           ; return afio_pin_config(2, 0, 0)
 
+pinmux_c0_gptm:
+    ; Select AF4 (GPTM) for GPIO C pin 0 (pin 30)
   0x5c3a:   2204        movs r2, #4
     5c3c:   2100        movs r1, #0
     5c3e:   2002        movs r0, #2
-    5c40:   f7fd bdac   b.w 0x379c           ; call afio_pin_config(2, 0, 4)
+    5c40:   f7fd bdac   b.w 0x379c           ; return afio_pin_config(2, 0, 4)
 
     5c44:   b570        push {r4, r5, r6, lr}
     5c46:   490d        ldr r1, [pc, #52]   ; (0x5c7c)
@@ -4612,34 +4627,36 @@ jump_130_2:
     5c82:   42d4        cmn r4, r2
     5c84:   ed10 e000   ldc 0, cr14, [r0, #-0]
 
+function_130_11:
   0x5c88:   e92d 47f0   stmdb sp!, {r4, r5, r6, r7, r8, r9, sl, lr}
-    5c8c:   4c0e        ldr r4, [pc, #56]   ; (0x5cc8)
+    5c8c:   4c0e        ldr r4, [pc, #56]       ; (0x5cc8)
     5c8e:   6827        ldr r7, [r4, #0]
-    5c90:   4d0d        ldr r5, [pc, #52]   ; (0x5cc8)
-    5c92:   3548        adds r5, #72   ; 0x48
+    5c90:   4d0d        ldr r5, [pc, #52]       ; (0x5cc8)
+    5c92:   3548        adds r5, #72            ; 0x48
     5c94:   682e        ldr r6, [r5, #0]
     5c96:   f04f 0901   mov.w r9, #1
     5c9a:   f8c4 9000   str.w r9, [r4]
     5c9e:   f04f 0800   mov.w r8, #0
     5ca2:   f8c5 8000   str.w r8, [r5]
     5ca6:   f000 f907   bl 0x5eb8
-    5caa:   4808        ldr r0, [pc, #32]   ; (0x5ccc)
-    5cac:   f8c0 809c   str.w r8, [r0, #156]   ; 0x9c
-    5cb0:   f8c0 908c   str.w r9, [r0, #140]   ; 0x8c
+    5caa:   4808        ldr r0, [pc, #32]       ; (0x5ccc)
+    5cac:   f8c0 809c   str.w r8, [r0, #156]    ; 0x9c
+    5cb0:   f8c0 908c   str.w r9, [r0, #140]    ; 0x8c
     5cb4:   6027        str r7, [r4, #0]
-    5cb6:   4806        ldr r0, [pc, #24]   ; (0x5cd0)
+    5cb6:   4806        ldr r0, [pc, #24]       ; (0x5cd0)
     5cb8:   6801        ldr r1, [r0, #0]
     5cba:   f041 0104   orr.w r1, r1, #4
     5cbe:   6001        str r1, [r0, #0]
-    5cc0:   bf20        wfe
+    5cc0:   bf20        wfe                     ; wait for event
     5cc2:   602e        str r6, [r5, #0]
     5cc4:   e8bd 87f0   ldmia.w sp!, {r4, r5, r6, r7, r8, r9, sl, pc}
-    5cc8:   0618        lsls r0, r3, #24
-    5cca:   4310        orrs r0, r2
-    5ccc:   2000        movs r0, #0
-    5cce:   42d4        cmn r4, r2
-    5cd0:   ed10 e000   ldc 0, cr14, [r0, #-0]
-    5cd4:   4904        ldr r1, [pc, #16]   ; (0x5ce8)
+
+  0x5cc8:   0x43100618  ; in APB/AHB bit band alias
+  0x5ccc:   0x42d42000  ; in APB/AHB bit band alias
+  0x5cd0:   0xe000ed10  ; ARM NVIC system control register
+
+function_130_12:
+  0x5cd4:   4904        ldr r1, [pc, #16]   ; (0x5ce8)
     5cd6:   680a        ldr r2, [r1, #0]
     5cd8:   f022 0204   bic.w r2, r2, #4
     5cdc:   600a        str r2, [r1, #0]
@@ -4648,18 +4665,23 @@ jump_130_2:
     5ce2:   4770        bx lr
     5ce4:   bf20        wfe
     5ce6:   4770        bx lr
-    5ce8:   ed10 e000   ldc 0, cr14, [r0, #-0]
-    5cec:   b570        push {r4, r5, r6, lr}
-    5cee:   4e35        ldr r6, [pc, #212]   ; (0x5dc4)
+
+  0x5ce8:   0xe000ed10  ; ARM NVIC system control register
+
+function_130_13:
+  0x5cec:   b570        push {r4, r5, r6, lr}
+    5cee:   4e35        ldr r6, [pc, #212]  ; (0x5dc4)
     5cf0:   7830        ldrb r0, [r6, #0]
     5cf2:   2801        cmp r0, #1
-    5cf4:   d15c        bne.n 0x5db0
-    5cf6:   4d34        ldr r5, [pc, #208]   ; (0x5dc8)
+    5cf4:   d15c        bne.n 0x5db0        ; return if [r6] != 1
+
+    5cf6:   4d34        ldr r5, [pc, #208]  ; (0x5dc8)
     5cf8:   2400        movs r4, #0
     5cfa:   4628        mov r0, r5
-    5cfc:   782a        ldrb r2, [r5, #0]
-    5cfe:   7840        ldrb r0, [r0, #1]
-    5d00:   4621        mov r1, r4
+    5cfc:   782a        ldrb r2, [r5, #0]   ; r2 = cmd
+    5cfe:   7840        ldrb r0, [r0, #1]   ; r0 = subcmd
+    5d00:   4621        mov r1, r4          ; r1 = 0
+
     5d02:   2a10        cmp r2, #16
     5d04:   d004        beq.n 0x5d10
     5d06:   2a11        cmp r2, #17
@@ -4667,87 +4689,116 @@ jump_130_2:
     5d0a:   2a12        cmp r2, #18
     5d0c:   d151        bne.n 0x5db2
     5d0e:   e007        b.n 0x5d20
-    5d10:   2802        cmp r0, #2
+
+    ; if r2 == 16 (0x10)
+  0x5d10:   2802        cmp r0, #2
     5d12:   d14e        bne.n 0x5db2
     5d14:   6069        str r1, [r5, #4]
     5d16:   2104        movs r1, #4
     5d18:   e03c        b.n 0x5d94
-    5d1a:   f000 f859   bl 0x5dd0           ; call reset_builtin
+
+    ; if r2 == 17 (0x11)
+  0x5d1a:   f000 f859   bl 0x5dd0           ; call reset_builtin(r0)
     5d1e:   e03d        b.n 0x5d9c
-    5d20:   f44f 6380   mov.w r3, #1024   ; 0x400
+
+    ; if r2 == 18 (0x12)
+  0x5d20:   f44f 6380   mov.w r3, #1024
     5d24:   2820        cmp r0, #32
-    5d26:   d30e        bcc.n 0x5d46
-    5d28:   f1a0 021f   sub.w r2, r0, #31
-    5d2c:   ebc2 1202   rsb r2, r2, r2, lsl #4
+    5d26:   d30e        bcc.n 0x5d46            ; if r0 < 0x20
+
+    ; else r0 >= 0x20
+    5d28:   f1a0 021f   sub.w r2, r0, #31           ; r2 = r0 - 31
+    5d2c:   ebc2 1202   rsb r2, r2, r2, lsl #4      ; r2 *= 15
     5d30:   ebb3 0f82   cmp.w r3, r2, lsl #2
-    5d34:   db07        blt.n 0x5d46
-    5d36:   ebc0 1000   rsb r0, r0, r0, lsl #4
-    5d3a:   f44f 5122   mov.w r1, #10368   ; 0x2880
-    5d3e:   eb01 0080   add.w r0, r1, r0, lsl #2
-    5d42:   213c        movs r1, #60   ; 0x3c
+    5d34:   db07        blt.n 0x5d46                ; if 0x400 < (r2 * 4)
+
+    5d36:   ebc0 1000   rsb r0, r0, r0, lsl #4      ; r0 *= 15
+    5d3a:   f44f 5122   mov.w r1, #10368
+    5d3e:   eb01 0080   add.w r0, r1, r0, lsl #2    ; r0 = 0x2880 + (r0 * 4)
+    5d42:   213c        movs r1, #60                ; r1 = 60
     5d44:   e027        b.n 0x5d96
-    5d46:   b120        cbz r0, 0x5d52
+
+  0x5d46:   b120        cbz r0, 0x5d52
     5d48:   2801        cmp r0, #1
     5d4a:   d01d        beq.n 0x5d88
     5d4c:   2802        cmp r0, #2
     5d4e:   d130        bne.n 0x5db2
     5d50:   e01e        b.n 0x5d90
-    5d52:   f891 010f   ldrb.w r0, [r1, #271]   ; 0x10f
-    5d56:   28aa        cmp r0, #170   ; 0xaa
-    5d58:   d011        beq.n 0x5d7e
+
+    ; if r0 == 0
+  0x5d52:   f891 010f   ldrb.w r0, [r1, #271]   ; 0x10f
+    5d56:   28aa        cmp r0, #170            ; 0xaa
+    5d58:   d011        beq.n 0x5d7e            ; if r0 == 0xaa
     5d5a:   781a        ldrb r2, [r3, #0]
-    5d5c:   4618        mov r0, r3
+    5d5c:   4618        mov r0, r3              ; r0 = 0x400
     5d5e:   2a04        cmp r2, #4
-    5d60:   d010        beq.n 0x5d84
+    5d60:   d010        beq.n 0x5d84            ; if [0x400] = 4
+
     5d62:   2220        movs r2, #32
     5d64:   4619        mov r1, r3
     5d66:   1d28        adds r0, r5, #4
-    5d68:   f7fd fc26   bl 0x35b8
-    5d6c:   4817        ldr r0, [pc, #92]   ; (0x5dcc)
-    5d6e:   f8d0 1180   ldr.w r1, [r0, #384]   ; 0x180
-    5d72:   6269        str r1, [r5, #36]   ; 0x24
-    5d74:   f8d0 018c   ldr.w r0, [r0, #396]   ; 0x18c
-    5d78:   2128        movs r1, #40   ; 0x28
-    5d7a:   62a8        str r0, [r5, #40]   ; 0x28
+    5d68:   f7fd fc26   bl 0x35b8               ; call memcpy(r5 + 4, 0x400, 32)
+
+    5d6c:   4817        ldr r0, [pc, #92]       ; (0x5dcc) FMC
+    5d6e:   f8d0 1180   ldr.w r1, [r0, #384]    ; 0x180     undocumented FMC register
+    5d72:   6269        str r1, [r5, #36]       ; [r5 + 0x24] = [FMC + 0x180]
+    5d74:   f8d0 018c   ldr.w r0, [r0, #396]    ; 0x18c     undocumented FMC register
+    5d78:   2128        movs r1, #40
+    5d7a:   62a8        str r0, [r5, #40]       ; [r5 + 0x28] = [FMC + 0x18c]
     5d7c:   e00a        b.n 0x5d94
-    5d7e:   2110        movs r1, #16
-    5d80:   0108        lsls r0, r1, #4
+
+  0x5d7e:   2110        movs r1, #16        ; r1 = 16
+    5d80:   0108        lsls r0, r1, #4     ; r0 = 0x100
     5d82:   e008        b.n 0x5d96
-    5d84:   2134        movs r1, #52   ; 0x34
+
+  0x5d84:   2134        movs r1, #52        ; r1 = 52
     5d86:   e006        b.n 0x5d96
-    5d88:   2104        movs r1, #4
-    5d8a:   f44f 5070   mov.w r0, #15360   ; 0x3c00
+
+    ; if r0 == 1
+  0x5d88:   2104        movs r1, #4
+    5d8a:   f44f 5070   mov.w r0, #15360    ; 0x3c00
     5d8e:   e002        b.n 0x5d96
-    5d90:   2101        movs r1, #1
-    5d92:   7129        strb r1, [r5, #4]
-    5d94:   1d28        adds r0, r5, #4
-    5d96:   f000 f85d   bl 0x5e54
+
+    ; if r0 == 2
+  0x5d90:   2101        movs r1, #1
+    5d92:   7129        strb r1, [r5, #4]   ; [r5 + 4] = 1
+  0x5d94:   1d28        adds r0, r5, #4
+
+  0x5d96:   f000 f85d   bl 0x5e54           ; call flash_read_packet(r1, r2)
     5d9a:   2401        movs r4, #1
-    5d9c:   7830        ldrb r0, [r6, #0]
+  0x5d9c:   7830        ldrb r0, [r6, #0]
     5d9e:   2801        cmp r0, #1
     5da0:   d106        bne.n 0x5db0
     5da2:   b134        cbz r4, 0x5db2
-    5da4:   213c        movs r1, #60   ; 0x3c
+
+    5da4:   213c        movs r1, #60
     5da6:   1d28        adds r0, r5, #4
-    5da8:   f7fd fc1f   bl 0x35ea
+  0x5da8:   f7fd fc1f   bl 0x35ea           ; call mem_zero(r5 + 4, 60)
+
     5dac:   2002        movs r0, #2
-    5dae:   7030        strb r0, [r6, #0]
-    5db0:   bd70        pop {r4, r5, r6, pc}
-    5db2:   6828        ldr r0, [r5, #0]
-    5db4:   6068        str r0, [r5, #4]
-    5db6:   f64a 20ff   movw r0, #43775   ; 0xaaff
-    5dba:   6028        str r0, [r5, #0]
-    5dbc:   4802        ldr r0, [pc, #8]   ; (0x5dc8)
-    5dbe:   2138        movs r1, #56   ; 0x38
+    5dae:   7030        strb r0, [r6, #0]   ; [r6] = 2
+  0x5db0:   bd70        pop {r4, r5, r6, pc}
+
+    ; else
+  0x5db2:   6828        ldr r0, [r5, #0]
+    5db4:   6068        str r0, [r5, #4]    ; [r5 + 4] = [r5]
+    5db6:   f64a 20ff   movw r0, #43775
+    5dba:   6028        str r0, [r5, #0]    ; [r5] = 0xaaff
+
+    5dbc:   4802        ldr r0, [pc, #8]    ; (0x5dc8)
+    5dbe:   2138        movs r1, #56        ; 0x38
     5dc0:   3008        adds r0, #8
-    5dc2:   e7f1        b.n 0x5da8
+    5dc2:   e7f1        b.n 0x5da8          ; call mem_zero(r5 + 8, 56)
 
   0x5dc4:   0x20000028
-  0x5dc8:   0x20000608
+  0x5dc8:   0x20000608  ; update_packet
   0x5dcc:   0x40080000  ; FMC
 
 reset_builtin:
-    ; r0 =
+    ; r0 = 0/1/2
+    ; 0: reset key 0x55aafaf5
+    ; 1: reset key 0x55aafaf0
+    ; 2: usb disconnect, wait event
   0x5dd0:   b510        push {r4, lr}
     5dd2:   491b        ldr r1, [pc, #108]   ; (0x5e40)
     5dd4:   b168        cbz r0, 0x5df2
@@ -4755,23 +4806,27 @@ reset_builtin:
     5dd8:   d00d        beq.n 0x5df6
 
     5dda:   2802        cmp r0, #2
-    5ddc:   d12f        bne.n 0x5e3e
+    5ddc:   d12f        bne.n 0x5e3e        ; return if r0 != 2
 
+    ; if r0 == 2
     ; Disable USB interrupt
     5dde:   2035        movs r0, #53
     5de0:   f7ff fcbc   bl 0x575c           ; call nvic_disable_intr(53)
 
     5de4:   2000        movs r0, #0
-    5de6:   f000 fd55   bl 0x6894
+    5de6:   f000 fd55   bl 0x6894           ; call usb_dp_pull_up(0)
 
     5dea:   e8bd 4010   ldmia.w sp!, {r4, lr}
-    5dee:   f7ff bf4b   b.w 0x5c88
+    5dee:   f7ff bf4b   b.w 0x5c88          ; return function_130_11
 
+    ; if r0 == 0
   0x5df2:   4814        ldr r0, [pc, #80]   ; (0x5e44)
     5df4:   e001        b.n 0x5dfa
 
+    ; if r0 == 1
   0x5df6:   4813        ldr r0, [pc, #76]   ; (0x5e44)
     5df8:   1f40        subs r0, r0, #5
+
   0x5dfa:   6008        str r0, [r1, #0]
 
     5dfc:   2100        movs r1, #0
@@ -4781,7 +4836,7 @@ reset_builtin:
     5e06:   f7fd fd3f   bl 0x3888           ; call ckcu_clocks_enable(0x10000, 0, 0, 1)
 
     5e0a:   490f        ldr r1, [pc, #60]   ; (0x5e48)
-    5e0c:   f44f 7000   mov.w r0, #512   ; 0x200
+    5e0c:   f44f 7000   mov.w r0, #512      ; 0x200
     5e10:   6248        str r0, [r1, #36]   ; 0x24
 
     ; Disable USB interrupt
@@ -4802,42 +4857,47 @@ reset_builtin:
     5e2a:   4808        ldr r0, [pc, #32]   ; (0x5e4c)
     5e2c:   6801        ldr r1, [r0, #0]
     5e2e:   4a08        ldr r2, [pc, #32]   ; (0x5e50)
-    5e30:   f401 61e0   and.w r1, r1, #1792   ; 0x700
+    5e30:   f401 61e0   and.w r1, r1, #1792 ; 0x700
     5e34:   4311        orrs r1, r2
     5e36:   6001        str r1, [r0, #0]
 
     5e38:   f3bf 8f4f   dsb sy
   0x5e3c:   e7fe        b.n 0x5e3c          ; dead loop
-    5e3e:   bd10        pop {r4, pc}
+  0x5e3e:   bd10        pop {r4, pc}
 
   0x5e40:   0x20003ffc
-  0x5e44:   0x55aafaf5
+  0x5e44:   0x55aafaf5  ; reset key
   0x5e48:   0x400b0000  ; GPIO A
   0x5e4c:   0xe000ed0c
   0x5e50:   0x05fa0004  ; AIRCR key and reset
 
-    5e54:   b570        push {r4, r5, r6, lr}
+flash_read_packet:
+    ; r0 = src
+    ; r1 = len
+  0x5e54:   b570        push {r4, r5, r6, lr}
     5e56:   460c        mov r4, r1
     5e58:   4a09        ldr r2, [pc, #36]   ; (0x5e80)
     5e5a:   4601        mov r1, r0
+
     5e5c:   2002        movs r0, #2
-    5e5e:   7010        strb r0, [r2, #0]
+    5e5e:   7010        strb r0, [r2, #0]   ; [r2] = 2
     5e60:   4808        ldr r0, [pc, #32]   ; (0x5e84)
-    5e62:   1f05        subs r5, r0, #4
+    5e62:   1f05        subs r5, r0, #4     ; r5 = r0 - 4
     5e64:   4281        cmp r1, r0
-    5e66:   d003        beq.n 0x5e70
+    5e66:   d003        beq.n 0x5e70        ; if r1 == r0
+
     5e68:   4622        mov r2, r4
     5e6a:   1d28        adds r0, r5, #4
-    5e6c:   f7fd fba4   bl 0x35b8
-    5e70:   1928        adds r0, r5, r4
-    5e72:   f1c4 013c   rsb r1, r4, #60   ; 0x3c
+    5e6c:   f7fd fba4   bl 0x35b8           ; call memcpy(r5 + 4, src, len)
+
+  0x5e70:   1928        adds r0, r5, r4
+    5e72:   f1c4 013c   rsb r1, r4, #60
     5e76:   e8bd 4070   ldmia.w sp!, {r4, r5, r6, lr}
     5e7a:   1d00        adds r0, r0, #4
-    5e7c:   f7fd bbb5   b.w 0x35ea
-    5e80:   0028        movs r0, r5
-    5e82:   2000        movs r0, #0
-    5e84:   060c        lsls r4, r1, #24
-    5e86:   2000        movs r0, #0
+    5e7c:   f7fd bbb5   b.w 0x35ea          ; return mem_zero(r5 + r4 + 4, 60 - r4)
+
+  0x5e80:   0x20000028
+  0x5e84:   0x2000060c
 
 ckcu_voodoo1:
     ; r0 = ??
@@ -5059,8 +5119,9 @@ ckcu_voodoo1:
     6088:   d2f6        bcs.n 0x6078
     608a:   e8bd 81f0   ldmia.w sp!, {r4, r5, r6, r7, r8, pc}
     608e:   0000        movs r0, r0
-    6090:   7c18        ldrb r0, [r3, #16]
-    6092:   0000        movs r0, r0
+
+  0x6090:   0x7c18      ; gpio_map_3
+
     6094:   01ac        lsls r4, r5, #6
     6096:   2000        movs r0, #0
     6098:   0310        lsls r0, r2, #12
@@ -5159,8 +5220,9 @@ ckcu_voodoo1:
     6172:   e8bd 41f0   ldmia.w sp!, {r4, r5, r6, r7, r8, lr}
     6176:   2110        movs r1, #16
     6178:   f7fe ba14   b.w 0x45a4
-    617c:   7c68        ldrb r0, [r5, #17]
-    617e:   0000        movs r0, r0
+
+  0x617c:   0x7c68      ; gpio_map_2
+
     6180:   0000        movs r0, r0
     6182:   400b        ands r3, r1
     6184:   b510        push {r4, lr}
@@ -5319,17 +5381,17 @@ ckcu_voodoo1:
     6306:   4620        mov r0, r4
     6308:   f7fd fa2f   bl 0x376a
     630c:   4620        mov r0, r4
-    630e:   f7fd fa25   bl 0x375c
-    6312:   4913        ldr r1, [pc, #76]   ; (0x6360)
+    630e:   f7fd fa25   bl 0x375c               ; call bftm_clear(BFTM1)
+    6312:   4913        ldr r1, [pc, #76]       ; (0x6360)
     6314:   1520        asrs r0, r4, #20
-    6316:   f8c1 0180   str.w r0, [r1, #384]   ; 0x180
+    6316:   f8c1 0180   str.w r0, [r1, #384]    ; 0x180
     631a:   2100        movs r1, #0
-    631c:   4811        ldr r0, [pc, #68]   ; (0x6364)
+    631c:   4811        ldr r0, [pc, #68]       ; (0x6364)
     631e:   f7fe f946   bl 0x45ae
-    6322:   4911        ldr r1, [pc, #68]   ; (0x6368)
+    6322:   4911        ldr r1, [pc, #68]       ; (0x6368)
     6324:   2002        movs r0, #2
-    6326:   6248        str r0, [r1, #36]   ; 0x24
-    6328:   4c10        ldr r4, [pc, #64]   ; (0x636c)
+    6326:   6248        str r0, [r1, #36]       ; 0x24
+    6328:   4c10        ldr r4, [pc, #64]       ; (0x636c)
     632a:   2508        movs r5, #8
     632c:   e012        b.n 0x6354
     632e:   88a0        ldrh r0, [r4, #4]
@@ -5353,15 +5415,14 @@ ckcu_voodoo1:
     6358:   d2e9        bcs.n 0x632e
     635a:   bd70        pop {r4, r5, r6, pc}
 
-  0x635c:   0x40077000  ; BFTM1
+  0x635c:   0x40077000  ; BFTM 1
   0x6360:   0xe000e004
+  0x6364:   0x4006f000  ; GPTM 1
+  0x6368:   0x400b4000  ; GPIO C
+  0x636c:   0x7d24      ; gpio_map_1
 
-    6364:   f000 4006   and.w r0, r0, #2248146944   ; 0x86000000
-    6368:   4000        ands r0, r0
-    636a:   400b        ands r3, r1
-    636c:   7d24        ldrb r4, [r4, #20]
-    636e:   0000        movs r0, r0
-    6370:   b570        push {r4, r5, r6, lr}
+function_130_16:
+  0x6370:   b570        push {r4, r5, r6, lr}
     6372:   4c23        ldr r4, [pc, #140]   ; (0x6400)
     6374:   2508        movs r5, #8
     6376:   e011        b.n 0x639c
@@ -5408,7 +5469,7 @@ ckcu_voodoo1:
     63da:   4620        mov r0, r4
     63dc:   f7fd f9db   bl 0x3796
     63e0:   4620        mov r0, r4
-    63e2:   f7fd f9bb   bl 0x375c
+    63e2:   f7fd f9bb   bl 0x375c           ; call bftm_clear(BFTM1)
     63e6:   2101        movs r1, #1
     63e8:   4620        mov r0, r4
     63ea:   f7fd f9be   bl 0x376a
@@ -5419,19 +5480,15 @@ ckcu_voodoo1:
     63f8:   1520        asrs r0, r4, #20
     63fa:   f8c1 0100   str.w r0, [r1, #256]   ; 0x100
     63fe:   bd70        pop {r4, r5, r6, pc}
-    6400:   7d24        ldrb r4, [r4, #20]
-    6402:   0000        movs r0, r0
-    6404:   4000        ands r0, r0
-    6406:   400b        ands r3, r1
-    6408:   0406        lsls r6, r0, #16
-    640a:   2000        movs r0, #0
-    640c:   0020        movs r0, r4
-    640e:   2000        movs r0, #0
-    6410:   0000        movs r0, r0
-    6412:   400b        ands r3, r1
-    6414:   f000 4006   and.w r0, r0, #2248146944   ; 0x86000000
-    6418:   7000        strb r0, [r0, #0]
-    641a:   4007        ands r7, r0
+
+  0x6400:   0x7d24      ; gpio_map_1
+  0x6404:   0x400b4000  ; GPIO B
+  0x6408:   0x20000406
+  0x640c:   0x20000020
+  0x6410:   0x400b0000  ; GPIO A
+  0x6414:   0x4006f000  ; GPTM 1
+  0x6418:   0x40077000  ; BFTM 1
+
     641c:   e004        b.n 0x6428
     641e:   e000        b.n 0x6422
     6420:   b530        push {r4, r5, lr}
@@ -5783,7 +5840,7 @@ usb_entry:
     6748:   2240        movs r2, #64   ; 0x40
     674a:   2000        movs r0, #0
     674c:   69e1        ldr r1, [r4, #28]
-    674e:   f000 f93d   bl 0x69cc               ; call function_71(0, , 0x40)
+    674e:   f000 f93d   bl 0x69cc               ; call usb_recv(0, , 64)
 
     6752:   69e1        ldr r1, [r4, #28]
     6754:   4401        add r1, r0
@@ -6050,6 +6107,8 @@ usb_get_ep_intr:
     6958:   bd10        pop {r4, pc}
 
 usb_get_ep_tcnt:
+    ; r0 = ep #
+    ; r1 = right shift
   0x695a:   b510        push {r4, lr}
     695c:   460c        mov r4, r1
     695e:   f000 ff11   bl 0x7784           ; call usb_get_ep_reg
@@ -6076,28 +6135,34 @@ function_e_70:
     ; ????
   0x698e:   f000 b835   b.w 0x69fc          ; call function_e_71
 
-function_72:
-    ; r0 =
-    ; r1 =
-    ; r2 =
+usb_read_ep_buff:
+    ; r0 = ep #
+    ; r1 = ptr
+    ; r2 = len
+    ; return tcnt
   0x6992:   e92d 41f0   stmdb sp!, {r4, r5, r6, r7, r8, lr}
     6996:   4616        mov r6, r2
     6998:   460f        mov r7, r1
     699a:   0005        movs r5, r0
-    699c:   d011        beq.n 0x69c2
+    699c:   d011        beq.n 0x69c2        ; if ep # == 0
+
     699e:   2100        movs r1, #0
-  0x69a0:   f7ff ffdb   bl 0x695a           ; call usb_get_ep_tcnt
+  0x69a0:   f7ff ffdb   bl 0x695a           ; call usb_get_ep_tcnt(ep #, 0)
     69a4:   4604        mov r4, r0
+
     69a6:   42b0        cmp r0, r6
-    69a8:   d808        bhi.n 0x69bc
+    69a8:   d808        bhi.n 0x69bc        ; return if tcnt > len
+
     69aa:   4628        mov r0, r5
-    69ac:   b15d        cbz r5, 0x69c6
-    69ae:   f7ff ff9b   bl 0x68e8           ; call usb_get_ep_buff
+    69ac:   b15d        cbz r5, 0x69c6      ; if ep # == 0
+    69ae:   f7ff ff9b   bl 0x68e8           ; call usb_get_ep_buff(ep #)
+
   0x69b2:   1ce1        adds r1, r4, #3
-    69b4:   088a        lsrs r2, r1, #2
+    69b4:   088a        lsrs r2, r1, #2     ; r2 = (r4 + 3) / 4
     69b6:   4639        mov r1, r7
-    69b8:   f000 fedc   bl 0x7774           ; call copy_ptr
-    69bc:   4620        mov r0, r4
+    69b8:   f000 fedc   bl 0x7774           ; call copy_words(ep buff, ptr, r2)
+
+  0x69bc:   4620        mov r0, r4
     69be:   e8bd 81f0   ldmia.w sp!, {r4, r5, r6, r7, r8, pc}
 
   0x69c2:   2110        movs r1, #16
@@ -6106,15 +6171,16 @@ function_72:
   0x69c6:   f7ff ff9b   bl 0x6900           ; call usb_get_ep_buff_end
     69ca:   e7f2        b.n 0x69b2
 
-function_71:
-    ; r0 =
-    ; r1 =
-    ; r2 =
+usb_recv:
+    ; r0 = ep #
+    ; r1 = ptr
+    ; r2 = len
   0x69cc:   e92d 41f0   stmdb sp!, {r4, r5, r6, r7, r8, lr}
     69d0:   4615        mov r5, r2
     69d2:   460e        mov r6, r1
     69d4:   4607        mov r7, r0
-    69d6:   f000 fed5   bl 0x7784           ; call usb_get_ep_reg
+
+    69d6:   f000 fed5   bl 0x7784           ; call usb_get_ep_reg(ep)
     69da:   4604        mov r4, r0
     69dc:   2000        movs r0, #0
     69de:   b13d        cbz r5, 0x69f0
@@ -6122,15 +6188,18 @@ function_71:
     69e0:   462a        mov r2, r5
     69e2:   4631        mov r1, r6
     69e4:   4638        mov r0, r7
-    69e6:   f7ff ffd4   bl 0x6992           ; call function_72
+    69e6:   f7ff ffd4   bl 0x6992           ; call usb_read_ep_buff(ep #, ptr, len)
 
-    69ea:   b908        cbnz r0, 0x69f0
+    69ea:   b908        cbnz r0, 0x69f0     ; if r0 != 0
     69ec:   2d00        cmp r5, #0
-    69ee:   d103        bne.n 0x69f8
-    69f0:   6821        ldr r1, [r4, #0]
-    69f2:   f001 0110   and.w r1, r1, #16
+    69ee:   d103        bne.n 0x69f8        ; return if r5 != 0
+
+    ; Toggle NAKRX
+  0x69f0:   6821        ldr r1, [r4, #0]
+    69f2:   f001 0110   and.w r1, r1, #16   ; r1 &= 0x10
     69f6:   6021        str r1, [r4, #0]
-    69f8:   e8bd 81f0   ldmia.w sp!, {r4, r5, r6, r7, r8, pc}
+
+  0x69f8:   e8bd 81f0   ldmia.w sp!, {r4, r5, r6, r7, r8, pc}
 
 function_e_71:
   0x69fc:   b510        push {r4, lr}
@@ -6186,7 +6255,7 @@ usb_copy_send:
     6a60:   1ce0        adds r0, r4, #3
     6a62:   0882        lsrs r2, r0, #2
     6a64:   4640        mov r0, r8
-    6a66:   f000 fe85   bl 0x7774           ; call copy_ptr
+    6a66:   f000 fe85   bl 0x7774           ; call copy_words
     6a6a:   60ec        str r4, [r5, #12]
     6a6c:   2002        movs r0, #2
     6a6e:   6028        str r0, [r5, #0]
@@ -7169,15 +7238,15 @@ function_130_1:
     72f8:   2001        movs r0, #1
     72fa:   7030        strb r0, [r6, #0]
 
-    72fc:   2240        movs r2, #64   ; 0x40
-    72fe:   492c        ldr r1, [pc, #176]   ; (0x73b0)
+    72fc:   2240        movs r2, #64
+    72fe:   492c        ldr r1, [pc, #176]  ; (0x73b0) update_packet
     7300:   2004        movs r0, #4
-    7302:   f7ff fb63   bl 0x69cc           ; call function_71(4, , 0x40)
+    7302:   f7ff fb63   bl 0x69cc           ; call usb_recv(4, update_packet, 64)
 
-    7306:   4a2a        ldr r2, [pc, #168]   ; (0x73b0)
-    7308:   f1c0 0140   rsb r1, r0, #64   ; 0x40
+    7306:   4a2a        ldr r2, [pc, #168]  ; (0x73b0) update_packet
+    7308:   f1c0 0140   rsb r1, r0, #64     ; 0x40
     730c:   4410        add r0, r2
-    730e:   f7fc f96c   bl 0x35ea           ; call function_130_5(ptr, 64-r0)
+    730e:   f7fc f96c   bl 0x35ea           ; call mem_zero(update_packet + r0, 64 - r0)
 
     7312:   79a8        ldrb r0, [r5, #6]
     7314:   f020 0010   bic.w r0, r0, #16
@@ -7190,7 +7259,7 @@ function_130_1:
 
     ; Send 64 bytes on endpoint 3
     7322:   2240        movs r2, #64   ; 0x40
-    7324:   4922        ldr r1, [pc, #136]   ; (0x73b0)
+    7324:   4922        ldr r1, [pc, #136]   ; (0x73b0) update_packet
     7326:   2003        movs r0, #3
     7328:   f7ff fb80   bl 0x6a2c           ; call usb_copy_send(3, ptr, 64)
 
@@ -7258,7 +7327,7 @@ function_130_1:
   0x73a4:   0x2000003e
   0x73a8:   0x20000028
   0x73ac:   0x400a8000  ; USB
-  0x73b0:   0x20000608
+  0x73b0:   0x20000608  ; update_packet
   0x73b4:   0x200006bc
 
     73b8:   b5f0        push {r4, r5, r6, r7, lr}
@@ -7681,10 +7750,10 @@ function_130_1:
     776e:   f7ff f8a5   bl 0x68bc
     7772:   e7e7        b.n 0x7744
 
-copy_ptr:
+copy_words:
     ; r0 = src
     ; r1 = dest
-    ; r2 = count
+    ; r2 = word count
   0x7774:   1e52        subs r2, r2, #1
     7776:   d404        bmi.n 0x7782
     7778:   f850 3022   ldr.w r3, [r0, r2, lsl #2]
@@ -7832,7 +7901,7 @@ main:
     78c0:   88a0        ldrh r0, [r4, #4]
     78c2:   b188        cbz r0, 0x78e8
     78c4:   f7fe fd54   bl 0x6370
-    78c8:   f7fe f9b7   bl 0x5c3a
+    78c8:   f7fe f9b7   bl 0x5c3a           ; call pinmux_c0_gptm()
     78cc:   2000        movs r0, #0
     78ce:   f7fe fb45   bl 0x5f5c
 
@@ -7846,30 +7915,36 @@ main:
     78e6:   e7f4        b.n 0x78d2
 
   0x78e8:   2001        movs r0, #1
-    78ea:   f7fd fe8d   bl 0x5608
-    78ee:   f7fe ff8d   bl 0x680c           ; call usb_init
+    78ea:   f7fd fe8d   bl 0x5608           ; call function_130_10(1)
+    78ee:   f7fe ff8d   bl 0x680c           ; call usb_init()
 
     78f2:   4e1a        ldr r6, [pc, #104]  ; (0x795c)
     78f4:   4d1a        ldr r5, [pc, #104]  ; (0x7960)
 
-function_130_3:
-  0x78f6:   f7ff f94d   bl 0x6b94               ; call function_130_2
+    ; main loop
+  0x78f6:   f7ff f94d   bl 0x6b94           ; call function_130_2
     78fa:   2801        cmp r0, #1
-    78fc:   d007        beq.n 0x790e
+    78fc:   d007        beq.n 0x790e        ; if r0 == 1
     78fe:   2802        cmp r0, #2
-    7900:   d00f        beq.n 0x7922
+    7900:   d00f        beq.n 0x7922        ; if r0 == 2
     7902:   2803        cmp r0, #3
-    7904:   d122        bne.n 0x794c
+    7904:   d122        bne.n 0x794c        ; if r0 == 3
+
+    ; if r0 == 3
     7906:   2001        movs r0, #1
-    7908:   f7fd fe7e   bl 0x5608
+    7908:   f7fd fe7e   bl 0x5608           ; call function_130_10(1)
     790c:   e01e        b.n 0x794c
-    790e:   2000        movs r0, #0
-    7910:   f7fd fe7a   bl 0x5608
-    7914:   f7fe fd2c   bl 0x6370
-    7918:   f7fe f98f   bl 0x5c3a
+
+    ; if r0 == 1
+  0x790e:   2000        movs r0, #0
+    7910:   f7fd fe7a   bl 0x5608           ; call function_130_10(0)
+    7914:   f7fe fd2c   bl 0x6370           ; call
+    7918:   f7fe f98f   bl 0x5c3a           ; call pinmux_c0_gptm()
     791c:   2000        movs r0, #0
-    791e:   f7fe fb1d   bl 0x5f5c
-    7922:   88a0        ldrh r0, [r4, #4]
+    791e:   f7fe fb1d   bl 0x5f5c           ; call
+
+    ; if r0 == 2
+  0x7922:   88a0        ldrh r0, [r4, #4]
     7924:   1c40        adds r0, r0, #1
     7926:   0400        lsls r0, r0, #16
     7928:   0c00        lsrs r0, r0, #16
@@ -7881,14 +7956,16 @@ function_130_3:
     7934:   6828        ldr r0, [r5, #0]
     7936:   1e40        subs r0, r0, #1
     7938:   6028        str r0, [r5, #0]
-    793a:   f7fe f9d7   bl 0x5cec
-    793e:   f000 f811   bl 0x7964
+    793a:   f7fe f9d7   bl 0x5cec           ; call function_130_13()
+    793e:   f000 f811   bl 0x7964           ; call function_130_15()
     7942:   7820        ldrb r0, [r4, #0]
     7944:   b910        cbnz r0, 0x794c
     7946:   2001        movs r0, #1
-    7948:   f7fe f9c4   bl 0x5cd4
-    794c:   f7ff f984   bl 0x6c58
-    7950:   e7d1        b.n 0x78f6
+    7948:   f7fe f9c4   bl 0x5cd4           ; call function_130_12(1)
+
+    ; else
+  0x794c:   f7ff f984   bl 0x6c58           ; call watchdog_reload_timer()
+    7950:   e7d1        b.n 0x78f6          ; loop
     7952:   0000
 
   0x7954:   0x20000030
@@ -7896,6 +7973,7 @@ function_130_3:
   0x795c:   0x55aafaf0
   0x7960:   0x20003ffc
 
+function_130_15:
   0x7964:   b570        push {r4, r5, r6, lr}
     7966:   4e32        ldr r6, [pc, #200]   ; (0x7a30)
     7968:   2400        movs r4, #0
@@ -7987,6 +8065,7 @@ function_130_3:
 
 .data:
 
+data_1:
   0x7a3c:   4544
     7a3e:   e3e6
     7a40:   082c
@@ -7994,6 +8073,7 @@ function_130_3:
     7a44:   0100
     7a46:   0200
 
+data_2:
   0x7a48:   e539
     7a4a:   65e4
     7a4c:   1fe7
@@ -8206,38 +8286,32 @@ function_130_3:
     7c12:   c3c2
     7c14:   0000
     7c16:   0000
-    7c18:   4000
-    7c1a:   400b
-    7c1c:   0200
-    7c1e:   0000
-    7c20:   0000
-    7c22:   400b
-    7c24:   0020
-    7c26:   0000
-    7c28:   0000
-    7c2a:   400b
-    7c2c:   0040
-    7c2e:   0000
-    7c30:   0000
-    7c32:   400b
-    7c34:   0080
-    7c36:   0000
-    7c38:   4000
-    7c3a:   400b
-    7c3c:   0800
-    7c3e:   0000
-    7c40:   4000
-    7c42:   400b
-    7c44:   2000
-    7c46:   0000
-    7c48:   4000
-    7c4a:   400b
-    7c4c:   4000
-    7c4e:   0000
-    7c50:   4000
-    7c52:   400b
-    7c54:   8000
-    7c56:   0000
+
+gpio_map_3:
+  0x7c18:   00 40 0b 40     0x400b4000  ; GPIO C
+    7c1c:   00 02 00 00     0x200       ; pin 9
+
+    7c20:   00 00 0b 40     0x400b0000  ; GPIO A
+    7c24:   20 00 00 00     0x20        ; pin 5
+
+    7c28:   00 00 0b 40     0x400b0000  ; GPIO A
+    7c2c:   40 00 00 00     0x40        ; pin 6
+
+    7c30:   00 00 0b 40     0x400b0000  ; GPIO A
+    7c34:   80 00 00 00     0x80        ; pin 7
+
+    7c38:   00 40 0b 40     0x400b4000  ; GPIO C
+    7c3c:   00 08 00 00     0x800       ; pin 12
+
+    7c40:   00 40 0b 40     0x400b4000  ; GPIO C
+    7c44:   00 20 00 00     0x2000      ; pin 13
+
+    7c48:   00 40 0b 40     0x400b4000  ; GPIO C
+    7c4c:   00 40 00 00     0x4000      ; pin 14
+
+    7c50:   00 40 0b 40     0x400b4000  ; GPIO C
+    7c54:   00 80 00 00     0x8000      ; pin 15
+
     7c58:   0902
     7c5a:   0500
     7c5c:   0600
@@ -8246,46 +8320,38 @@ function_130_3:
     7c62:   0d02
     7c64:   0e02
     7c66:   0f02
-    7c68:   4000
-    7c6a:   400b
-    7c6c:   0010
-    7c6e:   0000
-    7c70:   2000
-    7c72:   400b
-    7c74:   0040
-    7c76:   0000
-    7c78:   6000
-    7c7a:   400b
-    7c7c:   0001
-    7c7e:   0000
-    7c80:   2000
-    7c82:   400b
-    7c84:   0800
-    7c86:   0000
-    7c88:   0000
-    7c8a:   400b
-    7c8c:   0800
-    7c8e:   0000
-    7c90:   0000
-    7c92:   400b
-    7c94:   0001
-    7c96:   0000
-    7c98:   0000
-    7c9a:   400b
-    7c9c:   0002
-    7c9e:   0000
-    7ca0:   0000
-    7ca2:   400b
-    7ca4:   0004
-    7ca6:   0000
-    7ca8:   0000
-    7caa:   400b
-    7cac:   0008
-    7cae:   0000
-    7cb0:   0000
-    7cb2:   400b
-    7cb4:   0010
-    7cb6:   0000
+
+gpio_map_2:
+  0x7c68:   00 40 0b 40     0x400b4000  ; GPIO C
+    7c6c:   10 00 00 00     0x10        ; pin 4
+
+    7c70:   00 20 0b 40     0x400b2000  ; GPIO B
+    7c74:   40 00 00 00     0x40        ; pin 6
+
+    7c78:   00 60 0b 40     0x400b6000  ; GPIO D
+    7c7c:   01 00 00 00     0x1         ; pin 0
+
+    7c80:   00 20 0b 40     0x400b2000  ; GPIO B
+    7c84:   00 08 00 00     0x800       ; pin 11
+
+    7c88:   00 00 0b 40     0x400b0000  ; GPIO A
+    7c8c:   00 08 00 00     0x800       ; pin 11
+
+    7c90:   00 00 0b 40     0x400b0000  ; GPIO A
+    7c94:   01 00 00 00     0x1         ; pin 0
+
+    7c98:   00 00 0b 40     0x400b0000  ; GPIO A
+    7c9c:   02 00 00 00     0x2         ; pin 1
+
+    7ca0:   00 00 0b 40     0x400b0000  ; GPIO A
+    7ca4:   04 00 00 00     0x4         ; pin 2
+
+    7ca8:   00 00 0b 40     0x400b0000  ; GPIO A
+    7cac:   08 00 00 00     0x8         ; pin 3
+
+    7cb0:   00 00 0b 40     0x400b0000  ; GPIO A
+    7cb4:   10 00 00 00     0x10        ; pin 4
+
     7cb8:   2f2d
     7cba:   302e
     7cbc:   3414
@@ -8340,38 +8406,32 @@ function_130_3:
     7d1e:   0000
     7d20:   0100
     7d22:   0002
-    7d24:   4000
-    7d26:   400b
-    7d28:   0100
-    7d2a:   0000
-    7d2c:   4000
-    7d2e:   400b
-    7d30:   0080
-    7d32:   0000
-    7d34:   2000
-    7d36:   400b
-    7d38:   0020
-    7d3a:   0000
-    7d3c:   2000
-    7d3e:   400b
-    7d40:   0010
-    7d42:   0000
-    7d44:   2000
-    7d46:   400b
-    7d48:   0008
-    7d4a:   0000
-    7d4c:   2000
-    7d4e:   400b
-    7d50:   0004
-    7d52:   0000
-    7d54:   4000
-    7d56:   400b
-    7d58:   0040
-    7d5a:   0000
-    7d5c:   4000
-    7d5e:   400b
-    7d60:   0020
-    7d62:   0000
+
+gpio_map_1:
+  0x7d24:   00 40 0b 40     0x400b4000  ; GPIO C
+    7d28:   00 01 00 00     0x100       ; pin 8
+
+    7d2c:   00 40 0b 40     0x400b4000  ; GPIO C
+    7d30:   80 00 00 00     0x80        ; pin 7
+
+    7d34:   00 20 0b 40     0x400b2000  ; GPIO B
+    7d38:   20 00 00 00     0x20        ; pin 5
+
+    7d3c:   00 20 0b 40     0x400b2000  ; GPIO B
+    7d40:   10 00 00 00     0x10        ; pin 4
+
+    7d44:   00 20 0b 40     0x400b2000  ; GPIO B
+    7d48:   08 00 00 00     0x8         ; pin 3
+
+    7d4c:   00 20 0b 40     0x400b2000  ; GPIO B
+    7d50:   04 00 00 00     0x4         ; pin 2
+
+    7d54:   00 40 0b 40     0x400b4000  ; GPIO C
+    7d58:   40 00 00 00     0x40        ; pin 6
+
+    7d5c:   00 40 0b 40     0x400b4000  ; GPIO C
+    7d60:   20 00 00 00     0x20        ; pin 5
+
     7d64:   0000
     7d66:   0013
     7d68:   0026
