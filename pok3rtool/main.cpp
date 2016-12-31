@@ -1,13 +1,28 @@
 #include "pok3r.h"
+#include "pok3r_rgb.h"
+
 #include "zlog.h"
 #include "zfile.h"
 #include "zhash.h"
+
 #include <stdio.h>
 
 int readversion(){
     Pok3r pok3r;
     LOG("Looking for Vortex Pok3r...");
     if(!pok3r.findPok3r())
+        return -1;
+    LOG("Open...");
+    if(!pok3r.open())
+        return -2;
+    LOG("Found: " << pok3r.getVersion());
+    return 0;
+}
+
+int readversion_rgb(){
+    Pok3rRGB pok3r;
+    LOG("Looking for Vortex Pok3r RGB...");
+    if(!pok3r.findPok3rRGB())
         return -1;
     LOG("Open...");
     if(!pok3r.open())
@@ -599,8 +614,9 @@ int decode_updater(ZPath exe, ZPath out){
                 decode_firmware_scheme(sec);
                 break;
             case 2:
-                // Don't know how to do this yet
-                decode_firmware_scheme2(sec);
+                // Decrypt the firmwares only
+                if(sec.size() > 180)
+                    decode_firmware_scheme2(sec);
                 break;
             default:
                 break;
@@ -695,7 +711,7 @@ int main(int argc, char **argv){
         ZString cmd = argv[1];
         if(cmd == "version"){
             // Read version from Pok3r
-            return readversion();
+            return readversion_rgb();
 
         } else if(cmd == "setversion"){
             // Write version on Pok3r

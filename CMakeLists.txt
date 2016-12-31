@@ -50,6 +50,7 @@ SET(FILES
     disassemble/v130/firmware_v130.txt
     disassemble/v130/symbols_v130.txt
     disassemble/v130/sram-variables_v130.txt
+    disassemble/v130/patch_v130.txt
     disassemble/v130/fw_xor_decode.c
 
     firmware/ht32f165x.cfg
@@ -65,6 +66,8 @@ SET(FILES
     firmware/ht32_usbd_descriptor.c
     firmware/ht32f165x_it.c
     firmware/ht32f165x_usbdconf.h
+
+    pok3rtool/99-pok3r.rules
 )
 
 ### =================== CONFIG ==================== ###

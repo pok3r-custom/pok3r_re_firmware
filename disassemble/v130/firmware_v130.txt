@@ -932,8 +932,9 @@ function_130_6:
     3bfa:   0304        lsls r4, r0, #12
     3bfc:   0001        movs r1, r0
     3bfe:   3400        adds r4, #0
-    3c00:   0004        movs r4, r0
-    3c02:   0002        movs r2, r0
+
+  0x3c00:   04 00 02 00
+
     3c04:   b570        push {r4, r5, r6, lr}
     3c06:   483c        ldr r0, [pc, #240]   ; (0x3cf8)
     3c08:   4d3c        ldr r5, [pc, #240]   ; (0x3cfc)
@@ -4693,8 +4694,8 @@ function_130_13:
     ; if r2 == 16 (0x10)
   0x5d10:   2802        cmp r0, #2
     5d12:   d14e        bne.n 0x5db2
-    5d14:   6069        str r1, [r5, #4]
-    5d16:   2104        movs r1, #4
+    5d14:   6069        str r1, [r5, #4]    ; [r5 + 4] = r1 = 0
+    5d16:   2104        movs r1, #4         ; r1 = 4
     5d18:   e03c        b.n 0x5d94
 
     ; if r2 == 17 (0x11)
@@ -4726,7 +4727,7 @@ function_130_13:
     5d50:   e01e        b.n 0x5d90
 
     ; if r0 == 0
-  0x5d52:   f891 010f   ldrb.w r0, [r1, #271]   ; 0x10f
+  0x5d52:   f891 010f   ldrb.w r0, [r1, #271]   ; r0 = [r1 + 0x10f]
     5d56:   28aa        cmp r0, #170            ; 0xaa
     5d58:   d011        beq.n 0x5d7e            ; if r0 == 0xaa
     5d5a:   781a        ldrb r2, [r3, #0]
@@ -4762,9 +4763,9 @@ function_130_13:
     ; if r0 == 2
   0x5d90:   2101        movs r1, #1
     5d92:   7129        strb r1, [r5, #4]   ; [r5 + 4] = 1
-  0x5d94:   1d28        adds r0, r5, #4
+  0x5d94:   1d28        adds r0, r5, #4     ; r0 = r5 + 4
 
-  0x5d96:   f000 f85d   bl 0x5e54           ; call flash_read_packet(r1, r2)
+  0x5d96:   f000 f85d   bl 0x5e54           ; call flash_read_packet(r0, r1)
     5d9a:   2401        movs r4, #1
   0x5d9c:   7830        ldrb r0, [r6, #0]
     5d9e:   2801        cmp r0, #1
@@ -4779,7 +4780,7 @@ function_130_13:
     5dae:   7030        strb r0, [r6, #0]   ; [r6] = 2
   0x5db0:   bd70        pop {r4, r5, r6, pc}
 
-    ; else
+    ; else / error handler
   0x5db2:   6828        ldr r0, [r5, #0]
     5db4:   6068        str r0, [r5, #4]    ; [r5 + 4] = [r5]
     5db6:   f64a 20ff   movw r0, #43775

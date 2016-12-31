@@ -1,0 +1,9 @@
+Firmware v130 Exploit Patch:
+
+    5d28:   28ff        cmp r0, #255
+    5d2a:               bne.n 0x5d36
+    5d2c:               ldrh r0, [r5, #2]
+    5d2e:   213c        movs r1, #60
+    5d30:               b.n 0x5d96
+    5d32:   0000
+    5d34:   0000
