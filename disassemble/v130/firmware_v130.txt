@@ -4713,7 +4713,7 @@ function_130_13:
     5d30:   ebb3 0f82   cmp.w r3, r2, lsl #2
     5d34:   db07        blt.n 0x5d46                ; if 0x400 < (r2 * 4)
 
-    5d36:   ebc0 1000   rsb r0, r0, r0, lsl #4      ; r0 *= 15
+  0x5d36:   ebc0 1000   rsb r0, r0, r0, lsl #4      ; r0 *= 15
     5d3a:   f44f 5122   mov.w r1, #10368
     5d3e:   eb01 0080   add.w r0, r1, r0, lsl #2    ; r0 = 0x2880 + (r0 * 4)
     5d42:   213c        movs r1, #60                ; r1 = 60

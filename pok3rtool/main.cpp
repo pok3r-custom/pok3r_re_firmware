@@ -429,7 +429,7 @@ static const zu32 xor_key2[] = {
 
 // Decode the encryption scheme used by the POK3R RGB firmware
 // Just XOR encryption with 52-byte key seen above.
-void decode_firmware_scheme2(ZBinary &bin){
+void xor_firmware_scheme2(ZBinary &bin){
     // XOR decryption
     zu32 *words = (zu32 *)bin.raw();
     for(int i = 0; i < bin.size() / 4; ++i){
@@ -589,8 +589,9 @@ int decode_updater(ZPath exe, ZPath out){
         if(sec_len == 0)
             continue;
 
-        LOG("Section: " << i);
-        LOG("  Section Length: 0x" << ZString::ItoS(sec_len, 16));
+        LOG("Section " << i << ":");
+        LOG("  Offset: 0x" << ZString::ItoS(sec_start, 16));
+        LOG("  Length: 0x" << ZString::ItoS(sec_len, 16));
 
         // Read section
         ZBinary sec;
@@ -615,8 +616,10 @@ int decode_updater(ZPath exe, ZPath out){
                 break;
             case 2:
                 // Decrypt the firmwares only
-                if(sec.size() > 180)
-                    decode_firmware_scheme2(sec);
+                if(sec.size() > 180){
+                    xor_firmware_scheme2(sec);
+//                    xor_firmware_scheme2(sec);
+                }
                 break;
             default:
                 break;
@@ -628,7 +631,7 @@ int decode_updater(ZPath exe, ZPath out){
         ZPath secout = out;
         if(type == 2)
             secout.last() = out.getName() + "-" + i + out.getExtension();
-        LOG("  Section Output: " << secout);
+        LOG("  Output: " << secout);
 
         // Write firmware
         ZFile fwout(secout, ZFile::WRITE);
@@ -648,7 +651,10 @@ int encode_image(ZPath fwin, ZPath fwout){
         return -1;
     }
 
-    encode_firmware_scheme(fwbin);
+//    encode_firmware_scheme(fwbin);
+
+    xor_firmware_scheme2(fwbin);
+    encode_package_scheme(fwbin);
 
     LOG("Output: " << fwout);
 
@@ -662,8 +668,8 @@ int encode_image(ZPath fwin, ZPath fwout){
 }
 
 int encode_patch_updater(ZPath exein, ZPath fwin, ZPath exeout){
-    LOG("Updater: " << exein);
-    LOG("Decoded Firmware: " << fwin);
+    LOG("In Updater: " << exein);
+    LOG("In Firmware: " << fwin);
 
     // Read updater
     ZBinary exebin;
@@ -680,11 +686,13 @@ int encode_patch_updater(ZPath exein, ZPath fwin, ZPath exeout){
     }
 
     // Encode firmware
-    encode_firmware_scheme(fwbin);
+//    encode_firmware_scheme(fwbin);
+    xor_firmware_scheme2(fwbin);
     encode_package_scheme(fwbin);
 
     // Write encoded firmware onto exe
-    exebin.seek(0x1A3800);
+//    exebin.seek(0x1A3800);
+    exebin.seek(0x2BE000);
     exebin.write(fwbin);
 
     ZFile exefile;
@@ -698,7 +706,7 @@ int encode_patch_updater(ZPath exein, ZPath fwin, ZPath exeout){
         return -4;
     }
 
-    LOG("Updated Updater: " << exeout);
+    LOG("Out Updater: " << exeout);
 
     return 0;
 }
