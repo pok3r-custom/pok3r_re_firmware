@@ -4,19 +4,18 @@
 this in my free time for fun, as such there are no guarantees of progress or success.*
 
 ### Goals / Progress
-- Extract unencrypted POK3R firmware and flash contents. **DONE**
-- Reverse engineer the POK3R firmware and update procedure. **DONE**
-- Application to write new firmware to POK3R over USB. **WIP**
-
-
-- Extract unencrypted POK3R RGB firmware and flash contents. **DONE**
-- Reverse engineer the POK3R RGB firmware and update procedure. **WIP**
-- Application to write new firmware to POK3R RGB over USB. *TODO*
-
-
-- Open-source firmware compatible with POK3R and POK3R RGB. *TODO*
-    - Firmware can be installed from Vortex firmware over USB (no hardware required).
-    - Firmware can be rolled back with Votex firmware update application.
+- POK3R
+    - Extract unencrypted POK3R firmware and flash contents. **DONE**
+    - Reverse engineer the POK3R firmware and update procedure. **DONE**
+    - Application to write new firmware to POK3R over USB. **WIP**
+- POK3R RGB
+    - Extract unencrypted POK3R RGB firmware and flash contents. **DONE**
+    - Reverse engineer the POK3R RGB firmware and update procedure. **WIP**
+    - Application to write new firmware to POK3R RGB over USB. *TODO*
+- New Firmware
+    - Open-source firmware compatible with POK3R and POK3R RGB. *TODO*
+        - Firmware can be installed from Vortex firmware over USB (no hardware required).
+        - Firmware can be rolled back with Votex firmware update application.
 
 ### POK3R Firmware Patch
 A very small firmware patch will allow the contents of the flash storage to be read out over USB,
