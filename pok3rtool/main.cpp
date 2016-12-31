@@ -745,6 +745,20 @@ int main(int argc, char **argv){
                 return 2;
             }
 
+        } else if(cmd == "dump"){
+            Pok3rRGB pok3r;
+            LOG("Looking for Vortex Pok3r RGB...");
+            if(!pok3r.findPok3rRGB())
+                return -1;
+            LOG("Open...");
+            if(!pok3r.open())
+                return -2;
+            ZBinary bin = pok3r.dumpFlash();
+            LOG("Dump:");
+            RLOG(bin.dumpBytes(4, 8));
+            ZFile::writeBinary("dump_rgb.bin", bin);
+            return 0;
+
         } else if(cmd == "flash"){
             // Write firmware to Pok3r
             if(argc > 3){

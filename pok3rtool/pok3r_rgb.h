@@ -33,9 +33,11 @@ public:
     //! Read the firmware version from the keyboard.
     ZString getVersion();
 
+    ZBinary dumpFlash();
+
 private:
     //! Send command
-    bool sendCmd(zu8 cmd, zu8 arg, const zbyte *data, zu8 len);
+    bool sendCmd(zu8 cmd, zu8 a1, zu16 a2, const zbyte *data, zu8 len);
     //! Receive data (64 bytes)
     bool recvDat(zbyte *data);
 };

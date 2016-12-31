@@ -10,26 +10,39 @@ bool Pok3rRGB::findPok3rRGB(){
 
 ZString Pok3rRGB::getVersion(){
     ZBinary bin(PKT_LEN);
-    if(!sendCmd(CMD_READ, 0x20, nullptr, 0))
+    if(!sendCmd(CMD_READ, 0x20, 0, nullptr, 0))
         return "ERROR";
     if(!recvDat(bin.raw()))
         return "ERROR";
-//    RLOG(bin.dumpBytes(4, 8));
     ZString ver;
     ver.parseUTF16((zu16 *)(bin.raw() + 8), 60);
     return ver;
 }
 
+ZBinary Pok3rRGB::dumpFlash(){
+    ZBinary dump;
+    for(zu16 i = 0; i < 0x10000 - 60; i += 60){
+        ZBinary bin(PKT_LEN);
+        if(!sendCmd(CMD_READ, 0xff, i, nullptr, 0))
+            return dump;
+        if(!recvDat(bin.raw()))
+            return dump;
 
-bool Pok3rRGB::sendCmd(zu8 cmd, zu8 arg, const zbyte *data, zu8 len){
+//        RLOG(bin.dumpBytes(4, 8));
+        dump.write(bin.raw() + 4, 60);
+    }
+    return dump;
+}
+
+bool Pok3rRGB::sendCmd(zu8 cmd, zu8 a1, zu16 a2, const zbyte *data, zu8 len){
     if(len > 52)
         return false;
 
     ZBinary packet;
     packet.fill(0, PKT_LEN);
     packet.writeu8(cmd);    // command
-    packet.writeu8(arg);    // argument
-    packet.seek(4);
+    packet.writeu8(a1);     // argument
+    packet.writeleu16(a2);  // patch argument
 
     if(data){
         packet.write(data, len);  // data
