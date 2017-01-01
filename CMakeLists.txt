@@ -27,6 +27,7 @@ SET(SOURCES
     pok3rtool/pok3r_rgb.cpp
     pok3rtool/usbdevice.h
     pok3rtool/usbdevice.cpp
+    pok3rtool/updateinterface.h
 )
 
 SET(FILES
@@ -42,6 +43,7 @@ SET(FILES
 
     disassemble/builtin_rgb/firmware_builtin_rgb.bin
     disassemble/builtin_rgb/firmware_builtin_rgb.txt
+    disassemble/builtin_rgb/symbols_builtin_rgb.txt
 
     disassemble/v117/firmware_v117.bin
     disassemble/v117/firmware_v117.txt

@@ -18,7 +18,7 @@ entry:
       28:   4800        ldr r0, [pc, #0]        ; r0 = (0x2c)
       2a:   4700        bx r0                   ; jump main
 
-    0x2c:   0x1ee1      ; (main)
+    0x2c:   0x1ee1      ; main
     0x30:   0x20000ed8  ; stack_max
 
     0x34:   60c1        str r1, [r0, #12]
@@ -147,13 +147,13 @@ reset:
      122:   4700        bx r0               ; jump entry
 
 generic_fault:
-     124:   e7fe        b.n 0x124
+   0x124:   e7fe        b.n 0x124
 
-     126:   e7fe        b.n 0x126
+   0x126:   e7fe        b.n 0x126
 
-   0x128:   0x1a99
-   0x12c:   0x10e5
-   0x130:   0x0021
+   0x128:   0x1a99      ; watchdog_init
+   0x12c:   0x10e5      ; clock_init
+   0x130:   0x21        ; entry
 
      134:   b5f0        push {r4, r5, r6, r7, lr}
      136:   4b32        ldr r3, [pc, #200]    ; (0x200)
@@ -3721,7 +3721,7 @@ main:
 
   0x1ee0:   4827        ldr r0, [pc, #156]      ; r0 = (0x1f80)
     1ee2:   6800        ldr r0, [r0, #0]
-    1ee4:   4927        ldr r1, [pc, #156]      ; r1 = (0x1f84)
+    1ee4:   4927        ldr r1, [pc, #156]      ; r1 = (0x1f84) reset key
     ; Check if SBVT1 is 0x55aafaf5
     ; If it is, reset was requested, so continue
     1ee6:   4288        cmp r0, r1
@@ -3795,7 +3795,7 @@ main:
     1f7e:   0000
 
   0x1f80:   0x40080304  ; FMC SBVT1
-  0x1f84:   0x55aafaf5
+  0x1f84:   0x55aafaf5  ; reset key
   0x1f88:   0x200000b8  ; Stack position
   0x1f8c:   0x20000000  ; Stack limit
 

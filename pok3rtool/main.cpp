@@ -7,30 +7,7 @@
 
 #include <stdio.h>
 
-int readversion(){
-    Pok3r pok3r;
-    LOG("Looking for Vortex Pok3r...");
-    if(!pok3r.findPok3r())
-        return -1;
-    LOG("Open...");
-    if(!pok3r.open())
-        return -2;
-    LOG("Found: " << pok3r.getVersion());
-    return 0;
-}
-
-int readversion_rgb(){
-    Pok3rRGB pok3r;
-    LOG("Looking for Vortex Pok3r RGB...");
-    if(!pok3r.findPok3rRGB())
-        return -1;
-    LOG("Open...");
-    if(!pok3r.open())
-        return -2;
-    LOG("Found: " << pok3r.getVersion());
-    return 0;
-}
-
+/*
 int writeversion(ZString version){
     LOG("Looking for Vortex Pok3r...");
     Pok3r pok3r;
@@ -79,8 +56,9 @@ int writeversion(ZString version){
     LOG("Read Version: " << pok3r.getVersion());
     return 0;
 }
+*/
 
-
+/*
 int bootloader(){
     LOG("Looking for Vortex Pok3r...");
     Pok3r pok3r;
@@ -102,6 +80,7 @@ int bootloader(){
 
     return 0;
 }
+*/
 
 /* Flash
  * start = 0x0
@@ -124,6 +103,7 @@ int bootloader(){
  * len   = 0x100000
  */
 
+/*
 int readfw(zu32 start, zu32 len, ZPath out){
     LOG("Looking for Vortex Pok3r...");
     Pok3r pok3r;
@@ -250,6 +230,7 @@ int crcflash(){
         return -1;
     }
 }
+*/
 
 /*  Decode the encryption scheme used by the updater program.
  *  Produced from IDA disassembly in sub_401000 of v117 updater.
@@ -257,7 +238,7 @@ int crcflash(){
  *  Second, reverse each pair of bytes
  *  Third, shift the bits in each byte, sub 7 from MSBs
  */
-void decode_package_scheme(ZBinary &bin){
+void decode_package_data(ZBinary &bin){
     // Swap bytes 4 apart, skip 5
     for(zu64 i = 4; i < bin.size(); i+=5){
         zbyte a = bin[i-4];
@@ -282,7 +263,7 @@ void decode_package_scheme(ZBinary &bin){
 
 // Encrypt using the encryption scheme used by the updater program
 // Reverse engineered from the above
-void encode_package_scheme(ZBinary &bin){
+void encode_package_data(ZBinary &bin){
     // x = (y >> 4 + 7 & 0xF) | (x << 4)
     for(zu64 i = 0; i < bin.size(); ++i){
         bin[i] = (((bin[i] >> 4) + 7) & 0xF) | (bin[i] << 4);
@@ -302,138 +283,6 @@ void encode_package_scheme(ZBinary &bin){
         zbyte b = bin[i];
         bin[i-4] = b;
         bin[i] = a;
-    }
-}
-
-// POK3R firmware XOR encryption/decryption key
-// Found at 0x2188 in Pok3r flash
-static const zu32 xor_key[] = {
-    0x55aa55aa,
-    0xaa55aa55,
-    0x000000ff,
-    0x0000ff00,
-    0x00ff0000,
-    0xff000000,
-    0x00000000,
-    0xffffffff,
-    0x0f0f0f0f,
-    0xf0f0f0f0,
-    0xaaaaaaaa,
-    0x55555555,
-    0x00000000,
-};
-
-// This array was painstakingly translated from a switch with a lot of shifts in the firmware.
-// I noticed after the fact that it was identical to the array that Sprite used in his hack,
-// but the groups of offsets were in a rotated order. Oh well.
-const zu8 swap_key[] = {
-    0,1,2,3,
-    1,2,3,0,
-    2,1,3,0,
-    3,2,1,0,
-    3,1,0,2,
-    1,2,0,3,
-    2,3,1,0,
-    0,2,1,3,
-};
-
-void decode_firmware_packet(zbyte *data, zu32 num){
-    zu32 *words = (zu32*)data;
-
-    // XOR decryption
-    for(int i = 0; i < 13; ++i){
-        words[i] = words[i] ^ xor_key[i];
-    }
-
-    // Swap decryption
-    zu8 f = (num & 7) << 2;
-    for(int i = 0; i < 52; i+=4){
-        zbyte a = data[i + swap_key[f + 0]];
-        zbyte b = data[i + swap_key[f + 1]];
-        zbyte c = data[i + swap_key[f + 2]];
-        zbyte d = data[i + swap_key[f + 3]];
-
-        data[i + 0] = a;
-        data[i + 1] = b;
-        data[i + 2] = c;
-        data[i + 3] = d;
-    }
-}
-
-// Decode the encryption scheme used by the POK3R firmware
-// Ripped from the pok3r builtin firmware
-void decode_firmware_scheme(ZBinary &bin){
-    zu32 count = 0;
-    for(zu32 offset = 0; offset < bin.size(); offset += 52){
-        if(count >= 10 && count <= 100){
-            decode_firmware_packet(bin.raw() + offset, count);
-        }
-        count++;
-    }
-}
-
-void encode_firmware_packet(zbyte *data, zu32 num){
-    zu32 *words = (zu32*)data;
-
-    // Swap encryption
-    zu8 f = (num & 7) << 2;
-    for(int i = 0; i < 52; i+=4){
-        zbyte a = data[i + 0];
-        zbyte b = data[i + 1];
-        zbyte c = data[i + 2];
-        zbyte d = data[i + 3];
-
-        data[i + swap_key[f + 0]] = a;
-        data[i + swap_key[f + 1]] = b;
-        data[i + swap_key[f + 2]] = c;
-        data[i + swap_key[f + 3]] = d;
-    }
-
-    // XOR encryption
-    for(int i = 0; i < 13; ++i){
-        words[i] = words[i] ^ xor_key[i];
-    }
-}
-
-// Encode using the encryption scheme used by the POK3R firmware
-// Reverse engineered from the above
-void encode_firmware_scheme(ZBinary &bin){
-    zu32 count = 0;
-    for(zu32 offset = 0; offset < bin.size(); offset += 52){
-        if(count >= 10 && count <= 100){
-            encode_firmware_packet(bin.raw() + offset, count);
-        }
-        count++;
-    }
-}
-
-// POK3R RGB XOR encryption/decryption key
-// Somone somewhere thought a random XOR key was any better than the one they
-// used in the POK3R firmware. Yeah, good one.
-// See fw_xor_decode.c for the hilarious way this key was obtained.
-static const zu32 xor_key2[] = {
-    0xe7c29474,
-    0x79084b10,
-    0x53d54b0d,
-    0xfc1e8f32,
-    0x48e81a9b,
-    0x773c808e,
-    0xb7483552,
-    0xd9cb8c76,
-    0x2a8c8bc6,
-    0x0967ada8,
-    0xd4520f5c,
-    0xd0c3279d,
-    0xeac091c5,
-};
-
-// Decode the encryption scheme used by the POK3R RGB firmware
-// Just XOR encryption with 52-byte key seen above.
-void xor_firmware_scheme2(ZBinary &bin){
-    // XOR decryption
-    zu32 *words = (zu32 *)bin.raw();
-    for(int i = 0; i < bin.size() / 4; ++i){
-        words[i] = words[i] ^ xor_key2[i % 13];
     }
 }
 
@@ -515,7 +364,7 @@ int decode_updater(ZPath exe, ZPath out){
         return -5;
     }
     // Decrypt strings
-    decode_package_scheme(strs);
+    decode_package_data(strs);
 
     ZString company;
     ZString product;
@@ -607,18 +456,17 @@ int decode_updater(ZPath exe, ZPath out){
         sec_start += sec_len;
 
         // Decode section
-        decode_package_scheme(sec);
+        decode_package_data(sec);
 
         switch(type){
             case 1:
                 // Decrypt firmware
-                decode_firmware_scheme(sec);
+                Pok3r::decode_firmware(sec);
                 break;
             case 2:
-                // Decrypt the firmwares only
+                // Decrypt RGB firmwares only
                 if(sec.size() > 180){
-                    xor_firmware_scheme2(sec);
-//                    xor_firmware_scheme2(sec);
+                    Pok3rRGB::decode_firmware(sec);
                 }
                 break;
             default:
@@ -651,10 +499,9 @@ int encode_image(ZPath fwin, ZPath fwout){
         return -1;
     }
 
-//    encode_firmware_scheme(fwbin);
-
-    xor_firmware_scheme2(fwbin);
-    encode_package_scheme(fwbin);
+//    Pok3r::encode_firmware(fwbin);
+    Pok3rRGB::encode_firmware(fwbin);
+    encode_package_data(fwbin);
 
     LOG("Output: " << fwout);
 
@@ -686,9 +533,9 @@ int encode_patch_updater(ZPath exein, ZPath fwin, ZPath exeout){
     }
 
     // Encode firmware
-//    encode_firmware_scheme(fwbin);
-    xor_firmware_scheme2(fwbin);
-    encode_package_scheme(fwbin);
+//    Pok3r::encode_firmware(fwbin);
+    Pok3rRGB::encode_firmware(fwbin);
+    encode_package_data(fwbin);
 
     // Write encoded firmware onto exe
 //    exebin.seek(0x1A3800);
@@ -711,6 +558,55 @@ int encode_patch_updater(ZPath exein, ZPath fwin, ZPath exeout){
     return 0;
 }
 
+UpdateInterface* findKB(){
+    int count = 0;
+    UpdateInterface *kb = nullptr;
+    auto list = USBDevice::listDevices();
+    for(zu64 i = 0; i < list.size(); ++i){
+        if(list[i].vid == HOLTEK_VID){
+            switch(list[i].pid){
+                case POK3R_PID:
+                    LOG("Found POK3R");
+                    delete kb;
+                    kb = new Pok3r(list[i].dev.ptr());
+                    list[i].dev.divorce();
+                    count++;
+                    break;
+                case POK3R_BOOT_PID:
+                    LOG("Found POK3R (builtin)");
+                    delete kb;
+                    kb = new Pok3r(list[i].dev.ptr());
+                    list[i].dev.divorce();
+                    count++;
+                    break;
+                case POK3R_RGB_PID:
+                    LOG("Found POK3R RGB");
+                    delete kb;
+                    kb = new Pok3rRGB(list[i].dev.ptr());
+                    list[i].dev.divorce();
+                    count++;
+                    break;
+                case POK3R_RGB_BOOT_PID:
+                    LOG("Found POK3R RGB (builtin)");
+                    delete kb;
+                    kb = new Pok3rRGB(list[i].dev.ptr());
+                    list[i].dev.divorce();
+                    count++;
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+    if(count == 1){
+        return kb;
+    } else if(count > 1){
+        ELOG("Multiple devices found");
+        delete kb;
+    }
+    return nullptr;
+}
+
 int main(int argc, char **argv){
     ZLog::logLevelStdOut(ZLog::INFO, "%time% %thread% N %log%");
     ZLog::logLevelStdErr(ZLog::ERRORS, "\x1b[31m%time% %thread% E [%file%:%line%] %log%\x1b[m");
@@ -719,12 +615,18 @@ int main(int argc, char **argv){
         ZString cmd = argv[1];
         if(cmd == "version"){
             // Read version from Pok3r
-            return readversion_rgb();
+            UpdateInterface *kb = findKB();
+            kb->open();
+            if(kb){
+                LOG(kb->getVersion());
+            }
+            delete kb;
 
         } else if(cmd == "setversion"){
             // Write version on Pok3r
             if(argc > 2){
-                return writeversion(argv[2]);
+//                return writeversion(argv[2]);
+                return 0;
             } else {
                 LOG("Usage: pok3rtest setversion <version>");
                 return 2;
@@ -732,37 +634,26 @@ int main(int argc, char **argv){
 
         } else if(cmd == "loader"){
             // Boot to loader
-            return bootloader();
+//            return bootloader();
+            return 0;
 
         } else if(cmd == "read"){
             // Read bytes from Pok3r
             if(argc > 4){
                 zu64 start = ZString(argv[2]).toUint(16);
                 zu64 len = ZString(argv[3]).toUint(16);
-                return readfw(start, len, ZString(argv[4]));
+//                return readfw(start, len, ZString(argv[4]));
+                return 0;
             } else {
                 LOG("Usage: pok3rtest read <start address> <length> <output.bin>");
                 return 2;
             }
 
-        } else if(cmd == "dump"){
-            Pok3rRGB pok3r;
-            LOG("Looking for Vortex Pok3r RGB...");
-            if(!pok3r.findPok3rRGB())
-                return -1;
-            LOG("Open...");
-            if(!pok3r.open())
-                return -2;
-            ZBinary bin = pok3r.dumpFlash();
-            LOG("Dump:");
-            RLOG(bin.dumpBytes(4, 8));
-            ZFile::writeBinary("dump_rgb.bin", bin);
-            return 0;
-
         } else if(cmd == "flash"){
             // Write firmware to Pok3r
             if(argc > 3){
-                return flashfw(ZString(argv[2]), ZString(argv[3]));
+//                return flashfw(ZString(argv[2]), ZString(argv[3]));
+                return 0;
             } else {
                 LOG("Usage: pok3rtest flash <version> <firmware>");
                 return 2;
@@ -797,7 +688,8 @@ int main(int argc, char **argv){
 
         } else if(cmd == "crc"){
             // CRC
-            return crcflash();
+//            return crcflash();
+            return 0;
 
         } else {
             LOG("Unknown Command \"" << cmd << "\"");

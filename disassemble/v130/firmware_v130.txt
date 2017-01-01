@@ -4698,11 +4698,11 @@ function_130_13:
     5d16:   2104        movs r1, #4         ; r1 = 4
     5d18:   e03c        b.n 0x5d94
 
-    ; if r2 == 17 (0x11)
+    ; if r2 == 17 (0x11) reset command
   0x5d1a:   f000 f859   bl 0x5dd0           ; call reset_builtin(r0)
     5d1e:   e03d        b.n 0x5d9c
 
-    ; if r2 == 18 (0x12)
+    ; if r2 == 18 (0x12) read command
   0x5d20:   f44f 6380   mov.w r3, #1024
     5d24:   2820        cmp r0, #32
     5d26:   d30e        bcc.n 0x5d46            ; if r0 < 0x20
@@ -8313,14 +8313,10 @@ gpio_map_3:
     7c50:   00 40 0b 40     0x400b4000  ; GPIO C
     7c54:   00 80 00 00     0x8000      ; pin 15
 
-    7c58:   0902
-    7c5a:   0500
-    7c5c:   0600
-    7c5e:   0700
-    7c60:   0b02
-    7c62:   0d02
-    7c64:   0e02
-    7c66:   0f02
+  0x7c58:   02 09 00 05
+    7c5c:   00 06 00 07
+    7c60:   02 0b 02 0d
+    7c64:   02 0e 02 0f
 
 gpio_map_2:
   0x7c68:   00 40 0b 40     0x400b4000  ; GPIO C

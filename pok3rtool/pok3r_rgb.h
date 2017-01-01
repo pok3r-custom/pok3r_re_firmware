@@ -1,7 +1,7 @@
 #ifndef POK3R_RGB_H
 #define POK3R_RGB_H
 
-#include "libusb.h"
+#include "updateinterface.h"
 #include "usbdevice.h"
 
 #include "zstring.h"
@@ -10,6 +10,7 @@ using namespace LibChaos;
 
 #define HOLTEK_VID          0x04d9
 #define POK3R_RGB_PID       0x0167
+#define POK3R_RGB_BOOT_PID  0x1167
 
 #define RECV_EP             3
 #define SEND_EP             4
@@ -18,15 +19,37 @@ using namespace LibChaos;
 #define POK3R_RGB_VER_ADDR  0x3000
 #define POK3R_RGB_FW_ADDR   0x3400
 
-class Pok3rRGB : public USBDevice {
+class Pok3rRGB : public UpdateInterface {
 public:
     enum pok3r_rgb_cmd {
         CMD_16      = 0x10,
-        RESET_CMD   = 0x11,
-        CMD_READ    = 0x12,
+        CMD_16_ARG  = 2,
+
+        RESET       = 0x11,
+        RESET_0     = 0,
+        RESET_1     = 1,
+        RESET_DIS   = 2,
+
+        READ        = 0x12,
+        READ_400    = 0,
+        READ_3c00   = 1,
+        READ_2      = 2,
+
+        CMD_29      = 0x1d,
+
+        CMD_30      = 0x1e,
+        CMD_30_0    = 0,
+        CMD_30_1    = 1,
+
+        WRITE       = 0x1f,
     };
 
 public:
+    Pok3rRGB(USBDevice *device);
+    ~Pok3rRGB();
+
+    bool open(){ return device->open(); }
+
     //! Find a Pok3r RGB keyboard.
     bool findPok3rRGB();
 
@@ -35,11 +58,20 @@ public:
 
     ZBinary dumpFlash();
 
+    void test();
+
 private:
     //! Send command
     bool sendCmd(zu8 cmd, zu8 a1, zu16 a2, const zbyte *data, zu8 len);
     //! Receive data (64 bytes)
     bool recvDat(zbyte *data);
+
+public:
+    static void decode_firmware(ZBinary &bin);
+    static void encode_firmware(ZBinary &bin);
+
+private:
+    USBDevice *device;
 };
 
 #endif // POK3R_RGB_H

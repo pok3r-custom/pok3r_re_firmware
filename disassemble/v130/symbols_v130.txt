@@ -224,6 +224,7 @@ gpio_map_1                          @ 0x7d24
 usb_report1_desc                    @ 0x7f74
 usb_report2_desc                    @ 0x7f98
 usb_report0_desc                    @ 0x8020
+
 usb_config_desc                     @ 0x8060
 usb_interface0_desc                 @ 0x8069
 usb_hid0_desc                       @ 0x8072

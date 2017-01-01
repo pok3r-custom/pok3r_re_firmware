@@ -1,6 +1,7 @@
 #ifndef POK3R_H
 #define POK3R_H
 
+#include "updateinterface.h"
 #include "usbdevice.h"
 
 #include "libusb.h"
@@ -79,7 +80,7 @@ using namespace LibChaos;
 //   0x03
 //   Zero Padding
 
-class Pok3r : public USBDevice {
+class Pok3r : public UpdateInterface {
 public:
     enum pok3r_cmd {
         ERASE_CMD               = 0,    // Erase pages of flash
@@ -111,6 +112,11 @@ public:
     };
 
 public:
+    Pok3r(USBDevice *device);
+    ~Pok3r();
+
+    bool open(){ return device->open(); }
+
     //! Find a Pok3r keyboard.
     bool findPok3r();
 
@@ -142,6 +148,13 @@ private:
     bool sendCmd(zu8 cmd, zu8 subcmd, zu32 a1, zu32 a2, const zbyte *data, zu8 len);
     //! Receive data (64 bytes)
     bool recvDat(zbyte *data);
+
+public:
+    static void decode_firmware(ZBinary &bin);
+    static void encode_firmware(ZBinary &bin);
+
+private:
+    USBDevice *device;
 };
 
 #endif // POK3R_H

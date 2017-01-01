@@ -22,12 +22,20 @@ zu16 crc16(unsigned char *addr, zu64 size) {
     return (zu16)crc;
 }
 
+Pok3r::Pok3r(USBDevice *dev) : device(dev){
+
+}
+
+Pok3r::~Pok3r(){
+    delete device;
+}
+
 bool Pok3r::findPok3r(){
     // Try firmware vid and pid
-    if(findUSBVidPid(HOLTEK_VID, POK3R_PID))
+    if(device->findUSBVidPid(HOLTEK_VID, POK3R_PID))
         return true;
     // Try builtin vid and pid
-    if(findUSBVidPid(HOLTEK_VID, POK3R_BOOT_PID))
+    if(device->findUSBVidPid(HOLTEK_VID, POK3R_BOOT_PID))
         return true;
     return false;
 }
@@ -44,18 +52,18 @@ bool Pok3r::resetToLoader(){
     ZThread::sleep(3);
 
     // Close old handle
-    close();
+    device->close();
 
     // Find device with new loader vid and pid
     LOG("Find...");
-    if(!findUSBVidPid(HOLTEK_VID, POK3R_BOOT_PID)){
+    if(!device->findUSBVidPid(HOLTEK_VID, POK3R_BOOT_PID)){
         ELOG("Couldn't open device");
         return false;
     }
 
     // Open new handle
     LOG("Open...");
-    if(!open()){
+    if(!device->open()){
         ELOG("Open error");
         return false;
     }
@@ -150,7 +158,7 @@ bool Pok3r::sendCmd(zu8 cmd, zu8 subcmd, zu32 a1, zu32 a2, const zbyte *data, zu
 //    RLOG(packet.dumpBytes(4, 8));
 
     // Send command (interrupt write)
-    zu16 olen = interrupt_send(SEND_EP, packet.raw(), PKT_LEN);
+    zu16 olen = device->interrupt_send(SEND_EP, packet.raw(), PKT_LEN);
 
     if(olen != PKT_LEN){
         ELOG("Failed to send: length " << olen);
@@ -165,7 +173,7 @@ bool Pok3r::recvDat(zbyte *data){
         return false;
 
     // Recv data (interrupt read)
-    zu16 olen = interrupt_recv(RECV_EP, data, PKT_LEN);
+    zu16 olen = device->interrupt_recv(RECV_EP, data, PKT_LEN);
 
     if(olen != PKT_LEN){
         ELOG("Failed to recv: length " << olen);
@@ -178,4 +186,104 @@ bool Pok3r::recvDat(zbyte *data){
     return true;
 }
 
+// POK3R firmware XOR encryption/decryption key
+// Found at 0x2188 in Pok3r flash
+static const zu32 xor_key[] = {
+    0x55aa55aa,
+    0xaa55aa55,
+    0x000000ff,
+    0x0000ff00,
+    0x00ff0000,
+    0xff000000,
+    0x00000000,
+    0xffffffff,
+    0x0f0f0f0f,
+    0xf0f0f0f0,
+    0xaaaaaaaa,
+    0x55555555,
+    0x00000000,
+};
 
+// This array was painstakingly translated from a switch with a lot of shifts in the firmware.
+// I noticed after the fact that it was identical to the array that Sprite used in his hack,
+// but the groups of offsets were in a rotated order. Oh well.
+const zu8 swap_key[] = {
+    0,1,2,3,
+    1,2,3,0,
+    2,1,3,0,
+    3,2,1,0,
+    3,1,0,2,
+    1,2,0,3,
+    2,3,1,0,
+    0,2,1,3,
+};
+
+void decode_firmware_packet(zbyte *data, zu32 num){
+    zu32 *words = (zu32*)data;
+
+    // XOR decryption
+    for(int i = 0; i < 13; ++i){
+        words[i] = words[i] ^ xor_key[i];
+    }
+
+    // Swap decryption
+    zu8 f = (num & 7) << 2;
+    for(int i = 0; i < 52; i+=4){
+        zbyte a = data[i + swap_key[f + 0]];
+        zbyte b = data[i + swap_key[f + 1]];
+        zbyte c = data[i + swap_key[f + 2]];
+        zbyte d = data[i + swap_key[f + 3]];
+
+        data[i + 0] = a;
+        data[i + 1] = b;
+        data[i + 2] = c;
+        data[i + 3] = d;
+    }
+}
+
+// Decode the encryption scheme used by the POK3R firmware
+// Ripped from the pok3r builtin firmware
+void Pok3r::decode_firmware(ZBinary &bin){
+    zu32 count = 0;
+    for(zu32 offset = 0; offset < bin.size(); offset += 52){
+        if(count >= 10 && count <= 100){
+            decode_firmware_packet(bin.raw() + offset, count);
+        }
+        count++;
+    }
+}
+
+void encode_firmware_packet(zbyte *data, zu32 num){
+    zu32 *words = (zu32*)data;
+
+    // Swap encryption
+    zu8 f = (num & 7) << 2;
+    for(int i = 0; i < 52; i+=4){
+        zbyte a = data[i + 0];
+        zbyte b = data[i + 1];
+        zbyte c = data[i + 2];
+        zbyte d = data[i + 3];
+
+        data[i + swap_key[f + 0]] = a;
+        data[i + swap_key[f + 1]] = b;
+        data[i + swap_key[f + 2]] = c;
+        data[i + swap_key[f + 3]] = d;
+    }
+
+    // XOR encryption
+    for(int i = 0; i < 13; ++i){
+        words[i] = words[i] ^ xor_key[i];
+    }
+}
+
+// Encode using the encryption scheme used by the POK3R firmware
+// Reverse engineered from the above
+void Pok3r::encode_firmware(ZBinary &bin){
+    zu32 count = 0;
+    for(zu32 offset = 0; offset < bin.size(); offset += 52){
+        if(count >= 10 && count <= 100){
+            encode_firmware_packet(bin.raw() + offset, count);
+        }
+        count++;
+    }
+}

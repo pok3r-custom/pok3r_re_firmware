@@ -11,15 +11,15 @@ vector_table:
 
 .text:
 
+entry:
       1c:   f8df d00c   ldr.w sp, [pc, #12]    ; 0x2c
       20:   f000 f832   bl 0x88
       24:   4800        ldr r0, [pc, #0]    ; (0x28)
       26:   4700        bx r0
 
-      28:   1ea5        subs r5, r4, #2
-      2a:   0000        movs r0, r0
-      2c:   0740        lsls r0, r0, #29
-      2e:   2000        movs r0, #0
+    0x28:   0x1ea5      ; main
+    0x2c:   0x20000740  ; stack_max
+
       30:   6801        ldr r1, [r0, #0]
       32:   468d        mov sp, r1
       34:   6841        ldr r1, [r0, #4]
@@ -28,7 +28,12 @@ vector_table:
       3a:   4770        bx lr
       3c:   010f        lsls r7, r1, #4
       3e:   0000        movs r0, r0
-      40:   ea40 0301   orr.w r3, r0, r1
+
+memcpy:
+    ; r0 = dest
+    ; r1 = src
+    ; r2 = length (in bytes)
+    0x40:   ea40 0301   orr.w r3, r0, r1
       44:   079b        lsls r3, r3, #30
       46:   d003        beq.n 0x50
       48:   e009        b.n 0x5e
@@ -43,15 +48,30 @@ vector_table:
       5e:   1e52        subs r2, r2, #1
       60:   d2f9        bcs.n 0x56
       62:   4770        bx lr
-      64:   b2d2        uxtb r2, r2
+
+mem_set:
+    ; r0 = dest
+    ; r1 = len
+    ; r2 = byte
+    0x64:   b2d2        uxtb r2, r2
       66:   e001        b.n 0x6c
+
       68:   f800 2b01   strb.w r2, [r0], #1
       6c:   1e49        subs r1, r1, #1
       6e:   d2fb        bcs.n 0x68
       70:   4770        bx lr
-      72:   2200        movs r2, #0
+
+mem_zero:
+    ; r0 = dest
+    ; r1 = len
+    0x72:   2200        movs r2, #0
       74:   e7f6        b.n 0x64
-      76:   b510        push {r4, lr}
+
+mem_set2:
+    ; r0 = dest
+    ; r1 = byte
+    ; r2 = len
+    0x76:   b510        push {r4, lr}
       78:   4613        mov r3, r2
       7a:   460a        mov r2, r1
       7c:   4604        mov r4, r0
@@ -59,21 +79,25 @@ vector_table:
       80:   f7ff fff0   bl 0x64
       84:   4620        mov r0, r4
       86:   bd10        pop {r4, pc}
-      88:   4c06        ldr r4, [pc, #24]    ; (0xa4)
+
+sram_init:
+    0x88:   4c06        ldr r4, [pc, #24]    ; (0xa4)
       8a:   4d07        ldr r5, [pc, #28]    ; (0xa8)
       8c:   e006        b.n 0x9c
+
       8e:   68e0        ldr r0, [r4, #12]
       90:   f040 0301   orr.w r3, r0, #1
       94:   e894 0007   ldmia.w r4, {r0, r1, r2}
       98:   4798        blx r3
       9a:   3410        adds r4, #16
+
       9c:   42ac        cmp r4, r5
       9e:   d3f6        bcc.n 0x8e
       a0:   f7ff ffc0   bl 0x24
-      a4:   2230        movs r2, #48    ; 0x30
-      a6:   0000        movs r0, r0
-      a8:   2250        movs r2, #80    ; 0x50
-      aa:   0000        movs r0, r0
+
+    0xa4:   0x2230
+    0xa8:   0x2250
+
       ac:   b510        push {r4, lr}
       ae:   2200        movs r2, #0
       b0:   2807        cmp r0, #7
@@ -124,20 +148,24 @@ vector_table:
      110:   f001 ba04   b.w 0x151c
      114:   15e9        asrs r1, r5, #23
      116:   0000        movs r0, r0
-     118:   4803        ldr r0, [pc, #12]    ; (0x128)
-     11a:   4780        blx r0
-     11c:   4803        ldr r0, [pc, #12]    ; (0x12c)
-     11e:   4780        blx r0
-     120:   4803        ldr r0, [pc, #12]    ; (0x130)
-     122:   4700        bx r0
-     124:   e7fe        b.n 0x124
-     126:   e7fe        b.n 0x126
-     128:   15f5        asrs r5, r6, #23
-     12a:   0000        movs r0, r0
-     12c:   0f8d        lsrs r5, r1, #30
-     12e:   0000        movs r0, r0
-     130:   001d        movs r5, r3
-     132:   0000        movs r0, r0
+
+reset:
+   0x118:   4803        ldr r0, [pc, #12]   ; (0x128)
+     11a:   4780        blx r0              ; call watchdog_init
+     11c:   4803        ldr r0, [pc, #12]   ; (0x12c)
+     11e:   4780        blx r0              ; call clock_init
+     120:   4803        ldr r0, [pc, #12]   ; (0x130)
+     122:   4700        bx r0               ; jump entry
+
+generic_fault:
+   0x124:   e7fe        b.n 0x124
+
+   0x126:   e7fe        b.n 0x126
+
+   0x128:   0x15f5      ; watchdog_init
+   0x12c:   0xf8d       ; clock_init
+   0x130:   0x1d        ; entry
+
      134:   4809        ldr r0, [pc, #36]    ; (0x15c)
      136:   b510        push {r4, lr}
      138:   6801        ldr r1, [r0, #0]
@@ -305,8 +333,9 @@ vector_table:
      2c0:   e8bd 81f0   ldmia.w sp!, {r4, r5, r6, r7, r8, pc}
      2c4:   0000        movs r0, r0
      2c6:   400b        ands r3, r1
-     2c8:   8000        strh r0, [r0, #0]
-     2ca:   4008        ands r0, r1
+
+     2c8:   0x40088000
+
      2cc:   b5f0        push {r4, r5, r6, r7, lr}
      2ce:   4f07        ldr r7, [pc, #28]    ; (0x2ec)
      2d0:   6a7c        ldr r4, [r7, #36]    ; 0x24
@@ -323,57 +352,80 @@ vector_table:
      2e6:   62fd        str r5, [r7, #44]    ; 0x2c
      2e8:   633e        str r6, [r7, #48]    ; 0x30
      2ea:   bdf0        pop {r4, r5, r6, r7, pc}
-     2ec:   8000        strh r0, [r0, #0]
-     2ee:   4008        ands r0, r1
+
+     2ec:   0x40088000
+
      2f0:   4903        ldr r1, [pc, #12]    ; (0x300)
      2f2:   680a        ldr r2, [r1, #0]
      2f4:   f422 0240   bic.w r2, r2, #12582912    ; 0xc00000
      2f8:   ea42 5080   orr.w r0, r2, r0, lsl #22
-     2fc:   6008        str r0, [r1, #0]
-     2fe:   4770        bx lr
-     300:   8000        strh r0, [r0, #0]
-     302:   4008        ands r0, r1
-     304:   4902        ldr r1, [pc, #8]    ; (0x310)
+
+     2fc:   0x47706008
+     300:   0x40088000
+
+flash_page_erase:
+    ; r0 = page address
+   0x304:   4902        ldr r1, [pc, #8]    ; (0x310)
      306:   6008        str r0, [r1, #0]
      308:   2008        movs r0, #8
      30a:   60c8        str r0, [r1, #12]
      30c:   f000 b802   b.w 0x314
-     310:   0000        movs r0, r0
-     312:   4008        ands r0, r1
-     314:   4911        ldr r1, [pc, #68]    ; (0x35c)
-     316:   4810        ldr r0, [pc, #64]    ; (0x358)
+
+     310:   0x40080000  ; FMC
+
+flash_commit:
+   0x314:   4911        ldr r1, [pc, #68]   ; (0x35c) FMC
+     316:   4810        ldr r0, [pc, #64]   ; (0x358) timeout
+
      318:   694a        ldr r2, [r1, #20]
-     31a:   f042 0202   orr.w r2, r2, #2
+     31a:   f042 0202   orr.w r2, r2, #2    ; OIER |= 2
      31e:   614a        str r2, [r1, #20]
+
      320:   2214        movs r2, #20
-     322:   610a        str r2, [r1, #16]
+     322:   610a        str r2, [r1, #16]   ; commit
      324:   e004        b.n 0x330
-     326:   690a        ldr r2, [r1, #16]
+
+    ; wait loop
+   0x326:   690a        ldr r2, [r1, #16]   ; OPCR
      328:   f3c2 0281   ubfx r2, r2, #2, #2
      32c:   2a03        cmp r2, #3
      32e:   d001        beq.n 0x334
-     330:   1e40        subs r0, r0, #1
+   0x330:   1e40        subs r0, r0, #1
      332:   d2f8        bcs.n 0x326
-     334:   698a        ldr r2, [r1, #24]
+
+   0x334:   698a        ldr r2, [r1, #24]   ; OISR
+
      336:   698b        ldr r3, [r1, #24]
      338:   f023 0302   bic.w r3, r3, #2
      33c:   618b        str r3, [r1, #24]
+
+    ; check protected error flag
      33e:   0391        lsls r1, r2, #14
      340:   d501        bpl.n 0x346
+
+    ; error: page protected
      342:   2002        movs r0, #2
      344:   4770        bx lr
-     346:   0791        lsls r1, r2, #30
+
+   0x346:   0791        lsls r1, r2, #30
      348:   d501        bpl.n 0x34e
+
+    ; error: invalid address
      34a:   2001        movs r0, #1
      34c:   4770        bx lr
-     34e:   b108        cbz r0, 0x354
+
+    ; ok
+   0x34e:   b108        cbz r0, 0x354
      350:   2000        movs r0, #0
      352:   4770        bx lr
-     354:   2003        movs r0, #3
+
+     ; error: timeout
+   0x354:   2003        movs r0, #3
      356:   4770        bx lr
-     358:   ffff 000f   vaddl.u<illegal width 64> q8, d15, d15
-     35c:   0000        movs r0, r0
-     35e:   4008        ands r0, r1
+
+   0x358:   0xfffff     ; timeout
+   0x35c:   0x40080000  ; FMC
+
      360:   f000 0207   and.w r2, r0, #7
      364:   b510        push {r4, lr}
      366:   4b09        ldr r3, [pc, #36]    ; (0x38c)
@@ -450,29 +502,21 @@ vector_table:
      3f8:   2029        movs r0, #41    ; 0x29
      3fa:   f7ff bfb1   b.w 0x360
      3fe:   4770        bx lr
-     400:   0004        movs r4, r0
-     402:   0000        movs r0, r0
-     404:   0000        movs r0, r0
-     406:   0000        movs r0, r0
-     408:   04d9        lsls r1, r3, #19
-     40a:   1167        asrs r7, r4, #5
-     40c:   0000        movs r0, r0
-     40e:   0304        lsls r4, r0, #12
-     410:   ffff ffff        ; <UNDEFINED> instruction: 0xffffffff
-     414:   0001        movs r1, r0
-     416:   0000        movs r0, r0
-     418:   ffff ffff        ; <UNDEFINED> instruction: 0xffffffff
-     41c:   0041        lsls r1, r0, #1
-     41e:   0000        movs r0, r0
-     420:   0400        lsls r0, r0, #16
-     422:   0033        movs r3, r6
-     424:   0400        lsls r0, r0, #16
-     426:   424b        negs r3, r1
-     428:   3130        adds r1, #48    ; 0x30
-     42a:   3736        adds r7, #54    ; 0x36
-     42c:   0000        movs r0, r0
-     42e:   0000        movs r0, r0
-     430:   ffff ffff        ; <UNDEFINED> instruction: 0xffffffff
+
+   0x400:   04 00 00 00
+     404:   00 00 00 00
+     408:   d9 04 67 11
+     40c:   00 00 04 03
+     410:   ff ff ff ff
+     414:   01 00 00 00
+     418:   ff ff ff ff
+     41c:   41 00 00 00
+     420:   00 04 33 00
+     424:   00 04 4b 42
+     428:   30 31 36 37
+     42c:   00 00 00 00
+     430:   ff ff ff ff
+
      434:   0304        lsls r4, r0, #12
      436:   0409        lsls r1, r1, #16
      438:   0000        movs r0, r0
@@ -836,69 +880,94 @@ vector_table:
      7a8:   bf20        wfe
      7aa:   4770        bx lr
      7ac:   ed10 e000   ldc 0, cr14, [r0, #-0]
-     7b0:   b5f0        push {r4, r5, r6, r7, lr}
+
+decrypt_packet:
+    ; r0 = ptr
+    ; r1 = len
+   0x7b0:   b5f0        push {r4, r5, r6, r7, lr}
      7b2:   b0c0        sub sp, #256    ; 0x100
      7b4:   4604        mov r4, r0
      7b6:   460d        mov r5, r1
+
      7b8:   4668        mov r0, sp
-     7ba:   f000 ff35   bl 0x1628
+     7ba:   f000 ff35   bl 0x1628           ; call generate
+
      7be:   2200        movs r2, #0
      7c0:   4613        mov r3, r2
      7c2:   4669        mov r1, sp
      7c4:   e00e        b.n 0x7e4
-     7c6:   1c52        adds r2, r2, #1
+
+    ; loop
+   0x7c6:   1c52        adds r2, r2, #1     ; r2++
      7c8:   b2d2        uxtb r2, r2
-     7ca:   5c88        ldrb r0, [r1, r2]
-     7cc:   4403        add r3, r0
+     7ca:   5c88        ldrb r0, [r1, r2]   ; r0 = [r1 + r2]
+     7cc:   4403        add r3, r0          ; r3 += r0
      7ce:   b2db        uxtb r3, r3
-     7d0:   5cce        ldrb r6, [r1, r3]
-     7d2:   548e        strb r6, [r1, r2]
+
+     7d0:   5cce        ldrb r6, [r1, r3]   ; r6 = [r1 + r3]
+     7d2:   548e        strb r6, [r1, r2]   ; [r1 + r2] = r6
+
      7d4:   54c8        strb r0, [r1, r3]
-     7d6:   4430        add r0, r6
+     7d6:   4430        add r0, r6          ; r0 += r6
      7d8:   b2c0        uxtb r0, r0
-     7da:   7827        ldrb r7, [r4, #0]
-     7dc:   5c08        ldrb r0, [r1, r0]
-     7de:   4047        eors r7, r0
-     7e0:   f804 7b01   strb.w r7, [r4], #1
-     7e4:   1e6d        subs r5, r5, #1
+
+     7da:   7827        ldrb r7, [r4, #0]   ; r7 = [r4]
+     7dc:   5c08        ldrb r0, [r1, r0]   ; r0 = [r1 + r0]
+     7de:   4047        eors r7, r0         ; r7 ^= r0
+     7e0:   f804 7b01   strb.w r7, [r4], #1 ; [r4] = r7
+                                            ; r4++
+   0x7e4:   1e6d        subs r5, r5, #1     ; r5--
      7e6:   d2ee        bcs.n 0x7c6
+
      7e8:   b040        add sp, #256    ; 0x100
      7ea:   bdf0        pop {r4, r5, r6, r7, pc}
-     7ec:   b570        push {r4, r5, r6, lr}
+
+flash_write_buffer:
+    ; r0 = target addr
+    ; r1 = src
+    ; r2 = length
+   0x7ec:   b570        push {r4, r5, r6, lr}
      7ee:   0892        lsrs r2, r2, #2
      7f0:   2404        movs r4, #4
-     7f2:   4b06        ldr r3, [pc, #24]    ; (0x80c)
+     7f2:   4b06        ldr r3, [pc, #24]   ; (0x80c)
      7f4:   2514        movs r5, #20
      7f6:   e005        b.n 0x804
-     7f8:   60dc        str r4, [r3, #12]
+
+    ; loop
+   0x7f8:   60dc        str r4, [r3, #12]
      7fa:   6018        str r0, [r3, #0]
      7fc:   c940        ldmia r1!, {r6}
      7fe:   605e        str r6, [r3, #4]
      800:   611d        str r5, [r3, #16]
      802:   1d00        adds r0, r0, #4
-     804:   1e52        subs r2, r2, #1
+   0x804:   1e52        subs r2, r2, #1
      806:   d2f7        bcs.n 0x7f8
+
      808:   bd70        pop {r4, r5, r6, pc}
-     80a:   0000        movs r0, r0
-     80c:   0000        movs r0, r0
-     80e:   4008        ands r0, r1
-     810:   e92d 41f0   stmdb sp!, {r4, r5, r6, r7, r8, lr}
+     80a:   0000
+
+   0x80c:   0x40080000  ; FMC
+
+function_130_13:
+   0x810:   e92d 41f0   stmdb sp!, {r4, r5, r6, r7, r8, lr}
      814:   4d71        ldr r5, [pc, #452]    ; (0x9dc)
      816:   7828        ldrb r0, [r5, #0]
      818:   2801        cmp r0, #1
      81a:   d170        bne.n 0x8fe
-     81c:   4e70        ldr r6, [pc, #448]    ; (0x9e0)
+
+     81c:   4e70        ldr r6, [pc, #448]  ; (0x9e0)
      81e:   2400        movs r4, #0
      820:   4630        mov r0, r6
-     822:   7831        ldrb r1, [r6, #0]
-     824:   7840        ldrb r0, [r0, #1]
+     822:   7831        ldrb r1, [r6, #0]   ; r1 = cmd
+     824:   7840        ldrb r0, [r0, #1]   ; r0 = subcmd
      826:   46a4        mov ip, r4
+
      828:   2910        cmp r1, #16
      82a:   d00f        beq.n 0x84c
      82c:   4632        mov r2, r6
-     82e:   f44f 4e4c   mov.w lr, #52224    ; 0xcc00
+     82e:   f44f 4e4c   mov.w lr, #52224        ; 0xcc00
      832:   6853        ldr r3, [r2, #4]
-     834:   f44f 5250   mov.w r2, #13312    ; 0x3400
+     834:   f44f 5250   mov.w r2, #13312        ; 0x3400
      838:   f503 5740   add.w r7, r3, #12288    ; 0x3000
      83c:   291d        cmp r1, #29
      83e:   d047        beq.n 0x8d0
@@ -908,59 +977,82 @@ vector_table:
      846:   2912        cmp r1, #18
      848:   d170        bne.n 0x92c
      84a:   e00c        b.n 0x866
-     84c:   2802        cmp r0, #2
+
+    ; if r1 == 16 (0x10)
+   0x84c:   2802        cmp r0, #2
      84e:   d16d        bne.n 0x92c
      850:   f8c6 c004   str.w ip, [r6, #4]
      854:   e085        b.n 0x962
-     856:   291e        cmp r1, #30
+
+    ; if r1 > 29 (0x1d)
+   0x856:   291e        cmp r1, #30
      858:   d078        beq.n 0x94c
      85a:   291f        cmp r1, #31
      85c:   d166        bne.n 0x92c
      85e:   e091        b.n 0x984
-     860:   f000 f8c2   bl 0x9e8
+
+    ; if r1 == 17 (0x11) reset command
+   0x860:   f000 f8c2   bl 0x9e8            ; call reset_builtin
      864:   e082        b.n 0x96c
-     866:   f44f 6380   mov.w r3, #1024    ; 0x400
+
+    ; if r1 == 18 (0x12) read command
+   0x866:   f44f 6380   mov.w r3, #1024    ; 0x400
      86a:   2820        cmp r0, #32
      86c:   d30e        bcc.n 0x88c
+
+        ; else r0 >= 0x20
      86e:   f1a0 011f   sub.w r1, r0, #31
      872:   ebc1 1101   rsb r1, r1, r1, lsl #4
      876:   ebb3 0f81   cmp.w r3, r1, lsl #2
      87a:   db07        blt.n 0x88c
+
      87c:   ebc0 1000   rsb r0, r0, r0, lsl #4
-     880:   f44f 5122   mov.w r1, #10368    ; 0x2880
+     880:   f44f 5122   mov.w r1, #10368            ; 0x2880
      884:   eb01 0080   add.w r0, r1, r0, lsl #2
-     888:   213c        movs r1, #60    ; 0x3c
+     888:   213c        movs r1, #60                ; 0x3c
      88a:   e06c        b.n 0x966
-     88c:   b120        cbz r0, 0x898
+
+   0x88c:   b120        cbz r0, 0x898
      88e:   2801        cmp r0, #1
      890:   d016        beq.n 0x8c0
      892:   2802        cmp r0, #2
      894:   d14a        bne.n 0x92c
      896:   e017        b.n 0x8c8
-     898:   781a        ldrb r2, [r3, #0]
+
+        ; if r0 == 0
+   0x898:   781a        ldrb r2, [r3, #0]
      89a:   4618        mov r0, r3
      89c:   2a04        cmp r2, #4
      89e:   d00d        beq.n 0x8bc
+
      8a0:   2220        movs r2, #32
      8a2:   4619        mov r1, r3
      8a4:   1d30        adds r0, r6, #4
-     8a6:   f7ff fbcb   bl 0x40
-     8aa:   484e        ldr r0, [pc, #312]    ; (0x9e4)
-     8ac:   f8d0 1180   ldr.w r1, [r0, #384]    ; 0x180
-     8b0:   6271        str r1, [r6, #36]    ; 0x24
-     8b2:   f8d0 018c   ldr.w r0, [r0, #396]    ; 0x18c
-     8b6:   2128        movs r1, #40    ; 0x28
-     8b8:   62b0        str r0, [r6, #40]    ; 0x28
+     8a6:   f7ff fbcb   bl 0x40                 ; call memcpy(r5 + 4, 0x400, 32)
+
+     8aa:   484e        ldr r0, [pc, #312]      ; (0x9e4)
+     8ac:   f8d0 1180   ldr.w r1, [r0, #384]    ; 0x180 undocumented FMC register
+     8b0:   6271        str r1, [r6, #36]       ; 0x24
+     8b2:   f8d0 018c   ldr.w r0, [r0, #396]    ; 0x18c undocumented FMC register
+     8b6:   2128        movs r1, #40
+     8b8:   62b0        str r0, [r6, #40]       ; 0x28
      8ba:   e053        b.n 0x964
-     8bc:   2134        movs r1, #52    ; 0x34
+
+   0x8bc:   2134        movs r1, #52    ; 0x34
      8be:   e052        b.n 0x966
-     8c0:   2104        movs r1, #4
+
+        ; if r0 == 1
+   0x8c0:   2104        movs r1, #4
      8c2:   f44f 5070   mov.w r0, #15360    ; 0x3c00
      8c6:   e04e        b.n 0x966
-     8c8:   f886 c004   strb.w ip, [r6, #4]
+
+        ; if r0 == 2
+   0x8c8:   f886 c004   strb.w ip, [r6, #4]
      8cc:   2101        movs r1, #1
      8ce:   e049        b.n 0x964
-     8d0:   0799        lsls r1, r3, #30
+
+    ; if r1 == 29 (0x1d)
+   0x8d0:   0799        lsls r1, r3, #30
      8d2:   d179        bne.n 0x9c8
      8d4:   68b1        ldr r1, [r6, #8]
      8d6:   b349        cbz r1, 0x92c
@@ -976,12 +1068,15 @@ vector_table:
      8ea:   2802        cmp r0, #2
      8ec:   d16c        bne.n 0x9c8
      8ee:   e01f        b.n 0x930
+
      8f0:   1878        adds r0, r7, r1
      8f2:   f8c6 c008   str.w ip, [r6, #8]
      8f6:   e9c6 7003   strd r7, r0, [r6, #12]
      8fa:   4638        mov r0, r7
      8fc:   e00d        b.n 0x91a
+
      8fe:   e03f        b.n 0x980
+
      900:   f7ff fd00   bl 0x304
      904:   b960        cbnz r0, 0x920
      906:   f000 fe87   bl 0x1618
@@ -999,8 +1094,12 @@ vector_table:
      924:   f5a0 5040   sub.w r0, r0, #12288    ; 0x3000
      928:   6070        str r0, [r6, #4]
      92a:   e01b        b.n 0x964
+
+    ; else / error handler
      92c:   e04c        b.n 0x9c8
-     92e:   e00d        b.n 0x94c
+
+   0x92e:   e00d        b.n 0x94c
+
      930:   4297        cmp r7, r2
      932:   d349        bcc.n 0x9c8
      934:   f5b1 5f80   cmp.w r1, #4096    ; 0x1000
@@ -1008,25 +1107,35 @@ vector_table:
      93a:   2802        cmp r0, #2
      93c:   d004        beq.n 0x948
      93e:   2200        movs r2, #0
-     940:   4638        mov r0, r7
+   0x940:   4638        mov r0, r7
      942:   f000 fe91   bl 0x1668
      946:   e00b        b.n 0x960
+
      948:   2201        movs r2, #1
      94a:   e7f9        b.n 0x940
-     94c:   b130        cbz r0, 0x95c
+
+    ; if r1 == 30 (0x1e)
+   0x94c:   b130        cbz r0, 0x95c
      94e:   2801        cmp r0, #1
      950:   d13a        bne.n 0x9c8
-     952:   4573        cmp r3, lr
+
+        ; if r0 == 1
+   0x952:   4573        cmp r3, lr
      954:   d238        bcs.n 0x9c8
      956:   0798        lsls r0, r3, #30
      958:   d136        bne.n 0x9c8
      95a:   606f        str r7, [r5, #4]
-     95c:   6868        ldr r0, [r5, #4]
+
+        ; if r0 == 0
+   0x95c:   6868        ldr r0, [r5, #4]
      95e:   e030        b.n 0x9c2
-     960:   6070        str r0, [r6, #4]
+
+   0x960:   6070        str r0, [r6, #4]
      962:   2104        movs r1, #4
-     964:   1d30        adds r0, r6, #4
-     966:   f000 f881   bl 0xa6c
+   0x964:   1d30        adds r0, r6, #4
+
+   0x966:   f000 f881   bl 0xa6c            ; call flash_read_packet
+
      96a:   2401        movs r4, #1
      96c:   7828        ldrb r0, [r5, #0]
      96e:   2801        cmp r0, #1
@@ -1034,11 +1143,13 @@ vector_table:
      972:   b34c        cbz r4, 0x9c8
      974:   213c        movs r1, #60    ; 0x3c
      976:   1d30        adds r0, r6, #4
-     978:   f7ff fb7b   bl 0x72
+   0x978:   f7ff fb7b   bl 0x72
      97c:   2002        movs r0, #2
      97e:   7028        strb r0, [r5, #0]
      980:   e8bd 81f0   ldmia.w sp!, {r4, r5, r6, r7, r8, pc}
-     984:   b300        cbz r0, 0x9c8
+
+    ; if r1 == 31 (0x1f)
+   0x984:   b300        cbz r0, 0x9c8
      986:   0781        lsls r1, r0, #30
      988:   d11e        bne.n 0x9c8
      98a:   283c        cmp r0, #60    ; 0x3c
@@ -1052,22 +1163,27 @@ vector_table:
      99c:   4293        cmp r3, r2
      99e:   d813        bhi.n 0x9c8
      9a0:   e003        b.n 0x9aa
-     9a2:   4601        mov r1, r0
+
+   0x9a2:   4601        mov r1, r0
      9a4:   1d30        adds r0, r6, #4
      9a6:   f7ff ff03   bl 0x7b0
-     9aa:   7872        ldrb r2, [r6, #1]
+
+   0x9aa:   7872        ldrb r2, [r6, #1]
      9ac:   1d31        adds r1, r6, #4
      9ae:   6868        ldr r0, [r5, #4]
-     9b0:   f7ff ff1c   bl 0x7ec
+     9b0:   f7ff ff1c   bl 0x7ec            ; call flash_write_buffer
      9b4:   7870        ldrb r0, [r6, #1]
      9b6:   6869        ldr r1, [r5, #4]
      9b8:   4408        add r0, r1
      9ba:   f240 211e   movw r1, #542    ; 0x21e
      9be:   6068        str r0, [r5, #4]
      9c0:   8031        strh r1, [r6, #0]
-     9c2:   f5a0 5040   sub.w r0, r0, #12288    ; 0x3000
+
+   0x9c2:   f5a0 5040   sub.w r0, r0, #12288    ; 0x3000
      9c6:   e7cb        b.n 0x960
-     9c8:   6830        ldr r0, [r6, #0]
+
+    ; error handler
+   0x9c8:   6830        ldr r0, [r6, #0]
      9ca:   6070        str r0, [r6, #4]
      9cc:   f64a 20ff   movw r0, #43775    ; 0xaaff
      9d0:   6030        str r0, [r6, #0]
@@ -1075,14 +1191,18 @@ vector_table:
      9d4:   2138        movs r1, #56    ; 0x38
      9d6:   3008        adds r0, #8
      9d8:   e7ce        b.n 0x978
-     9da:   0000        movs r0, r0
-     9dc:   0004        movs r4, r0
-     9de:   2000        movs r0, #0
-     9e0:   0084        lsls r4, r0, #2
-     9e2:   2000        movs r0, #0
-     9e4:   0000        movs r0, r0
-     9e6:   4008        ands r0, r1
-     9e8:   b510        push {r4, lr}
+     9da:   0000
+
+   0x9dc:   0x20000004
+   0x9e0:   0x20000084
+   0x9e4:   0x40080000  ; FMC
+
+reset_builtin:
+    ; r0 = 0/1/2
+    ; 0: reset key 0x55aafaf5
+    ; 1: reset key 0x55aafaf0
+    ; 2: usb disconnect, wait event
+   0x9e8:   b510        push {r4, lr}
      9ea:   491b        ldr r1, [pc, #108]    ; (0xa58)
      9ec:   b168        cbz r0, 0xa0a
      9ee:   2801        cmp r0, #1
@@ -1090,7 +1210,7 @@ vector_table:
      9f2:   2802        cmp r0, #2
      9f4:   d12f        bne.n 0xa56
      9f6:   2035        movs r0, #53    ; 0x35
-     9f8:   f7ff fe36   bl 0x668
+     9f8:   f7ff fe36   bl 0x668            ; call nvic_disable_intr(53)
      9fc:   2000        movs r0, #0
      9fe:   f000 fc31   bl 0x1264
      a02:   e8bd 4010   ldmia.w sp!, {r4, lr}
@@ -1124,15 +1244,17 @@ vector_table:
      a50:   f3bf 8f4f   dsb sy
      a54:   e7fe        b.n 0xa54
      a56:   bd10        pop {r4, pc}
-     a58:   3ffc        subs r7, #252    ; 0xfc
-     a5a:   2000        movs r0, #0
-     a5c:   faf5 55aa        ; <UNDEFINED> instruction: 0xfaf555aa
-     a60:   0000        movs r0, r0
-     a62:   400b        ands r3, r1
-     a64:   ed0c e000   stc 0, cr14, [ip, #-0]
-     a68:   0004        movs r4, r0
-     a6a:   05fa        lsls r2, r7, #23
-     a6c:   b570        push {r4, r5, r6, lr}
+
+     a58:   0x20003ffc
+     a5c:   0x55aafaf5  ; reset key
+     a60:   0x400b0000  ; GPIO A
+     a64:   0xe000ed0c
+     a68:   0x05fa0004  ; AIRCR key and reset
+
+flash_read_packet:
+    ; r0 = src
+    ; r1 = len
+   0xa6c:   b570        push {r4, r5, r6, lr}
      a6e:   460c        mov r4, r1
      a70:   4a09        ldr r2, [pc, #36]    ; (0xa98)
      a72:   4601        mov r1, r0
@@ -1150,10 +1272,10 @@ vector_table:
      a8e:   e8bd 4070   ldmia.w sp!, {r4, r5, r6, lr}
      a92:   1d00        adds r0, r0, #4
      a94:   f7ff baed   b.w 0x72
-     a98:   0004        movs r4, r0
-     a9a:   2000        movs r0, #0
-     a9c:   0088        lsls r0, r1, #2
-     a9e:   2000        movs r0, #0
+
+     a98:   0x20000004
+     a9c:   0x20000088
+
      aa0:   b5f0        push {r4, r5, r6, r7, lr}
      aa2:   4f0a        ldr r7, [pc, #40]    ; (0xacc)
      aa4:   f8d7 4104   ldr.w r4, [r7, #260]    ; 0x104
@@ -1170,8 +1292,9 @@ vector_table:
      ac2:   f8c7 5108   str.w r5, [r7, #264]    ; 0x108
      ac6:   f8c7 610c   str.w r6, [r7, #268]    ; 0x10c
      aca:   bdf0        pop {r4, r5, r6, r7, pc}
-     acc:   8000        strh r0, [r0, #0]
-     ace:   4008        ands r0, r1
+
+     acc:   0x40088000
+
      ad0:   4a07        ldr r2, [pc, #28]    ; (0xaf0)
      ad2:   2100        movs r1, #0
      ad4:   f44f 50e1   mov.w r0, #7200    ; 0x1c20
@@ -1185,10 +1308,10 @@ vector_table:
      aea:   0689        lsls r1, r1, #26
      aec:   d5fc        bpl.n 0xae8
      aee:   4770        bx lr
-     af0:   0000        movs r0, r0
-     af2:   42d4        cmn r4, r2
-     af4:   8000        strh r0, [r0, #0]
-     af6:   4008        ands r0, r1
+
+     af0:   0x42d40000
+     af4:   0x40088000
+
      af8:   e92d 41f0   stmdb sp!, {r4, r5, r6, r7, r8, lr}
      afc:   270a        movs r7, #10
      afe:   4d16        ldr r5, [pc, #88]    ; (0xb58)
@@ -1696,12 +1819,11 @@ vector_table:
      fda:   d1fb        bne.n 0xfd4
      fdc:   4770        bx lr
      fde:   0000        movs r0, r0
-     fe0:   8000        strh r0, [r0, #0]
-     fe2:   4008        ands r0, r1
-     fe4:   0000        movs r0, r0
-     fe6:   4310        orrs r0, r2
-     fe8:   0000        movs r0, r0
-     fea:   4008        ands r0, r1
+
+     fe0:   0x40088000
+     fe4:   0x43100000
+     fe8:   0x40080000
+
      fec:   4804        ldr r0, [pc, #16]    ; (0x1000)
      fee:   2100        movs r1, #0
      ff0:   f100 0208   add.w r2, r0, #8
@@ -2336,50 +2458,62 @@ vector_table:
     1606:   4903        ldr r1, [pc, #12]    ; (0x1614)
     1608:   6041        str r1, [r0, #4]
     160a:   4770        bx lr
-    160c:   8000        strh r0, [r0, #0]
-    160e:   4008        ands r0, r1
-    1610:   8000        strh r0, [r0, #0]
-    1612:   4006        ands r6, r0
-    1614:   afff        add r7, sp, #1020    ; 0x3fc
-    1616:   0001        movs r1, r0
+
+    160c:   0x40088000
+    1610:   0x40068000
+    1614:   0x0001afff
+
     1618:   4902        ldr r1, [pc, #8]    ; (0x1624)
     161a:   4801        ldr r0, [pc, #4]    ; (0x1620)
     161c:   6008        str r0, [r1, #0]
     161e:   4770        bx lr
-    1620:   0001        movs r1, r0
-    1622:   5fa0        ldrsh r0, [r4, r6]
-    1624:   8000        strh r0, [r0, #0]
-    1626:   4006        ands r6, r0
-    1628:   b570        push {r4, r5, r6, lr}
+
+    1620:   0x5fa00001
+    1624:   0x40068000
+
+generate:
+    ; r0 = sp
+  0x1628:   b570        push {r4, r5, r6, lr}
     162a:   2100        movs r1, #0
-    162c:   f800 1b01   strb.w r1, [r0], #1
+
+    ; write counter over bytes on stack
+  0x162c:   f800 1b01   strb.w r1, [r0], #1
     1630:   1c49        adds r1, r1, #1
     1632:   29ff        cmp r1, #255    ; 0xff
     1634:   d9fa        bls.n 0x162c
+
     1636:   2300        movs r3, #0
-    1638:   4d0a        ldr r5, [pc, #40]    ; (0x1664)
-    163a:   461a        mov r2, r3
-    163c:   4619        mov r1, r3
-    163e:   f5a0 7080   sub.w r0, r0, #256    ; 0x100
-    1642:   5cae        ldrb r6, [r5, r2]
-    1644:   5c44        ldrb r4, [r0, r1]
+    1638:   4d0a        ldr r5, [pc, #40]   ; (0x1664)
+    163a:   461a        mov r2, r3          ; j
+    163c:   4619        mov r1, r3          ; i
+    163e:   f5a0 7080   sub.w r0, r0, #256  ; 0x100
+
+  0x1642:   5cae        ldrb r6, [r5, r2]   ; data byte
+    1644:   5c44        ldrb r4, [r0, r1]   ; counter byte
     1646:   1c52        adds r2, r2, #1
-    1648:   4423        add r3, r4
-    164a:   4433        add r3, r6
+
+    1648:   4423        add r3, r4          ; r3 += r4
+    164a:   4433        add r3, r6          ; r3 += r6
+
     164c:   b2db        uxtb r3, r3
     164e:   b2d2        uxtb r2, r2
+
     1650:   5cc6        ldrb r6, [r0, r3]
-    1652:   5446        strb r6, [r0, r1]
+    1652:   5446        strb r6, [r0, r1]   ; [r0 + i] = [r0 + r3]
+
     1654:   54c4        strb r4, [r0, r3]
+
     1656:   2a08        cmp r2, #8
     1658:   d300        bcc.n 0x165c
     165a:   2200        movs r2, #0
-    165c:   1c49        adds r1, r1, #1
-    165e:   29ff        cmp r1, #255    ; 0xff
+  0x165c:   1c49        adds r1, r1, #1     ; i++
+    165e:   29ff        cmp r1, #255        ; 0xff
     1660:   d9ef        bls.n 0x1642
+
     1662:   bd70        pop {r4, r5, r6, pc}
-    1664:   1f44        subs r4, r0, #5
-    1666:   0000        movs r0, r0
+
+    1664:   0x1f44
+
     1668:   e92d 4ff0   stmdb sp!, {r4, r5, r6, r7, r8, r9, sl, fp, lr}
     166c:   4606        mov r6, r0
     166e:   f643 30f8   movw r0, #15352    ; 0x3bf8
@@ -2418,7 +2552,7 @@ vector_table:
     16cc:   b2c4        uxtb r4, r0
     16ce:   1b2d        subs r5, r5, r4
     16d0:   4668        mov r0, sp
-    16d2:   f7ff ffa9   bl 0x1628
+    16d2:   f7ff ffa9   bl 0x1628           ; call generate
     16d6:   2100        movs r1, #0
     16d8:   4608        mov r0, r1
     16da:   e01d        b.n 0x1718
@@ -2457,8 +2591,9 @@ vector_table:
     172e:   4640        mov r0, r8
     1730:   e7ac        b.n 0x168c
     1732:   0000        movs r0, r0
-    1734:   a000        add r0, pc, #0    ; (adr r0, 0x1738)
-    1736:   4008        ands r0, r1
+
+    1734:   0x4008a000
+
     1738:   e92d 41f0   stmdb sp!, {r4, r5, r6, r7, r8, lr}
     173c:   4c28        ldr r4, [pc, #160]    ; (0x17e0)
     173e:   4d29        ldr r5, [pc, #164]    ; (0x17e4)
@@ -3260,24 +3395,31 @@ vector_table:
     1e9c:   d2f9        bcs.n 0x1e92
     1e9e:   f7fe b8c7   b.w 0x30
     1ea2:   4770        bx lr
-    1ea4:   4824        ldr r0, [pc, #144]    ; (0x1f38)
+
+main:
+  0x1ea4:   4824        ldr r0, [pc, #144]    ; (0x1f38)
     1ea6:   6803        ldr r3, [r0, #0]
-    1ea8:   4a24        ldr r2, [pc, #144]    ; (0x1f3c)
+    1ea8:   4a24        ldr r2, [pc, #144]    ; (0x1f3c) reset key
     1eaa:   1d51        adds r1, r2, #5
+    ; Check last sram word for reset key
     1eac:   4293        cmp r3, r2
     1eae:   d302        bcc.n 0x1eb6
+
     1eb0:   6803        ldr r3, [r0, #0]
     1eb2:   428b        cmp r3, r1
     1eb4:   d901        bls.n 0x1eba
-    1eb6:   6002        str r2, [r0, #0]
+
+  0x1eb6:   6002        str r2, [r0, #0]
     1eb8:   e005        b.n 0x1ec6
-    1eba:   6802        ldr r2, [r0, #0]
+
+  0x1eba:   6802        ldr r2, [r0, #0]
     1ebc:   428a        cmp r2, r1
     1ebe:   d202        bcs.n 0x1ec6
     1ec0:   6802        ldr r2, [r0, #0]
     1ec2:   1c52        adds r2, r2, #1
     1ec4:   e7f7        b.n 0x1eb6
-    1ec6:   6800        ldr r0, [r0, #0]
+
+  0x1ec6:   6800        ldr r0, [r0, #0]
     1ec8:   4288        cmp r0, r1
     1eca:   d001        beq.n 0x1ed0
     1ecc:   f7ff ffbc   bl 0x1e48
@@ -3291,7 +3433,9 @@ vector_table:
     1eea:   f7fe fb37   bl 0x55c
     1eee:   f7ff f975   bl 0x11dc
     1ef2:   4c13        ldr r4, [pc, #76]    ; (0x1f40)
-    1ef4:   f7ff fb34   bl 0x1560
+
+    ; main loop
+  0x1ef4:   f7ff fb34   bl 0x1560
     1ef8:   2801        cmp r0, #1
     1efa:   d007        beq.n 0x1f0c
     1efc:   2802        cmp r0, #2
@@ -3315,428 +3459,466 @@ vector_table:
     1f2e:   f7fe fc33   bl 0x798
     1f32:   f7ff fb71   bl 0x1618
     1f36:   e7dd        b.n 0x1ef4
-    1f38:   3ffc        subs r7, #252    ; 0xfc
-    1f3a:   2000        movs r0, #0
-    1f3c:   faf0 55aa        ; <UNDEFINED> instruction: 0xfaf055aa
-    1f40:   0004        movs r4, r0
-    1f42:   2000        movs r0, #0
-    1f44:   2301        movs r3, #1
-    1f46:   6745        str r5, [r0, #116]    ; 0x74
-    1f48:   ab89        add r3, sp, #548    ; 0x224
-    1f4a:   efcd 0908   vqdmlal.s<illegal width 8> q8, d13, d8
-    1f4e:   0b0a        lsrs r2, r1, #12
-    1f50:   0d0c        lsrs r4, r1, #20
-    1f52:   0f0e        lsrs r6, r1, #28
-    1f54:   1110        asrs r0, r2, #4
-    1f56:   1312        asrs r2, r2, #12
-    1f58:   1514        asrs r4, r2, #20
-    1f5a:   1716        asrs r6, r2, #28
-    1f5c:   1918        adds r0, r3, r4
-    1f5e:   1b1a        subs r2, r3, r4
-    1f60:   1d1c        adds r4, r3, #4
-    1f62:   1f1e        subs r6, r3, #4
-    1f64:   2120        movs r1, #32
-    1f66:   2322        movs r3, #34    ; 0x22
-    1f68:   2524        movs r5, #36    ; 0x24
-    1f6a:   2726        movs r7, #38    ; 0x26
-    1f6c:   2928        cmp r1, #40    ; 0x28
-    1f6e:   2b2a        cmp r3, #42    ; 0x2a
-    1f70:   2d2c        cmp r5, #44    ; 0x2c
-    1f72:   2f2e        cmp r7, #46    ; 0x2e
-    1f74:   3130        adds r1, #48    ; 0x30
-    1f76:   3332        adds r3, #50    ; 0x32
-    1f78:   3534        adds r5, #52    ; 0x34
-    1f7a:   3736        adds r7, #54    ; 0x36
-    1f7c:   3938        subs r1, #56    ; 0x38
-    1f7e:   3b3a        subs r3, #58    ; 0x3a
-    1f80:   3d3c        subs r5, #60    ; 0x3c
-    1f82:   3f3e        subs r7, #62    ; 0x3e
-    1f84:   1e29        subs r1, r5, #0
-    1f86:   201f        movs r0, #31
-    1f88:   2221        movs r2, #33    ; 0x21
-    1f8a:   2423        movs r4, #35    ; 0x23
-    1f8c:   142b        asrs r3, r5, #16
-    1f8e:   081a        lsrs r2, r3, #32
-    1f90:   1715        asrs r5, r2, #28
-    1f92:   181c        adds r4, r3, r0
-    1f94:   0439        lsls r1, r7, #16
-    1f96:   0716        lsls r6, r2, #28
-    1f98:   0a09        lsrs r1, r1, #8
-    1f9a:   0d0b        lsrs r3, r1, #20
-    1f9c:   1de1        adds r1, r4, #7
-    1f9e:   061b        lsls r3, r3, #24
-    1fa0:   0519        lsls r1, r3, #20
-    1fa2:   1011        asrs r1, r2, #32
-    1fa4:   e3e0        b.n 0x2768
-    1fa6:   25e2        movs r5, #226    ; 0xe2
-    1fa8:   2726        movs r7, #38    ; 0x26
-    1faa:   2a2d        cmp r2, #45    ; 0x2d
-    1fac:   0064        lsls r4, r4, #1
-    1fae:   0c2e        lsrs r6, r5, #16
-    1fb0:   1312        asrs r2, r2, #12
-    1fb2:   312f        adds r1, #47    ; 0x2f
-    1fb4:   0000        movs r0, r0
-    1fb6:   0e30        lsrs r0, r6, #24
-    1fb8:   330f        adds r3, #15
-    1fba:   2834        cmp r0, #52    ; 0x34
-    1fbc:   0000        movs r0, r0
-    1fbe:   362c        adds r6, #44    ; 0x2c
-    1fc0:   3837        subs r0, #55    ; 0x37
-    1fc2:   35e5        adds r5, #229    ; 0xe5
-    1fc4:   0000        movs r0, r0
-    1fc6:   e600        b.n 0x1bca
-    1fc8:   65e7        str r7, [r4, #92]    ; 0x5c
-    1fca:   e400        b.n 0x17ce
-    1fcc:   c1c0        stmia r1!, {r6, r7}
-    1fce:   c3c2        stmia r3!, {r1, r6, r7}
-    1fd0:   0000        movs r0, r0
-    1fd2:   0000        movs r0, r0
-    1fd4:   4000        ands r0, r0
-    1fd6:   400b        ands r3, r1
-    1fd8:   0200        lsls r0, r0, #8
-    1fda:   0000        movs r0, r0
-    1fdc:   0000        movs r0, r0
-    1fde:   400b        ands r3, r1
-    1fe0:   0020        movs r0, r4
-    1fe2:   0000        movs r0, r0
-    1fe4:   0000        movs r0, r0
-    1fe6:   400b        ands r3, r1
-    1fe8:   0040        lsls r0, r0, #1
-    1fea:   0000        movs r0, r0
-    1fec:   0000        movs r0, r0
-    1fee:   400b        ands r3, r1
-    1ff0:   0080        lsls r0, r0, #2
-    1ff2:   0000        movs r0, r0
-    1ff4:   4000        ands r0, r0
-    1ff6:   400b        ands r3, r1
-    1ff8:   0800        lsrs r0, r0, #32
-    1ffa:   0000        movs r0, r0
-    1ffc:   4000        ands r0, r0
-    1ffe:   400b        ands r3, r1
-    2000:   2000        movs r0, #0
-    2002:   0000        movs r0, r0
-    2004:   4000        ands r0, r0
-    2006:   400b        ands r3, r1
-    2008:   4000        ands r0, r0
-    200a:   0000        movs r0, r0
-    200c:   4000        ands r0, r0
-    200e:   400b        ands r3, r1
-    2010:   8000        strh r0, [r0, #0]
-    2012:   0000        movs r0, r0
-    2014:   0902        lsrs r2, r0, #4
-    2016:   0500        lsls r0, r0, #20
-    2018:   0600        lsls r0, r0, #24
-    201a:   0700        lsls r0, r0, #28
-    201c:   0b02        lsrs r2, r0, #12
-    201e:   0d02        lsrs r2, r0, #20
-    2020:   0e02        lsrs r2, r0, #24
-    2022:   0f02        lsrs r2, r0, #28
-    2024:   4000        ands r0, r0
-    2026:   400b        ands r3, r1
-    2028:   0010        movs r0, r2
-    202a:   0000        movs r0, r0
-    202c:   2000        movs r0, #0
-    202e:   400b        ands r3, r1
-    2030:   0040        lsls r0, r0, #1
-    2032:   0000        movs r0, r0
-    2034:   6000        str r0, [r0, #0]
-    2036:   400b        ands r3, r1
-    2038:   0001        movs r1, r0
-    203a:   0000        movs r0, r0
-    203c:   2000        movs r0, #0
-    203e:   400b        ands r3, r1
-    2040:   0800        lsrs r0, r0, #32
-    2042:   0000        movs r0, r0
-    2044:   0000        movs r0, r0
-    2046:   400b        ands r3, r1
-    2048:   0800        lsrs r0, r0, #32
-    204a:   0000        movs r0, r0
-    204c:   0000        movs r0, r0
-    204e:   400b        ands r3, r1
-    2050:   0001        movs r1, r0
-    2052:   0000        movs r0, r0
-    2054:   0000        movs r0, r0
-    2056:   400b        ands r3, r1
-    2058:   0002        movs r2, r0
-    205a:   0000        movs r0, r0
-    205c:   0000        movs r0, r0
-    205e:   400b        ands r3, r1
-    2060:   0004        movs r4, r0
-    2062:   0000        movs r0, r0
-    2064:   0000        movs r0, r0
-    2066:   400b        ands r3, r1
-    2068:   0008        movs r0, r1
-    206a:   0000        movs r0, r0
-    206c:   0000        movs r0, r0
-    206e:   400b        ands r3, r1
-    2070:   0010        movs r0, r2
-    2072:   0000        movs r0, r0
-    2074:   4000        ands r0, r0
-    2076:   400b        ands r3, r1
-    2078:   0100        lsls r0, r0, #4
-    207a:   0000        movs r0, r0
-    207c:   4000        ands r0, r0
-    207e:   400b        ands r3, r1
-    2080:   0080        lsls r0, r0, #2
-    2082:   0000        movs r0, r0
-    2084:   2000        movs r0, #0
-    2086:   400b        ands r3, r1
-    2088:   0020        movs r0, r4
-    208a:   0000        movs r0, r0
-    208c:   2000        movs r0, #0
-    208e:   400b        ands r3, r1
-    2090:   0010        movs r0, r2
-    2092:   0000        movs r0, r0
-    2094:   2000        movs r0, #0
-    2096:   400b        ands r3, r1
-    2098:   0008        movs r0, r1
-    209a:   0000        movs r0, r0
-    209c:   2000        movs r0, #0
-    209e:   400b        ands r3, r1
-    20a0:   0004        movs r4, r0
-    20a2:   0000        movs r0, r0
-    20a4:   4000        ands r0, r0
-    20a6:   400b        ands r3, r1
-    20a8:   0040        lsls r0, r0, #1
-    20aa:   0000        movs r0, r0
-    20ac:   4000        ands r0, r0
-    20ae:   400b        ands r3, r1
-    20b0:   0020        movs r0, r4
-    20b2:   0000        movs r0, r0
-    20b4:   0434        lsls r4, r6, #16
-    20b6:   0000        movs r0, r0
-    20b8:   21f8        movs r1, #248    ; 0xf8
-    20ba:   0000        movs r0, r0
-    20bc:   0006        movs r6, r0
-    20be:   09ff        lsrs r7, r7, #7
-    20c0:   a101        add r1, pc, #4    ; (adr r1, 0x20c8)
-    20c2:   0901        lsrs r1, r0, #4
-    20c4:   1502        asrs r2, r0, #20
-    20c6:   2600        movs r6, #0
-    20c8:   00ff        lsls r7, r7, #3
-    20ca:   0875        lsrs r5, r6, #1
-    20cc:   4095        lsls r5, r2
-    20ce:   0281        lsls r1, r0, #10
-    20d0:   0309        lsls r1, r1, #12
-    20d2:   0015        movs r5, r2
-    20d4:   ff26 7500   vrshl.u32 d7, d0, d6
-    20d8:   9508        str r5, [sp, #32]
-    20da:   9140        str r1, [sp, #256]    ; 0x100
-    20dc:   c002        stmia r0!, {r1}
-    20de:   0000        movs r0, r0
-    20e0:   0105        lsls r5, r0, #4
-    20e2:   8009        strh r1, [r1, #0]
-    20e4:   01a1        lsls r1, r4, #6
-    20e6:   0185        lsls r5, r0, #6
-    20e8:   8119        strh r1, [r3, #8]
-    20ea:   8329        strh r1, [r5, #24]
-    20ec:   0015        movs r5, r2
-    20ee:   0125        lsls r5, r4, #4
-    20f0:   0395        lsls r5, r2, #14
-    20f2:   0175        lsls r5, r6, #5
-    20f4:   0281        lsls r1, r0, #10
-    20f6:   0195        lsls r5, r2, #6
-    20f8:   0575        lsls r5, r6, #21
-    20fa:   0181        lsls r1, r0, #6
-    20fc:   05c0        lsls r0, r0, #23
-    20fe:   090c        lsrs r4, r1, #4
-    2100:   a101        add r1, pc, #4    ; (adr r1, 0x2108)
-    2102:   8501        strh r1, [r0, #40]    ; 0x28
-    2104:   1502        asrs r2, r0, #20
-    2106:   2500        movs r5, #0
-    2108:   9501        str r5, [sp, #4]
-    210a:   7512        strb r2, [r2, #20]
-    210c:   0a01        lsrs r1, r0, #8
-    210e:   0183        lsls r3, r0, #6
-    2110:   8a0a        ldrh r2, [r1, #16]
-    2112:   0a01        lsrs r1, r0, #8
-    2114:   0192        lsls r2, r2, #6
-    2116:   940a        str r4, [sp, #40]    ; 0x28
-    2118:   0901        lsrs r1, r0, #4
-    211a:   09cd        lsrs r5, r1, #7
-    211c:   09b7        lsrs r7, r6, #6
-    211e:   09b6        lsrs r6, r6, #6
-    2120:   09b5        lsrs r5, r6, #6
-    2122:   09e2        lsrs r2, r4, #7
-    2124:   09ea        lsrs r2, r5, #7
-    2126:   0ae9        lsrs r1, r5, #11
-    2128:   0221        lsls r1, r4, #8
-    212a:   230a        movs r3, #10
-    212c:   0a02        lsrs r2, r0, #8
-    212e:   0224        lsls r4, r4, #8
-    2130:   250a        movs r5, #10
-    2132:   0a02        lsrs r2, r0, #8
-    2134:   0226        lsls r6, r4, #8
-    2136:   270a        movs r7, #10
-    2138:   0a02        lsrs r2, r0, #8
-    213a:   022a        lsls r2, r5, #8
-    213c:   0281        lsls r1, r0, #10
-    213e:   0195        lsls r5, r2, #6
-    2140:   0e75        lsrs r5, r6, #25
-    2142:   0181        lsls r1, r0, #6
-    2144:   00c0        lsls r0, r0, #3
-    2146:   0000        movs r0, r0
-    2148:   0105        lsls r5, r0, #4
-    214a:   0609        lsls r1, r1, #24
-    214c:   01a1        lsls r1, r4, #6
-    214e:   0705        lsls r5, r0, #28
-    2150:   e019        b.n 0x2186
-    2152:   e729        b.n 0x1fa8
-    2154:   0015        movs r5, r2
-    2156:   0125        lsls r5, r4, #4
-    2158:   0175        lsls r5, r6, #5
-    215a:   0895        lsrs r5, r2, #2
-    215c:   0281        lsls r1, r0, #10
-    215e:   0195        lsls r5, r2, #6
-    2160:   0875        lsrs r5, r6, #1
-    2162:   0381        lsls r1, r0, #14
-    2164:   0395        lsls r5, r2, #14
-    2166:   0175        lsls r5, r6, #5
-    2168:   0805        lsrs r5, r0, #32
-    216a:   0119        lsls r1, r3, #4
-    216c:   0329        lsls r1, r5, #12
-    216e:   0291        lsls r1, r2, #10
-    2170:   0195        lsls r5, r2, #6
-    2172:   0575        lsls r5, r6, #21
-    2174:   0391        lsls r1, r2, #14
-    2176:   0695        lsls r5, r2, #26
-    2178:   0875        lsrs r5, r6, #1
-    217a:   0015        movs r5, r2
-    217c:   a426        add r4, pc, #152    ; (adr r4, 0x2218)
-    217e:   0500        lsls r0, r0, #20
-    2180:   1907        adds r7, r0, r4
-    2182:   2900        cmp r1, #0
-    2184:   81a4        strh r4, [r4, #12]
-    2186:   c000        stmia r0!, {}
-    2188:   0209        lsls r1, r1, #8
-    218a:   005b        lsls r3, r3, #1
-    218c:   0103        lsls r3, r0, #4
-    218e:   a000        add r0, pc, #0    ; (adr r0, 0x2190)
-    2190:   0932        lsrs r2, r6, #4
-    2192:   0004        movs r4, r0
-    2194:   0100        lsls r0, r0, #4
-    2196:   0103        lsls r3, r0, #4
-    2198:   0001        movs r1, r0
-    219a:   2109        movs r1, #9
-    219c:   0111        lsls r1, r2, #4
-    219e:   0100        lsls r0, r0, #4
-    21a0:   4022        ands r2, r4
-    21a2:   0700        lsls r0, r0, #28
-    21a4:   8105        strh r5, [r0, #8]
-    21a6:   0803        lsrs r3, r0, #32
-    21a8:   0100        lsls r0, r0, #4
-    21aa:   0409        lsls r1, r1, #16
-    21ac:   0001        movs r1, r0
-    21ae:   0302        lsls r2, r0, #12
-    21b0:   0000        movs r0, r0
-    21b2:   0900        lsrs r0, r0, #4
-    21b4:   1121        asrs r1, r4, #4
-    21b6:   0001        movs r1, r0
-    21b8:   2201        movs r2, #1
-    21ba:   0022        movs r2, r4
-    21bc:   0507        lsls r7, r0, #20
-    21be:   0383        lsls r3, r0, #14
-    21c0:   0040        lsls r0, r0, #1
-    21c2:   0701        lsls r1, r0, #28
-    21c4:   0405        lsls r5, r0, #16
-    21c6:   4003        ands r3, r0
-    21c8:   0100        lsls r0, r0, #4
-    21ca:   0409        lsls r1, r1, #16
-    21cc:   0002        movs r2, r0
-    21ce:   0301        lsls r1, r0, #12
-    21d0:   0000        movs r0, r0
-    21d2:   0900        lsrs r0, r0, #4
-    21d4:   1121        asrs r1, r4, #4
-    21d6:   0001        movs r1, r0
-    21d8:   2201        movs r2, #1
-    21da:   0065        lsls r5, r4, #1
-    21dc:   0507        lsls r7, r0, #20
-    21de:   0382        lsls r2, r0, #14
-    21e0:   0040        lsls r0, r0, #1
-    21e2:   0001        movs r1, r0
-    21e4:   0112        lsls r2, r2, #4
-    21e6:   0110        lsls r0, r2, #4
-    21e8:   0000        movs r0, r0
-    21ea:   4000        ands r0, r0
-    21ec:   04d9        lsls r1, r3, #19
-    21ee:   1167        asrs r7, r4, #5
-    21f0:   1103        asrs r3, r0, #4
-    21f2:   0100        lsls r0, r0, #4
-    21f4:   0100        lsls r0, r0, #4
-    21f6:   0000        movs r0, r0
-    21f8:   0318        lsls r0, r3, #12
-    21fa:   0055        lsls r5, r2, #1
-    21fc:   0053        lsls r3, r2, #1
-    21fe:   0042        lsls r2, r0, #1
-    2200:   002d        movs r5, r5
-    2202:   0048        lsls r0, r1, #1
-    2204:   0049        lsls r1, r1, #1
-    2206:   0044        lsls r4, r0, #1
-    2208:   0020        movs r0, r4
-    220a:   0049        lsls r1, r1, #1
-    220c:   0041        lsls r1, r0, #1
-    220e:   0050        lsls r0, r2, #1
-    2210:   0000        movs r0, r0
-    2212:   0000        movs r0, r0
-    2214:   1005        asrs r5, r0, #32
-    2216:   0000        movs r0, r0
-    2218:   0000        movs r0, r0
-    221a:   0000        movs r0, r0
-    221c:   1a99        subs r1, r3, r2
-    221e:   0000        movs r0, r0
-    2220:   0000        movs r0, r0
-    2222:   0000        movs r0, r0
-    2224:   0000        movs r0, r0
-    2226:   0000        movs r0, r0
-    2228:   19a5        adds r5, r4, r6
-    222a:   0000        movs r0, r0
-    222c:   18a9        adds r1, r5, r2
-    222e:   0000        movs r0, r0
-    2230:   2250        movs r2, #80    ; 0x50
-    2232:   0000        movs r0, r0
-    2234:   0000        movs r0, r0
-    2236:   2000        movs r0, #0
-    2238:   0040        lsls r0, r0, #1
-    223a:   0000        movs r0, r0
-    223c:   1e2c        subs r4, r5, #0
-    223e:   0000        movs r0, r0
-    2240:   2290        movs r2, #144    ; 0x90
-    2242:   0000        movs r0, r0
-    2244:   0040        lsls r0, r0, #1
-    2246:   2000        movs r0, #0
-    2248:   0700        lsls r0, r0, #28
-    224a:   0000        movs r0, r0
-    224c:   1e3a        subs r2, r7, #0
-    224e:   0000        movs r0, r0
-    2250:   0001        movs r1, r0
-    2252:   0000        movs r0, r0
-    2254:   0000        movs r0, r0
-    2256:   0000        movs r0, r0
-    2258:   3000        adds r0, #0
-    225a:   0000        movs r0, r0
-    225c:   0000        movs r0, r0
-    225e:   0000        movs r0, r0
-    2260:   00ff        lsls r7, r7, #3
-    2262:   0000        movs r0, r0
-    2264:   20ac        movs r0, #172    ; 0xac
-    2266:   0000        movs r0, r0
-    2268:   a200        add r2, pc, #0    ; (adr r2, 0x226c)
-    226a:   044a        lsls r2, r1, #17
-    226c:   0000        movs r0, r0
-    226e:   0000        movs r0, r0
-    2270:   0000        movs r0, r0
-    2272:   0000        movs r0, r0
-    2274:   0000        movs r0, r0
-    2276:   0000        movs r0, r0
-    2278:   0000        movs r0, r0
-    227a:   0000        movs r0, r0
-    227c:   0000        movs r0, r0
-    227e:   0000        movs r0, r0
-    2280:   0000        movs r0, r0
-    2282:   0000        movs r0, r0
-    2284:   0000        movs r0, r0
-    2286:   0000        movs r0, r0
-    2288:   0000        movs r0, r0
-    228a:   0000        movs r0, r0
-    228c:   0000        movs r0, r0
-    228e:   0000        movs r0, r0
+
+  0x1f38:   0x20003ffc  ; last sram word
+  0x1f3c:   0x55aafaf0  ; reset key
+  0x1f40:   0x20000004
+
+.data:
+
+  0x1f44:   01 23 45 67
+    1f48:   89 ab cd ef
+
+    1f4c:   08 09
+    1f4e:   0a 0b
+    1f50:   0c 0d
+    1f52:   0e 0f
+    1f54:   10 11
+    1f56:   12 13
+    1f58:   14 15
+    1f5a:   16 17
+    1f5c:   18 19
+    1f5e:   1a 1b
+    1f60:   1c 1d
+    1f62:   1e 1f
+    1f64:   20 21
+    1f66:   22 23
+    1f68:   24 25
+    1f6a:   26 27
+    1f6c:   28 29
+    1f6e:   2a 2b
+    1f70:   2c 2d
+    1f72:   2e 2f
+    1f74:   30 31
+    1f76:   32 33
+    1f78:   34 35
+    1f7a:   36 37
+    1f7c:   38 39
+    1f7e:   3a 3b
+    1f80:   3c 3d
+    1f82:   3e 3f
+    1f84:   29 1e
+    1f86:   1f 20
+    1f88:   21 22
+    1f8a:   23 24
+    1f8c:   2b 14
+    1f8e:   1a 08
+    1f90:   15 17
+    1f92:   1c 18
+    1f94:   39 04
+    1f96:   16 07
+    1f98:   09 0a
+    1f9a:   0b 0d
+    1f9c:   e1 1d
+    1f9e:   1b 06
+    1fa0:   19 05
+    1fa2:   11 10
+    1fa4:   e0 e3
+    1fa6:   e2 25
+    1fa8:   26 27
+    1faa:   2d 2a
+    1fac:   64 00
+    1fae:   2e 0c
+    1fb0:   12 13
+    1fb2:   2f 31
+    1fb4:   00 00
+    1fb6:   30 0e
+    1fb8:   0f 33
+    1fba:   34 28
+    1fbc:   00 00
+    1fbe:   2c 36
+    1fc0:   37 38
+    1fc2:   e5 35
+    1fc4:   00 00
+    1fc6:   00 e6
+    1fc8:   e7 65
+    1fca:   00 e4
+    1fcc:   c0 c1
+    1fce:   c2 c3
+    1fd0:   00 00
+    1fd2:   00 00
+
+gpio_map_3:
+  0x1fd4:   00 40 0b 40     0x400b4000  ; GPIO C
+    1fd8:   00 02 00 00     0x200       ; pin 9
+
+    1fdc:   00 00 0b 40     0x400b0000  ; GPIO A
+    1fe0:   20 00 00 00     0x20        ; pin 5
+
+    1fe4:   00 00 0b 40     0x400b0000  ; GPIO A
+    1fe8:   40 00 00 00     0x40        ; pin 6
+
+    1fec:   00 00 0b 40     0x400b0000  ; GPIO A
+    1ff0:   80 00 00 00     0x80        ; pin 7
+
+    1ff4:   00 40 0b 40     0x400b4000  ; GPIO C
+    1ff8:   00 08 00 00     0x800       ; pin 12
+
+    1ffc:   00 40 0b 40     0x400b4000  ; GPIO C
+    2000:   00 20 00 00     0x2000      ; pin 13
+
+    2004:   00 40 0b 40     0x400b4000  ; GPIO C
+    2008:   00 40 00 00     0x4000      ; pin 14
+
+    200c:   00 40 0b 40     0x400b4000  ; GPIO C
+    2010:   00 80 00 00     0x8000      ; pin 15
+
+  0x2014:   02 09 00 05
+    2018:   00 06 00 07
+    201c:   02 0b 02 0d
+    2020:   02 0e 02 0f
+
+gpio_map_2:
+  0x2024:   00 40 0b 40     0x400b4000  ; GPIO C
+    2028:   10 00 00 00     0x10        ; pin 4
+
+    202c:   00 20 0b 40     0x400b2000  ; GPIO B
+    2030:   40 00 00 00     0x40        ; pin 6
+
+    2034:   00 60 0b 40     0x400b6000  ; GPIO D
+    2038:   01 00 00 00     0x1         ; pin 0
+
+    203c:   00 20 0b 40     0x400b2000  ; GPIO B
+    2040:   00 08 00 00     0x800       ; pin 11
+
+    2044:   00 00 0b 40     0x400b0000  ; GPIO A
+    2048:   00 08 00 00     0x800       ; pin 11
+
+    204c:   00 00 0b 40     0x400b0000  ; GPIO A
+    2050:   01 00 00 00     0x1         ; pin 0
+
+    2054:   00 00 0b 40     0x400b0000  ; GPIO A
+    2058:   02 00 00 00     0x2         ; pin 1
+
+    205c:   00 00 0b 40     0x400b0000  ; GPIO A
+    2060:   04 00 00 00     0x4         ; pin 2
+
+    2064:   00 00 0b 40     0x400b0000  ; GPIO A
+    2068:   08 00 00 00     0x8         ; pin 3
+
+    206c:   00 00 0b 40     0x400b0000  ; GPIO A
+    2070:   10 00 00 00     0x10        ; pin 4
+
+gpio_map_1:
+  0x2074:   00 40 0b 40     0x400b4000  ; GPIO C
+    2078:   00 01 00 00     0x100       ; pin 8
+
+    207c:   00 40 0b 40     0x400b4000  ; GPIO C
+    2080:   80 00 00 00     0x80        ; pin 7
+
+    2084:   00 20 0b 40     0x400b2000  ; GPIO B
+    2088:   20 00 00 00     0x20        ; pin 5
+
+    208c:   00 20 0b 40     0x400b2000  ; GPIO B
+    2090:   10 00 00 00     0x10        ; pin 4
+
+    2094:   00 20 0b 40     0x400b2000  ; GPIO B
+    2098:   08 00 00 00     0x8         ; pin 3
+
+    209c:   00 20 0b 40     0x400b2000  ; GPIO B
+    20a0:   04 00 00 00     0x4         ; pin 2
+
+    20a4:   00 40 0b 40     0x400b4000  ; GPIO C
+    20a8:   40 00 00 00     0x40        ; pin 6
+
+    20ac:   00 40 0b 40     0x400b4000  ; GPIO C
+    20b0:   20 00 00 00     0x20        ; pin 5
+
+  0x20b4:   34 04 00 00
+    20b8:   f8 21 00 00
+
+usb_report1_desc:
+  0x20bc:
+    ; 0x06, 0x00, 0xFF,  // Usage Page (Vendor Defined 0xFF00)
+    ; 0x09, 0x01,        // Usage (0x01)
+    ; 0xA1, 0x01,        // Collection (Application)
+    ; 0x09, 0x02,        //   Usage (0x02)
+    ; 0x15, 0x00,        //   Logical Minimum (0)
+    ; 0x26, 0xFF, 0x00,  //   Logical Maximum (255)
+    ; 0x75, 0x08,        //   Report Size (8)
+    ; 0x95, 0x40,        //   Report Count (64)
+    ; 0x81, 0x02,        //   Input (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
+    ; 0x09, 0x03,        //   Usage (0x03)
+    ; 0x15, 0x00,        //   Logical Minimum (0)
+    ; 0x26, 0xFF, 0x00,  //   Logical Maximum (255)
+    ; 0x75, 0x08,        //   Report Size (8)
+    ; 0x95, 0x40,        //   Report Count (64)
+    ; 0x91, 0x02,        //   Output (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position,Non-volatile)
+    ; 0xC0,              // End Collection
+
+    20de:   00 00
+
+usb_report2_desc:
+  0x20ec:
+    ; 0x05, 0x01,        // Usage Page (Generic Desktop Ctrls)
+    ; 0x09, 0x80,        // Usage (Sys Control)
+    ; 0xA1, 0x01,        // Collection (Application)
+    ; 0x85, 0x01,        //   Report ID (1)
+    ; 0x19, 0x81,        //   Usage Minimum (Sys Power Down)
+    ; 0x29, 0x83,        //   Usage Maximum (Sys Wake Up)
+    ; 0x15, 0x00,        //   Logical Minimum (0)
+    ; 0x25, 0x01,        //   Logical Maximum (1)
+    ; 0x95, 0x03,        //   Report Count (3)
+    ; 0x75, 0x01,        //   Report Size (1)
+    ; 0x81, 0x02,        //   Input (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
+    ; 0x95, 0x01,        //   Report Count (1)
+    ; 0x75, 0x05,        //   Report Size (5)
+    ; 0x81, 0x01,        //   Input (Const,Array,Abs,No Wrap,Linear,Preferred State,No Null Position)
+    ; 0xC0,              // End Collection
+    ; 0x05, 0x0C,        // Usage Page (Consumer)
+    ; 0x09, 0x01,        // Usage (Consumer Control)
+    ; 0xA1, 0x01,        // Collection (Application)
+    ; 0x85, 0x02,        //   Report ID (2)
+    ; 0x15, 0x00,        //   Logical Minimum (0)
+    ; 0x25, 0x01,        //   Logical Maximum (1)
+    ; 0x95, 0x12,        //   Report Count (18)
+    ; 0x75, 0x01,        //   Report Size (1)
+    ; 0x0A, 0x83, 0x01,  //   Usage (AL Consumer Control Configuration)
+    ; 0x0A, 0x8A, 0x01,  //   Usage (AL Email Reader)
+    ; 0x0A, 0x92, 0x01,  //   Usage (AL Calculator)
+    ; 0x0A, 0x94, 0x01,  //   Usage (AL Local Machine Browser)
+    ; 0x09, 0xCD,        //   Usage (Play/Pause)
+    ; 0x09, 0xB7,        //   Usage (Stop)
+    ; 0x09, 0xB6,        //   Usage (Scan Previous Track)
+    ; 0x09, 0xB5,        //   Usage (Scan Next Track)
+    ; 0x09, 0xE2,        //   Usage (Mute)
+    ; 0x09, 0xEA,        //   Usage (Volume Decrement)
+    ; 0x09, 0xE9,        //   Usage (Volume Increment)
+    ; 0x0A, 0x21, 0x02,  //   Usage (AC Search)
+    ; 0x0A, 0x23, 0x02,  //   Usage (AC Home)
+    ; 0x0A, 0x24, 0x02,  //   Usage (AC Back)
+    ; 0x0A, 0x25, 0x02,  //   Usage (AC Forward)
+    ; 0x0A, 0x26, 0x02,  //   Usage (AC Stop)
+    ; 0x0A, 0x27, 0x02,  //   Usage (AC Refresh)
+    ; 0x0A, 0x2A, 0x02,  //   Usage (AC Bookmarks)
+    ; 0x81, 0x02,        //   Input (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
+    ; 0x95, 0x01,        //   Report Count (1)
+    ; 0x75, 0x0E,        //   Report Size (14)
+    ; 0x81, 0x01,        //   Input (Const,Array,Abs,No Wrap,Linear,Preferred State,No Null Position)
+    ; 0xC0,              // End Collection
+
+    2145:   00
+    2146:   00 00
+
+usb_report0_desc:
+  0x2148:
+    ; 0x05, 0x01,        // Usage Page (Generic Desktop Ctrls)
+    ; 0x09, 0x06,        // Usage (Keyboard)
+    ; 0xA1, 0x01,        // Collection (Application)
+    ; 0x05, 0x07,        //   Usage Page (Kbrd/Keypad)
+    ; 0x19, 0xE0,        //   Usage Minimum (0xE0)
+    ; 0x29, 0xE7,        //   Usage Maximum (0xE7)
+    ; 0x15, 0x00,        //   Logical Minimum (0)
+    ; 0x25, 0x01,        //   Logical Maximum (1)
+    ; 0x75, 0x01,        //   Report Size (1)
+    ; 0x95, 0x08,        //   Report Count (8)
+    ; 0x81, 0x02,        //   Input (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
+    ; 0x95, 0x01,        //   Report Count (1)
+    ; 0x75, 0x08,        //   Report Size (8)
+    ; 0x81, 0x03,        //   Input (Const,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
+    ; 0x95, 0x03,        //   Report Count (3)
+    ; 0x75, 0x01,        //   Report Size (1)
+    ; 0x05, 0x08,        //   Usage Page (LEDs)
+    ; 0x19, 0x01,        //   Usage Minimum (Num Lock)
+    ; 0x29, 0x03,        //   Usage Maximum (Scroll Lock)
+    ; 0x91, 0x02,        //   Output (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position,Non-volatile)
+    ; 0x95, 0x01,        //   Report Count (1)
+    ; 0x75, 0x05,        //   Report Size (5)
+    ; 0x91, 0x03,        //   Output (Const,Var,Abs,No Wrap,Linear,Preferred State,No Null Position,Non-volatile)
+    ; 0x95, 0x06,        //   Report Count (6)
+    ; 0x75, 0x08,        //   Report Size (8)
+    ; 0x15, 0x00,        //   Logical Minimum (0)
+    ; 0x26, 0xA4, 0x00,  //   Logical Maximum (164)
+    ; 0x05, 0x07,        //   Usage Page (Kbrd/Keypad)
+    ; 0x19, 0x00,        //   Usage Minimum (0x00)
+    ; 0x29, 0xA4,        //   Usage Maximum (0xA4)
+    ; 0x81, 0x00,        //   Input (Data,Array,Abs,No Wrap,Linear,Preferred State,No Null Position)
+    ; 0xC0,              // End Collection
+
+usb_descriptors:
+  0x2188:
+    ; 0x09,        // bLength
+    ; 0x02,        // bDescriptorType (Configuration)
+    ; 0x5B, 0x00,  // wTotalLength 91
+    ; 0x03,        // bNumInterfaces 3
+    ; 0x01,        // bConfigurationValue
+    ; 0x00,        // iConfiguration (String Index)
+    ; 0xA0,        // bmAttributes Remote Wakeup
+    ; 0x32,        // bMaxPower 100mA
+
+    ; 0x09,        // bLength
+    ; 0x04,        // bDescriptorType (Interface)
+    ; 0x00,        // bInterfaceNumber 0
+    ; 0x00,        // bAlternateSetting
+    ; 0x01,        // bNumEndpoints 1
+    ; 0x03,        // bInterfaceClass
+    ; 0x01,        // bInterfaceSubClass
+    ; 0x01,        // bInterfaceProtocol
+    ; 0x00,        // iInterface (String Index)
+
+    ; 0x09,        // bLength
+    ; 0x21,        // bDescriptorType (HID)
+    ; 0x11, 0x01,  // bcdHID 1.11
+    ; 0x00,        // bCountryCode
+    ; 0x01,        // bNumDescriptors
+    ; 0x22,        // bDescriptorType[0] (HID)
+    ; 0x40, 0x00,  // wDescriptorLength[0] 64
+
+    ; 0x07,        // bLength
+    ; 0x05,        // bDescriptorType (Endpoint)
+    ; 0x81,        // bEndpointAddress (IN/D2H)
+    ; 0x03,        // bmAttributes (Interrupt)
+    ; 0x08, 0x00,  // wMaxPacketSize 8
+    ; 0x01,        // bInterval 1 (unit depends on device speed)
+
+    ; 0x09,        // bLength
+    ; 0x04,        // bDescriptorType (Interface)
+    ; 0x01,        // bInterfaceNumber 1
+    ; 0x00,        // bAlternateSetting
+    ; 0x02,        // bNumEndpoints 2
+    ; 0x03,        // bInterfaceClass
+    ; 0x00,        // bInterfaceSubClass
+    ; 0x00,        // bInterfaceProtocol
+    ; 0x00,        // iInterface (String Index)
+
+    ; 0x09,        // bLength
+    ; 0x21,        // bDescriptorType (HID)
+    ; 0x11, 0x01,  // bcdHID 1.11
+    ; 0x00,        // bCountryCode
+    ; 0x01,        // bNumDescriptors
+    ; 0x22,        // bDescriptorType[0] (HID)
+    ; 0x22, 0x00,  // wDescriptorLength[0] 34
+
+    ; 0x07,        // bLength
+    ; 0x05,        // bDescriptorType (Endpoint)
+    ; 0x83,        // bEndpointAddress (IN/D2H)
+    ; 0x03,        // bmAttributes (Interrupt)
+    ; 0x40, 0x00,  // wMaxPacketSize 64
+    ; 0x01,        // bInterval 1 (unit depends on device speed)
+
+    ; 0x07,        // bLength
+    ; 0x05,        // bDescriptorType (Endpoint)
+    ; 0x04,        // bEndpointAddress (OUT/H2D)
+    ; 0x03,        // bmAttributes (Interrupt)
+    ; 0x40, 0x00,  // wMaxPacketSize 64
+    ; 0x01,        // bInterval 1 (unit depends on device speed)
+
+    ; 0x09,        // bLength
+    ; 0x04,        // bDescriptorType (Interface)
+    ; 0x02,        // bInterfaceNumber 2
+    ; 0x00,        // bAlternateSetting
+    ; 0x01,        // bNumEndpoints 1
+    ; 0x03,        // bInterfaceClass
+    ; 0x00,        // bInterfaceSubClass
+    ; 0x00,        // bInterfaceProtocol
+    ; 0x00,        // iInterface (String Index)
+
+    ; 0x09,        // bLength
+    ; 0x21,        // bDescriptorType (HID)
+    ; 0x11, 0x01,  // bcdHID 1.11
+    ; 0x00,        // bCountryCode
+    ; 0x01,        // bNumDescriptors
+    ; 0x22,        // bDescriptorType[0] (HID)
+    ; 0x65, 0x00,  // wDescriptorLength[0] 101
+
+    ; 0x07,        // bLength
+    ; 0x05,        // bDescriptorType (Endpoint)
+    ; 0x82,        // bEndpointAddress (IN/D2H)
+    ; 0x03,        // bmAttributes (Interrupt)
+    ; 0x40, 0x00,  // wMaxPacketSize 64
+    ; 0x01,        // bInterval 1 (unit depends on device speed)
+
+    ; 0x00,        // bLength
+    ; 0x12,        // bLength
+    ; 0x01,        // bDescriptorType (Device)
+    ; 0x10, 0x01,  // bcdUSB 1.10
+    ; 0x00,        // bDeviceClass (Use class information in the Interface Descriptors)
+    ; 0x00,        // bDeviceSubClass
+    ; 0x00,        // bDeviceProtocol
+    ; 0x40,        // bMaxPacketSize0 64
+    ; 0xD9, 0x04,  // idVendor 0x04D9
+    ; 0x67, 0x11,  // idProduct 0x1167
+    ; 0x03, 0x11,  // bcdDevice 28.03
+    ; 0x00,        // iManufacturer (String Index)
+    ; 0x01,        // iProduct (String Index)
+    ; 0x00,        // iSerialNumber (String Index)
+    ; 0x01,        // bNumConfigurations 1
+
+    21f6:   00 00
+
+    21f8:   18 03
+    21fa:   55 00
+    21fc:   53 00
+    21fe:   42 00
+    2200:   2d 00
+    2202:   48 00
+    2204:   49 00
+    2206:   44 00
+    2208:   20 00
+    220a:   49 00
+    220c:   41 00
+    220e:   50 00
+    2210:   00 00
+    2212:   00 00
+    2214:   05 10
+    2216:   00 00
+    2218:   00 00
+    221a:   00 00
+    221c:   99 1a
+    221e:   00 00
+    2220:   00 00
+    2222:   00 00
+    2224:   00 00
+    2226:   00 00
+    2228:   a5 19
+    222a:   00 00
+    222c:   a9 18
+    222e:   00 00
+    2230:   50 22
+    2232:   00 00
+    2234:   00 00
+    2236:   00 20
+    2238:   40 00
+    223a:   00 00
+    223c:   2c 1e
+    223e:   00 00
+    2240:   90 22
+    2242:   00 00
+    2244:   40 00
+    2246:   00 20
+    2248:   00 07
+    224a:   00 00
+    224c:   3a 1e
+    224e:   00 00
+    2250:   01 00
+    2252:   00 00
+    2254:   00 00
+    2256:   00 00
+    2258:   00 30
+    225a:   00 00
+    225c:   00 00
+    225e:   00 00
+    2260:   ff 00
+    2262:   00 00
+    2264:   ac 20
+    2266:   00 00
+    2268:   00 a2
+    226a:   4a 04
+    226c:   00 00
+    226e:   00 00
+    2270:   00 00
+    2272:   00 00
+    2274:   00 00
+    2276:   00 00
+    2278:   00 00
+    227a:   00 00
+    227c:   00 00
+    227e:   00 00
+    2280:   00 00
+    2282:   00 00
+    2284:   00 00
+    2286:   00 00
+    2288:   00 00
+    228a:   00 00
+    228c:   00 00
+    228e:   00 00

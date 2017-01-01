@@ -1,4 +1,4 @@
-Firmware Builtin Symbol Map:
+POK3R Builtin Firmware Symbol Map:
 
 Functions:
 

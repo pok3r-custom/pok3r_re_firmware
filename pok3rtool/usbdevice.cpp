@@ -9,10 +9,51 @@ USBDevice::USBDevice() : context(nullptr), device(nullptr), handle(nullptr), cla
     }
 }
 
+USBDevice::USBDevice(libusb_device *dev) : USBDevice(){
+    device = dev;
+}
+
 USBDevice::~USBDevice(){
     close();
     if(context)
         libusb_exit(context);
+}
+
+bool USBDevice::findUSBVidPid(zu16 vid, zu16 pid){
+    if(!context)
+        return false;
+
+    // List devices
+    int count = 1;
+    libusb_device *dev;
+    libusb_device **devices;
+    int status = libusb_get_device_list(context, &devices);
+    if(status < 0){
+        ELOG("Failed to get device list: " << libusb_error_name(status));
+    } else {
+        for(int i = 0; devices[i] != NULL; ++i){
+            // Get device descriptor (can't fail)
+            struct libusb_device_descriptor desc;
+            libusb_get_device_descriptor(devices[i], &desc);
+            // Check vid and pid
+            if(desc.idVendor == vid && desc.idProduct == pid){
+//                LOG("Found ID " << ZString::ItoS((zu64)desc.idVendor, 16, 4) << ":" << ZString::ItoS((zu64)desc.idProduct, 16, 4));
+                dev = devices[i];
+                break;
+            }
+        }
+    }
+    libusb_free_device_list(devices, 1);
+
+    if(count == 1){
+        // Reference device so it is not freed by libusb
+        device = dev;
+        libusb_ref_device(device);
+        return true;
+    } else if(count > 1){
+        ELOG("Multiple devices found");
+    }
+    return false;
 }
 
 bool USBDevice::open(){
@@ -32,9 +73,7 @@ bool USBDevice::open(){
     // Set auto detach (if supported, otherwise silently ignore)
     libusb_set_auto_detach_kernel_driver(handle, 1);
 
-    //detachKernel(0);
-    //detachKernel(1);
-    //detachKernel(2);
+//    detachKernel(1);
 
     // Set configuration
     status = libusb_set_configuration(handle, 1);
@@ -47,22 +86,17 @@ bool USBDevice::open(){
     }
 
     // Claim interface
-    claimInterface(0);
     claimInterface(1);
-    claimInterface(2);
 
     return true;
 }
 
 void USBDevice::close(){
     if(handle){
-        releaseInterface(0);
         releaseInterface(1);
-        releaseInterface(2);
 
-        if(kernel[0]) attachKernel(0);
-        if(kernel[1]) attachKernel(1);
-        if(kernel[2]) attachKernel(2);
+        if(kernel[1])
+            attachKernel(1);
 
         // Close handle
         libusb_close(handle);
@@ -106,13 +140,19 @@ zu16 USBDevice::interrupt_recv(int ep, zbyte *data, zu16 maxlen){
     return olen;
 }
 
-bool USBDevice::findUSBVidPid(zu16 vid, zu16 pid){
-    if(!context)
+ZArray<USBDevice::Dev> USBDevice::listDevices(){
+    libusb_context *context;
+    // Make context
+    int status = libusb_init(&context);
+    if(status != 0){
+        ELOG("Failed to init libusb: " << libusb_error_name(status));
         return false;
+    }
 
     // List devices
+    ZArray<Dev> list;
     libusb_device **devices;
-    int status = libusb_get_device_list(context, &devices);
+    status = libusb_get_device_list(context, &devices);
     if(status < 0){
         ELOG("Failed to get device list: " << libusb_error_name(status));
     } else {
@@ -120,18 +160,11 @@ bool USBDevice::findUSBVidPid(zu16 vid, zu16 pid){
             // Get device descriptor (can't fail)
             struct libusb_device_descriptor desc;
             libusb_get_device_descriptor(devices[i], &desc);
-            // Check vid and pid
-            if(desc.idVendor == vid && desc.idProduct == pid){
-                LOG("Found ID " << ZString::ItoS((zu64)desc.idVendor, 16, 4) << ":" << ZString::ItoS((zu64)desc.idProduct, 16, 4));
-                device = devices[i];
-                // Reference device so it is not freed by libusb
-                libusb_ref_device(device);
-                break;
-            }
+            list.push({new USBDevice(devices[i]), desc.idVendor, desc.idProduct});
         }
     }
     libusb_free_device_list(devices, 1);
-    return (device ? true : false);
+    return list;
 }
 
 bool USBDevice::claimInterface(int interface){
