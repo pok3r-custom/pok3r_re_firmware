@@ -1,12 +1,12 @@
 #include "pok3r_rgb.h"
 #include "zlog.h"
 
-Pok3rRGB::Pok3rRGB(USBDevice *dev) : device(dev){
+Pok3rRGB::Pok3rRGB(ZPointer<USBDevice> dev) : device(dev){
 
 }
 
 Pok3rRGB::~Pok3rRGB(){
-    delete device;
+
 }
 
 bool Pok3rRGB::findPok3rRGB(){
@@ -14,6 +14,38 @@ bool Pok3rRGB::findPok3rRGB(){
     if(device->findUSBVidPid(HOLTEK_VID, POK3R_RGB_PID))
         return true;
     return false;
+}
+
+bool Pok3rRGB::reboot(){
+    LOG("Reset");
+    if(!sendCmd(RESET, RESET_FW, 0, nullptr, 0))
+        return false;
+    device->close();
+    return true;
+//    LOG("Wait...");
+//    ZThread::sleep(3);
+//    if(!device->findUSBVidPid(HOLTEK_VID, POK3R_RGB_PID))
+//        return false;
+//    if(!device->open())
+//        return false;
+//    LOG("OK");
+//    return true;
+}
+
+bool Pok3rRGB::bootloader(){
+    LOG("Reset");
+    if(!sendCmd(RESET, RESET_BL, 0, nullptr, 0))
+        return false;
+    device->close();
+    return true;
+//    LOG("Wait...");
+//    ZThread::sleep(3);
+//    if(!device->findUSBVidPid(HOLTEK_VID, POK3R_RGB_BOOT_PID))
+//        return false;
+//    if(!device->open())
+//        return false;
+//    LOG("OK");
+//    return true;
 }
 
 ZString Pok3rRGB::getVersion(){
@@ -52,7 +84,7 @@ void Pok3rRGB::test(){
 }
 
 bool Pok3rRGB::sendCmd(zu8 cmd, zu8 a1, zu16 a2, const zbyte *data, zu8 len){
-    if(!device || len > 52)
+    if(!device.ptr() || len > 52)
         return false;
 
     ZBinary packet;
@@ -80,7 +112,7 @@ bool Pok3rRGB::sendCmd(zu8 cmd, zu8 a1, zu16 a2, const zbyte *data, zu8 len){
 }
 
 bool Pok3rRGB::recvDat(zbyte *data){
-    if(!device || !data)
+    if(!device.ptr() || !data)
         return false;
 
     // Recv data (interrupt read)

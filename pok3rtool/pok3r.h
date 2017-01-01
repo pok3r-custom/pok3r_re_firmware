@@ -112,7 +112,7 @@ public:
     };
 
 public:
-    Pok3r(USBDevice *device);
+    Pok3r(ZPointer<USBDevice> device = new USBDevice);
     ~Pok3r();
 
     bool open(){ return device->open(); }
@@ -120,8 +120,10 @@ public:
     //! Find a Pok3r keyboard.
     bool findPok3r();
 
+    //! Reset and re-open device.
+    bool reboot();
     //! Reset to loader and re-open device.
-    bool resetToLoader();
+    bool bootloader();
 
     //! Read the firmware version from the keyboard.
     ZString getVersion();
@@ -154,7 +156,7 @@ public:
     static void encode_firmware(ZBinary &bin);
 
 private:
-    USBDevice *device;
+    ZPointer<USBDevice> device;
 };
 
 #endif // POK3R_H

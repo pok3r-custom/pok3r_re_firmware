@@ -22,12 +22,12 @@ zu16 crc16(unsigned char *addr, zu64 size) {
     return (zu16)crc;
 }
 
-Pok3r::Pok3r(USBDevice *dev) : device(dev){
+Pok3r::Pok3r(ZPointer<USBDevice> dev) : device(dev){
 
 }
 
 Pok3r::~Pok3r(){
-    delete device;
+
 }
 
 bool Pok3r::findPok3r(){
@@ -40,7 +40,16 @@ bool Pok3r::findPok3r(){
     return false;
 }
 
-bool Pok3r::resetToLoader(){
+bool Pok3r::reboot(){
+    LOG("Reset...");
+    if(!reset(RESET_BOOT_SUBCMD)){
+        ELOG("Reset send error");
+        return false;
+    }
+    return true;
+}
+
+bool Pok3r::bootloader(){
     // Reset
     LOG("Reset...");
     if(!reset(RESET_BUILTIN_SUBCMD)){
@@ -136,7 +145,7 @@ zu16 Pok3r::crcFlash(zu32 addr, zu32 len){
 }
 
 bool Pok3r::sendCmd(zu8 cmd, zu8 subcmd, zu32 a1, zu32 a2, const zbyte *data, zu8 len){
-    if(len > 52)
+    if(!device.ptr() || len > 52)
         return false;
 
     ZBinary packet;
@@ -169,7 +178,7 @@ bool Pok3r::sendCmd(zu8 cmd, zu8 subcmd, zu32 a1, zu32 a2, const zbyte *data, zu
 }
 
 bool Pok3r::recvDat(zbyte *data){
-    if(!data)
+    if(!device.ptr() || !data)
         return false;
 
     // Recv data (interrupt read)

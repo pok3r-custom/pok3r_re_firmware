@@ -558,39 +558,31 @@ int encode_patch_updater(ZPath exein, ZPath fwin, ZPath exeout){
     return 0;
 }
 
-UpdateInterface* findKB(){
+ZPointer<UpdateInterface> openDevice(){
     int count = 0;
-    UpdateInterface *kb = nullptr;
+    ZPointer<UpdateInterface> kb;
     auto list = USBDevice::listDevices();
     for(zu64 i = 0; i < list.size(); ++i){
         if(list[i].vid == HOLTEK_VID){
             switch(list[i].pid){
                 case POK3R_PID:
                     LOG("Found POK3R");
-                    delete kb;
-                    kb = new Pok3r(list[i].dev.ptr());
-                    list[i].dev.divorce();
+                    kb = new Pok3r(list[i].dev);
                     count++;
                     break;
                 case POK3R_BOOT_PID:
                     LOG("Found POK3R (builtin)");
-                    delete kb;
-                    kb = new Pok3r(list[i].dev.ptr());
-                    list[i].dev.divorce();
+                    kb = new Pok3r(list[i].dev);
                     count++;
                     break;
                 case POK3R_RGB_PID:
                     LOG("Found POK3R RGB");
-                    delete kb;
-                    kb = new Pok3rRGB(list[i].dev.ptr());
-                    list[i].dev.divorce();
+                    kb = new Pok3rRGB(list[i].dev);
                     count++;
                     break;
                 case POK3R_RGB_BOOT_PID:
                     LOG("Found POK3R RGB (builtin)");
-                    delete kb;
-                    kb = new Pok3rRGB(list[i].dev.ptr());
-                    list[i].dev.divorce();
+                    kb = new Pok3rRGB(list[i].dev);
                     count++;
                     break;
                 default:
@@ -599,10 +591,10 @@ UpdateInterface* findKB(){
         }
     }
     if(count == 1){
+        kb->open();
         return kb;
     } else if(count > 1){
         ELOG("Multiple devices found");
-        delete kb;
     }
     return nullptr;
 }
@@ -614,13 +606,13 @@ int main(int argc, char **argv){
     if(argc > 1){
         ZString cmd = argv[1];
         if(cmd == "version"){
-            // Read version from Pok3r
-            UpdateInterface *kb = findKB();
-            kb->open();
-            if(kb){
-                LOG(kb->getVersion());
+            // Read version
+            ZPointer<UpdateInterface> kb = openDevice();
+            if(kb.ptr()){
+                LOG("Version: " << kb->getVersion());
+                return 0;
             }
-            delete kb;
+            return -1;
 
         } else if(cmd == "setversion"){
             // Write version on Pok3r
@@ -632,10 +624,33 @@ int main(int argc, char **argv){
                 return 2;
             }
 
-        } else if(cmd == "loader"){
-            // Boot to loader
-//            return bootloader();
-            return 0;
+        } else if(cmd == "reboot"){
+            // Reboot
+            ZPointer<UpdateInterface> kb = openDevice();
+            if(kb.ptr()){
+                LOG(kb->reboot());
+                ZThread::sleep(3);
+
+                kb = openDevice();
+                // Read version
+                LOG("Version: " << kb->getVersion());
+                return 0;
+            }
+            return -1;
+
+        } else if(cmd == "bootloader"){
+            // Bootloader
+            ZPointer<UpdateInterface> kb = openDevice();
+            if(kb.ptr()){
+                LOG(kb->bootloader());
+                ZThread::sleep(3);
+
+                kb = openDevice();
+                // Read version
+                LOG("Version: " << kb->getVersion());
+                return 0;
+            }
+            return -1;
 
         } else if(cmd == "read"){
             // Read bytes from Pok3r

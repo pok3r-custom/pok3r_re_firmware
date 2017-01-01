@@ -11,6 +11,9 @@ public:
 
     virtual bool open() = 0;
 
+    virtual bool reboot() = 0;
+    virtual bool bootloader() = 0;
+
     virtual ZString getVersion() = 0;
 };
 

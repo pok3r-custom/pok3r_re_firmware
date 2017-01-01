@@ -25,10 +25,10 @@ public:
         CMD_16      = 0x10,
         CMD_16_ARG  = 2,
 
-        RESET       = 0x11,
-        RESET_0     = 0,
-        RESET_1     = 1,
-        RESET_DIS   = 2,
+        RESET       = 0x11, //!< Reset command.
+        RESET_BL    = 0,    //!< Reset to bootloader.
+        RESET_FW    = 1,    //!< Reset to firmware.
+        RESET_DIS   = 2,    //!< Disconnect USB.
 
         READ        = 0x12,
         READ_400    = 0,
@@ -45,13 +45,18 @@ public:
     };
 
 public:
-    Pok3rRGB(USBDevice *device);
+    Pok3rRGB(ZPointer<USBDevice> device = new USBDevice);
     ~Pok3rRGB();
 
     bool open(){ return device->open(); }
 
     //! Find a Pok3r RGB keyboard.
     bool findPok3rRGB();
+
+    //! Reset and re-open device.
+    bool reboot();
+    //! Reset to bootloader and re-open device.
+    bool bootloader();
 
     //! Read the firmware version from the keyboard.
     ZString getVersion();
@@ -71,7 +76,7 @@ public:
     static void encode_firmware(ZBinary &bin);
 
 private:
-    USBDevice *device;
+    ZPointer<USBDevice> device;
 };
 
 #endif // POK3R_RGB_H

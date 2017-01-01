@@ -23,6 +23,8 @@ bool USBDevice::findUSBVidPid(zu16 vid, zu16 pid){
     if(!context)
         return false;
 
+    close();
+
     // List devices
     int count = 1;
     libusb_device *dev;
