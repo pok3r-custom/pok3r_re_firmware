@@ -1,4 +1,4 @@
-POK3R Firmware Builtin Disassembly:
+POK3R RGB Firmware Builtin Disassembly:
 
 vector_table:
      0x0:   0x20000740  ; Stack Pointer (stack_max)

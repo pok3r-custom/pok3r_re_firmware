@@ -80,7 +80,7 @@ void Pok3rRGB::test(){
         return;
     if(!recvDat(bin.raw()))
         return;
-    RLOG(bin.getSub(4).dumpBytes(4, 8));
+    RLOG(bin.getSub(4, bin.size()-4).dumpBytes(4, 8));
 }
 
 bool Pok3rRGB::sendCmd(zu8 cmd, zu8 a1, zu16 a2, const zbyte *data, zu8 len){

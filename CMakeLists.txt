@@ -35,7 +35,7 @@ SET(SOURCES
     pok3rtool/updateinterface.h
 
     pok3rtool/rawhid/hid.h
-    pok3rtool/rawhid/hid_LINUX.c
+    #pok3rtool/rawhid/hid_LINUX.c
 )
 
 SET(FILES
@@ -99,4 +99,5 @@ ADD_CUSTOM_TARGET(poker-dummy SOURCES ${FILES})
 
 ADD_EXECUTABLE(pok3rtest ${SOURCES})
 LibChaos_Configure_Target(pok3rtest)
-TARGET_LINK_LIBRARIES(pok3rtest ${LIBUSB_1_LIBRARIES} usb hidapi-hidraw)
+#TARGET_LINK_LIBRARIES(pok3rtest ${LIBUSB_1_LIBRARIES} usb hidapi-hidraw)
+TARGET_LINK_LIBRARIES(pok3rtest ${LIBUSB_1_LIBRARIES} setupapi hid)

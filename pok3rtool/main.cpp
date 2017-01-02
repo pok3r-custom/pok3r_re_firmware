@@ -613,26 +613,25 @@ int main(int argc, char **argv){
     dev.open(HOLTEK_VID, POK3R_RGB_PID, 0xFF00, 0x01);
     return 0;
 
-    int ret = rawhid_open(1, HOLTEK_VID, POK3R_RGB_PID, 0xFF00, 0x01);
-    if(ret <= 0){
-        ELOG("error");
-        return -1;
-    }
-    LOG("ok");
+//    int ret = rawhid_open(1, HOLTEK_VID, POK3R_RGB_PID, 0xFF00, 0x01);
+//    if(ret <= 0){
+//        ELOG("error");
+//        return -1;
+//    }
+//    LOG("ok");
 
-    ZBinary bin(64);
-    bin.fill(0);
-    bin.writeu8(0x12);
-    bin.writeu8(0x20);
+//    ZBinary bin(64);
+//    bin.fill(0);
+//    bin.writeu8(0x12);
+//    bin.writeu8(0x20);
 
-    rawhid_send(0, bin.raw(), bin.size(), 100);
-    rawhid_recv(0, bin.raw(), bin.size(), 100);
+//    rawhid_send(0, bin.raw(), bin.size(), 100);
+//    rawhid_recv(0, bin.raw(), bin.size(), 100);
 
-    RLOG(bin.dumpBytes(4, 8));
+//    RLOG(bin.dumpBytes(4, 8));
 
-    rawhid_close(0);
-    return 0;
-
+//    rawhid_close(0);
+//    return 0;
 
     if(argc > 1){
         ZString cmd = argv[1];

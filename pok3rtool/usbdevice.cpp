@@ -143,16 +143,17 @@ zu16 USBDevice::interrupt_recv(int ep, zbyte *data, zu16 maxlen){
 }
 
 ZArray<USBDevice::Dev> USBDevice::listDevices(){
+    ZArray<Dev> list;
+
     libusb_context *context;
     // Make context
     int status = libusb_init(&context);
     if(status != 0){
         ELOG("Failed to init libusb: " << libusb_error_name(status));
-        return false;
+        return list;
     }
 
     // List devices
-    ZArray<Dev> list;
     libusb_device **devices;
     status = libusb_get_device_list(context, &devices);
     if(status < 0){
