@@ -35,8 +35,15 @@ SET(SOURCES
     pok3rtool/updateinterface.h
 
     pok3rtool/rawhid/hid.h
-    #pok3rtool/rawhid/hid_LINUX.c
 )
+
+IF(${LibChaos_PLATFORM_WINDOWS})
+    SET(SOURCES ${SOURCES} pok3rtool/rawhid/hid_WINDOWS.c)
+ELSEIF(${LibChaos_PLATFORM_MACOSX})
+    SET(SOURCES ${SOURCES} pok3rtool/rawhid/hid_MACOSX.c)
+ELSE()
+    SET(SOURCES ${SOURCES} pok3rtool/rawhid/hid_LINUX.c)
+ENDIF()
 
 SET(FILES
     README.md
@@ -81,6 +88,9 @@ SET(FILES
     firmware/ht32f165x_usbdconf.h
 
     pok3rtool/99-pok3r.rules
+    pok3rtool/rawhid/hid_LINUX.c
+    pok3rtool/rawhid/hid_MACOSX.c
+    pok3rtool/rawhid/hid_WINDOWS.c
 )
 
 ### =================== CONFIG ==================== ###
@@ -99,5 +109,11 @@ ADD_CUSTOM_TARGET(poker-dummy SOURCES ${FILES})
 
 ADD_EXECUTABLE(pok3rtest ${SOURCES})
 LibChaos_Configure_Target(pok3rtest)
-#TARGET_LINK_LIBRARIES(pok3rtest ${LIBUSB_1_LIBRARIES} usb hidapi-hidraw)
-TARGET_LINK_LIBRARIES(pok3rtest ${LIBUSB_1_LIBRARIES} setupapi hid)
+
+IF(${LibChaos_PLATFORM_WINDOWS})
+    TARGET_LINK_LIBRARIES(pok3rtest ${LIBUSB_1_LIBRARIES} setupapi hid)
+ELSEIF(${LibChaos_PLATFORM_MACOSX})
+    TARGET_LINK_LIBRARIES(pok3rtest ${LIBUSB_1_LIBRARIES})
+ELSE()
+    TARGET_LINK_LIBRARIES(pok3rtest ${LIBUSB_1_LIBRARIES} usb hidapi-hidraw)
+ENDIF()
