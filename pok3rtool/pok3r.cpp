@@ -1,26 +1,14 @@
 #include "pok3r.h"
 #include "zlog.h"
 
-void setword(unsigned char *b, int i){
-    b[0]=(i>>0)&0xff;
-    b[1]=(i>>8)&0xff;
-}
+#define UPDATE_USAGE_PAGE   0xff00
+#define UPDATE_USAGE        0x01
+#define UPDATE_PKT_LEN      64
 
-// From http://mdfs.net/Info/Comp/Comms/CRC16.htm
-// CRC-CCITT
-#define poly 0x1021
-zu16 crc16(unsigned char *addr, zu64 size) {
-    zu32 crc = 0;
-    for(zu64 i = 0; i < size; ++i){             /* Step through bytes in memory */
-        crc ^= (zu16)(addr[i] << 8);            /* Fetch byte from memory, XOR into CRC top byte*/
-        for(int j = 0; j < 8; j++){             /* Prepare to rotate 8 bits */
-            crc = crc << 1;                     /* rotate */
-            if(crc & 0x10000)                   /* bit 15 was set (now bit 16)... */
-                crc = (crc ^ poly) & 0xFFFF;    /* XOR with XMODEM polynomic and ensure CRC remains 16-bit value */
-        }
-    }
-    return (zu16)crc;
-}
+#define VER_ADDR            0x2800
+#define FW_ADDR             0x2c00
+
+#define FLASH_LEN           0x20000
 
 Pok3r::Pok3r(){
 
@@ -74,10 +62,19 @@ bool Pok3r::bootloader(){
 
 ZString Pok3r::getVersion(){
     ZBinary bin;
-    if(readFlash(POK3R_VER_ADDR, bin)){
+    if(readFlash(VER_ADDR, bin)){
         return ZString(bin.raw() + 4);
     }
     return "NONE";
+}
+
+ZBinary Pok3r::dumpFlash(){
+    ZBinary dump;
+    for(zu16 i = 0; i < FLASH_LEN; i += 64){
+        if(!readFlash(i, dump))
+            break;
+    }
+    return dump;
 }
 
 bool Pok3r::eraseFlash(zu32 start, zu32 end){
@@ -94,8 +91,10 @@ bool Pok3r::readFlash(zu32 addr, ZBinary &bin){
 
     // Get response
     ZBinary pkt(UPDATE_PKT_LEN);
-    if(!recv(pkt))
+    if(!recv(pkt)){
+        ELOG("recv error");
         return false;
+    }
     bin.write(pkt);
 
     return true;
@@ -136,6 +135,22 @@ zu16 Pok3r::crcFlash(zu32 addr, zu32 len){
     return 0;
 }
 
+// From http://mdfs.net/Info/Comp/Comms/CRC16.htm
+// CRC-CCITT
+#define poly 0x1021
+zu16 crc16(unsigned char *addr, zu64 size) {
+    zu32 crc = 0;
+    for(zu64 i = 0; i < size; ++i){             /* Step through bytes in memory */
+        crc ^= (zu16)(addr[i] << 8);            /* Fetch byte from memory, XOR into CRC top byte*/
+        for(int j = 0; j < 8; j++){             /* Prepare to rotate 8 bits */
+            crc = crc << 1;                     /* rotate */
+            if(crc & 0x10000)                   /* bit 15 was set (now bit 16)... */
+                crc = (crc ^ poly) & 0xFFFF;    /* XOR with XMODEM polynomic and ensure CRC remains 16-bit value */
+        }
+    }
+    return (zu16)crc;
+}
+
 bool Pok3r::sendCmd(zu8 cmd, zu8 subcmd, zu32 a1, zu32 a2, const zbyte *data, zu8 len){
     if(len > 52)
         return false;
@@ -157,7 +172,7 @@ bool Pok3r::sendCmd(zu8 cmd, zu8 subcmd, zu32 a1, zu32 a2, const zbyte *data, zu
 
     // Send command (interrupt write)
     if(!send(packet)){
-        ELOG("Failed to send");
+        ELOG("send error");
         return false;
     }
     return true;

@@ -643,6 +643,16 @@ int main(int argc, char **argv){
             }
             return -1;
 
+        } else if(cmd == "dump"){
+            // Dump
+            ZPointer<UpdateInterface> kb = openDevice();
+            if(kb.ptr()){
+                ZBinary bin = kb->dumpFlash();
+                RLOG(bin.dumpBytes(4, 8));
+                return 0;
+            }
+            return -1;
+
         } else if(cmd == "read"){
             // Read bytes from Pok3r
             if(argc > 4){

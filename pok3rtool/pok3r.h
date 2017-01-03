@@ -12,13 +12,6 @@ using namespace LibChaos;
 #define POK3R_PID           0x0141
 #define POK3R_BOOT_PID      0x1141
 
-#define UPDATE_USAGE_PAGE   0xff00
-#define UPDATE_USAGE        0x01
-#define UPDATE_PKT_LEN      64
-
-#define POK3R_VER_ADDR      0x2800
-#define POK3R_FW_ADDR       0x2c00
-
 // Pok3r Update Protocol
 
 // Read:
@@ -123,6 +116,9 @@ public:
 
     //! Read the firmware version from the keyboard.
     ZString getVersion();
+
+    //! Dump the contents of flash.
+    ZBinary dumpFlash();
 
     //! Erase flash pages starting at \a start, ending on the page of \a end.
     bool eraseFlash(zu32 start, zu32 end);

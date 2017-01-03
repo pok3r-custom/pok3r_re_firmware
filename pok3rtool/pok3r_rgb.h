@@ -12,13 +12,6 @@ using namespace LibChaos;
 #define POK3R_RGB_PID       0x0167
 #define POK3R_RGB_BOOT_PID  0x1167
 
-#define UPDATE_USAGE_PAGE   0xff00
-#define UPDATE_USAGE        0x01
-#define UPDATE_PKT_LEN      64
-
-#define POK3R_RGB_VER_ADDR  0x3000
-#define POK3R_RGB_FW_ADDR   0x3400
-
 class Pok3rRGB : public UpdateInterface, public HIDDevice {
 public:
     enum pok3r_rgb_cmd {
@@ -59,6 +52,7 @@ public:
     //! Read the firmware version from the keyboard.
     ZString getVersion();
 
+    //! Dump the contents of flash.
     ZBinary dumpFlash();
 
     void test();

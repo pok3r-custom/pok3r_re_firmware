@@ -15,6 +15,8 @@ public:
     virtual bool bootloader() = 0;
 
     virtual ZString getVersion() = 0;
+
+    virtual ZBinary dumpFlash(){ return ZBinary(); }
 };
 
 #endif // UPDATEINTERFACE_H

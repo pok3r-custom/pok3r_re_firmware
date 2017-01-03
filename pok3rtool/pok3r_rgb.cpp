@@ -1,6 +1,17 @@
 #include "pok3r_rgb.h"
 #include "zlog.h"
 
+#define UPDATE_USAGE_PAGE   0xff00
+#define UPDATE_USAGE        0x01
+#define UPDATE_PKT_LEN      64
+
+#define UPDATE_ERROR        0xaaff
+
+#define VER_ADDR            0x3000
+#define FW_ADDR             0x3400
+
+#define FLASH_LEN           0x10000
+
 Pok3rRGB::Pok3rRGB(){
 
 }
@@ -27,7 +38,7 @@ bool Pok3rRGB::reboot(){
     ZThread::sleep(3);
     LOG("Open");
     if(!HIDDevice::open(HOLTEK_VID, POK3R_RGB_PID, UPDATE_USAGE_PAGE, UPDATE_USAGE)){
-        ELOG("Couldn't open device");
+        ELOG("open error");
         return false;
     }
     return true;
@@ -41,7 +52,7 @@ bool Pok3rRGB::bootloader(){
     ZThread::sleep(3);
     LOG("Open");
     if(!HIDDevice::open(HOLTEK_VID, POK3R_RGB_BOOT_PID, UPDATE_USAGE_PAGE, UPDATE_USAGE)){
-        ELOG("Couldn't open device");
+        ELOG("open error");
         return false;
     }
     return true;
@@ -49,10 +60,16 @@ bool Pok3rRGB::bootloader(){
 
 ZString Pok3rRGB::getVersion(){
     ZBinary bin(UPDATE_PKT_LEN);
-    if(!sendCmd(READ, 0x20, 0, nullptr, 0))
+    if(!sendCmd(READ, 0x20, 0, nullptr, 0)){
+        ELOG("send error");
+        ELOG(ZLog::RAW << bin.dumpBytes(4, 8));
         return "ERROR";
-    if(!recv(bin))
+    }
+    if(!recv(bin)){
+        ELOG("recv error");
+        ELOG(ZLog::RAW << bin.dumpBytes(4, 8));
         return "ERROR";
+    }
     ZString ver;
     ver.parseUTF16((zu16 *)(bin.raw() + 8), 60);
     return ver;
@@ -60,12 +77,23 @@ ZString Pok3rRGB::getVersion(){
 
 ZBinary Pok3rRGB::dumpFlash(){
     ZBinary dump;
-    for(zu16 i = 0; i < 0x10000 - 60; i += 60){
+    for(zu16 i = 0; i < FLASH_LEN - 60; i += 60){
         ZBinary bin(UPDATE_PKT_LEN);
-        if(!sendCmd(READ, 0xff, i, nullptr, 0))
+        if(!sendCmd(READ, 0xff, i, nullptr, 0)){
+            ELOG("send error");
+            ELOG(ZLog::RAW << bin.dumpBytes(4, 8));
             return dump;
-        if(!recv(bin))
+        }
+        if(!recv(bin)){
+            ELOG("recv error");
+            ELOG(ZLog::RAW << bin.dumpBytes(4, 8));
             return dump;
+        }
+        if(bin.readleu16() == UPDATE_ERROR){
+            ELOG("error response at 0x" << ZString::ItoS((zu64)i, 16));
+            ELOG(ZLog::RAW << bin.dumpBytes(4, 8));
+            break;
+        }
         dump.write(bin.raw() + 4, 60);
     }
     return dump;
@@ -77,7 +105,7 @@ void Pok3rRGB::test(){
         return;
     if(!recv(bin))
         return;
-    RLOG(bin.getSub(4, bin.size()-4).dumpBytes(4, 8));
+    RLOG(bin.getSub(4, bin.size() - 4).dumpBytes(4, 8));
 }
 
 bool Pok3rRGB::sendCmd(zu8 cmd, zu8 a1, zu16 a2, const zbyte *data, zu8 len){
@@ -96,7 +124,7 @@ bool Pok3rRGB::sendCmd(zu8 cmd, zu8 a1, zu16 a2, const zbyte *data, zu8 len){
 
     // Send command (interrupt write)
     if(!send(packet)){
-        ELOG("Failed to send");
+        ELOG("send error");
         return false;
     }
     return true;
