@@ -1,9 +1,10 @@
-## YAPTLYTOTI CMakeLists.txt
+## Pok3r CMakeLists.txt
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 
 PROJECT(Pok3r)
 
 ADD_SUBDIRECTORY(pok3rtool/libchaos)
+ADD_SUBDIRECTORY(pok3rtool/rawhid)
 
 SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/pok3rtool)
 FIND_PACKAGE(LibUSB-1.0 REQUIRED)
@@ -33,17 +34,7 @@ SET(SOURCES
     pok3rtool/usbdevice.cpp
 
     pok3rtool/updateinterface.h
-
-    pok3rtool/rawhid/hid.h
 )
-
-IF(${LibChaos_PLATFORM_WINDOWS})
-    SET(SOURCES ${SOURCES} pok3rtool/rawhid/hid_WINDOWS.c)
-ELSEIF(${LibChaos_PLATFORM_MACOSX})
-    SET(SOURCES ${SOURCES} pok3rtool/rawhid/hid_MACOSX.c)
-ELSE()
-    SET(SOURCES ${SOURCES} pok3rtool/rawhid/hid_LINUX.c)
-ENDIF()
 
 SET(FILES
     README.md
@@ -88,9 +79,6 @@ SET(FILES
     firmware/ht32f165x_usbdconf.h
 
     pok3rtool/99-pok3r.rules
-    pok3rtool/rawhid/hid_LINUX.c
-    pok3rtool/rawhid/hid_MACOSX.c
-    pok3rtool/rawhid/hid_WINDOWS.c
 )
 
 ### =================== CONFIG ==================== ###
@@ -109,11 +97,4 @@ ADD_CUSTOM_TARGET(poker-dummy SOURCES ${FILES})
 
 ADD_EXECUTABLE(pok3rtest ${SOURCES})
 LibChaos_Configure_Target(pok3rtest)
-
-IF(${LibChaos_PLATFORM_WINDOWS})
-    TARGET_LINK_LIBRARIES(pok3rtest ${LIBUSB_1_LIBRARIES} setupapi hid)
-ELSEIF(${LibChaos_PLATFORM_MACOSX})
-    TARGET_LINK_LIBRARIES(pok3rtest ${LIBUSB_1_LIBRARIES})
-ELSE()
-    TARGET_LINK_LIBRARIES(pok3rtest ${LIBUSB_1_LIBRARIES} usb hidapi-hidraw)
-ENDIF()
+TARGET_LINK_LIBRARIES(pok3rtest rawhid ${LIBUSB_1_LIBRARIES})

@@ -4,6 +4,9 @@
 #include "zbinary.h"
 using namespace LibChaos;
 
+#define SEND_TIMEOUT    1000
+#define RECV_TIMEOUT    100
+
 struct HIDDeviceData;
 
 class HIDDevice {

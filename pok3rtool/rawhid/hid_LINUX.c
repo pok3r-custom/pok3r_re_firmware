@@ -35,7 +35,6 @@
 
 #include "hid.h"
 
-
 // On Linux there are several options to access HID devices.
 //
 // libusb 0.1 - the only way that works well on all distributions
@@ -75,49 +74,34 @@
 // PCLinuxOS 2009.2: (would not boot)
 // Slackware: (no live cd available?  www.slackware-live.org dead)
 
-
 #define printf(...)  // comment this out for lots of info
 
-
-// a list of all opened HID devices, so the caller can
-// simply refer to them by number
 typedef struct hid_struct hid_t;
-static hid_t *first_hid = NULL;
-static hid_t *last_hid = NULL;
 struct hid_struct {
     usb_dev_handle *usb;
     int open;
     int iface;
     int ep_in;
     int ep_out;
-    struct hid_struct *prev;
-    struct hid_struct *next;
 };
 
-
 // private functions, not intended to be used from outside this file
-static void add_hid(hid_t *h);
-static hid_t * get_hid(int num);
-static void free_all_hid(void);
 static void hid_close(hid_t *hid);
 static int hid_parse_item(uint32_t *val, uint8_t **data, const uint8_t *end);
 
-
 //  rawhid_recv - receive a packet
 //    Inputs:
-//	num = device to receive from (zero based)
+//	num = device to receive from
 //	buf = buffer to receive packet
 //	len = buffer's size
 //	timeout = time to wait, in milliseconds
 //    Output:
 //	number of bytes received, or -1 on error
 //
-int rawhid_recv(int num, void *buf, int len, int timeout)
+int rawhid_recv(hid_t *hid, void *buf, int len, int timeout)
 {
-    hid_t *hid;
     int r;
 
-    hid = get_hid(num);
     if (!hid || !hid->open) return -1;
     r = usb_interrupt_read(hid->usb, hid->ep_in, buf, len, timeout);
     if (r >= 0) return r;
@@ -127,18 +111,15 @@ int rawhid_recv(int num, void *buf, int len, int timeout)
 
 //  rawhid_send - send a packet
 //    Inputs:
-//	num = device to transmit to (zero based)
+//	num = device to transmit to
 //	buf = buffer containing packet to send
 //	len = number of bytes to transmit
 //	timeout = time to wait, in milliseconds
 //    Output:
 //	number of bytes sent, or -1 on error
 //
-int rawhid_send(int num, void *buf, int len, int timeout)
+int rawhid_send(hid_t *hid, const void *buf, int len, int timeout)
 {
-    hid_t *hid;
-
-    hid = get_hid(num);
     if (!hid || !hid->open) return -1;
     if (hid->ep_out) {
         return usb_interrupt_write(hid->usb, hid->ep_out, buf, len, timeout);
@@ -147,7 +128,7 @@ int rawhid_send(int num, void *buf, int len, int timeout)
     }
 }
 
-//  rawhid_open - open 1 or more devices
+//  rawhid_open - open a device
 //
 //    Inputs:
 //	max = maximum number of devices to open
@@ -156,9 +137,9 @@ int rawhid_send(int num, void *buf, int len, int timeout)
 //	usage_page = top level usage page, or -1 if any
 //	usage = top level usage number, or -1 if any
 //    Output:
-//	actual number of devices opened
+//	device handle
 //
-int rawhid_open(int max, int vid, int pid, int usage_page, int usage)
+hid_t *rawhid_open(int vid, int pid, int usage_page, int usage)
 {
     struct usb_bus *bus;
     struct usb_device *dev;
@@ -167,13 +148,11 @@ int rawhid_open(int max, int vid, int pid, int usage_page, int usage)
     struct usb_endpoint_descriptor *ep;
     usb_dev_handle *u;
     uint8_t buf[1024], *p;
-    int i, n, len, tag, ep_in, ep_out, count=0, claimed;
+    int i, n, len, tag, ep_in, ep_out, claimed;
     uint32_t val=0, parsed_usage, parsed_usage_page;
-    hid_t *hid;
+    hid_t *hid = NULL;
 
-    if (first_hid) free_all_hid();
-    printf("rawhid_open, max=%d\n", max);
-    if (max < 1) return 0;
+    printf("rawhid_open\n");
     usb_init();
     usb_find_busses();
     usb_find_devices();
@@ -249,6 +228,12 @@ int rawhid_open(int max, int vid, int pid, int usage_page, int usage)
                     usb_release_interface(u, i);
                     continue;
                 }
+
+                if(hid){
+                    hid_close(hid);
+                    return NULL;
+                }
+
                 hid = (struct hid_struct *)malloc(sizeof(struct hid_struct));
                 if (!hid) {
                     usb_release_interface(u, i);
@@ -259,32 +244,40 @@ int rawhid_open(int max, int vid, int pid, int usage_page, int usage)
                 hid->ep_in = ep_in;
                 hid->ep_out = ep_out;
                 hid->open = 1;
-                add_hid(hid);
                 claimed++;
-                count++;
-                if (count >= max) return count;
+                return hid;
             }
             if (u && !claimed) usb_close(u);
         }
     }
-    return count;
+    return hid;
 }
-
 
 //  rawhid_close - close a device
 //
 //    Inputs:
-//	num = device to close (zero based)
+//	num = device to close
 //    Output
 //	(nothing)
 //
-void rawhid_close(int num)
+void rawhid_close(hid_t *hid)
 {
-    hid_t *hid;
-
-    hid = get_hid(num);
     if (!hid || !hid->open) return;
     hid_close(hid);
+    free(hid);
+}
+
+static void hid_close(hid_t *hid)
+{
+    hid_t *p;
+    int others=0;
+
+    usb_release_interface(hid->usb, hid->iface);
+    for (p = first_hid; p; p = p->next) {
+        if (p->open && p->usb == hid->usb) others++;
+    }
+    if (!others) usb_close(hid->usb);
+    hid->usb = NULL;
 }
 
 // Chuck Robey wrote a real HID report parser
@@ -322,59 +315,3 @@ static int hid_parse_item(uint32_t *val, uint8_t **data, const uint8_t *end)
     *data += len + 1;
     return tag;
 }
-
-
-static void add_hid(hid_t *h)
-{
-    if (!first_hid || !last_hid) {
-        first_hid = last_hid = h;
-        h->next = h->prev = NULL;
-        return;
-    }
-    last_hid->next = h;
-    h->prev = last_hid;
-    h->next = NULL;
-    last_hid = h;
-}
-
-
-static hid_t * get_hid(int num)
-{
-    hid_t *p;
-    for (p = first_hid; p && num > 0; p = p->next, num--) ;
-    return p;
-}
-
-
-static void free_all_hid(void)
-{
-    hid_t *p, *q;
-
-    for (p = first_hid; p; p = p->next) {
-        hid_close(p);
-    }
-    p = first_hid;
-    while (p) {
-        q = p;
-        p = p->next;
-        free(q);
-    }
-    first_hid = last_hid = NULL;
-}
-
-
-static void hid_close(hid_t *hid)
-{
-    hid_t *p;
-    int others=0;
-
-    usb_release_interface(hid->usb, hid->iface);
-    for (p = first_hid; p; p = p->next) {
-        if (p->open && p->usb == hid->usb) others++;
-    }
-    if (!others) usb_close(hid->usb);
-    hid->usb = NULL;
-}
-
-
-

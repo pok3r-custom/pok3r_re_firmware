@@ -41,13 +41,8 @@
 
 #define printf(...) // comment this out to get lots of info printed
 
-
-// a list of all opened HID devices, so the caller can
-// simply refer to them by number
 typedef struct hid_struct hid_t;
 typedef struct buffer_struct buffer_t;
-static hid_t *first_hid = NULL;
-static hid_t *last_hid = NULL;
 struct hid_struct {
     IOHIDDeviceRef ref;
     int open;
@@ -63,10 +58,10 @@ struct buffer_struct {
     uint8_t buf[BUFFER_SIZE];
 };
 
+hid_t curr = NULL;
+static int count = 0;
+
 // private functions, not intended to be used from outside this file
-static void add_hid(hid_t *);
-static hid_t * get_hid(int);
-static void free_all_hid(void);
 static void hid_close(hid_t *);
 static void attach_callback(void *, IOReturn, void *, IOHIDDeviceRef);
 static void detach_callback(void *, IOReturn, void *hid_mgr, IOHIDDeviceRef dev);
@@ -74,27 +69,23 @@ static void timeout_callback(CFRunLoopTimerRef, void *);
 static void input_callback(void *, IOReturn, void *, IOHIDReportType,
      uint32_t, uint8_t *, CFIndex);
 
-
-
 //  rawhid_recv - receive a packet
 //    Inputs:
-//	num = device to receive from (zero based)
+//	num = device to receive from
 //	buf = buffer to receive packet
 //	len = buffer's size
 //	timeout = time to wait, in milliseconds
 //    Output:
 //	number of bytes received, or -1 on error
 //
-int rawhid_recv(int num, void *buf, int len, int timeout)
+int rawhid_recv(hid_t *hid, void *buf, int len, int timeout)
 {
-    hid_t *hid;
     buffer_t *b;
     CFRunLoopTimerRef timer=NULL;
     CFRunLoopTimerContext context;
     int ret=0, timeout_occurred=0;
 
     if (len < 1) return 0;
-    hid = get_hid(num);
     if (!hid || !hid->open) return -1;
     if ((b = hid->first_buffer) != NULL) {
         if (len > b->len) len = b->len;
@@ -162,7 +153,6 @@ static void timeout_callback(CFRunLoopTimerRef timer, void *info)
     CFRunLoopStop(CFRunLoopGetCurrent());
 }
 
-
 void output_callback(void *context, IOReturn ret, void *sender,
     IOHIDReportType type, uint32_t id, uint8_t *data, CFIndex len)
 {
@@ -176,22 +166,19 @@ void output_callback(void *context, IOReturn ret, void *sender,
     CFRunLoopStop(CFRunLoopGetCurrent());
 }
 
-
 //  rawhid_send - send a packet
 //    Inputs:
-//	num = device to transmit to (zero based)
+//	num = device to transmit to
 //	buf = buffer containing packet to send
 //	len = number of bytes to transmit
 //	timeout = time to wait, in milliseconds
 //    Output:
 //	number of bytes sent, or -1 on error
 //
-int rawhid_send(int num, void *buf, int len, int timeout)
+int rawhid_send(hid_t *hid, const void *buf, int len, int timeout)
 {
-    hid_t *hid;
     int result=-100;
 
-    hid = get_hid(num);
     if (!hid || !hid->open) return -1;
 #if 1
     #warning "Send timeout not implemented on MACOSX"
@@ -228,8 +215,7 @@ int rawhid_send(int num, void *buf, int len, int timeout)
     return result;
 }
 
-
-//  rawhid_open - open 1 or more devices
+//  rawhid_open - open a device
 //
 //    Inputs:
 //	max = maximum number of devices to open
@@ -238,34 +224,32 @@ int rawhid_send(int num, void *buf, int len, int timeout)
 //	usage_page = top level usage page, or -1 if any
 //	usage = top level usage number, or -1 if any
 //    Output:
-//	actual number of devices opened
+//	device handle
 //
-int rawhid_open(int max, int vid, int pid, int usage_page, int usage)
+hid_t *rawhid_open(int vid, int pid, int usage_page, int usage)
 {
-        static IOHIDManagerRef hid_manager=NULL;
-        CFMutableDictionaryRef dict;
-        CFNumberRef num;
-        IOReturn ret;
-    hid_t *p;
-    int count=0;
+    static IOHIDManagerRef hid_manager=NULL;
+    CFMutableDictionaryRef dict;
+    CFNumberRef num;
+    IOReturn ret;
 
-    if (first_hid) free_all_hid();
-    printf("rawhid_open, max=%d\n", max);
-    if (max < 1) return 0;
-        // Start the HID Manager
-        // http://developer.apple.com/technotes/tn2007/tn2187.html
+    printf("rawhid_open\n");
+    // Start the HID Manager
+    // http://developer.apple.com/technotes/tn2007/tn2187.html
     if (!hid_manager) {
-            hid_manager = IOHIDManagerCreate(kCFAllocatorDefault, kIOHIDOptionsTypeNone);
-            if (hid_manager == NULL || CFGetTypeID(hid_manager) != IOHIDManagerGetTypeID()) {
-                    if (hid_manager) CFRelease(hid_manager);
-                    return 0;
-            }
+        hid_manager = IOHIDManagerCreate(kCFAllocatorDefault, kIOHIDOptionsTypeNone);
+        if (hid_manager == NULL || CFGetTypeID(hid_manager) != IOHIDManagerGetTypeID()) {
+            if (hid_manager) CFRelease(hid_manager);
+            return NULL;
+        }
     }
     if (vid > 0 || pid > 0 || usage_page > 0 || usage > 0) {
         // Tell the HID Manager what type of devices we want
-            dict = CFDictionaryCreateMutable(kCFAllocatorDefault, 0,
-                    &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
-            if (!dict) return 0;
+        dict = CFDictionaryCreateMutable(kCFAllocatorDefault, 0,
+                                         &kCFTypeDictionaryKeyCallBacks,
+                                         &kCFTypeDictionaryValueCallBacks);
+        if (!dict)
+            return NULL;
         if (vid > 0) {
             num = CFNumberCreate(kCFAllocatorDefault, kCFNumberIntType, &vid);
             CFDictionarySetValue(dict, CFSTR(kIOHIDVendorIDKey), num);
@@ -286,88 +270,49 @@ int rawhid_open(int max, int vid, int pid, int usage_page, int usage)
             CFDictionarySetValue(dict, CFSTR(kIOHIDPrimaryUsageKey), num);
             CFRelease(num);
         }
-            IOHIDManagerSetDeviceMatching(hid_manager, dict);
-            CFRelease(dict);
+        IOHIDManagerSetDeviceMatching(hid_manager, dict);
+        CFRelease(dict);
     } else {
-            IOHIDManagerSetDeviceMatching(hid_manager, NULL);
+        IOHIDManagerSetDeviceMatching(hid_manager, NULL);
     }
     // set up a callbacks for device attach & detach
-        IOHIDManagerScheduleWithRunLoop(hid_manager, CFRunLoopGetCurrent(),
-        kCFRunLoopDefaultMode);
-        IOHIDManagerRegisterDeviceMatchingCallback(hid_manager, attach_callback, NULL);
+    IOHIDManagerScheduleWithRunLoop(hid_manager,
+                                    CFRunLoopGetCurrent(),
+                                    kCFRunLoopDefaultMode);
+    IOHIDManagerRegisterDeviceMatchingCallback(hid_manager, attach_callback, NULL);
     IOHIDManagerRegisterDeviceRemovalCallback(hid_manager, detach_callback, NULL);
-        ret = IOHIDManagerOpen(hid_manager, kIOHIDOptionsTypeNone);
-        if (ret != kIOReturnSuccess) {
-                IOHIDManagerUnscheduleFromRunLoop(hid_manager,
-                        CFRunLoopGetCurrent(), kCFRunLoopDefaultMode);
-                CFRelease(hid_manager);
-                return 0;
-        }
+    ret = IOHIDManagerOpen(hid_manager, kIOHIDOptionsTypeNone);
+    if (ret != kIOReturnSuccess) {
+        IOHIDManagerUnscheduleFromRunLoop(hid_manager,
+                                          CFRunLoopGetCurrent(),
+                                          kCFRunLoopDefaultMode);
+        CFRelease(hid_manager);
+        return NULL;
+    }
     printf("run loop\n");
     // let it do the callback for all devices
     while (CFRunLoopRunInMode(kCFRunLoopDefaultMode, 0, true) == kCFRunLoopRunHandledSource) ;
-    // count up how many were added by the callback
-    for (p = first_hid; p; p = p->next) count++;
-    return count;
-}
 
+    hid_t *hid = curr;
+    curr = NULL;
+    count = 0;
+    return hid;
+}
 
 //  rawhid_close - close a device
 //
 //    Inputs:
-//	num = device to close (zero based)
+//	num = device to close
 //    Output
 //	(nothing)
 //
-void rawhid_close(int num)
+void rawhid_close(hid_t *hid)
 {
-    hid_t *hid;
-
-    hid = get_hid(num);
     if (!hid || !hid->open) return;
     hid_close(hid);
     hid->open = 0;
+    free(hid);
 }
-
-
-static void add_hid(hid_t *h)
-{
-    if (!first_hid || !last_hid) {
-        first_hid = last_hid = h;
-        h->next = h->prev = NULL;
-        return;
-    }
-    last_hid->next = h;
-    h->prev = last_hid;
-    h->next = NULL;
-    last_hid = h;
-}
-
-
-static hid_t * get_hid(int num)
-{
-    hid_t *p;
-    for (p = first_hid; p && num > 0; p = p->next, num--) ;
-    return p;
-}
-
-
-static void free_all_hid(void)
-{
-    hid_t *p, *q;
-
-    for (p = first_hid; p; p = p->next) {
-        hid_close(p);
-    }
-    p = first_hid;
-    while (p) {
-        q = p;
-        p = p->next;
-        free(q);
-    }
-    first_hid = last_hid = NULL;
-}
-
 
 static void hid_close(hid_t *hid)
 {
@@ -379,34 +324,42 @@ static void hid_close(hid_t *hid)
 
 static void detach_callback(void *context, IOReturn r, void *hid_mgr, IOHIDDeviceRef dev)
 {
-    hid_t *p;
+    hid_t *hid;
 
     printf("detach callback\n");
-    for (p = first_hid; p; p = p->next) {
-        if (p->ref == dev) {
-            p->open = 0;
+    for (hid = first_hid; hid; hid = hid->next) {
+        if (hid->ref == dev) {
+            hid->open = 0;
             CFRunLoopStop(CFRunLoopGetCurrent());
             return;
         }
     }
 }
 
-
 static void attach_callback(void *context, IOReturn r, void *hid_mgr, IOHIDDeviceRef dev)
 {
-    struct hid_struct *h;
+    hid_t *hid;
 
     printf("attach callback\n");
-    if (IOHIDDeviceOpen(dev, kIOHIDOptionsTypeNone) != kIOReturnSuccess) return;
-    h = (hid_t *)malloc(sizeof(hid_t));
-    if (!h) return;
-    memset(h, 0, sizeof(hid_t));
+    if (IOHIDDeviceOpen(dev, kIOHIDOptionsTypeNone) != kIOReturnSuccess)
+        return;
+
+    if(count){
+        hid_close(hid);
+        curr = NULL;
+        return false;
+    }
+
+    hid = (hid_t *)malloc(sizeof(hid_t));
+    if (!hid)
+        return;
+    memset(hid, 0, sizeof(hid_t));
     IOHIDDeviceScheduleWithRunLoop(dev, CFRunLoopGetCurrent(), kCFRunLoopDefaultMode);
-    IOHIDDeviceRegisterInputReportCallback(dev, h->buffer, sizeof(h->buffer),
-        input_callback, h);
-    h->ref = dev;
-    h->open = 1;
-    add_hid(h);
+    IOHIDDeviceRegisterInputReportCallback(dev, hid->buffer, sizeof(hid->buffer),
+        input_callback, hid);
+    hid->ref = dev;
+    hid->open = 1;
+
+    count++;
+    curr = hid;
 }
-
-
