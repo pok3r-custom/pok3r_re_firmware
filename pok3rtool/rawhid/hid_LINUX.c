@@ -85,6 +85,8 @@ struct hid_struct {
     int ep_out;
 };
 
+static int count = 0;
+
 // private functions, not intended to be used from outside this file
 static void hid_close(hid_t *hid);
 static int hid_parse_item(uint32_t *val, uint8_t **data, const uint8_t *end);
@@ -245,6 +247,7 @@ hid_t *rawhid_open(int vid, int pid, int usage_page, int usage)
                 hid->ep_out = ep_out;
                 hid->open = 1;
                 claimed++;
+                count++;
                 return hid;
             }
             if (u && !claimed) usb_close(u);
@@ -270,13 +273,11 @@ void rawhid_close(hid_t *hid)
 static void hid_close(hid_t *hid)
 {
     hid_t *p;
-    int others=0;
 
     usb_release_interface(hid->usb, hid->iface);
-    for (p = first_hid; p; p = p->next) {
-        if (p->open && p->usb == hid->usb) others++;
-    }
-    if (!others) usb_close(hid->usb);
+    count--;
+    if(count == 0)
+        usb_close(hid->usb);
     hid->usb = NULL;
 }
 

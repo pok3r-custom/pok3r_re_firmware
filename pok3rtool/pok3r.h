@@ -2,9 +2,7 @@
 #define POK3R_H
 
 #include "updateinterface.h"
-#include "usbdevice.h"
-
-#include "libusb.h"
+#include "hiddevice.h"
 
 #include "zstring.h"
 #include "zbinary.h"
@@ -14,9 +12,9 @@ using namespace LibChaos;
 #define POK3R_PID           0x0141
 #define POK3R_BOOT_PID      0x1141
 
-#define RECV_EP             3
-#define SEND_EP             4
-#define PKT_LEN             64
+#define UPDATE_USAGE_PAGE   0xff00
+#define UPDATE_USAGE        0x01
+#define UPDATE_PKT_LEN      64
 
 #define POK3R_VER_ADDR      0x2800
 #define POK3R_FW_ADDR       0x2c00
@@ -80,7 +78,7 @@ using namespace LibChaos;
 //   0x03
 //   Zero Padding
 
-class Pok3r : public UpdateInterface {
+class Pok3r : public UpdateInterface, public HIDDevice {
 public:
     enum pok3r_cmd {
         ERASE_CMD               = 0,    // Erase pages of flash
@@ -112,13 +110,11 @@ public:
     };
 
 public:
-    Pok3r(ZPointer<USBDevice> device = new USBDevice);
+    Pok3r();
     ~Pok3r();
 
-    bool open(){ return device->open(); }
-
-    //! Find a Pok3r keyboard.
-    bool findPok3r();
+    //! Find and open POK3R device.
+    bool open();
 
     //! Reset and re-open device.
     bool reboot();
@@ -148,15 +144,10 @@ public:
 private:
     //! Send command
     bool sendCmd(zu8 cmd, zu8 subcmd, zu32 a1, zu32 a2, const zbyte *data, zu8 len);
-    //! Receive data (64 bytes)
-    bool recvDat(zbyte *data);
 
 public:
     static void decode_firmware(ZBinary &bin);
     static void encode_firmware(ZBinary &bin);
-
-private:
-    ZPointer<USBDevice> device;
 };
 
 #endif // POK3R_H

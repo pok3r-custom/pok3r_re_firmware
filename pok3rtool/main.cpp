@@ -4,6 +4,7 @@
 #include "zlog.h"
 #include "zfile.h"
 #include "zhash.h"
+#include "zpointer.h"
 
 extern "C" {
 #include "rawhid/hid.h"
@@ -565,43 +566,19 @@ int encode_patch_updater(ZPath exein, ZPath fwin, ZPath exeout){
 }
 
 ZPointer<UpdateInterface> openDevice(){
-    int count = 0;
     ZPointer<UpdateInterface> kb;
-    auto list = USBDevice::listDevices();
-    for(zu64 i = 0; i < list.size(); ++i){
-        if(list[i].vid == HOLTEK_VID){
-            switch(list[i].pid){
-                case POK3R_PID:
-                    LOG("Found POK3R");
-                    kb = new Pok3r(list[i].dev);
-                    count++;
-                    break;
-                case POK3R_BOOT_PID:
-                    LOG("Found POK3R (builtin)");
-                    kb = new Pok3r(list[i].dev);
-                    count++;
-                    break;
-                case POK3R_RGB_PID:
-                    LOG("Found POK3R RGB");
-                    kb = new Pok3rRGB(list[i].dev);
-                    count++;
-                    break;
-                case POK3R_RGB_BOOT_PID:
-                    LOG("Found POK3R RGB (builtin)");
-                    kb = new Pok3rRGB(list[i].dev);
-                    count++;
-                    break;
-                default:
-                    break;
-            }
-        }
-    }
-    if(count == 1){
-        kb->open();
+
+    // POK3R
+    kb = new Pok3r();
+    if(kb->open())
         return kb;
-    } else if(count > 1){
-        ELOG("Multiple devices found");
-    }
+
+    // POK3R RGB
+    kb = new Pok3rRGB();
+    if(kb->open())
+        return kb;
+
+    ELOG("Failed to open");
     return nullptr;
 }
 
@@ -609,38 +586,18 @@ int main(int argc, char **argv){
     ZLog::logLevelStdOut(ZLog::INFO, "%time% %thread% N %log%");
     ZLog::logLevelStdErr(ZLog::ERRORS, "\x1b[31m%time% %thread% E [%file%:%line%] %log%\x1b[m");
 
-    HIDDevice dev;
-    LOG(dev.open(HOLTEK_VID, POK3R_RGB_PID, 0xFF00, 0x01));
-
-    ZBinary bin(64);
-    bin.fill(0);
-    bin.writeu8(0x12);
-    bin.writeu8(0x20);
-
-    LOG(dev.send(bin));
-    LOG(dev.recv(bin));
-
-    RLOG(bin.dumpBytes(4, 8));
-    return 0;
-
-//    int ret = rawhid_open(1, HOLTEK_VID, POK3R_RGB_PID, 0xFF00, 0x01);
-//    if(ret <= 0){
-//        ELOG("error");
-//        return -1;
-//    }
-//    LOG("ok");
+//    HIDDevice dev;
+//    LOG(dev.open(HOLTEK_VID, POK3R_RGB_PID, 0xFF00, 0x01));
 
 //    ZBinary bin(64);
 //    bin.fill(0);
 //    bin.writeu8(0x12);
 //    bin.writeu8(0x20);
 
-//    rawhid_send(0, bin.raw(), bin.size(), 100);
-//    rawhid_recv(0, bin.raw(), bin.size(), 100);
+//    LOG(dev.send(bin));
+//    LOG(dev.recv(bin));
 
 //    RLOG(bin.dumpBytes(4, 8));
-
-//    rawhid_close(0);
 //    return 0;
 
     if(argc > 1){
@@ -669,9 +626,6 @@ int main(int argc, char **argv){
             ZPointer<UpdateInterface> kb = openDevice();
             if(kb.ptr()){
                 LOG(kb->reboot());
-                ZThread::sleep(3);
-
-                kb = openDevice();
                 // Read version
                 LOG("Version: " << kb->getVersion());
                 return 0;
@@ -683,9 +637,6 @@ int main(int argc, char **argv){
             ZPointer<UpdateInterface> kb = openDevice();
             if(kb.ptr()){
                 LOG(kb->bootloader());
-                ZThread::sleep(3);
-
-                kb = openDevice();
                 // Read version
                 LOG("Version: " << kb->getVersion());
                 return 0;

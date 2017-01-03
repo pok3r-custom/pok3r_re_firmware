@@ -5,7 +5,7 @@
 using namespace LibChaos;
 
 #define SEND_TIMEOUT    1000
-#define RECV_TIMEOUT    100
+#define RECV_TIMEOUT    1000
 
 struct HIDDeviceData;
 
@@ -15,6 +15,7 @@ public:
     ~HIDDevice();
 
     bool open(zu16 vid, zu16 pid, zu16 upage, zu16 usage);
+    void close();
 
     bool send(const ZBinary &data);
     bool recv(ZBinary &data);

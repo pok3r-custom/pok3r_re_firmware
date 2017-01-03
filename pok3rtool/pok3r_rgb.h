@@ -2,7 +2,7 @@
 #define POK3R_RGB_H
 
 #include "updateinterface.h"
-#include "usbdevice.h"
+#include "hiddevice.h"
 
 #include "zstring.h"
 #include "zbinary.h"
@@ -12,14 +12,14 @@ using namespace LibChaos;
 #define POK3R_RGB_PID       0x0167
 #define POK3R_RGB_BOOT_PID  0x1167
 
-#define RECV_EP             3
-#define SEND_EP             4
-#define PKT_LEN             64
+#define UPDATE_USAGE_PAGE   0xff00
+#define UPDATE_USAGE        0x01
+#define UPDATE_PKT_LEN      64
 
 #define POK3R_RGB_VER_ADDR  0x3000
 #define POK3R_RGB_FW_ADDR   0x3400
 
-class Pok3rRGB : public UpdateInterface {
+class Pok3rRGB : public UpdateInterface, public HIDDevice {
 public:
     enum pok3r_rgb_cmd {
         CMD_16      = 0x10,
@@ -45,13 +45,11 @@ public:
     };
 
 public:
-    Pok3rRGB(ZPointer<USBDevice> device = new USBDevice);
+    Pok3rRGB();
     ~Pok3rRGB();
 
-    bool open(){ return device->open(); }
-
-    //! Find a Pok3r RGB keyboard.
-    bool findPok3rRGB();
+    //! Find and open POK3R RGB device.
+    bool open();
 
     //! Reset and re-open device.
     bool reboot();
@@ -68,15 +66,10 @@ public:
 private:
     //! Send command
     bool sendCmd(zu8 cmd, zu8 a1, zu16 a2, const zbyte *data, zu8 len);
-    //! Receive data (64 bytes)
-    bool recvDat(zbyte *data);
 
 public:
     static void decode_firmware(ZBinary &bin);
     static void encode_firmware(ZBinary &bin);
-
-private:
-    ZPointer<USBDevice> device;
 };
 
 #endif // POK3R_RGB_H

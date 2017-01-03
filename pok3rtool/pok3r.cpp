@@ -22,7 +22,7 @@ zu16 crc16(unsigned char *addr, zu64 size) {
     return (zu16)crc;
 }
 
-Pok3r::Pok3r(ZPointer<USBDevice> dev) : device(dev){
+Pok3r::Pok3r(){
 
 }
 
@@ -30,12 +30,12 @@ Pok3r::~Pok3r(){
 
 }
 
-bool Pok3r::findPok3r(){
+bool Pok3r::open(){
     // Try firmware vid and pid
-    if(device->findUSBVidPid(HOLTEK_VID, POK3R_PID))
+    if(HIDDevice::open(HOLTEK_VID, POK3R_PID, UPDATE_USAGE_PAGE, UPDATE_USAGE))
         return true;
     // Try builtin vid and pid
-    if(device->findUSBVidPid(HOLTEK_VID, POK3R_BOOT_PID))
+    if(HIDDevice::open(HOLTEK_VID, POK3R_BOOT_PID, UPDATE_USAGE_PAGE, UPDATE_USAGE))
         return true;
     return false;
 }
@@ -61,22 +61,14 @@ bool Pok3r::bootloader(){
     ZThread::sleep(3);
 
     // Close old handle
-    device->close();
+    close();
 
     // Find device with new loader vid and pid
     LOG("Find...");
-    if(!device->findUSBVidPid(HOLTEK_VID, POK3R_BOOT_PID)){
+    if(!HIDDevice::open(HOLTEK_VID, POK3R_BOOT_PID, UPDATE_USAGE_PAGE, UPDATE_USAGE)){
         ELOG("Couldn't open device");
         return false;
     }
-
-    // Open new handle
-    LOG("Open...");
-    if(!device->open()){
-        ELOG("Open error");
-        return false;
-    }
-
     return true;
 }
 
@@ -101,10 +93,10 @@ bool Pok3r::readFlash(zu32 addr, ZBinary &bin){
         return false;
 
     // Get response
-    zu64 pos = bin.size();
-    bin.resize(bin.size() + 64);
-    if(!recvDat(bin.raw() + pos))
+    ZBinary pkt(UPDATE_PKT_LEN);
+    if(!recv(pkt))
         return false;
+    bin.write(pkt);
 
     return true;
 }
@@ -125,7 +117,7 @@ bool Pok3r::updateStart(ZBinary &bin){
 
     // Get response
     bin.resize(64);
-    if(!recvDat(bin.raw()))
+    if(!recv(bin))
         return false;
 
     return true;
@@ -145,11 +137,11 @@ zu16 Pok3r::crcFlash(zu32 addr, zu32 len){
 }
 
 bool Pok3r::sendCmd(zu8 cmd, zu8 subcmd, zu32 a1, zu32 a2, const zbyte *data, zu8 len){
-    if(!device.ptr() || len > 52)
+    if(len > 52)
         return false;
 
-    ZBinary packet;
-    packet.fill(0, PKT_LEN);
+    ZBinary packet(UPDATE_PKT_LEN);
+    packet.fill(0);
     packet.writeu8(cmd);      // command
     packet.writeu8(subcmd);   // subcommand
     packet.seek(4);
@@ -161,37 +153,13 @@ bool Pok3r::sendCmd(zu8 cmd, zu8 subcmd, zu32 a1, zu32 a2, const zbyte *data, zu
     }
 
     packet.seek(2);
-    packet.writeleu16(crc16(packet.raw(), PKT_LEN)); // CRC
-
-    // debug
-//    RLOG(packet.dumpBytes(4, 8));
+    packet.writeleu16(crc16(packet.raw(), UPDATE_PKT_LEN)); // CRC
 
     // Send command (interrupt write)
-    zu16 olen = device->interrupt_send(SEND_EP, packet.raw(), PKT_LEN);
-
-    if(olen != PKT_LEN){
-        ELOG("Failed to send: length " << olen);
+    if(!send(packet)){
+        ELOG("Failed to send");
         return false;
     }
-
-    return true;
-}
-
-bool Pok3r::recvDat(zbyte *data){
-    if(!device.ptr() || !data)
-        return false;
-
-    // Recv data (interrupt read)
-    zu16 olen = device->interrupt_recv(RECV_EP, data, PKT_LEN);
-
-    if(olen != PKT_LEN){
-        ELOG("Failed to recv: length " << olen);
-        return false;
-    }
-
-    // debug
-//    RLOG(ZBinary(data, PKT_LEN).dumpBytes(4, 8));
-
     return true;
 }
 

@@ -1,7 +1,7 @@
 #include "pok3r_rgb.h"
 #include "zlog.h"
 
-Pok3rRGB::Pok3rRGB(ZPointer<USBDevice> dev) : device(dev){
+Pok3rRGB::Pok3rRGB(){
 
 }
 
@@ -9,9 +9,12 @@ Pok3rRGB::~Pok3rRGB(){
 
 }
 
-bool Pok3rRGB::findPok3rRGB(){
+bool Pok3rRGB::open(){
     // Try firmware vid and pid
-    if(device->findUSBVidPid(HOLTEK_VID, POK3R_RGB_PID))
+    if(HIDDevice::open(HOLTEK_VID, POK3R_RGB_PID, UPDATE_USAGE_PAGE, UPDATE_USAGE))
+        return true;
+    // Try builtin vid and pid
+    if(HIDDevice::open(HOLTEK_VID, POK3R_RGB_BOOT_PID, UPDATE_USAGE_PAGE, UPDATE_USAGE))
         return true;
     return false;
 }
@@ -20,39 +23,35 @@ bool Pok3rRGB::reboot(){
     LOG("Reset");
     if(!sendCmd(RESET, RESET_FW, 0, nullptr, 0))
         return false;
-    device->close();
+    close();
+    ZThread::sleep(3);
+    LOG("Open");
+    if(!HIDDevice::open(HOLTEK_VID, POK3R_RGB_PID, UPDATE_USAGE_PAGE, UPDATE_USAGE)){
+        ELOG("Couldn't open device");
+        return false;
+    }
     return true;
-//    LOG("Wait...");
-//    ZThread::sleep(3);
-//    if(!device->findUSBVidPid(HOLTEK_VID, POK3R_RGB_PID))
-//        return false;
-//    if(!device->open())
-//        return false;
-//    LOG("OK");
-//    return true;
 }
 
 bool Pok3rRGB::bootloader(){
     LOG("Reset");
     if(!sendCmd(RESET, RESET_BL, 0, nullptr, 0))
         return false;
-    device->close();
+    close();
+    ZThread::sleep(3);
+    LOG("Open");
+    if(!HIDDevice::open(HOLTEK_VID, POK3R_RGB_BOOT_PID, UPDATE_USAGE_PAGE, UPDATE_USAGE)){
+        ELOG("Couldn't open device");
+        return false;
+    }
     return true;
-//    LOG("Wait...");
-//    ZThread::sleep(3);
-//    if(!device->findUSBVidPid(HOLTEK_VID, POK3R_RGB_BOOT_PID))
-//        return false;
-//    if(!device->open())
-//        return false;
-//    LOG("OK");
-//    return true;
 }
 
 ZString Pok3rRGB::getVersion(){
-    ZBinary bin(PKT_LEN);
+    ZBinary bin(UPDATE_PKT_LEN);
     if(!sendCmd(READ, 0x20, 0, nullptr, 0))
         return "ERROR";
-    if(!recvDat(bin.raw()))
+    if(!recv(bin))
         return "ERROR";
     ZString ver;
     ver.parseUTF16((zu16 *)(bin.raw() + 8), 60);
@@ -62,33 +61,31 @@ ZString Pok3rRGB::getVersion(){
 ZBinary Pok3rRGB::dumpFlash(){
     ZBinary dump;
     for(zu16 i = 0; i < 0x10000 - 60; i += 60){
-        ZBinary bin(PKT_LEN);
+        ZBinary bin(UPDATE_PKT_LEN);
         if(!sendCmd(READ, 0xff, i, nullptr, 0))
             return dump;
-        if(!recvDat(bin.raw()))
+        if(!recv(bin))
             return dump;
-
-//        RLOG(bin.dumpBytes(4, 8));
         dump.write(bin.raw() + 4, 60);
     }
     return dump;
 }
 
 void Pok3rRGB::test(){
-    ZBinary bin(PKT_LEN);
+    ZBinary bin(UPDATE_PKT_LEN);
     if(!sendCmd(READ, READ_400, 0, nullptr, 0))
         return;
-    if(!recvDat(bin.raw()))
+    if(!recv(bin))
         return;
     RLOG(bin.getSub(4, bin.size()-4).dumpBytes(4, 8));
 }
 
 bool Pok3rRGB::sendCmd(zu8 cmd, zu8 a1, zu16 a2, const zbyte *data, zu8 len){
-    if(!device.ptr() || len > 52)
+    if(len > 52)
         return false;
 
-    ZBinary packet;
-    packet.fill(0, PKT_LEN);
+    ZBinary packet(UPDATE_PKT_LEN);
+    packet.fill(0);
     packet.writeu8(cmd);    // command
     packet.writeu8(a1);     // argument
     packet.writeleu16(a2);  // patch argument
@@ -97,35 +94,11 @@ bool Pok3rRGB::sendCmd(zu8 cmd, zu8 a1, zu16 a2, const zbyte *data, zu8 len){
         packet.write(data, len);  // data
     }
 
-    // debug
-//    RLOG(packet.dumpBytes(4, 8));
-
     // Send command (interrupt write)
-    zu16 olen = device->interrupt_send(SEND_EP, packet.raw(), PKT_LEN);
-
-    if(olen != PKT_LEN){
-        ELOG("Failed to send: length " << olen);
+    if(!send(packet)){
+        ELOG("Failed to send");
         return false;
     }
-
-    return true;
-}
-
-bool Pok3rRGB::recvDat(zbyte *data){
-    if(!device.ptr() || !data)
-        return false;
-
-    // Recv data (interrupt read)
-    zu16 olen = device->interrupt_recv(RECV_EP, data, PKT_LEN);
-
-    if(olen != PKT_LEN){
-        ELOG("Failed to recv: length " << olen);
-        return false;
-    }
-
-    // debug
-//    RLOG(ZBinary(data, PKT_LEN).dumpBytes(4, 8));
-
     return true;
 }
 
