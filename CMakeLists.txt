@@ -37,12 +37,12 @@ SET(FILES
     disassemble/v130/fw_xor_decode.c
 
     firmware/main.c
+    firmware/startup.s
 
     firmware/Makefile
-    firmware/linker.ld
+    firmware/pok3r.ld
 
     firmware/pok3r-jlink.cfg
-    firmware/pok3r-buspirate.cfg
 
     firmware/ht32/ht32_usbd_class.h
     firmware/ht32/ht32_usbd_class.c
