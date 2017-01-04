@@ -1,5 +1,7 @@
 Firmware v130 Exploit Patch:
 
+This patch will allow the contents of flash to be read out of a POK3R RGB keyboard.
+
     5d28:   28ff        cmp r0, #255
     5d2a:   d104        bne.n 0x5d36
     5d2c:   8868        ldrh r0, [r5, #2]

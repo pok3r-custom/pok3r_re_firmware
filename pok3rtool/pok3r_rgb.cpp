@@ -61,7 +61,6 @@ bool Pok3rRGB::bootloader(){
 ZString Pok3rRGB::getVersion(){
     ZBinary bin(UPDATE_PKT_LEN);
     if(!sendCmd(READ, 0x20, 0, nullptr, 0)){
-        ELOG("send error");
         ELOG(ZLog::RAW << bin.dumpBytes(4, 8));
         return "ERROR";
     }

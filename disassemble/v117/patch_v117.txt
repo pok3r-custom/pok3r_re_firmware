@@ -1,0 +1,5 @@
+Firmware v117 Exploit Patch:
+
+This patch will allow the contents of flash to be read out of a POK3R keyboard.
+
+    725a:   46c0        nop

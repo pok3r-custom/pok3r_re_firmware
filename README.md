@@ -14,6 +14,7 @@ this in my free time for fun, as such there are no guarantees of progress or suc
     - Application to write new firmware to POK3R RGB over USB. *TODO*
 - New Firmware
     - Open-source firmware compatible with POK3R and POK3R RGB. *TODO*
+        - Patch OpenOCD to allow JTAG flashing of HT32. **DONE**
         - Firmware can be installed from Vortex firmware over USB (no hardware required).
         - Firmware can be rolled back with Votex firmware update application.
 
@@ -23,7 +24,12 @@ with the protocol used to read the version number during an update. This is effe
 accomplished by changing a single byte in the Vortex firmware updater. In the v117 updater,
 changing the byte `0x09` at `0x1A7E5E` to `0x07` will patch the firmware update to allow reading
 flash. This circumvents a test in the code that normally only allows reading between 0x2800 and
-0x2C00. The relevant disassembly for this is at 0x7240 of the v117 firmware.
+0x2C00. The relevant disassembly for this is at 0x7240 of the v117 firmware. See patch_v117.txt.
+
+### POK3R RGB Firmware Patch
+The POK3R RGB update protocol is more minimal, and inherently doesn't allow reading arbitrary
+offsets. The equivalent patch for the POK3R RGB adds the ability to read from arbitrary addresses
+to the update protocol. See patch_v130.txt
 
 ### Usage
 The `pok3rtool` application is built with CMake. You will need the LibChaos submodule cloned, and
@@ -41,9 +47,9 @@ please tell me, because it stopped working on my machine.
     ./pok3rtest encode <path to firmware image> <output>
     ./pok3rtest encodepatch <path to updater> <path to firmware> <output updater>
 
-This will attempt to read the 128K flash:
+This will attempt to dump the contents of flash:
 
-    ./pok3rtest read 0x0 0x20000 pok3rdump_flash.bin
+    ./pok3rtest dump pok3rdump_flash.bin
 
 Without the patch, it will read a lot of 0x00. With the single-instruction patch, the tool will
 read back the entirety of flash, including the unencrypted firmware.
