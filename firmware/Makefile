@@ -5,11 +5,11 @@ APP_NAME = pok3r
 SRC_DIR = .
 BIN_DIR = build
 
-OUTPUT = $(BIN_DIR)/$(APP_NAME)
+OUTPUT = $(APP_NAME)
 
 CC = arm-none-eabi-gcc
 AS = arm-none-eabi-as
-LD = arm-none-eabi-gcc
+LD = arm-none-eabi-ld
 OC = arm-none-eabi-objcopy
 
 RM = rm
@@ -17,24 +17,27 @@ MKDIR = mkdir -p
 
 ARM_CPU = arm7tdmi
 
-CC_FLAGS = -gdwarf-2 -c -mcpu=$(ARM_CPU) -mthumb-interwork -O -mlong-calls -ffunction-sections -Wall -o$@
-AS_FLAGS = -gdwarf2 -mcpu=$(ARM_CPU) -mthumb-interwork -o$@
-LD_FLAGS = -T $(SRC_DIR)/$(APP_NAME).ld -o $(OUTPUT).elf -Wl,-Map,$(OUTPUT).map,--cref -lm
+CC_FLAGS = -c -mthumb -nostdlib -nostartfiles -ffreestanding -Wall -o $@
+AS_FLAGS = -o $@
+LD_FLAGS = -T $(SRC_DIR)/$(APP_NAME).ld -Map $(OUTOUT).map -o $(OUTPUT).elf
 
 all: $(OUTPUT).bin
 
 $(OUTPUT).bin: $(OUTPUT).elf
-	$(OC) -O binary $(OUTPUT).elf $(OUTPUT).bin
+	$(OC) $(OUTPUT).elf -O binary $(OUTPUT).bin
 	
-$(OUTPUT).elf: $(SRC_DIR)/$(APP_NAME).ld $(BIN_DIR)/startup.o
+$(OUTPUT).elf: $(SRC_DIR)/$(APP_NAME).ld startup.o
 	$(MKDIR) $(BIN_DIR)
-	$(LD) $(BIN_DIR)/startup.o $(LD_FLAGS)
+	$(LD) $(LD_FLAGS) startup.o main.o
 	
-$(BIN_DIR)/startup.o: $(SRC_DIR)/startup.s
+startup.o: $(SRC_DIR)/startup.s
 	$(AS) $(AS_FLAGS) $<
 	
+main.o: $(SRC_DIR)/main.c
+	$(CC) $(CC_FLAGS) $<
+	
 clean:
-	-$(RM) $(BIN_DIR)\$(OUTPUT).bin
-	-$(RM) $(BIN_DIR)\$(OUTPUT).elf
-	-$(RM) $(BIN_DIR)\*.o
-	-$(RM) $(BIN_DIR)\*.map
+	-$(RM) $(OUTPUT).bin
+	-$(RM) $(OUTPUT).elf
+	-$(RM) *.o
+	-$(RM) *.map

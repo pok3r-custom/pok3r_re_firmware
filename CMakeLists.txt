@@ -44,6 +44,7 @@ SET(FILES
 
     firmware/pok3r-jlink.cfg
 
+    firmware/ht32/main.c
     firmware/ht32/ht32_usbd_class.h
     firmware/ht32/ht32_usbd_class.c
     firmware/ht32/ht32_usbd_descriptor.h

@@ -25,89 +25,54 @@ SECTIONS {
 
     /* vector table and reset code */
     .reset : {
-        startup.o (.text)
+        startup.o(.text)
         . = ALIGN(4);
-    } >flash
+    } > flash
 
     /* main code */
     .text : {
-        CREATE_OBJECT_SYMBOLS
-
-        *(.text .text.* .gnu.linkonce.t.*)
-        *(.plt)
-        *(.gnu.warning)
+        *(.text .text.*)
         *(.glue_7t) *(.glue_7)
 
         . = ALIGN (4);
-        *(.rodata .rodata.* .gnu.linkonce.r.*)
-    } >flash
-
-
-    .ARM.exidx : {
-        __exidx_start = .;
-        *(.ARM.exidx* .gnu.linkonce.armexidx.*)
-        __exidx_end = .;
+        *(.rodata .rodata.*)
     } > flash
-    _etext = .;
 
-    /* data  */
-    .data : {
-        __data_load = LOADADDR (.data);
-        __data_start = .;
-
-        *(.data .data.* .gnu.linkonce.d.*)
-
-        . = ALIGN (4);
-        _edata = .;
-    } >sram AT>flash
-
-    .bss : {
-        __bss_start__ = . ;
-        *(.shbss)
-        *(.bss .bss.* .gnu.linkonce.b.*)
-        *(COMMON)
-        . = ALIGN (8);
-        __bss_end__ = .;
-    } >sram
-
+    /* stack */
     .stack : {
-        __stack_start__ = . ;
-
-        . += IRQ_STACK_SIZE;
-        . = ALIGN (4);
-        __irq_stack_top__ = . ;
-
-        . += FIQ_STACK_SIZE;
-        . = ALIGN (4);
-        __fiq_stack_top__ = . ;
-
-        . += SVC_STACK_SIZE;
-        . = ALIGN (4);
-        __svc_stack_top__ = . ;
-
-        . += ABT_STACK_SIZE;
-        . = ALIGN (4);
-        __abt_stack_top__ = . ;
-
-        . += UND_STACK_SIZE;
-        . = ALIGN (4);
-        __und_stack_top__ = . ;
+        __stack_start = .;
 
         . += C_STACK_SIZE;
         . = ALIGN (4);
-        __c_stack_top__ = . ;
 
-        __stack_end__ = .;
-    } >sram
+        __stack_end = .;
+    } > sram
 
-    _end = . ;
-    __end = . ;
-    PROVIDE(end = .);
+    /* uninitialized data */
+    .bss : {
+        __bss_start = .;
 
+        *(.bss .bss.*)
+        . = ALIGN (8);
+
+        __bss_end = .;
+    } > sram
+
+    /* data loaded from flash to sram */
+    .data : {
+        __data_load = LOADADDR(.data);
+        __data_start = .;
+
+        *(.data .data.*)
+        . = ALIGN (4);
+
+        __data_end = .;
+    } > sram AT > flash
+
+    /* stabs are not included */
     .stab 0 (NOLOAD) : {
         *(.stab)
     }
-
     .stabstr 0 (NOLOAD) : {
         *(.stabstr)
     }
