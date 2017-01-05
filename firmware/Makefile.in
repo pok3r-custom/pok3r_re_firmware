@@ -1,0 +1,70 @@
+# Makefile for ARM7 Cortex-M3
+
+APP_NAME = @OUT_NAME@
+
+# Files
+SRC_DIR = @CMAKE_CURRENT_SOURCE_DIR@
+BIN_DIR = @CMAKE_CURRENT_BINARY_DIR@/$(APP_NAME)
+OUT_DIR = @CMAKE_BINARY_DIR@
+
+OUT_ELF = $(BIN_DIR)/$(APP_NAME).elf
+OUT_BIN = $(OUT_DIR)/$(APP_NAME).bin
+OUT_MAP = $(BIN_DIR)/$(APP_NAME).map
+
+AS_SRCS = startup.s
+CC_SRCS = main.c usb/usb.c usb/descriptors.c
+
+#AS_SRCPATHS := $(addprefix $(SRC_DIR)/, $(AS_SRCS))
+#CC_SRCPATHS := $(addprefix $(SRC_DIR)/, $(CC_SRCS))
+
+#OBJ_NAMES = $(AS_SRCS:.s=.o) $(CC_SRCS:.c=.o)
+OBJ_NAMES = $(CC_SRCS:.c=.o)
+OBJS = $(addprefix $(BIN_DIR)/, $(OBJ_NAMES))
+
+# Config
+ARM_CPU = arm7tdmi
+
+# Commands
+CC = arm-none-eabi-gcc
+AS = arm-none-eabi-as
+LD = arm-none-eabi-ld
+OC = arm-none-eabi-objcopy
+
+RM = rm -f
+MKDIR = mkdir -p
+
+# Flags
+CC_FLAGS = -c -mcpu=$(ARM_CPU) -mthumb -nostdlib -nostartfiles -ffreestanding -Wall @C_DEFS@ -o $@
+AS_FLAGS = -mcpu=$(ARM_CPU) -o $@
+LD_FLAGS = -T $(SRC_DIR)/$(APP_NAME).ld -Map $(OUT_MAP) -o $(OUT_ELF)
+
+# Targets
+all: $(OUT_BIN)
+
+$(OUT_BIN): $(OUT_ELF)
+	$(OC) $(OUT_ELF) -O binary $(OUT_BIN)
+
+$(OUT_ELF): $(SRC_DIR)/$(APP_NAME).ld $(BIN_DIR)/startup.o $(OBJS) 
+	$(LD) $(LD_FLAGS) startup.o $(OBJS)
+
+$(BIN_DIR)/startup.o: $(SRC_DIR)/startup.s
+	$(AS) $(AS_FLAGS) $<
+
+$(BIN_DIR)/main.o: $(SRC_DIR)/main.c
+	$(CC) $(CC_FLAGS) $<
+
+$(BIN_DIR)/usb/usb.o: $(SRC_DIR)/usb/usb.c
+	$(MKDIR) $(BIN_DIR)/usb
+	$(CC) $(CC_FLAGS) $<
+
+$(BIN_DIR)/usb/descriptors.o: $(SRC_DIR)/usb/descriptors.c
+	$(MKDIR) $(BIN_DIR)/usb
+	$(CC) $(CC_FLAGS) $<
+
+clean:
+	$(RM) $(OUT_ELF)
+	$(RM) $(OUT_BIN)
+	$(RM) $(OUT_MAP)
+	$(RM) *.o
+	$(RM) usb/*.o
+

@@ -4,6 +4,7 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
 PROJECT(Pok3r)
 
 ADD_SUBDIRECTORY(pok3rtool)
+ADD_SUBDIRECTORY(firmware)
 
 ### =================== SOURCES =================== ###
 
@@ -35,23 +36,6 @@ SET(FILES
     disassemble/v130/sram-variables_v130.txt
     disassemble/v130/patch_v130.txt
     disassemble/v130/fw_xor_decode.c
-
-    firmware/main.c
-    firmware/startup.s
-
-    firmware/Makefile
-    firmware/pok3r.ld
-
-    firmware/pok3r-jlink.cfg
-
-    firmware/ht32/main.c
-    firmware/ht32/ht32_usbd_class.h
-    firmware/ht32/ht32_usbd_class.c
-    firmware/ht32/ht32_usbd_descriptor.h
-    firmware/ht32/ht32_usbd_descriptor.c
-    firmware/ht32/ht32f165x_it.c
-    firmware/ht32/ht32f165x_usbdconf.h
-    firmware/ht32/startup_ht32f165x.s
 )
 
 ### =================== BUILD =================== ###

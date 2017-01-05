@@ -4,6 +4,8 @@
 .cpu cortex-m3
 .thumb
 
+.global _start
+
 .equ _stack_top,    0x20000400
 .equ _stack_fill,   0xACACACAC
 
@@ -17,11 +19,18 @@ _vectors:
     .word   _generic_intr   /* Usage Fault */
     .word   0               /* Reserved */
 
+.string "POK3R Custom\0\0\0"
+.string "POK3R Custom\0\0\0"
+.string "POK3R Custom\0\0\0"
+.string "POK3R Custom\0\0\0"
+.align 2
 
-.global _start
+
+/* entry point */
 .thumb_func
 _start:
-    mov sp, =_stack_top
+    ldr r0, =_stack_top
+    mov sp, r0
 
     bl _mem_init
 
@@ -33,11 +42,13 @@ _start:
     b _start
 
 
+/* generic interrupt handler */
 .thumb_func
 _generic_intr:
     b .
 
 
+/* memory initialization */
 .thumb_func
 _mem_init:
     /* stack */

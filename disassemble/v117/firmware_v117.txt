@@ -6505,10 +6505,12 @@ clock_init:
     ; Sets the system clock frequency to CK_AHB = CK_SYS / 2
     66f2:   6201        str r1, [r0, #32]       ; [r0 + 0x20] = r1
 
+    ; Set clock source to PLL
     66f4:   6842        ldr r2, [r0, #4]        ; r2 = [r0 + 4]
-    66f6:   f022 0203   bic.w r2, r2, #3        ; r2 = r2 & ~2
+    66f6:   f022 0203   bic.w r2, r2, #3        ; r2 = r2 & ~3
     66fa:   f102 0201   add.w r2, r2, #1        ; r2 = r2 + 1
     66fe:   6042        str r2, [r0, #4]        ; [r0 + 4] = r2
+
     6700:   6b42        ldr r2, [r0, #52]       ; r2 = [r0 + 0x34]
     6702:   ebb1 7f92   cmp.w r1, r2, lsr #30
     6706:   d1fb        bne.n 0x6700            ; branch if r1 != r2 >> 30
@@ -7749,38 +7751,44 @@ watchdog_init:
     70ec:   6b0a        ldr r2, [r1, #48]       ; r2 = [r1 + 0x30]
     70ee:   f042 0210   orr.w r2, r2, #16       ; r2 = r2 | 0x10
     70f2:   630a        str r2, [r1, #48]       ; [r1 + 0x30] = r2
+
     ; Enable watchdog timer
     70f4:   4911        ldr r1, [pc, #68]       ; r1 = (0x713c) WDT Registers
     70f6:   684a        ldr r2, [r1, #4]        ; r2 = [r1 + 4] WDTMR0
     70f8:   f3c2 020b   ubfx r2, r2, #0, #12    ; r2 = r2 & 0xfff
     70fc:   f442 32d0   orr.w r2, r2, #106496   ; r2 = r2 | 0x1a000
     7100:   e003        b.n 0x710a              ; branch into loop
+
   0x7102:   604a        str r2, [r1, #4]        ; [r1 + 4] = r2
     7104:   684b        ldr r3, [r1, #4]        ; r3 = [r1 + 4]
     7106:   03db        lsls r3, r3, #15        ; r3 = r3 << 15
     7108:   d401        bmi.n 0x710e            ; exit loop if negative?
   0x710a:   1e40        subs r0, r0, #1         ; r0 = r0 - 1
     710c:   d2f9        bcs.n 0x7102            ; loop if r0 >= 0
+
     ; Set watchdog timer prescaler to 1/32
   0x710e:   6888        ldr r0, [r1, #8]        ; r0 = [r1 + 8] WDTMR1
     7110:   f3c0 000b   ubfx r0, r0, #0, #12    ; r0 = r0 & 0xfff
     7114:   f440 40a0   orr.w r0, r0, #20480    ; r0 = r0 | 0x5000
     7118:   6088        str r0, [r1, #8]        ; [r1 + 8] = r0
+
     ; Set watchdog timer to 2000
     711a:   6848        ldr r0, [r1, #4]        ; r0 = [r1 + 4]
     711c:   f400 30f8   and.w r0, r0, #126976   ; r0 = r0 & 0x1f000
     7120:   f440 60fa   orr.w r0, r0, #2000     ; r0 = r0 | 0x7d0
     7124:   6048        str r0, [r1, #4]        ; [r1 + 4] = r0
+
     ; Reload watchdog timer
     7126:   4806        ldr r0, [pc, #24]       ; r0 = (0x7140)
     7128:   6008        str r0, [r1, #0]        ; [r1] = r0
+
     ; Disable watchdog timer register protection
     712a:   f64c 2035   movw r0, #51765         ; r0 = 0xca35
     712e:   6108        str r0, [r1, #16]       ; [r1 + 0x10] = r0
     7130:   4770        bx lr
     7132:   0000
 
-  0x7134:   0x6ddd00  ; 7,200,000
+  0x7134:   0x6ddd00    ; 7,200,000
   0x7138:   0x40088000  ; CKCU Registers
   0x713c:   0x40068000  ; WDT Registers
   0x7140:   0x5fa00001  ; Watchdog timer reload lock and set

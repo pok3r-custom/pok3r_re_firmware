@@ -5,10 +5,3 @@
 *.id2
 *.nam
 
-firmware/build
-
-firmware/*.o
-firmware/*.elf
-firmware/*.bin
-firmware/*.map
-
