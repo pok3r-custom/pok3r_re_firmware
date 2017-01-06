@@ -34,7 +34,7 @@ RM = rm -f
 MKDIR = mkdir -p
 
 # Flags
-CC_FLAGS = -c -mcpu=$(ARM_CPU) -mthumb -nostdlib -nostartfiles -ffreestanding -Wall @C_DEFS@ -o $@
+CC_FLAGS = -c -mcpu=$(ARM_CPU) -mthumb -std=c11 -nostdlib -nostartfiles -ffreestanding -Wall @C_DEFS@ -o $@
 AS_FLAGS = -mcpu=$(ARM_CPU) -o $@
 LD_FLAGS = -T $(SRC_DIR)/$(APP_NAME).ld -Map $(OUT_MAP) -o $(OUT_ELF)
 

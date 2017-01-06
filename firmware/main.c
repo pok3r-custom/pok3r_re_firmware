@@ -58,6 +58,10 @@ void ckcu_init(){
     while(REG(CKCU_CKST) >> 30 != 1);
 }
 
+void nvic_init(){
+
+}
+
 void gpio_set_input_enable(int port, int pin, int en){
     if(en)
         REG(GPIOn_PnINER(port)) |= (1 << pin);
@@ -105,7 +109,7 @@ void afio_init(){
     afio_pin_config(GPIO_C, 15, 1);
 
     // check HSEEN
-    if(REG(CKCU_GCCR) & 0x400 == 0){
+    if((REG(CKCU_GCCR) & 0x400) == 0){
         afio_pin_config(GPIO_B, 14, 1);
         afio_pin_config(GPIO_B, 15, 1);
     }
@@ -115,7 +119,7 @@ void afio_init(){
 }
 
 int main(){
-    wdt_init();
+    //wdt_init();
     ckcu_init();
 
     //nvic_init();
@@ -124,6 +128,10 @@ int main(){
     USB_Device usbdev;
     usb_init_descriptors(&usbdev);
     usb_init(&usbdev);
+
+    while(1){
+
+    }
 
     return 0;
 }
