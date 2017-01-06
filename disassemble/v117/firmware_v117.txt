@@ -117,6 +117,7 @@ pendsv_intr:
   0x2d6e:   e7fe        b.n 0x2d6e
 systick_intr:
   0x2d70:   e7fe        b.n 0x2d70
+
 generic_intr:
   0x2d72:   e7fe        b.n 0x2d72
 
@@ -2975,7 +2976,6 @@ nop_2:
 
 function_37:
     ; r0 =
-    ; r1 =
   0x461c:   e92d 41f0   stmdb sp!, {r4, r5, r6, r7, r8, lr}
     4620:   4604        mov r4, r0              ; r4 = r0
     4622:   f7ff f8db   bl 0x37dc               ; call nop_1
@@ -3028,6 +3028,7 @@ function_37:
 
     4686:   2202        movs r2, #2             ; r2 = 2
     4688:   e012        b.n 0x46b0
+
   0x468a:   2201        movs r2, #1             ; r2 = 1
     468c:   f7fe ff5e   bl 0x354c               ; call gpio_set_open_drain
 
@@ -7191,6 +7192,7 @@ function_23:
     6cae:   7081        strb r1, [r0, #2]       ; [r0 + 2] = r1
     6cb0:   6d40        ldr r0, [r0, #84]       ; r0 = [r0 + 0x54] = [0x200002b8] (pointer_38)
     6cb2:   f000 b98b   b.w 0x6fcc              ; jump jump_1(pointer_39)
+
     6cb6:   f890 0032   ldrb.w r0, [r0, #50]    ; r0 = [r0 + 0x32]
     6cba:   2803        cmp r0, #3
     6cbc:   d001        beq.n 0x6cc2            ; return (r0 == 3 ? 1 : 0)

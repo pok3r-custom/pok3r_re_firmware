@@ -23,12 +23,15 @@
 #define CMP_BASE        0x40018000
 
 // Alternate Function I/O Unit
+// ////////////////////////////////////////////////////////////////////////////////////////////////
 #define AFIO_BASE       0x40022000
 
 // External Interrupt/Event Controller
+// ////////////////////////////////////////////////////////////////////////////////////////////////
 #define EXTI_BASE       0x40024000
 
 // Watchdog Timer
+// ////////////////////////////////////////////////////////////////////////////////////////////////
 #define WDT_BASE        0x40068000
 
 #define WDT_WDTCR       WDT_BASE + 0x0      // Watchdog Timer Control
@@ -45,6 +48,7 @@
 #define PWRCU_BASE      0x4006A000
 
 // Flash Memory Controller
+// ////////////////////////////////////////////////////////////////////////////////////////////////
 #define FMC_BASE        0x40080000
 
 #define FMC_TADR        FMC_BASE + 0x0      // Flash Target Address
@@ -70,6 +74,7 @@
 
 // Clock Control Unit
 // Reset Control Unit
+// ////////////////////////////////////////////////////////////////////////////////////////////////
 #define CKCU_BASE       0x40088000
 #define RSTCU_BASE      0x40088000
 
@@ -91,6 +96,7 @@
 #define CKCU_MCUDBGCR   CKCU_BASE + 0x304   // MCU Debug Control
 
 // CRC
+// ////////////////////////////////////////////////////////////////////////////////////////////////
 #define CRC_BASE        0x4008A000
 
 // Peripheral Direct Memory Access
@@ -123,11 +129,35 @@
 #define EBI_BASE        0x40098000
 
 // USB
+// ////////////////////////////////////////////////////////////////////////////////////////////////
 #define USB_BASE        0x400A8000
 #define USB_SRAM_BASE   0x400AA000
 
+#define EP_0            0
+#define EP_1            1
+#define EP_2            2
+#define EP_3            3
+#define EP_4            4
+#define EP_5            5
+#define EP_6            6
+#define EP_7            7
+#define EPn_BASE(n)     USB_BASE + (n * 0x14)
+
+#define USB_USBCSR      USB_BASE + 0x0      // USB Control and Status
+#define USB_USBIER      USB_BASE + 0x4      // USB Interrupt Enable
+#define USB_USBISR      USB_BASE + 0x8      // USB Interrupt Status
+#define USB_USBFCR      USB_BASE + 0xC      // USB Frame Count
+#define USB_USBDEVAR    USB_BASE + 0x10     // USB Device Address
+
+#define USB_USBEPnCSR(n)    EPn_BASE(n) + 0x14  // USB Endpoint n Control and Status
+#define USB_USBEPnIER(n)    EPn_BASE(n) + 0x18  // USB Endpoint n Interrupt Enable
+#define USB_USBEPnISR(n)    EPn_BASE(n) + 0x1C  // USB Endpoint n Interrupt Status
+#define USB_USBEPnTCR(n)    EPn_BASE(n) + 0x20  // USB Endpoint n Transfer Count
+#define USB_USBEPnCFGR(n)   EPn_BASE(n) + 0x24  // USB Endpoint n Configuration
+
 
 // Analog To Digital Converter
+// ////////////////////////////////////////////////////////////////////////////////////////////////
 #define ADC_BASE        0x40010000
 
 

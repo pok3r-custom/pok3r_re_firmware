@@ -79,7 +79,9 @@ sram_init:
       96:   bd10        pop {r4, pc}
       98:   2000        movs r0, #0
       9a:   4002        ands r2, r0
-      9c:   b510        push {r4, lr}
+
+bftm0_intr:
+    0x9c:   b510        push {r4, lr}
       9e:   4808        ldr r0, [pc, #32]    ; (0xc0)
       a0:   f000 f828   bl 0xf4
       a4:   4807        ldr r0, [pc, #28]    ; (0xc4)
@@ -95,12 +97,13 @@ sram_init:
       b8:   1e49        subs r1, r1, #1
       ba:   6041        str r1, [r0, #4]
       bc:   bd10        pop {r4, pc}
-      be:   0000        movs r0, r0
-      c0:   6000        str r0, [r0, #0]
-      c2:   4007        ands r7, r0
-      c4:   018c        lsls r4, r1, #6
-      c6:   2000        movs r0, #0
-      c8:   b510        push {r4, lr}
+      be:   0000
+
+    0xc0:   0x40076000  ; BFTM0
+    0xc4:   0x2000018c
+
+bftm1_intr:
+    0xc8:   b510        push {r4, lr}
       ca:   4803        ldr r0, [pc, #12]    ; (0xd8)
       cc:   f000 f812   bl 0xf4
       d0:   e8bd 4010   ldmia.w sp!, {r4, lr}
@@ -111,18 +114,16 @@ sram_init:
 usb_disable_dppu:
     ; Disable USB DP pull up
     0xdc:   2000        movs r0, #0
-      de:   f001 bb3f   b.w 0x1760              ; return usb_dp_pull_up(0)
+      de:   f001 bb3f   b.w 0x1760      ; return usb_dp_pull_up(0)
 
-      e2:   4770        bx lr
-      e4:   009d        lsls r5, r3, #2
-      e6:   0000        movs r0, r0
-      e8:   00c9        lsls r1, r1, #3
-      ea:   0000        movs r0, r0
-      ec:   0127        lsls r7, r4, #4
-      ee:   0000        movs r0, r0
-      f0:   04f1        lsls r1, r6, #19
-      f2:   0000        movs r0, r0
-      f4:   6841        ldr r1, [r0, #4]
+    0xe2:   4770        bx lr
+
+      e4:   0x09d       ; 41 BFTM0          (bftm0_intr)
+      e8:   0x0c9       ; 42 BFTM1          (bftm1_intr)
+      ec:   0x127       ; 43 I2C0           (generic_intr)
+      f0:   0x4f1       ; 44 I2C1           (i2c1_intr)
+
+    0xf4:   6841        ldr r1, [r0, #4]
       f6:   f021 0101   bic.w r1, r1, #1
       fa:   6041        str r1, [r0, #4]
       fc:   f3bf 8f4f   dsb sy
@@ -135,8 +136,8 @@ usb_disable_dppu:
      10e:   6241        str r1, [r0, #36]    ; 0x24
      110:   4770        bx lr
      112:   4770        bx lr
-     114:   1a8d        subs r5, r1, r2
-     116:   0000
+
+   0x114:   0x1a8d      ; 53 USB            (usb_intr)
 
 reset:
    0x118:   4803        ldr r0, [pc, #12]   ; r0 = (0x128)
@@ -149,6 +150,7 @@ reset:
 generic_fault:
    0x124:   e7fe        b.n 0x124
 
+generic_intr:
    0x126:   e7fe        b.n 0x126
 
    0x128:   0x1a99      ; watchdog_init
@@ -294,29 +296,29 @@ setup_afio_gpio:
      276:   2200        movs r2, #0
      278:   4629        mov r1, r5
      27a:   4630        mov r0, r6
-     27c:   f000 f914   bl 0x4a8
+     27c:   f000 f914   bl 0x4a8            ; call gpio_set_input_enable
      280:   1067        asrs r7, r4, #1
      282:   2200        movs r2, #0
      284:   4639        mov r1, r7
      286:   4630        mov r0, r6
-     288:   f000 f90e   bl 0x4a8
+     288:   f000 f90e   bl 0x4a8            ; call gpio_set_input_enable
      28c:   2202        movs r2, #2
      28e:   4629        mov r1, r5
      290:   4630        mov r0, r6
-     292:   f000 f919   bl 0x4c8
+     292:   f000 f919   bl 0x4c8            ; call gpio_set_pin_pull_up_down
      296:   2202        movs r2, #2
      298:   4639        mov r1, r7
      29a:   4630        mov r0, r6
-     29c:   f000 f914   bl 0x4c8
+     29c:   f000 f914   bl 0x4c8            ; call gpio_set_pin_pull_up_down
      2a0:   1165        asrs r5, r4, #5
      2a2:   2200        movs r2, #0
      2a4:   4629        mov r1, r5
      2a6:   4630        mov r0, r6
-     2a8:   f000 f8fe   bl 0x4a8
+     2a8:   f000 f8fe   bl 0x4a8            ; call gpio_set_input_enable
      2ac:   2202        movs r2, #2
      2ae:   4629        mov r1, r5
      2b0:   4630        mov r0, r6
-     2b2:   f000 f909   bl 0x4c8
+     2b2:   f000 f909   bl 0x4c8            ; call gpio_set_pin_pull_up_down
      2b6:   2201        movs r2, #1
      2b8:   210b        movs r1, #11
      2ba:   2000        movs r0, #0
@@ -593,6 +595,7 @@ flash_write:
      4a4:   6002        str r2, [r0, #0]
      4a6:   4770        bx lr
 
+gpio_set_input_enable:
     ; r0 =
     ; r1 =
     ; r2 =
@@ -613,7 +616,9 @@ flash_write:
      4c2:   438a        bics r2, r1
      4c4:   6102        str r2, [r0, #16]
      4c6:   4770        bx lr
-     4c8:   b142        cbz r2, 0x4dc
+
+gpio_set_pin_pull_up_down:
+   0x4c8:   b142        cbz r2, 0x4dc
      4ca:   2a01        cmp r2, #1
      4cc:   d009        beq.n 0x4e2
      4ce:   6882        ldr r2, [r0, #8]
@@ -634,7 +639,8 @@ flash_write:
      4ec:   6082        str r2, [r0, #8]
      4ee:   4770        bx lr
 
-     4f0:   e92d 47f0   stmdb sp!, {r4, r5, r6, r7, r8, r9, sl, lr}
+i2c1_intr:
+   0x4f0:   e92d 47f0   stmdb sp!, {r4, r5, r6, r7, r8, r9, sl, lr}
      4f4:   4847        ldr r0, [pc, #284]    ; (0x614)
      4f6:   68c2        ldr r2, [r0, #12]
      4f8:   60c2        str r2, [r0, #12]
@@ -685,6 +691,7 @@ flash_write:
      55c:   e8bd 47f0   ldmia.w sp!, {r4, r5, r6, r7, r8, r9, sl, lr}
      560:   2101        movs r1, #1
      562:   f000 b85d   b.w 0x620
+
      566:   4f2c        ldr r7, [pc, #176]    ; (0x618)
      568:   f8df 80b0   ldr.w r8, [pc, #176]    ; 0x61c
      56c:   f04f 0a01   mov.w sl, #1
@@ -1299,41 +1306,48 @@ function_b_2:
      a36:   f7ff ff09   bl 0x84c
      a3a:   4620        mov r0, r4
      a3c:   f000 fa58   bl 0xef0
+
      a40:   f44f 5780   mov.w r7, #4096    ; 0x1000
      a44:   4e14        ldr r6, [pc, #80]    ; (0xa98)
      a46:   007d        lsls r5, r7, #1
      a48:   b184        cbz r4, 0xa6c
+
      a4a:   2200        movs r2, #0
      a4c:   4639        mov r1, r7
      a4e:   4630        mov r0, r6
-     a50:   f7ff fd2a   bl 0x4a8
+     a50:   f7ff fd2a   bl 0x4a8            ; call gpio_set_input_enable(GPIO A, 0x1000, 0)
      a54:   2200        movs r2, #0
      a56:   4629        mov r1, r5
      a58:   4630        mov r0, r6
-     a5a:   f7ff fd25   bl 0x4a8
+     a5a:   f7ff fd25   bl 0x4a8            ; call gpio_set_input_enable(GPIO A, 0x2000, 0)
+
      a5e:   2202        movs r2, #2
      a60:   4639        mov r1, r7
      a62:   4630        mov r0, r6
-     a64:   f7ff fd30   bl 0x4c8
+     a64:   f7ff fd30   bl 0x4c8            ; call gpio_set_pin_pull_up_down(GPIO A, 0x1000, 2)
+
      a68:   2202        movs r2, #2
      a6a:   e00f        b.n 0xa8c
-     a6c:   2201        movs r2, #1
+
+   0xa6c:   2201        movs r2, #1
      a6e:   4639        mov r1, r7
      a70:   4630        mov r0, r6
-     a72:   f7ff fd19   bl 0x4a8
+     a72:   f7ff fd19   bl 0x4a8            ; call gpio_set_input_enable(GPIO A, 0x1000, 1)
      a76:   2201        movs r2, #1
      a78:   4629        mov r1, r5
      a7a:   4630        mov r0, r6
-     a7c:   f7ff fd14   bl 0x4a8
+     a7c:   f7ff fd14   bl 0x4a8            ; call gpio_set_input_enable(GPIO A, 0x2000, 1)
+
      a80:   2200        movs r2, #0
      a82:   4639        mov r1, r7
      a84:   4630        mov r0, r6
-     a86:   f7ff fd1f   bl 0x4c8
+     a86:   f7ff fd1f   bl 0x4c8            ; call gpio_set_pin_pull_up_down(GPIO A, 0x1000, 0)
+
      a8a:   2200        movs r2, #0
-     a8c:   4629        mov r1, r5
+   0xa8c:   4629        mov r1, r5
      a8e:   4630        mov r0, r6
      a90:   e8bd 41f0   ldmia.w sp!, {r4, r5, r6, r7, r8, lr}
-     a94:   f7ff bd18   b.w 0x4c8
+     a94:   f7ff bd18   b.w 0x4c8            ; call gpio_set_pin_pull_up_down(GPIO A, 0x2000, 0)
 
    0xa98:   0x400b0000  ; GPIO A
 
@@ -1667,74 +1681,74 @@ ckcu_set_wtf:
      d58:   2200        movs r2, #0
      d5a:   2108        movs r1, #8
      d5c:   4638        mov r0, r7
-     d5e:   f7ff fbb3   bl 0x4c8
+     d5e:   f7ff fbb3   bl 0x4c8            ; call gpio_set_pin_pull_up_down
      d62:   2200        movs r2, #0
      d64:   2110        movs r1, #16
      d66:   4638        mov r0, r7
-     d68:   f7ff fbae   bl 0x4c8
+     d68:   f7ff fbae   bl 0x4c8            ; call gpio_set_pin_pull_up_down
      d6c:   2200        movs r2, #0
      d6e:   2120        movs r1, #32
      d70:   4638        mov r0, r7
-     d72:   f7ff fba9   bl 0x4c8
+     d72:   f7ff fba9   bl 0x4c8            ; call gpio_set_pin_pull_up_down
      d76:   2200        movs r2, #0
      d78:   2140        movs r1, #64    ; 0x40
      d7a:   4638        mov r0, r7
-     d7c:   f7ff fba4   bl 0x4c8
+     d7c:   f7ff fba4   bl 0x4c8            ; call gpio_set_pin_pull_up_down
      d80:   f8df 9160   ldr.w r9, [pc, #352]    ; 0xee4
      d84:   1126        asrs r6, r4, #4
      d86:   2200        movs r2, #0
      d88:   4631        mov r1, r6
      d8a:   4648        mov r0, r9
-     d8c:   f7ff fb9c   bl 0x4c8
+     d8c:   f7ff fb9c   bl 0x4c8            ; call gpio_set_pin_pull_up_down
      d90:   f8df a154   ldr.w sl, [pc, #340]    ; 0xee8
      d94:   f44f 5b00   mov.w fp, #8192    ; 0x2000
      d98:   2200        movs r2, #0
      d9a:   4659        mov r1, fp
      d9c:   4655        mov r5, sl
      d9e:   4650        mov r0, sl
-     da0:   f7ff fb92   bl 0x4c8
+     da0:   f7ff fb92   bl 0x4c8            ; call gpio_set_pin_pull_up_down
      da4:   2200        movs r2, #0
      da6:   1061        asrs r1, r4, #1
      da8:   4628        mov r0, r5
-     daa:   f7ff fb8d   bl 0x4c8
+     daa:   f7ff fb8d   bl 0x4c8            ; call gpio_set_pin_pull_up_down
      dae:   2200        movs r2, #0
      db0:   4621        mov r1, r4
      db2:   4628        mov r0, r5
-     db4:   f7ff fb88   bl 0x4c8
+     db4:   f7ff fb88   bl 0x4c8            ; call gpio_set_pin_pull_up_down
      db8:   2201        movs r2, #1
      dba:   2108        movs r1, #8
      dbc:   4638        mov r0, r7
      dbe:   e000        b.n 0xdc2
      dc0:   e089        b.n 0xed6
-     dc2:   f7ff fb71   bl 0x4a8
+     dc2:   f7ff fb71   bl 0x4a8            ; call gpio_set_input_enable
      dc6:   2201        movs r2, #1
      dc8:   2110        movs r1, #16
      dca:   4638        mov r0, r7
-     dcc:   f7ff fb6c   bl 0x4a8
+     dcc:   f7ff fb6c   bl 0x4a8            ; call gpio_set_input_enable
      dd0:   2201        movs r2, #1
      dd2:   2120        movs r1, #32
      dd4:   4638        mov r0, r7
-     dd6:   f7ff fb67   bl 0x4a8
+     dd6:   f7ff fb67   bl 0x4a8            ; call gpio_set_input_enable
      dda:   2201        movs r2, #1
      ddc:   2140        movs r1, #64    ; 0x40
      dde:   4638        mov r0, r7
-     de0:   f7ff fb62   bl 0x4a8
+     de0:   f7ff fb62   bl 0x4a8            ; call gpio_set_input_enable
      de4:   2201        movs r2, #1
      de6:   4631        mov r1, r6
      de8:   4648        mov r0, r9
-     dea:   f7ff fb5d   bl 0x4a8
+     dea:   f7ff fb5d   bl 0x4a8            ; call gpio_set_input_enable
      dee:   2201        movs r2, #1
      df0:   4659        mov r1, fp
      df2:   4628        mov r0, r5
-     df4:   f7ff fb58   bl 0x4a8
+     df4:   f7ff fb58   bl 0x4a8            ; call gpio_set_input_enable
      df8:   2201        movs r2, #1
      dfa:   0391        lsls r1, r2, #14
      dfc:   4628        mov r0, r5
-     dfe:   f7ff fb53   bl 0x4a8
+     dfe:   f7ff fb53   bl 0x4a8            ; call gpio_set_input_enable
      e02:   2201        movs r2, #1
      e04:   4621        mov r1, r4
      e06:   4628        mov r0, r5
-     e08:   f7ff fb4e   bl 0x4a8
+     e08:   f7ff fb4e   bl 0x4a8            ; call gpio_set_input_enable
      e0c:   2100        movs r1, #0
      e0e:   200c        movs r0, #12
      e10:   f7ff f930   bl 0x74
@@ -1783,11 +1797,11 @@ ckcu_set_wtf:
      e80:   01d4        lsls r4, r2, #7
      e82:   4621        mov r1, r4
      e84:   4638        mov r0, r7
-     e86:   f7ff fb1f   bl 0x4c8
+     e86:   f7ff fb1f   bl 0x4c8            ; call gpio_set_pin_pull_up_down
      e8a:   2200        movs r2, #0
      e8c:   4621        mov r1, r4
      e8e:   4638        mov r0, r7
-     e90:   f7ff fb0a   bl 0x4a8
+     e90:   f7ff fb0a   bl 0x4a8            ; call gpio_set_input_enable
      e94:   2201        movs r2, #1
      e96:   2104        movs r1, #4
      e98:   4650        mov r0, sl
@@ -1796,11 +1810,11 @@ ckcu_set_wtf:
      ea0:   0214        lsls r4, r2, #8
      ea2:   4621        mov r1, r4
      ea4:   4638        mov r0, r7
-     ea6:   f7ff fb0f   bl 0x4c8
+     ea6:   f7ff fb0f   bl 0x4c8            ; call gpio_set_pin_pull_up_down
      eaa:   2200        movs r2, #0
      eac:   4621        mov r1, r4
      eae:   4638        mov r0, r7
-     eb0:   f7ff fafa   bl 0x4a8
+     eb0:   f7ff fafa   bl 0x4a8            ; call gpio_set_input_enable
      eb4:   4621        mov r1, r4
      eb6:   4638        mov r0, r7
      eb8:   f7ff f929   bl 0x10e
@@ -1832,7 +1846,7 @@ ckcu_set_wtf:
      eec:   2264        movs r2, #100    ; 0x64
      eee:   0000        movs r0, r0
 
-     ef0:   e92d 41f0   stmdb sp!, {r4, r5, r6, r7, r8, lr}
+   0xef0:   e92d 41f0   stmdb sp!, {r4, r5, r6, r7, r8, lr}
      ef4:   4c1c        ldr r4, [pc, #112]    ; (0xf68)
      ef6:   4e1d        ldr r6, [pc, #116]    ; (0xf6c)
      ef8:   1525        asrs r5, r4, #20
@@ -3147,7 +3161,6 @@ usb_clear_csr:
   0x1a88:   0x400a8000
 
 usb_intr:
-    ; Not sure if this is even called directly in the builtin firmware
   0x1a8c:   4801        ldr r0, [pc, #4]        ; (0x1a94)
     1a8e:   f7ff bd08   b.w 0x14a2              ; jump usb_entry
     1a92:   0000

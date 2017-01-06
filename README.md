@@ -11,9 +11,9 @@ this in my free time for fun, as such there are no guarantees of progress or suc
 - POK3R RGB
     - Extract unencrypted POK3R RGB firmware and flash contents. **DONE**
     - Reverse engineer the POK3R RGB firmware and update procedure. **WIP**
-    - Application to write new firmware to POK3R RGB over USB. *TODO*
+    - Application to write new firmware to POK3R RGB over USB. *WIP*
 - New Firmware
-    - Open-source firmware compatible with POK3R and POK3R RGB. *TODO*
+    - Open-source firmware compatible with POK3R and POK3R RGB. *WIP*
         - Patch OpenOCD to allow JTAG flashing of HT32. **DONE**
         - Firmware can be installed from Vortex firmware over USB (no hardware required).
         - Firmware can be rolled back with Votex firmware update application.

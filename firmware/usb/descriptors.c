@@ -103,17 +103,28 @@ const u8 report0Desc[] = {
     0xC0,              // End Collection
 };
 
-const u8 *interfaceDescs[] = {
+const u8 *ifaceDescs[] = {
     interface0Desc,
 };
-const u8 *endpointDescs[] = {
+const u8 *epDescs[] = {
     ep1Desc,
     ep2Desc,
+};
+const u8 *strDescs[] = {
+    str0Desc,
+    str1Desc,
 };
 
 void usb_init_descriptors(USB_Device *dev){
     dev->deviceDesc = deviceDesc;
     dev->configDesc = configDesc;
-    dev->interfaceDescs = interfaceDescs;
-    dev->endpointDescs = endpointDescs;
+
+    dev->interfaceDescs = ifaceDescs;
+    dev->numInterfaceDescs = sizeof(ifaceDescs) / sizeof(u8*);
+
+    dev->endpointDescs = epDescs;
+    dev->numEndpointDescs = sizeof(epDescs) / sizeof(u8*);
+
+    dev->stringDescs = strDescs;
+    dev->numStringDescs = sizeof(strDescs) / sizeof(u8*);
 }

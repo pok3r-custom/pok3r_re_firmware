@@ -9,10 +9,11 @@ Functions:
 entry                               @ 0x20
     sram_init
     main
-
 load_jump_fw                        @ 0x48
-
 sram_init                           @ 0x50
+
+bftm0_intr                          @ 0x9c
+bftm1_intr                          @ 0xc8
 
 usb_disable_dppu                    @ 0xdc
     usb_dp_pull_up
@@ -40,6 +41,11 @@ crc16                         @ 0x3fc
 flash_page_erase                    @ 0x440
 flash_get_protection_status         @ 0x454
 flash_write                         @ 0x460
+
+gpio_set_input_enable               @ 0x4a8
+gpio_set_pin_pull_up_down           @ 0x4c8
+
+i2c1_intr                           @ 0x4f0
 
 handle_update_packet                @ 0x650
 
