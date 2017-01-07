@@ -570,13 +570,17 @@ ZPointer<UpdateInterface> openDevice(){
 
     // POK3R
     kb = new Pok3r();
-    if(kb->open())
+    if(kb->open()){
+        LOG("Opened POK3R");
         return kb;
+    }
 
     // POK3R RGB
     kb = new Pok3rRGB();
-    if(kb->open())
+    if(kb->open()){
+        LOG("Opened POK3R RGB");
         return kb;
+    }
 
     ELOG("Failed to open");
     return nullptr;
@@ -586,24 +590,10 @@ int main(int argc, char **argv){
     ZLog::logLevelStdOut(ZLog::INFO, "%time% %thread% N %log%");
     ZLog::logLevelStdErr(ZLog::ERRORS, "\x1b[31m%time% %thread% E [%file%:%line%] %log%\x1b[m");
 
-//    HIDDevice dev;
-//    LOG(dev.open(HOLTEK_VID, POK3R_RGB_PID, 0xFF00, 0x01));
-
-//    ZBinary bin(64);
-//    bin.fill(0);
-//    bin.writeu8(0x12);
-//    bin.writeu8(0x20);
-
-//    LOG(dev.send(bin));
-//    LOG(dev.recv(bin));
-
-//    RLOG(bin.dumpBytes(4, 8));
-//    return 0;
-
     if(argc > 1){
         ZString cmd = argv[1];
         if(cmd == "version"){
-            // Read version
+            // Read Version
             ZPointer<UpdateInterface> kb = openDevice();
             if(kb.ptr()){
                 LOG("Version: " << kb->getVersion());
@@ -617,12 +607,12 @@ int main(int argc, char **argv){
 //                return writeversion(argv[2]);
                 return 0;
             } else {
-                LOG("Usage: pok3rtest setversion <version>");
+                LOG("Usage: pok3rtool setversion <version>");
                 return 2;
             }
 
         } else if(cmd == "reboot"){
-            // Reboot
+            // Reset to Firmware
             ZPointer<UpdateInterface> kb = openDevice();
             if(kb.ptr()){
                 LOG(kb->reboot());
@@ -633,7 +623,7 @@ int main(int argc, char **argv){
             return -1;
 
         } else if(cmd == "bootloader"){
-            // Bootloader
+            // Reset to Bootloader
             ZPointer<UpdateInterface> kb = openDevice();
             if(kb.ptr()){
                 LOG(kb->bootloader());
@@ -644,24 +634,19 @@ int main(int argc, char **argv){
             return -1;
 
         } else if(cmd == "dump"){
-            // Dump
-            ZPointer<UpdateInterface> kb = openDevice();
-            if(kb.ptr()){
-                ZBinary bin = kb->dumpFlash();
-                RLOG(bin.dumpBytes(4, 8));
-                return 0;
-            }
-            return -1;
-
-        } else if(cmd == "read"){
-            // Read bytes from Pok3r
-            if(argc > 4){
-                zu64 start = ZString(argv[2]).toUint(16);
-                zu64 len = ZString(argv[3]).toUint(16);
-//                return readfw(start, len, ZString(argv[4]));
-                return 0;
+            if(argc > 2){
+                // Dump Flash
+                ZPointer<UpdateInterface> kb = openDevice();
+                if(kb.ptr()){
+                    LOG("Dump Flash...");
+                    ZBinary bin = kb->dumpFlash();
+                    RLOG(bin.dumpBytes(4, 8));
+                    ZFile::writeBinary(argv[2], bin);
+                    return 0;
+                }
+                return -1;
             } else {
-                LOG("Usage: pok3rtest read <start address> <length> <output.bin>");
+                LOG("Usage: pok3rtool dump <output file>");
                 return 2;
             }
 
@@ -671,7 +656,7 @@ int main(int argc, char **argv){
 //                return flashfw(ZString(argv[2]), ZString(argv[3]));
                 return 0;
             } else {
-                LOG("Usage: pok3rtest flash <version> <firmware>");
+                LOG("Usage: pok3rtool flash <version> <firmware>");
                 return 2;
             }
 
@@ -680,7 +665,7 @@ int main(int argc, char **argv){
             if(argc > 3){
                 return decode_updater(ZString(argv[2]), ZString(argv[3]));
             } else {
-                LOG("Usage: pok3rtest decode <path to updater> <output>");
+                LOG("Usage: pok3rtool decode <path to updater> <output file>");
                 return 2;
             }
 
@@ -689,7 +674,7 @@ int main(int argc, char **argv){
             if(argc > 3){
                 return encode_image(ZString(argv[2]), ZString(argv[3]));
             } else {
-                LOG("Usage: pok3rtest encode <path to firmware image> <output>");
+                LOG("Usage: pok3rtool encode <path to firmware image> <output file>");
                 return 2;
             }
 
@@ -698,14 +683,9 @@ int main(int argc, char **argv){
             if(argc > 4){
                 return encode_patch_updater(ZString(argv[2]), ZString(argv[3]), ZString(argv[4]));
             } else {
-                LOG("Usage: pok3rtest encodepatch <path to updater> <path to firmware> <output updater>");
+                LOG("Usage: pok3rtool encodepatch <path to updater> <path to firmware> <output updater>");
                 return 2;
             }
-
-        } else if(cmd == "crc"){
-            // CRC
-//            return crcflash();
-            return 0;
 
         } else {
             LOG("Unknown Command \"" << cmd << "\"");

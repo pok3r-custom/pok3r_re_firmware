@@ -135,7 +135,8 @@ usb_disable_dppu:
      10c:   4770        bx lr
      10e:   6241        str r1, [r0, #36]    ; 0x24
      110:   4770        bx lr
-     112:   4770        bx lr
+
+   0x112:   4770        bx lr
 
    0x114:   0x1a8d      ; 53 USB            (usb_intr)
 

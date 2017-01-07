@@ -34,8 +34,8 @@ RM = rm -f
 MKDIR = mkdir -p
 
 # Flags
-CC_FLAGS = -c -mcpu=$(ARM_CPU) -mthumb -std=c11 -nostdlib -nostartfiles -ffreestanding -Wall @C_DEFS@ -o $@
-AS_FLAGS = -mcpu=$(ARM_CPU) -o $@
+CC_FLAGS = -c -mcpu=$(ARM_CPU) -mthumb -std=c11 -nostdlib -nostartfiles -ffreestanding -Wall @C_DEFS@
+AS_FLAGS = -mcpu=$(ARM_CPU)
 LD_FLAGS = -T $(SRC_DIR)/$(APP_NAME).ld -Map $(OUT_MAP) -o $(OUT_ELF)
 
 # Targets
@@ -44,22 +44,17 @@ all: $(OUT_BIN)
 $(OUT_BIN): $(OUT_ELF)
 	$(OC) $(OUT_ELF) -O binary $(OUT_BIN)
 
-$(OUT_ELF): $(SRC_DIR)/$(APP_NAME).ld $(BIN_DIR)/startup.o $(OBJS) 
+$(OUT_ELF): $(SRC_DIR)/$(APP_NAME).ld $(BIN_DIR)/startup.o | dirs $(OBJS)
 	$(LD) $(LD_FLAGS) startup.o $(OBJS)
 
 $(BIN_DIR)/startup.o: $(SRC_DIR)/startup.s
-	$(AS) $(AS_FLAGS) $<
+	$(AS) $(AS_FLAGS) -o $@ $<
 
-$(BIN_DIR)/main.o: $(SRC_DIR)/main.c
-	$(CC) $(CC_FLAGS) $<
+$(BIN_DIR)/%.o: $(SRC_DIR)/%.c
+	$(CC) $(CC_FLAGS) -o $@ $<
 
-$(BIN_DIR)/usb/usb.o: $(SRC_DIR)/usb/usb.c
+dirs:
 	$(MKDIR) $(BIN_DIR)/usb
-	$(CC) $(CC_FLAGS) $<
-
-$(BIN_DIR)/usb/descriptors.o: $(SRC_DIR)/usb/descriptors.c
-	$(MKDIR) $(BIN_DIR)/usb
-	$(CC) $(CC_FLAGS) $<
 
 clean:
 	$(RM) $(OUT_ELF)
@@ -67,4 +62,6 @@ clean:
 	$(RM) $(OUT_MAP)
 	$(RM) *.o
 	$(RM) usb/*.o
+
+.PHONY: all clean dirs
 

@@ -70,7 +70,7 @@ ZString Pok3r::getVersion(){
 
 ZBinary Pok3r::dumpFlash(){
     ZBinary dump;
-    for(zu16 i = 0; i < FLASH_LEN; i += 64){
+    for(zu32 i = 0; i < FLASH_LEN; i += 64){
         if(!readFlash(i, dump))
             break;
     }

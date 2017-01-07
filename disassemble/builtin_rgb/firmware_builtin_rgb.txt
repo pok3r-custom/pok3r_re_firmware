@@ -126,14 +126,12 @@ sram_init:
       de:   4770        bx lr
       e0:   6241        str r1, [r0, #36]    ; 0x24
       e2:   4770        bx lr
-      e4:   0135        lsls r5, r6, #4
-      e6:   0000        movs r0, r0
-      e8:   0165        lsls r5, r4, #5
-      ea:   0000        movs r0, r0
-      ec:   0127        lsls r7, r4, #4
-      ee:   0000        movs r0, r0
-      f0:   0127        lsls r7, r4, #4
-      f2:   0000        movs r0, r0
+
+    0xe4:   0x135       ; 41 BFTM0          (bftm0_intr)
+    0xe8:   0x165       ; 42 BFTM1          (bftm1_intr)
+    0xec:   0x127       ; 43 I2C0           (generic_intr)
+    0xf0:   0x127       ; 44 I2C1           (generic_intr)
+
       f4:   6841        ldr r1, [r0, #4]
       f6:   f021 0101   bic.w r1, r1, #1
       fa:   6041        str r1, [r0, #4]
@@ -146,8 +144,8 @@ sram_init:
      10c:   4770        bx lr
      10e:   4770        bx lr
      110:   f001 ba04   b.w 0x151c
-     114:   15e9        asrs r1, r5, #23
-     116:   0000        movs r0, r0
+
+   0x114:   0x15e9      ; 53 USB            (usb_intr)
 
 reset:
    0x118:   4803        ldr r0, [pc, #12]   ; (0x128)
@@ -160,6 +158,7 @@ reset:
 generic_fault:
    0x124:   e7fe        b.n 0x124
 
+generic_intr;
    0x126:   e7fe        b.n 0x126
 
    0x128:   0x15f5      ; watchdog_init
@@ -2443,12 +2442,16 @@ flash_read_packet:
     15e2:   0000        movs r0, r0
     15e4:   8000        strh r0, [r0, #0]
     15e6:   400a        ands r2, r1
-    15e8:   4801        ldr r0, [pc, #4]    ; (0x15f0)
+
+usb_intr:
+  0x15e8:   4801        ldr r0, [pc, #4]    ; (0x15f0)
     15ea:   f7ff bd21   b.w 0x1030
-    15ee:   0000        movs r0, r0
-    15f0:   0304        lsls r4, r0, #12
-    15f2:   2000        movs r0, #0
-    15f4:   4805        ldr r0, [pc, #20]    ; (0x160c)
+    15ee:   0000
+
+    15f0:   0x20000304
+
+watchdog_init:
+  0x15f4:   4805        ldr r0, [pc, #20]    ; (0x160c)
     15f6:   6b01        ldr r1, [r0, #48]    ; 0x30
     15f8:   f041 0110   orr.w r1, r1, #16
     15fc:   6301        str r1, [r0, #48]    ; 0x30
@@ -2459,17 +2462,18 @@ flash_read_packet:
     1608:   6041        str r1, [r0, #4]
     160a:   4770        bx lr
 
-    160c:   0x40088000
-    1610:   0x40068000
+    160c:   0x40088000  ; CKCU
+    1610:   0x40068000  ; WDT
     1614:   0x0001afff
 
-    1618:   4902        ldr r1, [pc, #8]    ; (0x1624)
+watchdog_reload_timer:
+  0x1618:   4902        ldr r1, [pc, #8]    ; (0x1624)
     161a:   4801        ldr r0, [pc, #4]    ; (0x1620)
     161c:   6008        str r0, [r1, #0]
     161e:   4770        bx lr
 
     1620:   0x5fa00001
-    1624:   0x40068000
+    1624:   0x40068000  ; WDT
 
 generate:
     ; r0 = sp
