@@ -58,7 +58,7 @@ struct buffer_struct {
     uint8_t buf[BUFFER_SIZE];
 };
 
-hid_t curr = NULL;
+hid_t *curr = NULL;
 static int count = 0;
 
 // private functions, not intended to be used from outside this file
@@ -327,13 +327,13 @@ static void detach_callback(void *context, IOReturn r, void *hid_mgr, IOHIDDevic
     hid_t *hid;
 
     printf("detach callback\n");
-    for (hid = first_hid; hid; hid = hid->next) {
-        if (hid->ref == dev) {
-            hid->open = 0;
-            CFRunLoopStop(CFRunLoopGetCurrent());
-            return;
-        }
-    }
+//    for (hid = first_hid; hid; hid = hid->next) {
+//        if (hid->ref == dev) {
+//            hid->open = 0;
+//            CFRunLoopStop(CFRunLoopGetCurrent());
+//            return;
+//        }
+//    }
 }
 
 static void attach_callback(void *context, IOReturn r, void *hid_mgr, IOHIDDeviceRef dev)
@@ -347,7 +347,7 @@ static void attach_callback(void *context, IOReturn r, void *hid_mgr, IOHIDDevic
     if(count){
         hid_close(hid);
         curr = NULL;
-        return false;
+        return;
     }
 
     hid = (hid_t *)malloc(sizeof(hid_t));

@@ -36,7 +36,11 @@ bool HIDDevice::send(const ZBinary &data){
         return false;
     int ret = rawhid_send(device->hid, data.raw(), data.size(), SEND_TIMEOUT);
     if(ret < 0){
+#if PLATFORM == MACOSX
+        ELOG("error: " << ret);
+#else
         ELOG("error: " << ret << ": " << usb_strerror());
+#endif
         return false;
     }
     if(ret != data.size())
