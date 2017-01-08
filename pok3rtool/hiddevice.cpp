@@ -31,33 +31,41 @@ void HIDDevice::close(){
     device->hid = NULL;
 }
 
+bool HIDDevice::isOpen(){
+    return !!(device->hid);
+}
+
 bool HIDDevice::send(const ZBinary &data){
-    if(!device->hid)
+    if(!isOpen())
         return false;
     int ret = rawhid_send(device->hid, data.raw(), data.size(), SEND_TIMEOUT);
     if(ret < 0){
-#if PLATFORM == MACOSX
-        ELOG("error: " << ret);
+#if PLATFORM == LINUX
+        ELOG("hid send error: " << ret << ": " << usb_strerror());
 #else
-        ELOG("error: " << ret << ": " << usb_strerror());
+        ELOG("hid send error: " << ret);
 #endif
         return false;
     }
-    if(ret != data.size())
+    if((zu64)ret != data.size())
         return false;
     return true;
 }
 
 bool HIDDevice::recv(ZBinary &data){
-    if(!device->hid)
+    if(!isOpen())
+        return false;
+    if(data.size() == 0)
         return false;
     int ret = rawhid_recv(device->hid, data.raw(), data.size(), RECV_TIMEOUT);
     if(ret < 0){
-        ELOG("error: " << ret);
+#if PLATFORM == LINUX
+        ELOG("hid recv error: " << ret << ": " << usb_strerror());
+#else
+        ELOG("hid recv error: " << ret);
+#endif
         return false;
     }
-    data.resize(ret);
-    if(ret < 0)
-        return false;
+    data.resize((zu64)ret);
     return true;
 }

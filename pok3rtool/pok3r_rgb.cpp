@@ -12,6 +12,8 @@
 
 #define FLASH_LEN           0x10000
 
+#define WAIT_SLEEP          2
+
 Pok3rRGB::Pok3rRGB(){
 
 }
@@ -22,39 +24,63 @@ Pok3rRGB::~Pok3rRGB(){
 
 bool Pok3rRGB::open(){
     // Try firmware vid and pid
-    if(HIDDevice::open(HOLTEK_VID, POK3R_RGB_PID, UPDATE_USAGE_PAGE, UPDATE_USAGE))
+    if(HIDDevice::open(HOLTEK_VID, POK3R_RGB_PID, UPDATE_USAGE_PAGE, UPDATE_USAGE)){
+        LOG("Opened POK3R RGB");
+        builtin = false;
         return true;
+    }
     // Try builtin vid and pid
-    if(HIDDevice::open(HOLTEK_VID, POK3R_RGB_BOOT_PID, UPDATE_USAGE_PAGE, UPDATE_USAGE))
+    if(HIDDevice::open(HOLTEK_VID, POK3R_RGB_BOOT_PID, UPDATE_USAGE_PAGE, UPDATE_USAGE)){
+        LOG("Opened POK3R RGB (builtin)");
+        builtin = true;
         return true;
+    }
     return false;
 }
 
-bool Pok3rRGB::reboot(){
-    LOG("Reset");
+bool Pok3rRGB::enterFirmware(){
+    if(!builtin){
+        LOG("In Firmware");
+        return true;
+    }
+
+    LOG("Reset to Firmware");
     if(!sendCmd(RESET, RESET_FW, 0, nullptr, 0))
         return false;
+
     close();
-    ZThread::sleep(3);
-    LOG("Open");
-    if(!HIDDevice::open(HOLTEK_VID, POK3R_RGB_PID, UPDATE_USAGE_PAGE, UPDATE_USAGE)){
+    ZThread::sleep(WAIT_SLEEP);
+
+    if(!open()){
         ELOG("open error");
         return false;
     }
+
+    if(builtin)
+        return false;
     return true;
 }
 
-bool Pok3rRGB::bootloader(){
-    LOG("Reset");
+bool Pok3rRGB::enterBootloader(){
+    if(builtin){
+        LOG("In Bootloader");
+        return true;
+    }
+
+    LOG("Reset to Bootloader");
     if(!sendCmd(RESET, RESET_BL, 0, nullptr, 0))
         return false;
+
     close();
-    ZThread::sleep(3);
-    LOG("Open");
-    if(!HIDDevice::open(HOLTEK_VID, POK3R_RGB_BOOT_PID, UPDATE_USAGE_PAGE, UPDATE_USAGE)){
+    ZThread::sleep(WAIT_SLEEP);
+
+    if(!open()){
         ELOG("open error");
         return false;
     }
+
+    if(!builtin)
+        return false;
     return true;
 }
 
@@ -95,7 +121,34 @@ ZBinary Pok3rRGB::dumpFlash(){
         }
         dump.write(bin.raw() + 4, 60);
     }
+
+    // readable flash is not a multiple of 60,
+    // so read the last little bit for a full dump
+
+    ZBinary bin(UPDATE_PKT_LEN);
+    if(!sendCmd(READ, 0xff, FLASH_LEN - 60, nullptr, 0)){
+        ELOG("send error");
+        ELOG(ZLog::RAW << bin.dumpBytes(4, 8));
+        return dump;
+    }
+    if(!recv(bin)){
+        ELOG("recv error");
+        ELOG(ZLog::RAW << bin.dumpBytes(4, 8));
+        return dump;
+    }
+    if(bin.readleu16() == UPDATE_ERROR){
+        ELOG("error response at 0x" << ZString::ItoS((zu64)(FLASH_LEN - 60), 16));
+        ELOG(ZLog::RAW << bin.dumpBytes(4, 8));
+    }
+    dump.write(bin.raw() + 48, 16);
+
     return dump;
+}
+
+bool Pok3rRGB::updateFirmware(ZString version, const ZBinary &fwbin){
+    LOG("");
+
+    return false;
 }
 
 void Pok3rRGB::test(){

@@ -1,7 +1,7 @@
 #ifndef HID_H
 #define HID_H
 
-#if __cplusplus
+#ifdef __cplusplus
 extern "C" {
 #endif
 
@@ -12,7 +12,7 @@ int rawhid_recv(hid_t *hid, void *buf, int len, int timeout);
 int rawhid_send(hid_t *hid, const void *buf, int len, int timeout);
 void rawhid_close(hid_t *hid);
 
-#if __cplusplus
+#ifdef __cplusplus
 }
 #endif
 

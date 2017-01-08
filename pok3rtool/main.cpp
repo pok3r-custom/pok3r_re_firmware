@@ -1,18 +1,14 @@
 #include "pok3r.h"
 #include "pok3r_rgb.h"
+#include "hiddevice.h"
 
 #include "zlog.h"
 #include "zfile.h"
 #include "zhash.h"
 #include "zpointer.h"
-
-extern "C" {
-#include "rawhid/hid.h"
-}
+using namespace LibChaos;
 
 #include <stdio.h>
-
-#include "hiddevice.h"
 
 /*
 int writeversion(ZString version){
@@ -571,14 +567,12 @@ ZPointer<UpdateInterface> openDevice(){
     // POK3R
     kb = new Pok3r();
     if(kb->open()){
-        LOG("Opened POK3R");
         return kb;
     }
 
     // POK3R RGB
     kb = new Pok3rRGB();
     if(kb->open()){
-        LOG("Opened POK3R RGB");
         return kb;
     }
 
@@ -587,8 +581,13 @@ ZPointer<UpdateInterface> openDevice(){
 }
 
 int main(int argc, char **argv){
-    ZLog::logLevelStdOut(ZLog::INFO, "%time% %thread% N %log%");
-    ZLog::logLevelStdErr(ZLog::ERRORS, "\x1b[31m%time% %thread% E [%file%:%line%] %log%\x1b[m");
+    ZLog::logLevelStdOut(ZLog::INFO, "%clock% N %log%");
+//    ZLog::logLevelStdOut(ZLog::DEBUG, "\x1b[35m%time% %thread% N %log%");
+    ZLog::logLevelStdErr(ZLog::ERRORS, "\x1b[31m%time% E [%file%:%line%] %log%\x1b[m");
+    ZPath lgf = ZPath("logs") + ZLog::genLogFileName("pok3rtool_");
+    ZLog::logLevelFile(ZLog::INFO, lgf, "%clock% N %log%");
+    ZLog::logLevelFile(ZLog::DEBUG, lgf, "%clock% D [%function%|%file%:%line%] %log%");
+    ZLog::logLevelFile(ZLog::ERRORS, lgf, "%clock% E [%function%|%file%:%line%] %log%");
 
     if(argc > 1){
         ZString cmd = argv[1];
@@ -602,20 +601,33 @@ int main(int argc, char **argv){
             return -1;
 
         } else if(cmd == "setversion"){
-            // Write version on Pok3r
             if(argc > 2){
-//                return writeversion(argv[2]);
-                return 0;
+                // Set Version
+                ZPointer<UpdateInterface> kb = openDevice();
+                if(kb.ptr()){
+                    LOG(kb->setVersion(argv[2]));
+                    return 0;
+                }
+                return -1;
             } else {
                 LOG("Usage: pok3rtool setversion <version>");
                 return 2;
             }
 
+        } else if(cmd == "info"){
+            // Get Info
+            ZPointer<UpdateInterface> kb = openDevice();
+            if(kb.ptr()){
+                LOG(kb->getInfo());
+                return 0;
+            }
+            return -1;
+
         } else if(cmd == "reboot"){
             // Reset to Firmware
             ZPointer<UpdateInterface> kb = openDevice();
             if(kb.ptr()){
-                LOG(kb->reboot());
+                LOG(kb->enterFirmware());
                 // Read version
                 LOG("Version: " << kb->getVersion());
                 return 0;
@@ -626,7 +638,7 @@ int main(int argc, char **argv){
             // Reset to Bootloader
             ZPointer<UpdateInterface> kb = openDevice();
             if(kb.ptr()){
-                LOG(kb->bootloader());
+                LOG(kb->enterBootloader());
                 // Read version
                 LOG("Version: " << kb->getVersion());
                 return 0;
@@ -638,9 +650,10 @@ int main(int argc, char **argv){
                 // Dump Flash
                 ZPointer<UpdateInterface> kb = openDevice();
                 if(kb.ptr()){
-                    LOG("Dump Flash...");
+                    LOG("Dump Flash");
                     ZBinary bin = kb->dumpFlash();
                     RLOG(bin.dumpBytes(4, 8));
+                    LOG("Out: " << argv[2]);
                     ZFile::writeBinary(argv[2], bin);
                     return 0;
                 }
@@ -651,10 +664,18 @@ int main(int argc, char **argv){
             }
 
         } else if(cmd == "flash"){
-            // Write firmware to Pok3r
+            // Update Firmware
             if(argc > 3){
-//                return flashfw(ZString(argv[2]), ZString(argv[3]));
-                return 0;
+                ZPointer<UpdateInterface> kb = openDevice();
+                if(kb.ptr()){
+                    LOG("Update Firmware: " << argv[3]);
+                    ZBinary fwbin;
+                    if(!ZFile::readBinary(argv[3], fwbin))
+                        return -3;
+                    LOG(kb->updateFirmware(argv[2], fwbin));
+                    return 0;
+                }
+                return -1;
             } else {
                 LOG("Usage: pok3rtool flash <version> <firmware>");
                 return 2;

@@ -108,7 +108,7 @@ int rawhid_recv(hid_t *hid, void *buf, int len, int timeout)
     r = usb_interrupt_read(hid->usb, hid->ep_in, buf, len, timeout);
     if (r >= 0) return r;
     if (r == -110) return 0;  // timeout
-    return -1;
+    return r;
 }
 
 //  rawhid_send - send a packet
@@ -126,7 +126,7 @@ int rawhid_send(hid_t *hid, const void *buf, int len, int timeout)
     if (hid->ep_out) {
         return usb_interrupt_write(hid->usb, hid->ep_out, buf, len, timeout);
     } else {
-        return usb_control_msg(hid->usb, 0x21, 9, 0, hid->iface, buf, len, timeout);
+        return usb_control_msg(hid->usb, 0x21, 9, 0, hid->iface, (void *)buf, len, timeout);
     }
 }
 

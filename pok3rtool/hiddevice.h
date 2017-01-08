@@ -16,6 +16,7 @@ public:
 
     bool open(zu16 vid, zu16 pid, zu16 upage, zu16 usage);
     void close();
+    bool isOpen();
 
     bool send(const ZBinary &data);
     bool recv(ZBinary &data);

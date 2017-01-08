@@ -71,7 +71,7 @@ using namespace LibChaos;
 //   0x03
 //   Zero Padding
 
-class Pok3r : public UpdateInterface, public HIDDevice {
+class Pok3r : public HIDDevice, public UpdateInterface {
 public:
     enum pok3r_cmd {
         ERASE_CMD               = 0,    // Erase pages of flash
@@ -110,15 +110,23 @@ public:
     bool open();
 
     //! Reset and re-open device.
-    bool reboot();
+    bool enterFirmware();
     //! Reset to loader and re-open device.
-    bool bootloader();
+    bool enterBootloader();
+
+    bool getInfo();
 
     //! Read the firmware version from the keyboard.
     ZString getVersion();
 
+    bool clearVersion();
+
+    bool setVersion(ZString version);
+
     //! Dump the contents of flash.
     ZBinary dumpFlash();
+    //! Update the firmware.
+    bool updateFirmware(ZString version, const ZBinary &fwbin);
 
     //! Erase flash pages starting at \a start, ending on the page of \a end.
     bool eraseFlash(zu32 start, zu32 end);
@@ -127,6 +135,8 @@ public:
     bool readFlash(zu32 addr, ZBinary &bin);
     //! Write 52 bytes at \a addr.
     bool writeFlash(zu32 addr, ZBinary bin);
+    //! Check 52 bytes at \a addr.
+    bool checkFlash(zu32 addr, ZBinary bin);
 
     //! Send CRC command.
     zu16 crcFlash(zu32 addr, zu32 len);
@@ -144,6 +154,11 @@ private:
 public:
     static void decode_firmware(ZBinary &bin);
     static void encode_firmware(ZBinary &bin);
+
+private:
+    bool builtin;
+    bool debug;
+    bool nop;
 };
 
 #endif // POK3R_H

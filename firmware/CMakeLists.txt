@@ -33,7 +33,7 @@ SET(FILES
     ${POK3R_RGB_SOURCES}
     pok3r_custom.ld
     pok3r_rgb_custom.ld
-    pok3r-jlink.cfg
+    openocd.cfg
 )
 
 ### =================== CONFIG ==================== ###

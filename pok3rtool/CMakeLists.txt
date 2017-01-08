@@ -13,6 +13,7 @@ FIND_PACKAGE(LibUSB-1.0 REQUIRED)
 
 SET(POK3RTOOL_SOURCES
     main.cpp
+
     pok3r.h
     pok3r.cpp
     pok3r_rgb.h
@@ -20,9 +21,6 @@ SET(POK3RTOOL_SOURCES
 
     hiddevice.h
     hiddevice.cpp
-
-    usbdevice.h
-    usbdevice.cpp
 
     updateinterface.h
 )

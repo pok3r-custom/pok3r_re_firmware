@@ -12,7 +12,7 @@ using namespace LibChaos;
 #define POK3R_RGB_PID       0x0167
 #define POK3R_RGB_BOOT_PID  0x1167
 
-class Pok3rRGB : public UpdateInterface, public HIDDevice {
+class Pok3rRGB : public HIDDevice, public UpdateInterface {
 public:
     enum pok3r_rgb_cmd {
         CMD_16      = 0x10,
@@ -45,15 +45,17 @@ public:
     bool open();
 
     //! Reset and re-open device.
-    bool reboot();
+    bool enterFirmware();
     //! Reset to bootloader and re-open device.
-    bool bootloader();
+    bool enterBootloader();
 
     //! Read the firmware version from the keyboard.
     ZString getVersion();
 
     //! Dump the contents of flash.
     ZBinary dumpFlash();
+    //! Update the firmware.
+    bool updateFirmware(ZString version, const ZBinary &fwbin);
 
     void test();
 
@@ -64,6 +66,9 @@ private:
 public:
     static void decode_firmware(ZBinary &bin);
     static void encode_firmware(ZBinary &bin);
+
+private:
+    bool builtin;
 };
 
 #endif // POK3R_RGB_H

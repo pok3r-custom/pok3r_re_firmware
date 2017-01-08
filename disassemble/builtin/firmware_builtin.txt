@@ -895,6 +895,7 @@ function_b_3:
      700:   f1a0 000a   sub.w r0, r0, #10           ; r0 -= 10
      704:   ea42 4000   orr.w r0, r2, r0, lsl #16   ; r0 = r2 | (r0 << 16)
      708:   6088        str r0, [r1, #8]            ; [r1 + 8] = r0
+
      70a:   f44f 5020   mov.w r0, #10240
      70e:   60c8        str r0, [r1, #12]           ; [r0 + 0xc] = 0x2800
 
@@ -3264,7 +3265,7 @@ flash_erase_cmd:
   0x1b36:   e8bd 87f0   ldmia.w sp!, {r4, r5, r6, r7, r8, r9, sl, pc}
 
   0x1b3a:   2500        movs r5, #0             ; r5 = 0
-    1b3c:   460c        mov r4, r1              ; r4 = r1
+    1b3c:   460c        mov r4, r1              ; r4 = r1 first page
     1b3e:   1e6f        subs r7, r5, #1         ; r7 = r5 - 1 = 0xffffffff
     1b40:   f8df 802c   ldr.w r8, [pc, #44]     ; r8 = (0x1b70) byteswap_key
     1b44:   f04f 091e   mov.w r9, #30           ; r9 = 0x1e
