@@ -928,11 +928,8 @@ function_130_6:
 
   0x3bf4:   0x2000005c
 
-    3bf8:   0000        movs r0, r0
-    3bfa:   0304        lsls r4, r0, #12
-    3bfc:   0001        movs r1, r0
-    3bfe:   3400        adds r4, #0
-
+  0x3bf8:   00 00 04 03
+  0x3bfc:   01 00 00 34
   0x3c00:   04 00 02 00
 
     3c04:   b570        push {r4, r5, r6, lr}
@@ -4669,7 +4666,7 @@ function_130_12:
 
   0x5ce8:   0xe000ed10  ; ARM NVIC system control register
 
-function_130_13:
+handle_frame:
   0x5cec:   b570        push {r4, r5, r6, lr}
     5cee:   4e35        ldr r6, [pc, #212]  ; (0x5dc4)
     5cf0:   7830        ldrb r0, [r6, #0]
@@ -7957,7 +7954,7 @@ main:
     7934:   6828        ldr r0, [r5, #0]
     7936:   1e40        subs r0, r0, #1
     7938:   6028        str r0, [r5, #0]
-    793a:   f7fe f9d7   bl 0x5cec           ; call function_130_13()
+    793a:   f7fe f9d7   bl 0x5cec           ; call handle_frame()
     793e:   f000 f811   bl 0x7964           ; call function_130_15()
     7942:   7820        ldrb r0, [r4, #0]
     7944:   b910        cbnz r0, 0x794c

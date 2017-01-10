@@ -43,7 +43,7 @@ bool Pok3r::enterFirmware(){
     }
 
     LOG("Reset to Firmware");
-    if(!sendCmd(RESET_CMD, RESET_BOOT_SUBCMD, 0, 0, nullptr, 0))
+    if(!sendCmd(RESET_CMD, RESET_BOOT_SUBCMD, 0, 0))
         return false;
 
     close();
@@ -67,7 +67,7 @@ bool Pok3r::enterBootloader(){
     }
 
     LOG("Reset to Bootloader");
-    if(!sendCmd(RESET_CMD, RESET_BUILTIN_SUBCMD, 0, 0, nullptr, 0))
+    if(!sendCmd(RESET_CMD, RESET_BUILTIN_SUBCMD, 0, 0))
         return false;
 
     close();
@@ -85,7 +85,7 @@ bool Pok3r::enterBootloader(){
 }
 
 bool Pok3r::getInfo(){
-    if(!sendCmd(UPDATE_START_CMD, 0, 0, 0, nullptr, 0))
+    if(!sendCmd(UPDATE_START_CMD, 0, 0, 0))
         return false;
 
     ZBinary data(64);
@@ -114,7 +114,7 @@ bool Pok3r::getInfo(){
 ZString Pok3r::getVersion(){
     ZBinary bin;
     if(!readFlash(VER_ADDR, bin))
-        return "NONE";
+        return "ERROR";
 
     ZBinary tst;
     tst.fill(0xFF, 64);
@@ -193,7 +193,7 @@ bool Pok3r::updateFirmware(ZString version, const ZBinary &fwbinin){
     LOG("Old Version: " << getVersion());
 
     // update reset
-    if(!sendCmd(UPDATE_START_CMD, 0, 0, 0, nullptr, 0))
+    if(!sendCmd(UPDATE_START_CMD, 0, 0, 0))
         return false;
     ZBinary data(64);
     if(!recv(data))
@@ -245,7 +245,7 @@ bool Pok3r::updateFirmware(ZString version, const ZBinary &fwbinin){
         return false;
 
     // update reset?
-    if(!sendCmd(UPDATE_START_CMD, 0, 0, 0, nullptr, 0)){
+    if(!sendCmd(UPDATE_START_CMD, 0, 0, 0)){
         return false;
     }
     if(!recv(data)){
@@ -258,14 +258,14 @@ bool Pok3r::updateFirmware(ZString version, const ZBinary &fwbinin){
 
 bool Pok3r::eraseFlash(zu32 start, zu32 end){
     // Send command
-    if(!sendCmd(ERASE_CMD, 8, start, end, nullptr, 0))
+    if(!sendCmd(ERASE_CMD, 8, start, end))
         return false;
     return true;
 }
 
 bool Pok3r::readFlash(zu32 addr, ZBinary &bin){
     // Send command
-    if(!sendCmd(FLASH_CMD, FLASH_READ_SUBCMD, addr, addr + 64, nullptr, 0))
+    if(!sendCmd(FLASH_CMD, FLASH_READ_SUBCMD, addr, addr + 64))
         return false;
 
     // Get response
@@ -274,8 +274,8 @@ bool Pok3r::readFlash(zu32 addr, ZBinary &bin){
         ELOG("recv error");
         return false;
     }
-    bin.write(pkt);
 
+    bin.write(pkt);
     return true;
 }
 
@@ -299,7 +299,7 @@ bool Pok3r::checkFlash(zu32 addr, ZBinary bin){
 
 bool Pok3r::updateStart(ZBinary &bin){
     // Send command
-    if(!sendCmd(UPDATE_START_CMD, 0, 0, 0, nullptr, 0))
+    if(!sendCmd(UPDATE_START_CMD, 0, 0, 0))
         return false;
 
     // Get response
@@ -310,16 +310,9 @@ bool Pok3r::updateStart(ZBinary &bin){
     return true;
 }
 
-bool Pok3r::reset(zu8 subcmd){
-    // Send command
-    if(!sendCmd(RESET_CMD, subcmd, 0, 0, nullptr, 0))
-        return false;
-    return true;
-}
-
 zu16 Pok3r::crcFlash(zu32 addr, zu32 len){
     // Send command
-    sendCmd(CRC_CMD, 0, addr, len, nullptr, 0);
+    sendCmd(CRC_CMD, 0, addr, len);
     return 0;
 }
 

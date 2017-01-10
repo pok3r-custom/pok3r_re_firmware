@@ -565,10 +565,10 @@ ZPointer<UpdateInterface> openDevice(){
     ZPointer<UpdateInterface> kb;
 
     // POK3R
-    kb = new Pok3r();
-    if(kb->open()){
-        return kb;
-    }
+//    kb = new Pok3r();
+//    if(kb->open()){
+//        return kb;
+//    }
 
     // POK3R RGB
     kb = new Pok3rRGB();
@@ -680,6 +680,15 @@ int main(int argc, char **argv){
                 LOG("Usage: pok3rtool flash <version> <firmware>");
                 return 2;
             }
+
+        } else if(cmd == "test"){
+            // Test
+            Pok3rRGB kb;
+            if(kb.open()){
+                kb.test();
+                return 0;
+            }
+            return -1;
 
         } else if(cmd == "decode"){
             // Decode firmware from updater executable

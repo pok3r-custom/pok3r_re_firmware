@@ -22,6 +22,7 @@ SET(FILES
     disassemble/builtin_rgb/firmware_builtin_rgb.bin
     disassemble/builtin_rgb/firmware_builtin_rgb.txt
     disassemble/builtin_rgb/symbols_builtin_rgb.txt
+    disassemble/builtin_rgb/sram-variables_builtin_rgb.txt
 
     disassemble/v117/firmware_v117.bin
     disassemble/v117/firmware_v117.txt

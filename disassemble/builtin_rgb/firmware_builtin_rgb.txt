@@ -118,12 +118,16 @@ sram_init:
       ce:   6011        str r1, [r2, #0]
       d0:   bd10        pop {r4, pc}
       d2:   0000        movs r0, r0
-      d4:   2000        movs r0, #0
-      d6:   4002        ands r2, r0
-      d8:   6081        str r1, [r0, #8]
+
+      d4:   0x40022000
+
+bftm_set_counter:
+    0xd8:   6081        str r1, [r0, #8]
       da:   4770        bx lr
+
       dc:   6281        str r1, [r0, #40]    ; 0x28
       de:   4770        bx lr
+
       e0:   6241        str r1, [r0, #36]    ; 0x24
       e2:   4770        bx lr
 
@@ -132,11 +136,14 @@ sram_init:
     0xec:   0x127       ; 43 I2C0           (generic_intr)
     0xf0:   0x127       ; 44 I2C1           (generic_intr)
 
-      f4:   6841        ldr r1, [r0, #4]
+bftm_clear:
+    ; r0 = bftm base reg
+    0xf4:   6841        ldr r1, [r0, #4]
       f6:   f021 0101   bic.w r1, r1, #1
       fa:   6041        str r1, [r0, #4]
       fc:   f3bf 8f4f   dsb sy
      100:   4770        bx lr
+
      102:   eb00 0080   add.w r0, r0, r0, lsl #2
      106:   0080        lsls r0, r0, #2
      108:   1e40        subs r0, r0, #1
@@ -178,7 +185,7 @@ generic_intr;
      148:   1e49        subs r1, r1, #1
      14a:   6041        str r1, [r0, #4]
      14c:   4804        ldr r0, [pc, #16]    ; (0x160)
-     14e:   f7ff ffd1   bl 0xf4
+     14e:   f7ff ffd1   bl 0xf4                 ; call bftm_clear
      152:   e8bd 4010   ldmia.w sp!, {r4, lr}
      156:   f000 bd21   b.w 0xb9c
      15a:   0000        movs r0, r0
@@ -188,7 +195,7 @@ generic_intr;
      162:   4007        ands r7, r0
      164:   b510        push {r4, lr}
      166:   4813        ldr r0, [pc, #76]    ; (0x1b4)
-     168:   f7ff ffc4   bl 0xf4
+     168:   f7ff ffc4   bl 0xf4             ; call bftm_clear
      16c:   4c12        ldr r4, [pc, #72]    ; (0x1b8)
      16e:   6860        ldr r0, [r4, #4]
      170:   8881        ldrh r1, [r0, #4]
@@ -224,7 +231,11 @@ generic_intr;
      1be:   400b        ands r3, r1
      1c0:   2074        movs r0, #116    ; 0x74
      1c2:   0000        movs r0, r0
-     1c4:   2900        cmp r1, #0
+
+bftm_set_cen:
+    ; r0 = bftm base
+    ; r1 = 0/1
+   0x1c4:   2900        cmp r1, #0
      1c6:   6801        ldr r1, [r0, #0]
      1c8:   d002        beq.n 0x1d0
      1ca:   f041 0104   orr.w r1, r1, #4
@@ -232,15 +243,20 @@ generic_intr;
      1d0:   f021 0104   bic.w r1, r1, #4
      1d4:   6001        str r1, [r0, #0]
      1d6:   4770        bx lr
-     1d8:   2900        cmp r1, #0
+
+bftm_set_mien:
+    ; r0 = bftm base
+    ; r1 = 0/1
+   0x1d8:   2900        cmp r1, #0
      1da:   6801        ldr r1, [r0, #0]
      1dc:   d002        beq.n 0x1e4
      1de:   f041 0101   orr.w r1, r1, #1
      1e2:   e001        b.n 0x1e8
-     1e4:   f021 0101   bic.w r1, r1, #1
-     1e8:   6001        str r1, [r0, #0]
+   0x1e4:   f021 0101   bic.w r1, r1, #1
+   0x1e8:   6001        str r1, [r0, #0]
      1ea:   4770        bx lr
-     1ec:   00c0        lsls r0, r0, #3
+
+   0x1ec:   00c0        lsls r0, r0, #3
      1ee:   08cb        lsrs r3, r1, #3
      1f0:   eb00 0083   add.w r0, r0, r3, lsl #2
      1f4:   4b06        ldr r3, [pc, #24]    ; (0x210)
@@ -256,9 +272,10 @@ generic_intr;
      208:   4313        orrs r3, r2
      20a:   6003        str r3, [r0, #0]
      20c:   bd10        pop {r4, pc}
-     20e:   0000        movs r0, r0
-     210:   2020        movs r0, #32
-     212:   4002        ands r2, r0
+     20e:   0000
+
+   0x210:   0x40022020
+
      214:   e92d 41f0   stmdb sp!, {r4, r5, r6, r7, r8, lr}
      218:   f44f 4580   mov.w r5, #16384    ; 0x4000
      21c:   2400        movs r4, #0
@@ -267,7 +284,7 @@ generic_intr;
      222:   4680        mov r8, r0
      224:   2301        movs r3, #1
      226:   4629        mov r1, r5
-     228:   f000 f850   bl 0x2cc
+     228:   f000 f850   bl 0x2cc                ; call ckcu_clocks_enable
      22c:   4e25        ldr r6, [pc, #148]    ; (0x2c4)
      22e:   2200        movs r2, #0
      230:   4629        mov r1, r5
@@ -327,7 +344,7 @@ generic_intr;
      2b4:   2300        movs r3, #0
      2b6:   4622        mov r2, r4
      2b8:   4640        mov r0, r8
-     2ba:   f000 f807   bl 0x2cc
+     2ba:   f000 f807   bl 0x2cc                ; call ckcu_clocks_enable
      2be:   2001        movs r0, #1
      2c0:   e8bd 81f0   ldmia.w sp!, {r4, r5, r6, r7, r8, pc}
      2c4:   0000        movs r0, r0
@@ -335,7 +352,13 @@ generic_intr;
 
      2c8:   0x40088000
 
-     2cc:   b5f0        push {r4, r5, r6, r7, lr}
+ckcu_clocks_enable:
+    ; Enable AHB, APB0, or APB1 clocks
+    ; r0 = AHB clock mask
+    ; r1 = APB0 clock mask
+    ; r2 = APB1 clock mask
+    ; r3 = enable/disable
+   0x2cc:   b5f0        push {r4, r5, r6, r7, lr}
      2ce:   4f07        ldr r7, [pc, #28]    ; (0x2ec)
      2d0:   6a7c        ldr r4, [r7, #36]    ; 0x24
      2d2:   6afd        ldr r5, [r7, #44]    ; 0x2c
@@ -352,15 +375,18 @@ generic_intr;
      2e8:   633e        str r6, [r7, #48]    ; 0x30
      2ea:   bdf0        pop {r4, r5, r6, r7, pc}
 
-     2ec:   0x40088000
+     2ec:   0x40088000  ; CKCU
 
-     2f0:   4903        ldr r1, [pc, #12]    ; (0x300)
+ckcu_set_usb_prescaler:
+    ; r0 = usb clock prescaler 0/1/2
+   0x2f0:   4903        ldr r1, [pc, #12]    ; (0x300)
      2f2:   680a        ldr r2, [r1, #0]
      2f4:   f422 0240   bic.w r2, r2, #12582912    ; 0xc00000
      2f8:   ea42 5080   orr.w r0, r2, r0, lsl #22
+     2fc:   6008        str r0, [r1, #0]
+     2fe:   4770        bx lr
 
-     2fc:   0x47706008
-     300:   0x40088000
+     300:   0x40088000  ; CKCU
 
 flash_page_erase:
     ; r0 = page address
@@ -649,51 +675,65 @@ flash_commit:
      556:   2000        movs r0, #0
      558:   001c        movs r4, r3
      55a:   2000        movs r0, #0
-     55c:   b510        push {r4, lr}
-     55e:   4c18        ldr r4, [pc, #96]    ; (0x5c0)
+
+   0x55c:   b510        push {r4, lr}
+     55e:   4c18        ldr r4, [pc, #96]   ; (0x5c0)
      560:   b1b0        cbz r0, 0x590
+
      562:   2100        movs r1, #0
      564:   4620        mov r0, r4
-     566:   f7ff fe37   bl 0x1d8
+     566:   f7ff fe37   bl 0x1d8            ; call bftm_set_mien(BFTM0, 0)
+
      56a:   2100        movs r1, #0
      56c:   4620        mov r0, r4
-     56e:   f7ff fe29   bl 0x1c4
+     56e:   f7ff fe29   bl 0x1c4            ; call bftm_set_cen(BFTM0, 0)
+
      572:   4620        mov r0, r4
-     574:   f7ff fdbe   bl 0xf4
-     578:   2029        movs r0, #41    ; 0x29
-     57a:   f000 f875   bl 0x668
+     574:   f7ff fdbe   bl 0xf4             ; call bftm_clear(BFTM0)
+
+     578:   2029        movs r0, #41
+     57a:   f000 f875   bl 0x668            ; call nvic_disable_intr(41)
+
      57e:   f000 f8b9   bl 0x6f4
+
      582:   2001        movs r0, #1
      584:   f000 fb70   bl 0xc68
+
      588:   e8bd 4010   ldmia.w sp!, {r4, lr}
      58c:   f000 bc00   b.w 0xd90
-     590:   2000        movs r0, #0
+
+   0x590:   2000        movs r0, #0
      592:   f000 fb69   bl 0xc68
+
      596:   2100        movs r1, #0
      598:   4620        mov r0, r4
-     59a:   f7ff fd9d   bl 0xd8
+     59a:   f7ff fd9d   bl 0xd8             ; call bftm_set_counter(BFTM0, 0)
+
      59e:   4620        mov r0, r4
-     5a0:   f7ff fda8   bl 0xf4
+     5a0:   f7ff fda8   bl 0xf4             ; call bftm_clear(BFTM0)
+
      5a4:   2101        movs r1, #1
      5a6:   4620        mov r0, r4
-     5a8:   f7ff fe0c   bl 0x1c4
+     5a8:   f7ff fe0c   bl 0x1c4            ; call bftm_set_cen(BFTM0, 1)
+
      5ac:   2101        movs r1, #1
      5ae:   4620        mov r0, r4
-     5b0:   f7ff fe12   bl 0x1d8
-     5b4:   4903        ldr r1, [pc, #12]    ; (0x5c4)
-     5b6:   f44f 7000   mov.w r0, #512    ; 0x200
+     5b0:   f7ff fe12   bl 0x1d8            ; call bftm_set_mien(BFTM0, 1)
+
+     5b4:   4903        ldr r1, [pc, #12]       ; (0x5c4)
+     5b6:   f44f 7000   mov.w r0, #512          ; 0x200
      5ba:   f8c1 0100   str.w r0, [r1, #256]    ; 0x100
      5be:   bd10        pop {r4, pc}
-     5c0:   6000        str r0, [r0, #0]
-     5c2:   4007        ands r7, r0
-     5c4:   e004        b.n 0x5d0
-     5c6:   e000        b.n 0x5ca
+
+   0x5c0:   0x40076000  ; BFTM0
+   0x5c4:   0xe000e004
+
      5c8:   b510        push {r4, lr}
      5ca:   2000        movs r0, #0
      5cc:   f44f 3280   mov.w r2, #65536    ; 0x10000
      5d0:   2301        movs r3, #1
      5d2:   4601        mov r1, r0
-     5d4:   f7ff fe7a   bl 0x2cc
+     5d4:   f7ff fe7a   bl 0x2cc                ; call ckcu_clocks_enable
      5d8:   e8bd 4010   ldmia.w sp!, {r4, lr}
      5dc:   f648 419f   movw r1, #35999    ; 0x8c9f
      5e0:   4801        ldr r0, [pc, #4]    ; (0x5e8)
@@ -749,7 +789,10 @@ flash_commit:
      660:   ed0c e000   stc 0, cr14, [ip, #-0]
      664:   0000        movs r0, r0
      666:   05fa        lsls r2, r7, #23
-     668:   f000 021f   and.w r2, r0, #31
+
+nvic_disable_intr:
+    ; r0 = interrupt number
+   0x668:   f000 021f   and.w r2, r0, #31
      66c:   2101        movs r1, #1
      66e:   4091        lsls r1, r2
      670:   0940        lsrs r0, r0, #5
@@ -757,6 +800,7 @@ flash_commit:
      674:   f100 20e0   add.w r0, r0, #3758153728    ; 0xe000e000
      678:   f8c0 1180   str.w r1, [r0, #384]    ; 0x180
      67c:   4770        bx lr
+
      67e:   b530        push {r4, r5, lr}
      680:   f000 0307   and.w r3, r0, #7
      684:   f1c3 0407   rsb r4, r3, #7
@@ -795,7 +839,7 @@ flash_commit:
      6d6:   2100        movs r1, #0
      6d8:   0250        lsls r0, r2, #9
      6da:   2301        movs r3, #1
-     6dc:   f7ff fdf6   bl 0x2cc
+     6dc:   f7ff fdf6   bl 0x2cc                ; call ckcu_clocks_enable
      6e0:   2201        movs r2, #1
      6e2:   e8bd 4010   ldmia.w sp!, {r4, lr}
      6e6:   4611        mov r1, r2
@@ -804,10 +848,12 @@ flash_commit:
      6ee:   0000        movs r0, r0
      6f0:   4000        ands r0, r0
      6f2:   400b        ands r3, r1
+
      6f4:   2200        movs r2, #0
      6f6:   4611        mov r1, r2
      6f8:   2002        movs r0, #2
      6fa:   f7ff bd77   b.w 0x1ec
+
      6fe:   2204        movs r2, #4
      700:   2100        movs r1, #0
      702:   2002        movs r0, #2
@@ -947,7 +993,7 @@ flash_write_buffer:
 
    0x80c:   0x40080000  ; FMC
 
-function_130_13:
+handle_frame:
    0x810:   e92d 41f0   stmdb sp!, {r4, r5, r6, r7, r8, lr}
      814:   4d71        ldr r5, [pc, #452]    ; (0x9dc)
      816:   7828        ldrb r0, [r5, #0]
@@ -1027,7 +1073,7 @@ function_130_13:
      8a0:   2220        movs r2, #32
      8a2:   4619        mov r1, r3
      8a4:   1d30        adds r0, r6, #4
-     8a6:   f7ff fbcb   bl 0x40                 ; call memcpy(r5 + 4, 0x400, 32)
+     8a6:   f7ff fbcb   bl 0x40                 ; call memcpy(r6 + 4, 0x400, 32)
 
      8aa:   484e        ldr r0, [pc, #312]      ; (0x9e4)
      8ac:   f8d0 1180   ldr.w r1, [r0, #384]    ; 0x180 undocumented FMC register
@@ -1035,20 +1081,20 @@ function_130_13:
      8b2:   f8d0 018c   ldr.w r0, [r0, #396]    ; 0x18c undocumented FMC register
      8b6:   2128        movs r1, #40
      8b8:   62b0        str r0, [r6, #40]       ; 0x28
-     8ba:   e053        b.n 0x964
+     8ba:   e053        b.n 0x964               ; read 40 bytes back from packet...
 
-   0x8bc:   2134        movs r1, #52    ; 0x34
-     8be:   e052        b.n 0x966
+   0x8bc:   2134        movs r1, #52
+     8be:   e052        b.n 0x966               ; read 52 bytes from 0x400
 
         ; if r0 == 1
    0x8c0:   2104        movs r1, #4
      8c2:   f44f 5070   mov.w r0, #15360    ; 0x3c00
-     8c6:   e04e        b.n 0x966
+     8c6:   e04e        b.n 0x966           ; read 4 bytes from 0x3c00
 
         ; if r0 == 2
    0x8c8:   f886 c004   strb.w ip, [r6, #4]
      8cc:   2101        movs r1, #1
-     8ce:   e049        b.n 0x964
+     8ce:   e049        b.n 0x964           ; read 1 byte back from packet...
 
     ; if r1 == 29 (0x1d)
    0x8d0:   0799        lsls r1, r3, #30
@@ -1061,6 +1107,7 @@ function_130_13:
      8de:   4573        cmp r3, lr
      8e0:   d872        bhi.n 0x9c8
      8e2:   6077        str r7, [r6, #4]
+
      8e4:   b120        cbz r0, 0x8f0
      8e6:   2801        cmp r0, #1
      8e8:   d022        beq.n 0x930
@@ -1068,38 +1115,43 @@ function_130_13:
      8ec:   d16c        bne.n 0x9c8
      8ee:   e01f        b.n 0x930
 
-     8f0:   1878        adds r0, r7, r1
+        ; if r0 == 0
+   0x8f0:   1878        adds r0, r7, r1
      8f2:   f8c6 c008   str.w ip, [r6, #8]
      8f6:   e9c6 7003   strd r7, r0, [r6, #12]
      8fa:   4638        mov r0, r7
-     8fc:   e00d        b.n 0x91a
+     8fc:   e00d        b.n 0x91a           ; enter erase loop
 
-     8fe:   e03f        b.n 0x980
+   0x8fe:   e03f        b.n 0x980           ; return
 
-     900:   f7ff fd00   bl 0x304
+   0x900:   f7ff fd00   bl 0x304            ; call flash_page_erase
      904:   b960        cbnz r0, 0x920
-     906:   f000 fe87   bl 0x1618
+     906:   f000 fe87   bl 0x1618           ; call watchdog_reload_timer
      90a:   68b0        ldr r0, [r6, #8]
-     90c:   f500 6080   add.w r0, r0, #1024    ; 0x400
+     90c:   f500 6080   add.w r0, r0, #1024 ; 0x400
      910:   60b0        str r0, [r6, #8]
      912:   68f0        ldr r0, [r6, #12]
-     914:   f500 6080   add.w r0, r0, #1024    ; 0x400
+     914:   f500 6080   add.w r0, r0, #1024 ; 0x400
      918:   60f0        str r0, [r6, #12]
-     91a:   6931        ldr r1, [r6, #16]
+   0x91a:   6931        ldr r1, [r6, #16]
      91c:   4288        cmp r0, r1
      91e:   d3ef        bcc.n 0x900
-     920:   6870        ldr r0, [r6, #4]
+
+    ; erase error
+   0x920:   6870        ldr r0, [r6, #4]
      922:   2108        movs r1, #8
      924:   f5a0 5040   sub.w r0, r0, #12288    ; 0x3000
      928:   6070        str r0, [r6, #4]
      92a:   e01b        b.n 0x964
 
     ; else / error handler
-     92c:   e04c        b.n 0x9c8
+   0x92c:   e04c        b.n 0x9c8
 
    0x92e:   e00d        b.n 0x94c
 
-     930:   4297        cmp r7, r2
+        ; if r0 == 1 (sum firmware)
+        ; if r0 == 2 (crc firmware)
+   0x930:   4297        cmp r7, r2
      932:   d349        bcc.n 0x9c8
      934:   f5b1 5f80   cmp.w r1, #4096    ; 0x1000
      938:   d346        bcc.n 0x9c8
@@ -1107,10 +1159,10 @@ function_130_13:
      93c:   d004        beq.n 0x948
      93e:   2200        movs r2, #0
    0x940:   4638        mov r0, r7
-     942:   f000 fe91   bl 0x1668
-     946:   e00b        b.n 0x960
+     942:   f000 fe91   bl 0x1668           ; call firmware_check(0x3400, [r6 + 8], r2)
+     946:   e00b        b.n 0x960           ; write return to response
 
-     948:   2201        movs r2, #1
+   0x948:   2201        movs r2, #1
      94a:   e7f9        b.n 0x940
 
     ; if r1 == 30 (0x1e)
@@ -1130,9 +1182,9 @@ function_130_13:
      95e:   e030        b.n 0x9c2
 
    0x960:   6070        str r0, [r6, #4]
+
      962:   2104        movs r1, #4
    0x964:   1d30        adds r0, r6, #4
-
    0x966:   f000 f881   bl 0xa6c            ; call flash_read_packet
 
      96a:   2401        movs r4, #1
@@ -1145,7 +1197,7 @@ function_130_13:
    0x978:   f7ff fb7b   bl 0x72
      97c:   2002        movs r0, #2
      97e:   7028        strb r0, [r5, #0]
-     980:   e8bd 81f0   ldmia.w sp!, {r4, r5, r6, r7, r8, pc}
+   0x980:   e8bd 81f0   ldmia.w sp!, {r4, r5, r6, r7, r8, pc}
 
     ; if r1 == 31 (0x1f)
    0x984:   b300        cbz r0, 0x9c8
@@ -1223,12 +1275,12 @@ reset_builtin:
      a16:   f44f 3080   mov.w r0, #65536    ; 0x10000
      a1a:   2301        movs r3, #1
      a1c:   460a        mov r2, r1
-     a1e:   f7ff fc55   bl 0x2cc
+     a1e:   f7ff fc55   bl 0x2cc                ; call ckcu_clocks_enable
      a22:   490f        ldr r1, [pc, #60]    ; (0xa60)
      a24:   f44f 7000   mov.w r0, #512    ; 0x200
      a28:   6248        str r0, [r1, #36]    ; 0x24
      a2a:   2035        movs r0, #53    ; 0x35
-     a2c:   f7ff fe1c   bl 0x668
+     a2c:   f7ff fe1c   bl 0x668            ; call nvic_disable_intr(53)
      a30:   2000        movs r0, #0
      a32:   f000 fc17   bl 0x1264
      a36:   f644 6020   movw r0, #20000    ; 0x4e20
@@ -1311,7 +1363,7 @@ flash_read_packet:
      af0:   0x42d40000
      af4:   0x40088000
 
-     af8:   e92d 41f0   stmdb sp!, {r4, r5, r6, r7, r8, lr}
+   0xaf8:   e92d 41f0   stmdb sp!, {r4, r5, r6, r7, r8, lr}
      afc:   270a        movs r7, #10
      afe:   4d16        ldr r5, [pc, #88]    ; (0xb58)
      b00:   e025        b.n 0xb4e
@@ -1397,7 +1449,7 @@ flash_read_packet:
      bbc:   f44f 2070   mov.w r0, #983040    ; 0xf0000
      bc0:   2301        movs r3, #1
      bc2:   4632        mov r2, r6
-     bc4:   f7ff fb82   bl 0x2cc
+     bc4:   f7ff fb82   bl 0x2cc                ; call ckcu_clocks_enable
      bc8:   2408        movs r4, #8
      bca:   e017        b.n 0xbfc
      bcc:   4824        ldr r0, [pc, #144]    ; (0xc60)
@@ -1512,7 +1564,7 @@ flash_read_packet:
      cda:   f44f 3200   mov.w r2, #131072    ; 0x20000
      cde:   f44f 20e0   mov.w r0, #458752    ; 0x70000
      ce2:   2301        movs r3, #1
-     ce4:   f7ff faf2   bl 0x2cc
+     ce4:   f7ff faf2   bl 0x2cc                ; call ckcu_clocks_enable
      ce8:   f64e 2160   movw r1, #60000    ; 0xea60
      cec:   4824        ldr r0, [pc, #144]    ; (0xd80)
      cee:   f7ff f9a3   bl 0x38
@@ -1581,14 +1633,18 @@ flash_read_packet:
      d8e:   400b        ands r3, r1
      d90:   b570        push {r4, r5, r6, lr}
      d92:   4c18        ldr r4, [pc, #96]    ; (0xdf4)
+
      d94:   2100        movs r1, #0
      d96:   4620        mov r0, r4
-     d98:   f7ff fa1e   bl 0x1d8
+     d98:   f7ff fa1e   bl 0x1d8            ; call bftm_set_mien(BFTM1, 0)
+
      d9c:   2100        movs r1, #0
      d9e:   4620        mov r0, r4
-     da0:   f7ff fa10   bl 0x1c4
+     da0:   f7ff fa10   bl 0x1c4            ; call bftm_set_cen(BFTM1, 0)
+
      da4:   4620        mov r0, r4
-     da6:   f7ff f9a5   bl 0xf4
+     da6:   f7ff f9a5   bl 0xf4             ; call bftm_clear(BFTM1)
+
      daa:   4913        ldr r1, [pc, #76]    ; (0xdf8)
      dac:   1520        asrs r0, r4, #20
      dae:   f8c1 0180   str.w r0, [r1, #384]    ; 0x180
@@ -1621,16 +1677,15 @@ flash_read_packet:
      dee:   b2ed        uxtb r5, r5
      df0:   d2e9        bcs.n 0xdc6
      df2:   bd70        pop {r4, r5, r6, pc}
-     df4:   7000        strb r0, [r0, #0]
-     df6:   4007        ands r7, r0
-     df8:   e004        b.n 0xe04
-     dfa:   e000        b.n 0xdfe
-     dfc:   f000 4006   and.w r0, r0, #2248146944    ; 0x86000000
-     e00:   4000        ands r0, r0
-     e02:   400b        ands r3, r1
-     e04:   2074        movs r0, #116    ; 0x74
-     e06:   0000        movs r0, r0
-     e08:   b570        push {r4, r5, r6, lr}
+
+   0xdf4:   0x40077000  ; BFTM1
+   0xdf8:   0xe000e004
+
+   0xdfc:   0x4006f000
+   0xe00:   0x400b4000
+   0xe04:   0x2074
+
+   0xe08:   b570        push {r4, r5, r6, lr}
      e0a:   4c23        ldr r4, [pc, #140]    ; (0xe98)
      e0c:   2508        movs r5, #8
      e0e:   e011        b.n 0xe34
@@ -1673,34 +1728,36 @@ flash_read_packet:
      e68:   4810        ldr r0, [pc, #64]    ; (0xeac)
      e6a:   f7ff faeb   bl 0x444
      e6e:   4c10        ldr r4, [pc, #64]    ; (0xeb0)
+
      e70:   2100        movs r1, #0
      e72:   4620        mov r0, r4
-     e74:   f7ff f930   bl 0xd8
+     e74:   f7ff f930   bl 0xd8             ; call bftm_set_counter(BFTM1, 0)
+
      e78:   4620        mov r0, r4
-     e7a:   f7ff f93b   bl 0xf4
+     e7a:   f7ff f93b   bl 0xf4             ; call bftm_clear(BFTM1)
+
      e7e:   2101        movs r1, #1
      e80:   4620        mov r0, r4
-     e82:   f7ff f99f   bl 0x1c4
+     e82:   f7ff f99f   bl 0x1c4            ; call bftm_set_cen(BFTM1, 1)
+
      e86:   2101        movs r1, #1
      e88:   4620        mov r0, r4
-     e8a:   f7ff f9a5   bl 0x1d8
+     e8a:   f7ff f9a5   bl 0x1d8            ; call bftm_set_mien(BFTM1, 1)
+
      e8e:   4909        ldr r1, [pc, #36]    ; (0xeb4)
      e90:   1520        asrs r0, r4, #20
      e92:   f8c1 0100   str.w r0, [r1, #256]    ; 0x100
      e96:   bd70        pop {r4, r5, r6, pc}
-     e98:   2074        movs r0, #116    ; 0x74
-     e9a:   0000        movs r0, r0
-     e9c:   4000        ands r0, r0
-     e9e:   400b        ands r3, r1
-     ea0:   00ec        lsls r4, r5, #3
-     ea2:   2000        movs r0, #0
-     ea4:   0010        movs r0, r2
-     ea6:   2000        movs r0, #0
-     ea8:   0000        movs r0, r0
-     eaa:   400b        ands r3, r1
-     eac:   f000 4006   and.w r0, r0, #2248146944    ; 0x86000000
-     eb0:   7000        strb r0, [r0, #0]
-     eb2:   4007        ands r7, r0
+
+     e98:   0x2074        movs r0, #116    ; 0x74
+
+   0xe9c:   0x400b4000  ; GPIO C
+   0xea0:   0x200000ec
+   0xea4:   0x20000010
+   0xea8:   0x400b0000  ; GPIO A
+   0xeac:   0x4006f000  ; GPTM1
+   0xeb0:   0x40077000  ; BFTM1
+
      eb4:   e004        b.n 0xec0
      eb6:   e000        b.n 0xeba
      eb8:   b530        push {r4, r5, lr}
@@ -2019,7 +2076,7 @@ flash_read_packet:
     11e0:   f44f 6080   mov.w r0, #1024    ; 0x400
     11e4:   2240        movs r2, #64    ; 0x40
     11e6:   2301        movs r3, #1
-    11e8:   f7ff f870   bl 0x2cc
+    11e8:   f7ff f870   bl 0x2cc                ; call ckcu_clocks_enable
     11ec:   2002        movs r0, #2
     11ee:   f7ff f87f   bl 0x2f0
     11f2:   4c12        ldr r4, [pc, #72]    ; (0x123c)
@@ -2381,7 +2438,10 @@ flash_read_packet:
     155a:   9301        str r3, [sp, #4]
     155c:   0110        lsls r0, r2, #4
     155e:   8401        strh r1, [r0, #32]
-    1560:   b510        push {r4, lr}
+
+get_event:
+    ; return 0,1,2,3
+  0x1560:   b510        push {r4, lr}
     1562:   4c12        ldr r4, [pc, #72]    ; (0x15ac)
     1564:   f894 0032   ldrb.w r0, [r4, #50]    ; 0x32
     1568:   2803        cmp r0, #3
@@ -2398,26 +2458,29 @@ flash_read_packet:
     1582:   2806        cmp r0, #6
     1584:   d101        bne.n 0x158a
     1586:   f000 f999   bl 0x18bc
-    158a:   2002        movs r0, #2
+    158a:   2002        movs r0, #2         ; return 2
     158c:   bd10        pop {r4, pc}
-    158e:   2000        movs r0, #0
+
+  0x158e:   2000        movs r0, #0
     1590:   7108        strb r0, [r1, #4]
-    1592:   2003        movs r0, #3
+    1592:   2003        movs r0, #3         ; return 3
     1594:   bd10        pop {r4, pc}
-    1596:   f894 0032   ldrb.w r0, [r4, #50]    ; 0x32
+
+  0x1596:   f894 0032   ldrb.w r0, [r4, #50]    ; 0x32
     159a:   2806        cmp r0, #6
     159c:   d001        beq.n 0x15a2
-    159e:   2000        movs r0, #0
+    159e:   2000        movs r0, #0         ; return 0
     15a0:   bd10        pop {r4, pc}
-    15a2:   2002        movs r0, #2
+
+  0x15a2:   2002        movs r0, #2
     15a4:   7108        strb r0, [r1, #4]
-    15a6:   2001        movs r0, #1
+    15a6:   2001        movs r0, #1         ; return 1
     15a8:   bd10        pop {r4, pc}
-    15aa:   0000        movs r0, r0
-    15ac:   0304        lsls r4, r0, #12
-    15ae:   2000        movs r0, #0
-    15b0:   001c        movs r4, r3
-    15b2:   2000        movs r0, #0
+    15aa:   0000
+
+  0x15ac:   0x20000304
+  0x15b0:   0x2000001c
+
     15b4:   4902        ldr r1, [pc, #8]    ; (0x15c0)
     15b6:   680a        ldr r2, [r1, #0]
     15b8:   6002        str r2, [r0, #0]
@@ -2516,9 +2579,13 @@ generate:
 
     1662:   bd70        pop {r4, r5, r6, pc}
 
-    1664:   0x1f44
+  0x1664:   0x1f44
 
-    1668:   e92d 4ff0   stmdb sp!, {r4, r5, r6, r7, r8, r9, sl, fp, lr}
+firmware_check:
+    ; r0 = 0x3400
+    ; r1 =
+    ; r2 = 0/1 sum/crc
+  0x1668:   e92d 4ff0   stmdb sp!, {r4, r5, r6, r7, r8, r9, sl, fp, lr}
     166c:   4606        mov r6, r0
     166e:   f643 30f8   movw r0, #15352    ; 0x3bf8
     1672:   b0c1        sub sp, #260    ; 0x104
@@ -2527,40 +2594,50 @@ generate:
     1678:   460d        mov r5, r1
     167a:   f1b0 7f41   cmp.w r0, #50593792    ; 0x3040000
     167e:   d104        bne.n 0x168a
+
     1680:   f643 30fc   movw r0, #15356    ; 0x3bfc
     1684:   7800        ldrb r0, [r0, #0]
     1686:   2801        cmp r0, #1
     1688:   d003        beq.n 0x1692
-    168a:   2000        movs r0, #0
-    168c:   b041        add sp, #260    ; 0x104
+
+  0x168a:   2000        movs r0, #0
+  0x168c:   b041        add sp, #260    ; 0x104
     168e:   e8bd 8ff0   ldmia.w sp!, {r4, r5, r6, r7, r8, r9, sl, fp, pc}
-    1692:   f8df a0a0   ldr.w sl, [pc, #160]    ; 0x1734
+
+  0x1692:   f8df a0a0   ldr.w sl, [pc, #160]    ; 0x1734
     1696:   f04f 0800   mov.w r8, #0
     169a:   f643 3bff   movw fp, #15359    ; 0x3bff
     169e:   f1b9 0f00   cmp.w r9, #0
     16a2:   d03c        beq.n 0x171e
+
+    ; Enable CRC clock
     16a4:   2100        movs r1, #0
-    16a6:   f44f 5000   mov.w r0, #8192    ; 0x2000
+    16a6:   f44f 5000   mov.w r0, #8192     ; 0x2000
     16aa:   2301        movs r3, #1
     16ac:   460a        mov r2, r1
-    16ae:   f7fe fe0d   bl 0x2cc
-    16b2:   f04f 31ff   mov.w r1, #4294967295    ; 0xffffffff
+    16ae:   f7fe fe0d   bl 0x2cc            ; call ckcu_clocks_enable(0x2000, 0, 0, 1)
+
+    16b2:   f04f 31ff   mov.w r1, #4294967295   ; 0xffffffff
     16b6:   f8ca 1004   str.w r1, [sl, #4]
-    16ba:   21e6        movs r1, #230    ; 0xe6
+    16ba:   21e6        movs r1, #230           ; 0xe6
     16bc:   f8ca 1000   str.w r1, [sl]
     16c0:   e02d        b.n 0x171e
-    16c2:   f89b 0000   ldrb.w r0, [fp]
+
+  0x16c2:   f89b 0000   ldrb.w r0, [fp]
     16c6:   42a8        cmp r0, r5
     16c8:   d900        bls.n 0x16cc
     16ca:   4628        mov r0, r5
     16cc:   b2c4        uxtb r4, r0
     16ce:   1b2d        subs r5, r5, r4
+
     16d0:   4668        mov r0, sp
     16d2:   f7ff ffa9   bl 0x1628           ; call generate
+
     16d6:   2100        movs r1, #0
     16d8:   4608        mov r0, r1
     16da:   e01d        b.n 0x1718
-    16dc:   1c49        adds r1, r1, #1
+
+  0x16dc:   1c49        adds r1, r1, #1
     16de:   b2c9        uxtb r1, r1
     16e0:   f81d 2001   ldrb.w r2, [sp, r1]
     16e4:   4410        add r0, r2
@@ -2573,30 +2650,38 @@ generate:
     16f8:   7837        ldrb r7, [r6, #0]
     16fa:   f81d 2002   ldrb.w r2, [sp, r2]
     16fe:   4057        eors r7, r2
+
     1700:   f1b9 0f00   cmp.w r9, #0
     1704:   d002        beq.n 0x170c
+
     1706:   f88a 700c   strb.w r7, [sl, #12]
     170a:   e004        b.n 0x1716
-    170c:   1e4a        subs r2, r1, #1
+
+  0x170c:   1e4a        subs r2, r1, #1
     170e:   0792        lsls r2, r2, #30
     1710:   0ed2        lsrs r2, r2, #27
     1712:   4097        lsls r7, r2
     1714:   44b8        add r8, r7
-    1716:   1c76        adds r6, r6, #1
-    1718:   1e64        subs r4, r4, #1
+
+  0x1716:   1c76        adds r6, r6, #1
+  0x1718:   1e64        subs r4, r4, #1
     171a:   b2e4        uxtb r4, r4
-    171c:   d2de        bcs.n 0x16dc
-    171e:   2d00        cmp r5, #0
+    171c:   d2de        bcs.n 0x16dc        ; loop
+
+  0x171e:   2d00        cmp r5, #0
     1720:   d1cf        bne.n 0x16c2
+
     1722:   f1b9 0f00   cmp.w r9, #0
     1726:   d002        beq.n 0x172e
-    1728:   f8da 0008   ldr.w r0, [sl, #8]
-    172c:   e7ae        b.n 0x168c
-    172e:   4640        mov r0, r8
-    1730:   e7ac        b.n 0x168c
-    1732:   0000        movs r0, r0
 
-    1734:   0x4008a000
+    1728:   f8da 0008   ldr.w r0, [sl, #8]
+    172c:   e7ae        b.n 0x168c          ; return
+
+  0x172e:   4640        mov r0, r8
+    1730:   e7ac        b.n 0x168c          ; return
+    1732:   0000
+
+  0x1734:   0x4008a000  ; CRC
 
     1738:   e92d 41f0   stmdb sp!, {r4, r5, r6, r7, r8, lr}
     173c:   4c28        ldr r4, [pc, #160]    ; (0x17e0)
@@ -3289,7 +3374,7 @@ generate:
     1d80:   468a        mov sl, r1
     1d82:   2301        movs r3, #1
     1d84:   4610        mov r0, r2
-    1d86:   f7fe faa1   bl 0x2cc
+    1d86:   f7fe faa1   bl 0x2cc                ; call ckcu_clocks_enable
     1d8a:   4824        ldr r0, [pc, #144]    ; (0x1e1c)
     1d8c:   f7ff f94a   bl 0x1024
     1d90:   4d23        ldr r5, [pc, #140]    ; (0x1e20)
@@ -3343,7 +3428,7 @@ generate:
     1e10:   e8bd 47f0   ldmia.w sp!, {r4, r5, r6, r7, r8, r9, sl, lr}
     1e14:   2300        movs r3, #0
     1e16:   4610        mov r0, r2
-    1e18:   f7fe ba58   b.w 0x2cc
+    1e18:   f7fe ba58   b.w 0x2cc                ; call ckcu_clocks_enable
     1e1c:   0304        lsls r4, r0, #12
     1e1e:   2000        movs r0, #0
     1e20:   4000        ands r0, r0
@@ -3439,29 +3524,38 @@ main:
     1ef2:   4c13        ldr r4, [pc, #76]    ; (0x1f40)
 
     ; main loop
-  0x1ef4:   f7ff fb34   bl 0x1560
+  0x1ef4:   f7ff fb34   bl 0x1560           ; call get_event
+
     1ef8:   2801        cmp r0, #1
     1efa:   d007        beq.n 0x1f0c
     1efc:   2802        cmp r0, #2
     1efe:   d00f        beq.n 0x1f20
     1f00:   2803        cmp r0, #3
     1f02:   d116        bne.n 0x1f32
+
+    ; if r0 == 3
     1f04:   2001        movs r0, #1
     1f06:   f7fe fb29   bl 0x55c
     1f0a:   e012        b.n 0x1f32
-    1f0c:   2000        movs r0, #0
+
+    ; if r0 == 1
+  0x1f0c:   2000        movs r0, #0
     1f0e:   f7fe fb25   bl 0x55c
     1f12:   f7fe ff79   bl 0xe08
     1f16:   f7fe fbf2   bl 0x6fe
     1f1a:   2000        movs r0, #0
     1f1c:   f7fe fe1e   bl 0xb5c
-    1f20:   f7fe fc76   bl 0x810
+
+    ; if r0 == 2
+  0x1f20:   f7fe fc76   bl 0x810            ; call handle_frame()
     1f24:   f7fe fde8   bl 0xaf8
     1f28:   7820        ldrb r0, [r4, #0]
     1f2a:   b910        cbnz r0, 0x1f32
     1f2c:   2001        movs r0, #1
     1f2e:   f7fe fc33   bl 0x798
-    1f32:   f7ff fb71   bl 0x1618
+
+    ; else
+  0x1f32:   f7ff fb71   bl 0x1618
     1f36:   e7dd        b.n 0x1ef4
 
   0x1f38:   0x20003ffc  ; last sram word

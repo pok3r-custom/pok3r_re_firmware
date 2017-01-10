@@ -1,0 +1,16 @@
+POK3R RGB Builtin Firmware SRAM Variable Map:
+List of variables in sram (0x2000_0000) and where they are referenced.
+
+<variable name>                         @ 0x<address>
+    // description
+    0x<offset>: <type> <possible values / description>
+        <field-referencing functions>
+    <pointer-referencing functions>
+
+types:
+    b   byte
+    h   halfword
+    w   word
+    p   sram address
+    d   data address
+    f   function address

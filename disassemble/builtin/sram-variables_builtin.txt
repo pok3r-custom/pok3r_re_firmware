@@ -1,4 +1,4 @@
-Firmware Builtin SRAM Variable Map:
+POK3R Builtin Firmware SRAM Variable Map:
 List of variables in sram (0x2000_0000) and where they are referenced.
 
 <variable name>                         @ 0x<address>

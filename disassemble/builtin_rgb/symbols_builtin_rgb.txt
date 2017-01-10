@@ -19,6 +19,9 @@ mem_set2                            @ 0x76
 
 sram_init                           @ 0x88
 
+bftm_set_counter                    @ 0xd8
+bftm_clear                          @ 0xf4
+
 reset                               @ 0x118
     watchdog_init
     clock_init
@@ -26,14 +29,21 @@ reset                               @ 0x118
 
 generic_fault                       @ 0x124
 
+bftm_set_mien                       @ 0x1d8
+
+ckcu_clocks_enable                  @ 0x2cc
+ckcu_set_usb_prescaler              @ 0x2f0
+
 flash_page_erase                    @ 0x304
     flash_commit
 flash_commit                        @ 0x314
 
+nvic_disable_intr                   @ 0x668
+
 decrypt_packet                      @ 0x7b0
     generate
 flash_write_buffer                  @ 0x7ec
-function_130_13                     @ 0x810
+handle_frame                        @ 0x810
     reset_builtin
     decrypt_packet
     flash_write_buffer
@@ -41,7 +51,11 @@ function_130_13                     @ 0x810
 reset_builtin                       @ 0x9e8
 flash_read_packet                   @ 0xa6c
 
+get_event                           @ 0x1560
+
 generate                            @ 0x1628
+firmware_check                       @ 0x1668
+    generate
 
 main                                @ 0x1ea4
 

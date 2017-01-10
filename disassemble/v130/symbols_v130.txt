@@ -121,7 +121,7 @@ pinmux_c0_gptm                      @ 0x5c3a
 
 function_130_11                     @ 0x5c88
 function_130_12                     @ 0x5cd4
-function_130_13                     @ 0x5cec
+handle_frame                        @ 0x5cec
     reset_builtin
 
 flash_read_packet                   @ 0x5e54
