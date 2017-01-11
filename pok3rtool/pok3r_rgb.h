@@ -55,6 +55,8 @@ public:
     //! Reset to bootloader and re-open device.
     bool enterBootloader();
 
+    bool getInfo();
+
     //! Read the firmware version from the keyboard.
     ZString getVersion();
 
@@ -70,7 +72,7 @@ public:
     void test();
 
     //! Erase flash pages starting at \a start, ending on the page of \a end.
-    bool eraseFlash(zu32 start, zu32 end);
+    bool eraseFlash(zu32 start, zu32 length);
     //! Read 64 bytes at \a addr.
     bool readFlash(zu32 addr, ZBinary &bin);
     //! Write 52 bytes at \a addr.
