@@ -222,30 +222,34 @@ bool Pok3rRGB::updateFirmware(ZString version, const ZBinary &fwbinin){
 }
 
 void Pok3rRGB::test(){
-    ZBinary bin(UPDATE_PKT_LEN);
+    ZBinary bin;
+
     LOG("READ_400");
-    if(!sendCmd(READ, READ_400))
-        return;
-    if(!recv(bin))
+    bin.clear();
+    if(!sendRecvCmd(READ, READ_400, bin))
         return;
     RLOG(bin.getSub(4, 52).dumpBytes(4, 8));
 
     LOG("READ_3c00");
-    if(!sendCmd(READ, READ_3C00))
-        return;
-    if(!recv(bin))
+    bin.clear();
+    if(!sendRecvCmd(READ, READ_3C00, bin))
         return;
     RLOG(bin.getSub(4, 4).dumpBytes(4, 8));
 
     LOG("READ_MODE");
-    if(!sendCmd(READ, READ_MODE))
-        return;
-    if(!recv(bin))
+    bin.clear();
+    if(!sendRecvCmd(READ, READ_MODE, bin))
         return;
     RLOG(bin.getSub(4, 1).dumpBytes(4, 8));
 
     if(!enterBootloader())
         return;
+
+    LOG("READ_MODE");
+    bin.clear();
+    if(!sendRecvCmd(READ, READ_MODE, bin))
+        return;
+    RLOG(bin.getSub(4, 1).dumpBytes(4, 8));
 
     ZBinary data;
     data.writeleu32(0x400);

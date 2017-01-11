@@ -581,13 +581,13 @@ ZPointer<UpdateInterface> openDevice(){
 }
 
 int main(int argc, char **argv){
-    ZLog::logLevelStdOut(ZLog::INFO, "%clock% N %log%");
-//    ZLog::logLevelStdOut(ZLog::DEBUG, "\x1b[35m%time% %thread% N %log%");
-    ZLog::logLevelStdErr(ZLog::ERRORS, "\x1b[31m%time% E [%file%:%line%] %log%\x1b[m");
+    ZLog::logLevelStdOut(ZLog::INFO, "[%clock%] N %log%");
+//    ZLog::logLevelStdOut(ZLog::DEBUG, "\x1b[35m[%clock%] %thread% N %log%\x1b[m");
+    ZLog::logLevelStdErr(ZLog::ERRORS, "\x1b[31m[%clock%] E %log%\x1b[m");
     ZPath lgf = ZPath("logs") + ZLog::genLogFileName("pok3rtool_");
-    ZLog::logLevelFile(ZLog::INFO, lgf, "%clock% N %log%");
-    ZLog::logLevelFile(ZLog::DEBUG, lgf, "%clock% D [%function%|%file%:%line%] %log%");
-    ZLog::logLevelFile(ZLog::ERRORS, lgf, "%clock% E [%function%|%file%:%line%] %log%");
+    ZLog::logLevelFile(ZLog::INFO, lgf, "[%clock%] N %log%");
+    ZLog::logLevelFile(ZLog::DEBUG, lgf, "[%clock%] D [%function%|%file%:%line%] %log%");
+    ZLog::logLevelFile(ZLog::ERRORS, lgf, "[%clock%] E [%function%|%file%:%line%] %log%");
 
     if(argc > 1){
         ZString cmd = argv[1];
