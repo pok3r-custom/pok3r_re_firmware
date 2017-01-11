@@ -9,6 +9,7 @@
 using namespace LibChaos;
 
 #include <stdio.h>
+#include <iostream>
 
 /*
 int writeversion(ZString version){
@@ -561,14 +562,29 @@ int encode_patch_updater(ZPath exein, ZPath fwin, ZPath exeout){
     return 0;
 }
 
+void warning(){
+    ELOG("WARNING: THIS TOOL IS RELATIVELY UNTESTESTED, AND HAS A VERY REAL RISK OF "
+         "CORRUPTING YOUR POK3R OR POK3R RGB, MAKING IT UNUSABLE WITHOUT EXPENSIVE "
+         "DEVELOPMENT TOOLS. PROCEED AT YOUR OWN RISK.");
+    ELOG("Type \"OK\" to continue:");
+    std::string str;
+    std::getline(std::cin, str);
+    if(str != "OK"){
+        LOG("Exiting...");
+        exit(EXIT_FAILURE);
+    } else {
+        LOG("Proceeding...");
+    }
+}
+
 ZPointer<UpdateInterface> openDevice(){
     ZPointer<UpdateInterface> kb;
 
     // POK3R
-//    kb = new Pok3r();
-//    if(kb->open()){
-//        return kb;
-//    }
+    kb = new Pok3r();
+    if(kb->open()){
+        return kb;
+    }
 
     // POK3R RGB
     kb = new Pok3rRGB();
@@ -576,7 +592,7 @@ ZPointer<UpdateInterface> openDevice(){
         return kb;
     }
 
-    ELOG("Failed to open");
+    ELOG("Failed to open POK3R");
     return nullptr;
 }
 
@@ -592,6 +608,7 @@ int main(int argc, char **argv){
     if(argc > 1){
         ZString cmd = argv[1];
         if(cmd == "version"){
+            warning();
             // Read Version
             ZPointer<UpdateInterface> kb = openDevice();
             if(kb.ptr()){
@@ -602,6 +619,7 @@ int main(int argc, char **argv){
 
         } else if(cmd == "setversion"){
             if(argc > 2){
+                warning();
                 // Set Version
                 ZPointer<UpdateInterface> kb = openDevice();
                 if(kb.ptr()){
@@ -615,6 +633,7 @@ int main(int argc, char **argv){
             }
 
         } else if(cmd == "info"){
+            warning();
             // Get Info
             ZPointer<UpdateInterface> kb = openDevice();
             if(kb.ptr()){
@@ -624,6 +643,7 @@ int main(int argc, char **argv){
             return -1;
 
         } else if(cmd == "reboot"){
+            warning();
             // Reset to Firmware
             ZPointer<UpdateInterface> kb = openDevice();
             if(kb.ptr()){
@@ -635,6 +655,7 @@ int main(int argc, char **argv){
             return -1;
 
         } else if(cmd == "bootloader"){
+            warning();
             // Reset to Bootloader
             ZPointer<UpdateInterface> kb = openDevice();
             if(kb.ptr()){
@@ -647,6 +668,7 @@ int main(int argc, char **argv){
 
         } else if(cmd == "dump"){
             if(argc > 2){
+                warning();
                 // Dump Flash
                 ZPointer<UpdateInterface> kb = openDevice();
                 if(kb.ptr()){
@@ -664,6 +686,7 @@ int main(int argc, char **argv){
             }
 
         } else if(cmd == "flash"){
+            warning();
             // Update Firmware
             if(argc > 3){
                 ZPointer<UpdateInterface> kb = openDevice();
@@ -682,6 +705,7 @@ int main(int argc, char **argv){
             }
 
         } else if(cmd == "test"){
+            warning();
             // Test
             Pok3rRGB kb;
             if(kb.open()){
