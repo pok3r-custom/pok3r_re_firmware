@@ -4760,8 +4760,8 @@ handle_frame:
     ; if r0 == 2
   0x5d90:   2101        movs r1, #1
     5d92:   7129        strb r1, [r5, #4]   ; [r5 + 4] = 1
-  0x5d94:   1d28        adds r0, r5, #4     ; r0 = r5 + 4
 
+  0x5d94:   1d28        adds r0, r5, #4     ; r0 = r5 + 4
   0x5d96:   f000 f85d   bl 0x5e54           ; call flash_read_packet(r0, r1)
     5d9a:   2401        movs r4, #1
   0x5d9c:   7830        ldrb r0, [r6, #0]

@@ -20,14 +20,17 @@ entry:
     0x28:   0x1ea5      ; main
     0x2c:   0x20000740  ; stack_max
 
-      30:   6801        ldr r1, [r0, #0]
+load_jump_fw:
+    ; r0 = vector address
+    0x30:   6801        ldr r1, [r0, #0]
       32:   468d        mov sp, r1
       34:   6841        ldr r1, [r0, #4]
       36:   4708        bx r1
-      38:   60c1        str r1, [r0, #12]
+
+    0x38:   60c1        str r1, [r0, #12]
       3a:   4770        bx lr
-      3c:   010f        lsls r7, r1, #4
-      3e:   0000        movs r0, r0
+
+    0x3c:   0x10f      ; SySTick           (systick_intr)
 
 memcpy:
     ; r0 = dest
@@ -98,7 +101,7 @@ sram_init:
     0xa4:   0x2230
     0xa8:   0x2250
 
-      ac:   b510        push {r4, lr}
+    0xac:   b510        push {r4, lr}
       ae:   2200        movs r2, #0
       b0:   2807        cmp r0, #7
       b2:   d902        bls.n 0xba
@@ -1096,7 +1099,7 @@ handle_frame:
      8cc:   2101        movs r1, #1
      8ce:   e049        b.n 0x964           ; read 1 byte back from packet...
 
-    ; if r1 == 29 (0x1d)
+    ; if r1 == 0x1d (firmware command)
    0x8d0:   0799        lsls r1, r3, #30
      8d2:   d179        bne.n 0x9c8
      8d4:   68b1        ldr r1, [r6, #8]
@@ -1115,7 +1118,7 @@ handle_frame:
      8ec:   d16c        bne.n 0x9c8
      8ee:   e01f        b.n 0x930
 
-        ; if r0 == 0
+        ; if r0 == 0 (erase)
    0x8f0:   1878        adds r0, r7, r1
      8f2:   f8c6 c008   str.w ip, [r6, #8]
      8f6:   e9c6 7003   strd r7, r0, [r6, #12]
@@ -1137,7 +1140,7 @@ handle_frame:
      91c:   4288        cmp r0, r1
      91e:   d3ef        bcc.n 0x900
 
-    ; erase error
+    ; erase exit
    0x920:   6870        ldr r0, [r6, #4]
      922:   2108        movs r1, #8
      924:   f5a0 5040   sub.w r0, r0, #12288    ; 0x3000
@@ -1172,9 +1175,9 @@ handle_frame:
 
         ; if r0 == 1
    0x952:   4573        cmp r3, lr
-     954:   d238        bcs.n 0x9c8
+     954:   d238        bcs.n 0x9c8         ;
      956:   0798        lsls r0, r3, #30
-     958:   d136        bne.n 0x9c8
+     958:   d136        bne.n 0x9c8         ; error if address not word aligned
      95a:   606f        str r7, [r5, #4]
 
         ; if r0 == 0
@@ -1199,34 +1202,36 @@ handle_frame:
      97e:   7028        strb r0, [r5, #0]
    0x980:   e8bd 81f0   ldmia.w sp!, {r4, r5, r6, r7, r8, pc}
 
-    ; if r1 == 31 (0x1f)
+    ; if r1 == 0x1f (write)
    0x984:   b300        cbz r0, 0x9c8
-     986:   0781        lsls r1, r0, #30
-     988:   d11e        bne.n 0x9c8
-     98a:   283c        cmp r0, #60    ; 0x3c
-     98c:   d81c        bhi.n 0x9c8
-     98e:   6869        ldr r1, [r5, #4]
+     986:   0781        lsls r1, r0, #30    ; error if length 0
+     988:   d11e        bne.n 0x9c8         ; error if length not multiple of 4
+     98a:   283c        cmp r0, #60
+     98c:   d81c        bhi.n 0x9c8         ; error if length > 60
+     98e:   6869        ldr r1, [r5, #4]    ; write addr
      990:   1843        adds r3, r0, r1
-     992:   f5b3 4f7c   cmp.w r3, #64512    ; 0xfc00
-     996:   d817        bhi.n 0x9c8
+     992:   f5b3 4f7c   cmp.w r3, #64512
+     996:   d817        bhi.n 0x9c8         ; error if addr + len > 0xfc00
      998:   4291        cmp r1, r2
-     99a:   d202        bcs.n 0x9a2
+     99a:   d202        bcs.n 0x9a2         ; decrypt if addr >= 0x3400
      99c:   4293        cmp r3, r2
-     99e:   d813        bhi.n 0x9c8
-     9a0:   e003        b.n 0x9aa
+     99e:   d813        bhi.n 0x9c8         ; error if addr + len > 0x3400
+     9a0:   e003        b.n 0x9aa           ; jump to write
 
    0x9a2:   4601        mov r1, r0
      9a4:   1d30        adds r0, r6, #4
-     9a6:   f7ff ff03   bl 0x7b0
+     9a6:   f7ff ff03   bl 0x7b0            ; call decrypt_packet(r6 + 4, len)
 
    0x9aa:   7872        ldrb r2, [r6, #1]
      9ac:   1d31        adds r1, r6, #4
      9ae:   6868        ldr r0, [r5, #4]
-     9b0:   f7ff ff1c   bl 0x7ec            ; call flash_write_buffer
+     9b0:   f7ff ff1c   bl 0x7ec            ; call flash_write_buffer([r5 + 4], r6 + 4, [r6 + 1])
+
+    ; increment target address
      9b4:   7870        ldrb r0, [r6, #1]
      9b6:   6869        ldr r1, [r5, #4]
      9b8:   4408        add r0, r1
-     9ba:   f240 211e   movw r1, #542    ; 0x21e
+     9ba:   f240 211e   movw r1, #542       ; 0x21e
      9be:   6068        str r0, [r5, #4]
      9c0:   8031        strh r1, [r6, #0]
 
@@ -1244,7 +1249,7 @@ handle_frame:
      9d8:   e7ce        b.n 0x978
      9da:   0000
 
-   0x9dc:   0x20000004
+   0x9dc:   0x20000004  ; pointer_br_1
    0x9e0:   0x20000084
    0x9e4:   0x40080000  ; FMC
 
@@ -3451,39 +3456,50 @@ firmware_check:
     1e42:   2a00        cmp r2, #0
     1e44:   d1fb        bne.n 0x1e3e
     1e46:   4770        bx lr
-    1e48:   f44f 5050   mov.w r0, #13312    ; 0x3400
+
+check_fw_sp_pc:
+  0x1e48:   f44f 5050   mov.w r0, #13312            ; 0x3400
     1e4c:   6801        ldr r1, [r0, #0]
     1e4e:   f1a1 5100   sub.w r1, r1, #536870912    ; 0x20000000
-    1e52:   f5b1 4f80   cmp.w r1, #16384    ; 0x4000
-    1e56:   d824        bhi.n 0x1ea2
+    1e52:   f5b1 4f80   cmp.w r1, #16384            ; 0x4000
+    1e56:   d824        bhi.n 0x1ea2                ; error if stack max > 0x4000
+
     1e58:   1d01        adds r1, r0, #4
     1e5a:   6809        ldr r1, [r1, #0]
-    1e5c:   f5a1 5150   sub.w r1, r1, #13312    ; 0x3400
-    1e60:   f5b1 4f48   cmp.w r1, #51200    ; 0xc800
-    1e64:   d21d        bcs.n 0x1ea2
-    1e66:   f643 31f8   movw r1, #15352    ; 0x3bf8
+    1e5c:   f5a1 5150   sub.w r1, r1, #13312        ; 0x3400
+    1e60:   f5b1 4f48   cmp.w r1, #51200            ; 0xc800
+    1e64:   d21d        bcs.n 0x1ea2                ; error if reset out of range
+
+    1e66:   f643 31f8   movw r1, #15352             ; 0x3bf8
     1e6a:   6809        ldr r1, [r1, #0]
-    1e6c:   f1b1 7f41   cmp.w r1, #50593792    ; 0x3040000
-    1e70:   d117        bne.n 0x1ea2
-    1e72:   f44f 5140   mov.w r1, #12288    ; 0x3000
-    1e76:   f8d1 10b0   ldr.w r1, [r1, #176]    ; 0xb0
+    1e6c:   f1b1 7f41   cmp.w r1, #50593792         ; 0x3040000
+    1e70:   d117        bne.n 0x1ea2                ; error if [0x3bf8] != 0x03040000
+
+    1e72:   f44f 5140   mov.w r1, #12288            ; 0x3000
+    1e76:   f8d1 10b0   ldr.w r1, [r1, #176]        ; 0xb0
     1e7a:   f3c1 0211   ubfx r2, r1, #0, #18
-    1e7e:   f5a2 43b4   sub.w r3, r2, #23040    ; 0x5a00
-    1e82:   3ba5        subs r3, #165    ; 0xa5
+    1e7e:   f5a2 43b4   sub.w r3, r2, #23040        ; 0x5a00
+    1e82:   3ba5        subs r3, #165               ; 0xa5
     1e84:   d10d        bne.n 0x1ea2
+
     1e86:   0c8a        lsrs r2, r1, #18
     1e88:   2a0e        cmp r2, #14
     1e8a:   d80a        bhi.n 0x1ea2
-    1e8c:   f243 0178   movw r1, #12408    ; 0x3078
+
+    1e8c:   f243 0178   movw r1, #12408     ; 0x3078
     1e90:   e003        b.n 0x1e9a
-    1e92:   680b        ldr r3, [r1, #0]
+
+  0x1e92:   680b        ldr r3, [r1, #0]    ; read word
     1e94:   1c5b        adds r3, r3, #1
-    1e96:   d004        beq.n 0x1ea2
+    1e96:   d004        beq.n 0x1ea2        ; error if word == -1
     1e98:   1d09        adds r1, r1, #4
-    1e9a:   1e52        subs r2, r2, #1
-    1e9c:   d2f9        bcs.n 0x1e92
-    1e9e:   f7fe b8c7   b.w 0x30
-    1ea2:   4770        bx lr
+
+  0x1e9a:   1e52        subs r2, r2, #1
+    1e9c:   d2f9        bcs.n 0x1e92        ; loop
+
+    1e9e:   f7fe b8c7   b.w 0x30            ; jump load_jump_fw(0x3400)
+
+  0x1ea2:   4770        bx lr
 
 main:
   0x1ea4:   4824        ldr r0, [pc, #144]    ; (0x1f38)
@@ -3511,8 +3527,10 @@ main:
   0x1ec6:   6800        ldr r0, [r0, #0]
     1ec8:   4288        cmp r0, r1
     1eca:   d001        beq.n 0x1ed0
-    1ecc:   f7ff ffbc   bl 0x1e48
-    1ed0:   f7fe fb8c   bl 0x5ec
+
+    1ecc:   f7ff ffbc   bl 0x1e48           ; call check_fw_sp_pc()
+
+  0x1ed0:   f7fe fb8c   bl 0x5ec
     1ed4:   f7fe f99e   bl 0x214
     1ed8:   f7fe fe6c   bl 0xbb4
     1edc:   f7fe fbf8   bl 0x6d0

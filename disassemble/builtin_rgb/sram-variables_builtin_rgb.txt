@@ -14,3 +14,8 @@ types:
     p   sram address
     d   data address
     f   function address
+
+pointer_br_1                            @ 0x20000004
+    0x0:
+    0x4:  w flash write address
+    handle_frame

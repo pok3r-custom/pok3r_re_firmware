@@ -26,19 +26,19 @@ public:
         READ        = 0x12, //!< Read command.
         READ_400    = 0,
         READ_3C00   = 1,
-        READ_2      = 2,
+        READ_MODE   = 2,    //!< Get firmware mode. 0 is bootloader, 1 is firmware.
         READ_VER1   = 0x20, //!< Read version string.
         READ_VER2   = 0x22, //!< Read version data.
         READ_ADDR   = 0xff, //!< Patched command, read arbitrary address.
 
-        CMD_29          = 0x1d,
-        CMD_29_ERASE    = 0,
-        CMD_29_SUM      = 1,
-        CMD_29_CRC      = 2,
+        FW          = 0x1d, //!< Firmware management command.
+        FW_ERASE    = 0,    //!< Erase firmware.
+        FW_SUM      = 1,    //!< Firwmare sum.
+        FW_CRC      = 2,    //!< Firmware CRC.
 
-        CMD_30      = 0x1e,
-        CMD_30_0    = 0,
-        CMD_30_1    = 1,
+        ADDR        = 0x1e, //! Write address command.
+        ADDR_GET    = 0,    //! Get write address.
+        ADDR_SET    = 1,    //! Set write address.
 
         WRITE       = 0x1f, //!< Write command.
     };
@@ -58,6 +58,10 @@ public:
     //! Read the firmware version from the keyboard.
     ZString getVersion();
 
+    bool clearVersion();
+
+    bool setVersion(ZString version);
+
     //! Dump the contents of flash.
     ZBinary dumpFlash();
     //! Update the firmware.
@@ -75,6 +79,8 @@ public:
 private:
     //! Send command
     bool sendCmd(zu8 cmd, zu8 a1, zu16 a2 = 0, ZBinary data = ZBinary());
+    //! Send command and recv response.
+    bool sendRecvCmd(zu8 cmd, zu8 a1, ZBinary &data, zu16 a2 = 0);
 
 public:
     static void decode_firmware(ZBinary &bin);

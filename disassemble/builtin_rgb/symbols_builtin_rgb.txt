@@ -10,6 +10,8 @@ entry                               @ 0x1c
     sram_init
     main
 
+load_jump_fw                        @ 0x30
+
 memcpy                              @ 0x40
 mem_set                             @ 0x64
 mem_zero                            @ 0x72
@@ -54,10 +56,16 @@ flash_read_packet                   @ 0xa6c
 get_event                           @ 0x1560
 
 generate                            @ 0x1628
-firmware_check                       @ 0x1668
+firmware_check                      @ 0x1668
     generate
 
+check_fw_sp_pc                      @ 0x1e48
+    load_jump_fw
+
 main                                @ 0x1ea4
+    check_fw_sp_pc
+    get_event
+    handle_frame
 
 
 Data:
