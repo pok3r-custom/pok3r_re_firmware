@@ -18,6 +18,34 @@ this in my free time for fun, as such there are no guarantees of progress or suc
         - Firmware can be installed from Vortex firmware over USB (no hardware required).
         - Firmware can be rolled back with Votex firmware update application.
 
+## pok3rtool
+The `pok3rtool` CLI application runs on Linux, Windows, and Mac OS X. Along with some development
+tools, `pok3rtool` implements the firmware update protocol over USB for the POK3R and POK3R RGB.
+
+The `pok3rtool` executable is built with CMake. You will need the LibChaos submodule cloned to
+build it. After it is compiled, it should have no runtime dependencies, and can be run portably.
+
+### Usage
+**WARNING: THIS TOOL IS RELATIVELY UNTESTESTED, AND HAS A VERY REAL RISK OF CORRUPTING YOUR
+POK3R OR POK3R RGB, MAKING IT UNUSABLE WITHOUT EXPENSIVE DEVELOPMENT TOOLS. PROCEED AT YOUR
+OWN RISK.**
+
+The italicized commands below are particularly dangerous, and have the ability to put the keyboard
+info a state where it will not accept another update.
+
+    ./pok3rtool version
+    *./pok3rtool setversion <version>*
+    ./pok3rtool info
+
+    ./pok3rtool reboot
+    ./pok3rtool bootloader
+
+    ./pok3rtool dump <output>
+    *./pok3rtool flash <version> <firmware>*
+
+**NOTE:** The `dump` command will not do much without the firmware patch mentioned below
+installed. However, there is not much reason to do this for non-development purporses.
+
 ### POK3R Firmware Patch
 A very small firmware patch will allow the contents of the flash storage to be read out over USB,
 with the protocol used to read the version number during an update. This is effectively
@@ -31,37 +59,16 @@ The POK3R RGB update protocol is more minimal, and inherently doesn't allow read
 offsets. The equivalent patch for the POK3R RGB adds the ability to read from arbitrary addresses
 to the update protocol. See patch_v130.txt
 
-### Usage
-The `pok3rtool` application is built with CMake. You will need the LibChaos submodule cloned, and
-libusb installed. It works on Linux, and will run on Windows, but USB functions will fail on
-Windows without the correct libusb drivers. If you figure out what exactly needs to be installed,
-please tell me, because it stopped working on my machine.
-
-    ./pok3rtest version
-    ./pok3rtest setversion <version>
-
-    ./pok3rtest read <start address> <length> <output.bin>
-    ./pok3rtest flash <version> <firmware>
-
-    ./pok3rtest decode <path to updater> <output>
-    ./pok3rtest encode <path to firmware image> <output>
-    ./pok3rtest encodepatch <path to updater> <path to firmware> <output updater>
-
-This will attempt to dump the contents of flash:
-
-    ./pok3rtest dump pok3rdump_flash.bin
-
-Without the patch, it will read a lot of 0x00. With the single-instruction patch, the tool will
-read back the entirety of flash, including the unencrypted firmware.
-
 ## POK3R Notes
 
 ### General
 - Holtek HT32F1655
-- ARM Cortex M3
-- 128KB Flash
-- 32KB SRAM
-- 64LQFP
+    - ARM Cortex M3
+    - 128KB Flash
+    - 32KB SRAM
+    - 64LQFP
+- GD25Q40
+    - 4Mbit EEPROM
 
 ### Updater
 The updater executable contains the firmware update, encrypted twice. It is decrypted once by
@@ -133,10 +140,12 @@ mouse controls, media keys and system controls.
 
 ### General
 - Holtek HT32F1654
-- ARM Cortex M3
-- 64KB Flash
-- 16KB SRAM
-- 64LQFP
+    - ARM Cortex M3
+    - 64KB Flash
+    - 16KB SRAM
+    - 64LQFP
+- GD25Q41
+    - 4Mbit EEPROM
 
 ### PCB
 
