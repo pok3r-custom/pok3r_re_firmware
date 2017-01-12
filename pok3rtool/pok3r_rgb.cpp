@@ -335,12 +335,14 @@ zu32 crc32_2(zu32 crc, const zbyte *data, zu64 size, zu8 fl){
 bool Pok3rRGB::updateFirmware(ZString version, const ZBinary &fwbinin){
     ZBinary fwbin = fwbinin;
 
-//    zu32 pcrc = ZHash<ZBinary>(fwbin).hash();
-//    zu32 pcrc = crc32(ZU32_MAX, fwbin.raw(), fwbin.size());
-    zu32 pcrc = crc32_2(ZU32_MAX, fwbin.raw(), fwbin.size(), 0);
+    zu32 pcrc = ZHash<ZBinary, ZHashBase::CRC32>(fwbin).hash();
     LOG("pre1   " << ZString::ItoS((zu64)pcrc, 16, 8) << " " << ZString::ItoS((zu64)pcrc, 2, 32));
-    pcrc = crc32_2(ZU32_MAX, fwbin.raw(), fwbin.size(), 0xe6);
+
+    pcrc = crc32(0, fwbin.raw(), fwbin.size());
     LOG("pre2   " << ZString::ItoS((zu64)pcrc, 16, 8) << " " << ZString::ItoS((zu64)pcrc, 2, 32));
+
+    pcrc = crc32_2(0, fwbin.raw(), fwbin.size(), 0);
+    LOG("pre3   " << ZString::ItoS((zu64)pcrc, 16, 8) << " " << ZString::ItoS((zu64)pcrc, 2, 32));
 
     // Encode the firmware for the POK3R RGB
     encode_firmware(fwbin);
@@ -353,12 +355,15 @@ bool Pok3rRGB::updateFirmware(ZString version, const ZBinary &fwbinin){
         fw2.writeleu32(w);
     }
 
+    zu32 crc = ZHash<ZBinary, ZHashBase::CRC32>(fwbin).hash();
+    LOG("crc    " << ZString::ItoS((zu64)crc, 16, 8) << " " << ZString::ItoS((zu64)crc, 2, 32));
+
 //    zu32 crc2 = 0xad0455d7;
     zu32 test = 0x3e0530db;
     LOG("test   " << ZString::ItoS((zu64)test, 16, 8) << " " << ZString::ItoS((zu64)test, 2, 32));
 
     for(zu8 f = 0; f < 0x3f; ++f){
-        zu32 crc = crc32_2(ZU32_MAX, fwbin.raw(), fwbin.size(), f << 2);
+        zu32 crc = crc32_2(0, fwbin.raw(), fwbin.size(), f << 2);
         LOG("crc " <<
             ZString::ItoS((zu64)(f << 2), 16, 2) << " " <<
             ZString::ItoS((zu64)crc, 16, 8) << " " <<
