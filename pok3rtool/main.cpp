@@ -561,26 +561,33 @@ int encode_patch_updater(ZPath exein, ZPath fwin, ZPath exeout){
     return 0;
 }
 
-ZPointer<UpdateInterface> openDevice(){
+ZPointer<UpdateInterface> openDevice(int device){
     ZPointer<UpdateInterface> kb;
 
-    // POK3R
-//    kb = new Pok3r();
-//    if(kb->open()){
-//        return kb;
-//    }
+    if(device == 0)
+        device = 1 | 2;
 
-    // POK3R RGB
-    kb = new Pok3rRGB();
-    if(kb->open()){
-        return kb;
+    // POK3R
+    if(device & 1){
+        kb = new Pok3r();
+        if(kb->open()){
+            return kb;
+        }
     }
 
-    ELOG("Failed to open");
+    // POK3R RGB
+    if(device & 2){
+        kb = new Pok3rRGB();
+        if(kb->open()){
+            return kb;
+        }
+    }
+
+    ELOG("Failed to open device");
     return nullptr;
 }
 
-int main(int argc, char **argv){
+int main(int _argc, char **_argv){
     ZLog::logLevelStdOut(ZLog::INFO, "[%clock%] N %log%");
 //    ZLog::logLevelStdOut(ZLog::DEBUG, "\x1b[35m[%clock%] %thread% N %log%\x1b[m");
     ZLog::logLevelStdErr(ZLog::ERRORS, "\x1b[31m[%clock%] E %log%\x1b[m");
@@ -589,11 +596,35 @@ int main(int argc, char **argv){
     ZLog::logLevelFile(ZLog::DEBUG, lgf, "[%clock%] D [%function%|%file%:%line%] %log%");
     ZLog::logLevelFile(ZLog::ERRORS, lgf, "[%clock%] E [%function%|%file%:%line%] %log%");
 
-    if(argc > 1){
-        ZString cmd = argv[1];
+    int device = 0;
+
+    ZArray<ZString> args;
+    for(int i = 1; i < _argc; ++i){
+        ZString arg = _argv[i];
+        if(arg == "--pok3r"){
+            if(device != 0){
+                LOG("Cannot specify multiple devices");
+                return 2;
+            }
+            LOG("Selected POK3R");
+            device = 1;
+        } else if(arg == "--pok3r-rgb"){
+            if(device != 0){
+                LOG("Cannot specify multiple devices");
+                return 2;
+            }
+            LOG("Selected POK3R RGB");
+            device = 2;
+        } else {
+            args.push(arg);
+        }
+    }
+
+    if(args.size()){
+        ZString cmd = args[0];
         if(cmd == "version"){
             // Read Version
-            ZPointer<UpdateInterface> kb = openDevice();
+            ZPointer<UpdateInterface> kb = openDevice(device);
             if(kb.ptr()){
                 LOG("Version: " << kb->getVersion());
                 return 0;
@@ -601,11 +632,13 @@ int main(int argc, char **argv){
             return -1;
 
         } else if(cmd == "setversion"){
-            if(argc > 2){
+            if(args.size() > 1){
                 // Set Version
-                ZPointer<UpdateInterface> kb = openDevice();
+                ZPointer<UpdateInterface> kb = openDevice(device);
                 if(kb.ptr()){
-                    LOG(kb->setVersion(argv[2]));
+                    LOG("Old Version: " << kb->getVersion());
+                    LOG(kb->setVersion(args[1]));
+                    LOG(kb->enterFirmware());
                     return 0;
                 }
                 return -1;
@@ -616,7 +649,7 @@ int main(int argc, char **argv){
 
         } else if(cmd == "info"){
             // Get Info
-            ZPointer<UpdateInterface> kb = openDevice();
+            ZPointer<UpdateInterface> kb = openDevice(device);
             if(kb.ptr()){
                 LOG(kb->getInfo());
                 return 0;
@@ -625,7 +658,7 @@ int main(int argc, char **argv){
 
         } else if(cmd == "reboot"){
             // Reset to Firmware
-            ZPointer<UpdateInterface> kb = openDevice();
+            ZPointer<UpdateInterface> kb = openDevice(device);
             if(kb.ptr()){
                 LOG(kb->enterFirmware());
                 // Read version
@@ -636,7 +669,7 @@ int main(int argc, char **argv){
 
         } else if(cmd == "bootloader"){
             // Reset to Bootloader
-            ZPointer<UpdateInterface> kb = openDevice();
+            ZPointer<UpdateInterface> kb = openDevice(device);
             if(kb.ptr()){
                 LOG(kb->enterBootloader());
                 // Read version
@@ -646,15 +679,15 @@ int main(int argc, char **argv){
             return -1;
 
         } else if(cmd == "dump"){
-            if(argc > 2){
+            if(args.size() > 1){
                 // Dump Flash
-                ZPointer<UpdateInterface> kb = openDevice();
+                ZPointer<UpdateInterface> kb = openDevice(device);
                 if(kb.ptr()){
                     LOG("Dump Flash");
                     ZBinary bin = kb->dumpFlash();
                     RLOG(bin.dumpBytes(4, 8));
-                    LOG("Out: " << argv[2]);
-                    ZFile::writeBinary(argv[2], bin);
+                    LOG("Out: " << args[1]);
+                    ZFile::writeBinary(args[1], bin);
                     return 0;
                 }
                 return -1;
@@ -665,14 +698,18 @@ int main(int argc, char **argv){
 
         } else if(cmd == "flash"){
             // Update Firmware
-            if(argc > 3){
-                ZPointer<UpdateInterface> kb = openDevice();
+            if(args.size() > 2){
+                if(device == 0){
+                    LOG("Please specifiy a device");
+                    return 2;
+                }
+                ZPointer<UpdateInterface> kb = openDevice(device);
                 if(kb.ptr()){
-                    LOG("Update Firmware: " << argv[3]);
+                    LOG("Update Firmware: " << args[2]);
                     ZBinary fwbin;
-                    if(!ZFile::readBinary(argv[3], fwbin))
+                    if(!ZFile::readBinary(args[2], fwbin))
                         return -3;
-                    LOG(kb->updateFirmware(argv[2], fwbin));
+                    LOG(kb->updateFirmware(args[1], fwbin));
                     return 0;
                 }
                 return -1;
@@ -692,8 +729,8 @@ int main(int argc, char **argv){
 
         } else if(cmd == "decode"){
             // Decode firmware from updater executable
-            if(argc > 3){
-                return decode_updater(ZString(argv[2]), ZString(argv[3]));
+            if(args.size() > 2){
+                return decode_updater(ZString(args[1]), ZString(args[2]));
             } else {
                 LOG("Usage: pok3rtool decode <path to updater> <output file>");
                 return 2;
@@ -701,8 +738,8 @@ int main(int argc, char **argv){
 
         } else if(cmd == "encode"){
             // Encode firmware to format accepted by Pok3r
-            if(argc > 3){
-                return encode_image(ZString(argv[2]), ZString(argv[3]));
+            if(args.size() > 2){
+                return encode_image(ZString(args[1]), ZString(args[2]));
             } else {
                 LOG("Usage: pok3rtool encode <path to firmware image> <output file>");
                 return 2;
@@ -710,8 +747,8 @@ int main(int argc, char **argv){
 
         } else if(cmd == "encodepatch"){
             // Encode firmware abd patch into updater executable
-            if(argc > 4){
-                return encode_patch_updater(ZString(argv[2]), ZString(argv[3]), ZString(argv[4]));
+            if(args.size() > 3){
+                return encode_patch_updater(ZString(args[1]), ZString(args[2]), ZString(args[3]));
             } else {
                 LOG("Usage: pok3rtool encodepatch <path to updater> <path to firmware> <output updater>");
                 return 2;

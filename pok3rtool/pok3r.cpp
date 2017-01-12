@@ -38,7 +38,7 @@ bool Pok3r::open(){
 
 bool Pok3r::enterFirmware(){
     if(!builtin){
-        LOG("In Firmware");
+//        LOG("In Firmware");
         return true;
     }
 
@@ -62,7 +62,7 @@ bool Pok3r::enterFirmware(){
 
 bool Pok3r::enterBootloader(){
     if(builtin){
-        LOG("In Bootloader");
+//        LOG("In Bootloader");
         return true;
     }
 
@@ -89,8 +89,12 @@ bool Pok3r::getInfo(){
         return false;
 
     ZBinary data(64);
-    if(!recv(data))
+    if(!recv(data)){
+        ELOG("recv error");
         return false;
+    }
+    DLOG("recv:");
+    DLOG(ZLog::RAW << data.dumpBytes(4, 8));
 
     RLOG(data.dumpBytes(4, 8));
 
@@ -125,6 +129,7 @@ ZString Pok3r::getVersion(){
 }
 
 bool Pok3r::clearVersion(){
+    DLOG("clearVersion");
     if(!enterBootloader())
         return false;
 
@@ -145,8 +150,7 @@ bool Pok3r::clearVersion(){
 }
 
 bool Pok3r::setVersion(ZString version){
-    LOG("Old Version: " << getVersion());
-
+    DLOG("setVersion " << version);
     if(!clearVersion())
         return false;
 
@@ -158,19 +162,20 @@ bool Pok3r::setVersion(ZString version){
     vdata.writeleu32(version.size());
     vdata.write(version.bytes(), version.size());
 
+    // write version
     if(!writeFlash(VER_ADDR, vdata)){
         LOG("write error");
         return false;
     }
 
+    // check version
     ZString nver = getVersion();
     LOG("New Version: " << nver);
 
-    if(nver != version)
+    if(nver != version){
+        ELOG("failed to set version");
         return false;
-
-    if(!enterFirmware())
-        return false;
+    }
 
     return true;
 }
@@ -186,37 +191,39 @@ ZBinary Pok3r::dumpFlash(){
 
 bool Pok3r::updateFirmware(ZString version, const ZBinary &fwbinin){
     ZBinary fwbin = fwbinin;
+    // Encode the firmware for the POK3R
+    encode_firmware(fwbin);
 
     if(!enterBootloader())
         return false;
 
-    LOG("Old Version: " << getVersion());
+    LOG("Current Version: " << getVersion());
 
     // update reset
     if(!sendCmd(UPDATE_START_CMD, 0, 0, 0))
         return false;
-    ZBinary data(64);
-    if(!recv(data))
+    ZBinary data(UPDATE_PKT_LEN);
+    if(!recv(data)){
+        ELOG("recv error");
         return false;
+    }
+    DLOG("recv:");
     DLOG(ZLog::RAW << data.dumpBytes(4, 8));
 
     if(!clearVersion())
         return false;
 
-    LOG("Erase 0x2c00...");
-//    if(!eraseFlash(FW_ADDR, FW_ADDR + fwbin.size())){
-    if(!eraseFlash(VER_ADDR, 0xA108)){
+    LOG("Erase...");
+    if(!eraseFlash(FW_ADDR, FW_ADDR + fwbin.size())){
+//    if(!eraseFlash(VER_ADDR, 0xA108)){
         ELOG("erase error");
         return false;
     }
 
     ZThread::sleep(WAIT_SLEEP);
 
-    // Encode the firmware for the POK3R
-    encode_firmware(fwbin);
-
     // Write firmware
-    LOG("Writing " << fwbin.size() << " bytes...");
+    LOG("Write...");
     for(zu64 o = 0; o < fwbin.size(); o += 52){
         ZBinary packet;
         fwbin.read(packet, 52);
@@ -228,7 +235,7 @@ bool Pok3r::updateFirmware(ZString version, const ZBinary &fwbinin){
 
     fwbin.rewind();
 
-    LOG("Checking " << fwbin.size() << " bytes...");
+    LOG("Check...");
     for(zu64 o = 0; o < fwbin.size(); o += 52){
         ZBinary packet;
         fwbin.read(packet, 52);
@@ -249,14 +256,17 @@ bool Pok3r::updateFirmware(ZString version, const ZBinary &fwbinin){
         return false;
     }
     if(!recv(data)){
+        ELOG("recv error");
         return false;
     }
+    DLOG("recv:");
     DLOG(ZLog::RAW << data.dumpBytes(4, 8));
 
     return true;
 }
 
 bool Pok3r::eraseFlash(zu32 start, zu32 end){
+    DLOG("eraseFlash " << start << " " << end);
     // Send command
     if(!sendCmd(ERASE_CMD, 8, start, end))
         return false;
@@ -264,6 +274,7 @@ bool Pok3r::eraseFlash(zu32 start, zu32 end){
 }
 
 bool Pok3r::readFlash(zu32 addr, ZBinary &bin){
+    DLOG("readFlash " << addr);
     // Send command
     if(!sendCmd(FLASH_CMD, FLASH_READ_SUBCMD, addr, addr + 64))
         return false;
@@ -274,12 +285,15 @@ bool Pok3r::readFlash(zu32 addr, ZBinary &bin){
         ELOG("recv error");
         return false;
     }
+    DLOG("recv:");
+    DLOG(ZLog::RAW << pkt.dumpBytes(4, 8));
 
     bin.write(pkt);
     return true;
 }
 
 bool Pok3r::writeFlash(zu32 addr, ZBinary bin){
+    DLOG("writeFlash " << addr << " " << bin.size());
     if(!bin.size())
         return false;
     // Send command
@@ -289,24 +303,12 @@ bool Pok3r::writeFlash(zu32 addr, ZBinary bin){
 }
 
 bool Pok3r::checkFlash(zu32 addr, ZBinary bin){
+    DLOG("checkFlash " << addr << " " << bin.size());
     if(!bin.size())
         return false;
     // Send command
     if(!sendCmd(FLASH_CMD, FLASH_CHECK_SUBCMD, addr, addr + bin.size() - 1, bin.raw(), bin.size()))
         return false;
-    return true;
-}
-
-bool Pok3r::updateStart(ZBinary &bin){
-    // Send command
-    if(!sendCmd(UPDATE_START_CMD, 0, 0, 0))
-        return false;
-
-    // Get response
-    bin.resize(64);
-    if(!recv(bin))
-        return false;
-
     return true;
 }
 
@@ -333,8 +335,10 @@ zu16 crc16(unsigned char *addr, zu64 size) {
 }
 
 bool Pok3r::sendCmd(zu8 cmd, zu8 subcmd, zu32 a1, zu32 a2, const zbyte *data, zu8 len){
-    if(len > 52)
+    if(len > 52){
+        ELOG("bad data size");
         return false;
+    }
 
     ZBinary packet(UPDATE_PKT_LEN);
     packet.fill(0);
@@ -351,16 +355,13 @@ bool Pok3r::sendCmd(zu8 cmd, zu8 subcmd, zu32 a1, zu32 a2, const zbyte *data, zu
     packet.seek(2);
     packet.writeleu16(crc16(packet.raw(), UPDATE_PKT_LEN)); // CRC
 
-    if(debug){
-        DLOG(ZLog::RAW << packet.dumpBytes(4, 8));
-    }
+    DLOG("send:");
+    DLOG(ZLog::RAW << packet.dumpBytes(4, 8));
 
-    if(!nop){
-        // Send command (interrupt write)
-        if(!send(packet)){
-            ELOG("send error");
-            return false;
-        }
+    // Send command (interrupt write)
+    if(!send(packet)){
+        ELOG("send error");
+        return false;
     }
     return true;
 }

@@ -40,7 +40,7 @@ bool Pok3rRGB::open(){
 
 bool Pok3rRGB::enterFirmware(){
     if(!builtin){
-        LOG("In Firmware");
+//        LOG("In Firmware");
         return true;
     }
 
@@ -63,7 +63,7 @@ bool Pok3rRGB::enterFirmware(){
 
 bool Pok3rRGB::enterBootloader(){
     if(builtin){
-        LOG("In Bootloader");
+//        LOG("In Bootloader");
         return true;
     }
 
@@ -128,22 +128,23 @@ ZString Pok3rRGB::getVersion(){
 }
 
 bool Pok3rRGB::clearVersion(){
+    DLOG("clearVersion");
     if(!enterBootloader())
         return false;
 
-    LOG("Clear Version");
     if(!eraseFlash(VER_ADDR, 0xB4))
         return false;
 
     ZBinary data;
     if(!sendRecvCmd(READ, READ_VER2, data))
         return false;
-//    RLOG(data.dumpBytes(4, 8));
 
     ZBinary tst;
     tst.fill(0xFF, 60);
-    if(data.getSub(4) != tst)
+    if(data.getSub(4) != tst){
+        ELOG("version not cleared");
         return false;
+    }
 
     return true;
 }
@@ -152,41 +153,54 @@ const zu32 ver2[15] = {
     0x00800004, 0x00010300, 0x00000041, 0xefffffff,
     0x00000001, 0x00000000, 0x016704d9, 0xffffffff,
     0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff,
-    0xffffffff, 0xffffffff, 0x001c5aa5
+    0xffffffff, 0xffffffff, 0x001c5aa5,
 };
 
 bool Pok3rRGB::setVersion(ZString version){
-    LOG("Old Version: " << getVersion());
-
+    DLOG("setVersion " << version);
     if(!clearVersion())
         return false;
 
     LOG("Write Version: " << version);
 
     zu16 str[256];
-    zu64 len = version.readUTF16(str, 256);
+    zu64 len = version.readUTF16(str, 255);
+    str[len++] = 0;
 
     ZBinary sdata;
-    sdata.writeleu32((len * 2) + 10);
+    sdata.writeleu32(len * 2);
     for(zu64 i = 0; i < len; ++i)
         sdata.writeleu16(str[i]);
-    sdata.writeleu32(0);
-    sdata.writeleu32(0);
-    sdata.writeleu16(0);
 
     ZBinary vdata;
     vdata.fill(0xFF, 0x78);
     vdata.write(sdata);
     vdata.seek(0x78);
     vdata.write((const zbyte *)ver2, sizeof(ver2));
-    RLOG(vdata.dumpBytes(4, 8));
+//    RLOG(vdata.dumpBytes(4, 8));
 
+    // write version
     if(!writeFlash(VER_ADDR, vdata)){
         ELOG("write error");
         return false;
     }
 
-    LOG("New Version: " << getVersion());
+    // check version
+    ZBinary data;
+    if(!sendRecvCmd(READ, READ_VER2, data))
+        return false;
+    ZBinary cdata(ver2, sizeof(ver2));
+    if(data.getSub(4) != cdata){
+        ELOG("failed to set version");
+        return false;
+    }
+
+    ZString nver = getVersion();
+    LOG("New Version: " << nver);
+    if(nver != version){
+        ELOG("failed to set version string");
+        return false;
+    }
 
     return true;
 }
@@ -218,20 +232,14 @@ bool Pok3rRGB::updateFirmware(ZString version, const ZBinary &fwbinin){
         return false;
 
     LOG("Current Version: " << getVersion());
+    LOG("New Version: " << version);
+
 //    zu32 ccrc = crcFlash(FW_ADDR, 0xc000);
     zu32 ccrc = crcFlash(FW_ADDR, fwbin.size());
     LOG("Current CRC: " << ZString::ItoS((zu64)ccrc, 16, 8));
 
-    LOG("New Version: " << version);
-
-    ZBinary flash;
-    flash.fill(0xFF, 0xc000);
-    flash.write(fwbin);
-//    zu32 ncrc = ZHash<ZBinary, ZHashBase::CRC32>(flash).hash();
-    zu32 ncrc = ZHash<ZBinary, ZHashBase::CRC32>(fwbin).hash();
-    LOG("New CRC: " << ZString::ItoS((zu64)ncrc, 16, 8));
-
-    return true;
+    zu32 crc1 = ZHash<ZBinary, ZHashBase::CRC32>(fwbin).hash();
+    LOG("New CRC: " << ZString::ItoS((zu64)crc1, 16, 8));
 
     if(!clearVersion())
         return false;
@@ -246,12 +254,13 @@ bool Pok3rRGB::updateFirmware(ZString version, const ZBinary &fwbinin){
     if(!writeFlash(FW_ADDR, fwbin))
         return false;
 
-    ZBinary data;
-    data.writeleu32(FW_ADDR - VER_ADDR);
-    data.writeleu32(fwbin.size());
-    if(!sendRecvCmd(FW, FW_SUM, data))
+    zu32 crc2 = crcFlash(FW_ADDR, fwbin.size());
+    LOG("Firmware CRC: " << ZString::ItoS((zu64)crc1, 16, 8));
+
+    if(crc2 != crc1){
+        ELOG("crc mismatch");
         return false;
-    RLOG(data.dumpBytes(4, 8));
+    }
 
     if(!setVersion(version))
         return false;
@@ -317,6 +326,7 @@ void Pok3rRGB::test(){
 }
 
 bool Pok3rRGB::eraseFlash(zu32 start, zu32 length){
+    DLOG("eraseFlash " << start << " " << length);
     if(start < VER_ADDR){
         ELOG("bad address");
         return false;
@@ -333,6 +343,7 @@ bool Pok3rRGB::eraseFlash(zu32 start, zu32 length){
 }
 
 bool Pok3rRGB::readFlash(zu32 addr, ZBinary &bin){
+    DLOG("readFlash " << addr);
     ZBinary data;
     if(!sendRecvCmd(READ, READ_ADDR, data, addr))
         return false;
@@ -342,23 +353,31 @@ bool Pok3rRGB::readFlash(zu32 addr, ZBinary &bin){
 }
 
 bool Pok3rRGB::writeFlash(zu32 addr, ZBinary bin){
+    DLOG("writeFlash " << addr << " " << bin.size());
     if(addr < VER_ADDR){
         ELOG("bad address");
         return false;
     }
 
-    ZBinary adata;
-
     // Set address
+    ZBinary adata;
     adata.writeleu32(addr - VER_ADDR);
     if(!sendRecvCmd(ADDR, ADDR_SET, adata))
         return false;
 
+    // Get address
     adata.clear();
-//    adata.writeleu32(ZU32_MAX);
     if(!sendRecvCmd(ADDR, ADDR_GET, adata))
         return false;
+    adata.seek(4);
+    zu32 saddr = adata.readleu32();
 
+    if(saddr != addr - VER_ADDR){
+        ELOG("failed to set write address");
+        return false;
+    }
+
+    // Write
     bin.rewind();
     while(!bin.atEnd()){
         ZBinary data;
@@ -376,6 +395,8 @@ zu32 Pok3rRGB::crcFlash(zu32 addr, zu32 len){
         return 0;
     }
 
+    DLOG("crcFlash " << addr << " " << len);
+
     ZBinary data;
     data.writeleu32(addr - VER_ADDR);
     data.writeleu32(len);
@@ -389,8 +410,10 @@ zu32 Pok3rRGB::crcFlash(zu32 addr, zu32 len){
 }
 
 bool Pok3rRGB::sendCmd(zu8 cmd, zu8 a1, zu16 a2, ZBinary data){
-    if(data.size() > 52)
+    if(data.size() > 52){
+        ELOG("bad data size");
         return false;
+    }
 
     ZBinary packet(UPDATE_PKT_LEN);
     packet.fill(0);
@@ -399,17 +422,13 @@ bool Pok3rRGB::sendCmd(zu8 cmd, zu8 a1, zu16 a2, ZBinary data){
     packet.writeleu16(a2);  // patch argument
     packet.write(data);     // data
 
-    if(debug){
-        LOG("send");
-        LOG(ZLog::RAW << packet.dumpBytes(4, 8));
-    }
+    DLOG("send:");
+    DLOG(ZLog::RAW << packet.dumpBytes(4, 8));
 
-    if(!nop){
-        // Send command (interrupt write)
-        if(!send(packet)){
-            ELOG("send error");
-            return false;
-        }
+    // Send packet
+    if(!send(packet)){
+        ELOG("send error");
+        return false;
     }
     return true;
 }
@@ -418,19 +437,15 @@ bool Pok3rRGB::sendRecvCmd(zu8 cmd, zu8 a1, ZBinary &data, zu16 a2){
     if(!sendCmd(cmd, a1, a2, data))
         return false;
 
-    if(nop)
-        return true;
-
+    // Recv packet
     data.resize(UPDATE_PKT_LEN);
     if(!recv(data)){
         ELOG("recv error");
         return false;
     }
 
-    if(debug){
-        LOG("recv");
-        LOG(ZLog::RAW << data.dumpBytes(4, 8));
-    }
+    DLOG("recv:");
+    DLOG(ZLog::RAW << data.dumpBytes(4, 8));
 
     // Check error
     data.rewind();

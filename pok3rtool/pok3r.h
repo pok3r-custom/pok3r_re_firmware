@@ -140,9 +140,6 @@ public:
     //! Send CRC command.
     zu16 crcFlash(zu32 addr, zu32 len);
 
-    //! Send update start command, get response.
-    bool updateStart(ZBinary &bin);
-
 private:
     //! Send command
     bool sendCmd(zu8 cmd, zu8 subcmd, zu32 a1, zu32 a2, const zbyte *data = 0, zu8 len = 0);
