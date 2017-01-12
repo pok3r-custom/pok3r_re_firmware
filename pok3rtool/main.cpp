@@ -9,231 +9,7 @@
 using namespace LibChaos;
 
 #include <stdio.h>
-
-/*
-int writeversion(ZString version){
-    LOG("Looking for Vortex Pok3r...");
-    Pok3r pok3r;
-    if(!pok3r.findPok3r())
-        return -1;
-    LOG("Open...");
-    if(!pok3r.open())
-        return -2;
-
-    LOG("Reset to Loader");
-    if(!pok3r.resetToLoader()){
-        ELOG("Reset error");
-        return -3;
-    }
-
-    ZBinary data;
-
-    LOG("Update Start");
-    if(!pok3r.updateStart(data)){
-        ELOG("Update start fail");
-        return -4;
-    }
-
-    LOG("Version: " << pok3r.getVersion());
-
-    LOG("Erase 0x2800");
-    if(!pok3r.eraseFlash(POK3R_VER_ADDR, POK3R_VER_ADDR + 8)){
-        return -5;
-    }
-
-    LOG("Write Version: " << version);
-    ZBinary vdata;
-    vdata.writeleu32(version.size());
-    vdata.write(version.bytes(), version.size());
-    if(!pok3r.writeFlash(POK3R_VER_ADDR, vdata)){
-        LOG("Version write error");
-        return -6;
-    }
-
-    LOG("Update Start");
-    if(!pok3r.updateStart(data)){
-        ELOG("Update start fail");
-        return -7;
-    }
-
-    LOG("Read Version: " << pok3r.getVersion());
-    return 0;
-}
-*/
-
-/*
-int bootloader(){
-    LOG("Looking for Vortex Pok3r...");
-    Pok3r pok3r;
-    if(!pok3r.findPok3r()){
-        ELOG("Not Found");
-        return -1;
-    }
-    LOG("Open...");
-    if(!pok3r.open()){
-        ELOG("Failed to Open");
-        return -2;
-    }
-
-    LOG("Reset to Loader");
-    if(!pok3r.reset(Pok3r::RESET_BUILTIN_SUBCMD)){
-        ELOG("Send error");
-        return -3;
-    }
-
-    return 0;
-}
-*/
-
-/* Flash
- * start = 0x0
- * len   = 0x20000
- *
- * Boot loader
- * start = 0x1F000000
- * len   = 0x2000
- *
- * SRAM
- * start = 0x20000000
- * len   = 0x8000
- *
- * GPIO registers
- * start = 0x400B0000
- * len   = 0xA000
- *
- * VTOR
- * start = 0xE0000000
- * len   = 0x100000
- */
-
-/*
-int readfw(zu32 start, zu32 len, ZPath out){
-    LOG("Looking for Vortex Pok3r...");
-    Pok3r pok3r;
-    if(pok3r.findPok3r()){
-        if(pok3r.open()){
-
-            ZBinary data;
-
-            LOG("Reading 0x" << ZString::ItoS((zu64)start, 16) << ", " << len << " bytes");
-            for(zu64 o = 0; o < len; o += 64){
-                if(!pok3r.readFlash(start + o, data)){
-                    LOG("Failed to read: 0x" << ZString::ItoS(start + o, 16));
-                    return -3;
-                }
-            }
-            LOG("Size: " << data.size());
-            RLOG(data.dumpBytes(4, 8, start));
-            ZFile::writeBinary(out, data);
-            return 0;
-        } else {
-            LOG("Failed to Open");
-            return -2;
-        }
-    } else {
-        LOG("Not Found");
-        return -1;
-    }
-}
-
-int flashfw(ZString version, ZPath fw){
-    LOG("Looking for Vortex Pok3r...");
-    Pok3r pok3r;
-    if(!pok3r.findPok3r()){
-        ELOG("Not Found");
-        return -1;
-    }
-    LOG("Open...");
-    if(!pok3r.open()){
-        ELOG("Failed to Open");
-        return -2;
-    }
-
-    // Read firmware file
-    ZBinary fwbin;
-    if(!ZFile::readBinary(fw, fwbin)){
-        LOG("Failed to read file");
-        return -3;
-    }
-
-    // Reset to loader
-    LOG("Reset to Loader");
-    if(!pok3r.resetToLoader()){
-        ELOG("Reset error");
-        return -4;
-    }
-
-    // Start update
-    LOG("Update Start");
-    ZBinary data;
-    if(!pok3r.updateStart(data)){
-        ELOG("Update start error");
-        return -5;
-    }
-    RLOG(data.dumpBytes());
-
-    LOG("Version: " << pok3r.getVersion());
-
-    // Erase firmware
-    LOG("Erase 0x2800...");
-    if(!pok3r.eraseFlash(POK3R_VER_ADDR, 0xf408)){
-        ELOG("Erase flash error");
-        return -6;
-    }
-
-    ZThread::sleep(5);
-
-    // Write firmware
-    LOG("Writing " << fwbin.size() << " bytes");
-    for(zu64 o = 0; o < fwbin.size(); o += 52){
-        ZBinary packet;
-        packet.write(fwbin.raw() + o, 52);
-        if(!pok3r.writeFlash(POK3R_FW_ADDR + o, packet)){
-            LOG("Error writing: 0x" << ZString::ItoS(POK3R_FW_ADDR + o, 16));
-            return -7;
-        }
-    }
-
-    // Write version number
-    LOG("Write Version: " << version);
-    ZBinary vdata;
-    vdata.writeleu32(version.size());
-    vdata.write(version.bytes(), version.size());
-    if(!pok3r.writeFlash(POK3R_VER_ADDR, vdata)){
-        LOG("Version write error");
-        return -7;
-    }
-
-    LOG("Version: " << pok3r.getVersion());
-
-    // Reset to firmware
-    LOG("Reset to Firmware");
-    if(!pok3r.reset(Pok3r::RESET_BOOT_SUBCMD)){
-        ELOG("Reset error");
-        return -8;
-    }
-
-    return 0;
-}
-
-int crcflash(){
-    LOG("Looking for Vortex Pok3r...");
-    Pok3r pok3r;
-    if(pok3r.findPok3r()){
-        if(pok3r.open()){
-            zu32 len = pok3r.crcFlash(0x0, 0x100);
-            LOG(len);
-            return 0;
-        } else {
-            LOG("Failed to Open");
-            return -2;
-        }
-    } else {
-        LOG("Not Found");
-        return -1;
-    }
-}
-*/
+#include <iostream>
 
 /*  Decode the encryption scheme used by the updater program.
  *  Produced from IDA disassembly in sub_401000 of v117 updater.
@@ -561,6 +337,21 @@ int encode_patch_updater(ZPath exein, ZPath fwin, ZPath exeout){
     return 0;
 }
 
+void warning(){
+    ELOG("WARNING: THIS TOOL IS RELATIVELY UNTESTESTED, AND HAS A VERY REAL RISK OF "
+         "CORRUPTING YOUR POK3R OR POK3R RGB, MAKING IT UNUSABLE WITHOUT EXPENSIVE "
+         "DEVELOPMENT TOOLS. PROCEED AT YOUR OWN RISK.");
+    ELOG("Type \"OK\" to continue:");
+    std::string str;
+    std::getline(std::cin, str);
+    if(str != "OK"){
+        LOG("Exiting...");
+        exit(EXIT_FAILURE);
+    } else {
+        LOG("Proceeding...");
+    }
+}
+
 ZPointer<UpdateInterface> openDevice(int device){
     ZPointer<UpdateInterface> kb;
 
@@ -596,12 +387,15 @@ int main(int _argc, char **_argv){
     ZLog::logLevelFile(ZLog::DEBUG, lgf, "[%clock%] D [%function%|%file%:%line%] %log%");
     ZLog::logLevelFile(ZLog::ERRORS, lgf, "[%clock%] E [%function%|%file%:%line%] %log%");
 
+    bool ok = false;
     int device = 0;
 
     ZArray<ZString> args;
     for(int i = 1; i < _argc; ++i){
         ZString arg = _argv[i];
-        if(arg == "--pok3r"){
+        if(arg == "--ok"){
+            ok = true;
+        } else if(arg == "--pok3r"){
             if(device != 0){
                 LOG("Cannot specify multiple devices");
                 return 2;
@@ -623,6 +417,7 @@ int main(int _argc, char **_argv){
     if(args.size()){
         ZString cmd = args[0];
         if(cmd == "version"){
+            if(!ok) warning();
             // Read Version
             ZPointer<UpdateInterface> kb = openDevice(device);
             if(kb.ptr()){
@@ -633,6 +428,7 @@ int main(int _argc, char **_argv){
 
         } else if(cmd == "setversion"){
             if(args.size() > 1){
+                if(!ok) warning();
                 // Set Version
                 ZPointer<UpdateInterface> kb = openDevice(device);
                 if(kb.ptr()){
@@ -648,6 +444,7 @@ int main(int _argc, char **_argv){
             }
 
         } else if(cmd == "info"){
+            if(!ok) warning();
             // Get Info
             ZPointer<UpdateInterface> kb = openDevice(device);
             if(kb.ptr()){
@@ -657,6 +454,7 @@ int main(int _argc, char **_argv){
             return -1;
 
         } else if(cmd == "reboot"){
+            if(!ok) warning();
             // Reset to Firmware
             ZPointer<UpdateInterface> kb = openDevice(device);
             if(kb.ptr()){
@@ -668,6 +466,7 @@ int main(int _argc, char **_argv){
             return -1;
 
         } else if(cmd == "bootloader"){
+            if(!ok) warning();
             // Reset to Bootloader
             ZPointer<UpdateInterface> kb = openDevice(device);
             if(kb.ptr()){
@@ -680,6 +479,7 @@ int main(int _argc, char **_argv){
 
         } else if(cmd == "dump"){
             if(args.size() > 1){
+                if(!ok) warning();
                 // Dump Flash
                 ZPointer<UpdateInterface> kb = openDevice(device);
                 if(kb.ptr()){
@@ -697,6 +497,7 @@ int main(int _argc, char **_argv){
             }
 
         } else if(cmd == "flash"){
+            if(!ok) warning();
             // Update Firmware
             if(args.size() > 2){
                 if(device == 0){
@@ -719,6 +520,7 @@ int main(int _argc, char **_argv){
             }
 
         } else if(cmd == "test"){
+            if(!ok) warning();
             // Test
             Pok3rRGB kb;
             if(kb.open()){
