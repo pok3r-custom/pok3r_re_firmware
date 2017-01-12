@@ -47,11 +47,15 @@ please tell me, because it stopped working on my machine.
     ./pok3rtest encode <path to firmware image> <output>
     ./pok3rtest encodepatch <path to updater> <path to firmware> <output updater>
 
-This will attempt to dump the contents of flash:
+Flags:
+- `--pok3r` Force connecting to POK3R
+- `--pok3r-rgb` Force connecting to POK3R RGB
 
-    ./pok3rtest dump pok3rdump_flash.bin
+This will attempt to dump the contents of flash on a POK3R:
 
-Without the patch, it will read a lot of 0x00. With the single-instruction patch, the tool will
+    ./pok3rtest --pok3r dump pok3rdump_flash.bin
+
+Without the firmware patch, it will read a lot of 0x00. With the single-instruction patch, the tool will
 read back the entirety of flash, including the unencrypted firmware.
 
 ## POK3R Notes
