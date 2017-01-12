@@ -78,6 +78,9 @@ public:
     //! Write 52 bytes at \a addr.
     bool writeFlash(zu32 addr, ZBinary bin);
 
+    //! Get CRC of firmware.
+    zu32 crcFlash(zu32 addr, zu32 len);
+
 private:
     //! Send command
     bool sendCmd(zu8 cmd, zu8 a1, zu16 a2 = 0, ZBinary data = ZBinary());
