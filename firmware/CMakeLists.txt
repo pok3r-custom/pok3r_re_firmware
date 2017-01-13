@@ -27,6 +27,9 @@ SET(POK3R_RGB_SOURCES
     board/pok3r_board.h
 )
 
+FILE(GLOB_RECURSE DEMO_FILES demo/*.c demo/*.h demo/*.s demo/*.ld)
+FILE(GLOB_RECURSE HT32_FILES ht32/*.c ht32/*.h ht32/*.s ht32/*.ld)
+
 SET(FILES
     ${COMMON_SOURCES}
     ${POK3R_SOURCES}
@@ -34,6 +37,8 @@ SET(FILES
     pok3r_custom.ld
     pok3r_rgb_custom.ld
     openocd.cfg
+    ${DEMO_FILES}
+    ${HT32_FILES}
 )
 
 ### =================== CONFIG ==================== ###
@@ -67,12 +72,14 @@ IF(NOT CMAKE_SYSTEM_NAME MATCHES "Windows" AND
     ADD_CUSTOM_TARGET(pok3r_custom ALL
         DEPENDS ${COMMON_SOURCES} ${POK3R_SOURCES}
         WORKING_DIRECTORY ${POK3R_DIR}
+        VERBATIM
         COMMAND make -f ${POK3R_MAKE}
     )
 
     ADD_CUSTOM_TARGET(pok3r_rgb_custom ALL
         DEPENDS ${COMMON_SOURCES} ${POK3R_RGB_SOURCES}
         WORKING_DIRECTORY ${POK3R_RGB_DIR}
+        VERBATIM
         COMMAND make -f ${POK3R_RGB_MAKE}
     )
 

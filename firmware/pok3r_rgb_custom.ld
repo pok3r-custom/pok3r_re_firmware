@@ -21,11 +21,10 @@ UND_STACK_SIZE = 0;
 /* Sections */
 SECTIONS {
 
-    . = 0;
-
     /* vector table and reset code */
     .reset : {
-        startup.o(.text)
+        *(.vectors)
+        *(.reset)
         . = ALIGN(4);
     } > flash
 

@@ -1,0 +1,670 @@
+
+Allocating common symbols
+Common symbol       size              file
+
+pUSBCore            0x4               ./lib/ht32_usbd_core.o
+gUSBCore            0x90              ./main.o
+gUSBDriver          0x44              ./main.o
+
+Memory Configuration
+
+Name             Origin             Length             Attributes
+rom              0x0000000000000000 0x000000000003fc00 xr
+ram              0x0000000020000000 0x0000000000008000 xrw
+*default*        0x0000000000000000 0xffffffffffffffff
+
+Linker script and memory map
+
+
+.text           0x0000000000000000     0x4a68
+ CREATE_OBJECT_SYMBOLS
+                0x0000000000000000                __cs3_region_start_rom = .
+ *(.cs3.region-head.rom)
+                0x0000000000000000                __cs3_interrupt_vector = __cs3_interrupt_vector_cortex_m
+ *(.cs3.interrupt_vector)
+ .cs3.interrupt_vector
+                0x0000000000000000      0x154 startup.o
+                0x0000000000000000                __cs3_interrupt_vector_cortex_m
+                0x0000000000000001                ASSERT ((. != __cs3_interrupt_vector_cortex_m), No interrupt vector)
+ *(.rom)
+ *(.rom.b)
+                0x0000000000000154                __cs3_reset = __cs3_reset_cortex_m
+ *(.cs3.reset)
+ .cs3.reset     0x0000000000000154       0x10 startup.o
+                0x0000000000000154                __cs3_reset_cortex_m
+                0x0000000000000001                ASSERT ((. != __cs3_reset), No reset code)
+ *(.text .text.* .gnu.linkonce.t.*)
+ .text          0x0000000000000164       0x14 startup.o
+                0x0000000000000164                NMI_Handler
+                0x0000000000000166                HardFault_Handler
+                0x0000000000000168                MemManage_Handler
+                0x000000000000016a                BusFault_Handler
+                0x000000000000016c                UsageFault_Handler
+                0x000000000000016e                SVC_Handler
+                0x0000000000000170                DebugMon_Handler
+                0x0000000000000172                PendSV_Handler
+                0x0000000000000174                SysTick_Handler
+                0x0000000000000176                EXTI2_IRQHandler
+                0x0000000000000176                EXTI5_IRQHandler
+                0x0000000000000176                LVD_IRQHandler
+                0x0000000000000176                I2C0_IRQHandler
+                0x0000000000000176                EXTI13_IRQHandler
+                0x0000000000000176                PDMA_CH4_IRQHandler
+                0x0000000000000176                EXTI12_IRQHandler
+                0x0000000000000176                EXTI3_IRQHandler
+                0x0000000000000176                I2C1_IRQHandler
+                0x0000000000000176                UART1_IRQHandler
+                0x0000000000000176                MCTM1UP_IRQHandler
+                0x0000000000000176                SCI_IRQHandler
+                0x0000000000000176                EXTI8_IRQHandler
+                0x0000000000000176                UART0_IRQHandler
+                0x0000000000000176                MCTM1TR_IRQHandler
+                0x0000000000000176                EXTI0_IRQHandler
+                0x0000000000000176                MCTM0TR_IRQHandler
+                0x0000000000000176                PDMA_CH5_IRQHandler
+                0x0000000000000176                PDMA_CH7_IRQHandler
+                0x0000000000000176                SPI1_IRQHandler
+                0x0000000000000176                CKRDY_IRQHandler
+                0x0000000000000176                I2S_IRQHandler
+                0x0000000000000176                EXTI15_IRQHandler
+                0x0000000000000176                RTC_IRQHandler
+                0x0000000000000176                EXTI9_IRQHandler
+                0x0000000000000176                PDMA_CH1_IRQHandler
+                0x0000000000000176                BFTM1_IRQHandler
+                0x0000000000000176                LPWUP_IRQHandler
+                0x0000000000000176                GPTM1_IRQHandler
+                0x0000000000000176                MCTM0CC_IRQHandler
+                0x0000000000000176                USART0_IRQHandler
+                0x0000000000000176                GPTM0_IRQHandler
+                0x0000000000000176                Default_Handler
+                0x0000000000000176                ADC_IRQHandler
+                0x0000000000000176                PDMA_CH2_IRQHandler
+                0x0000000000000176                BOD_IRQHandler
+                0x0000000000000176                MCTM1BRK_IRQHandler
+                0x0000000000000176                EXTI14_IRQHandler
+                0x0000000000000176                EXTI11_IRQHandler
+                0x0000000000000176                WDT_IRQHandler
+                0x0000000000000176                EXTI4_IRQHandler
+                0x0000000000000176                COMP_IRQHandler
+                0x0000000000000176                EVWUP_IRQHandler
+                0x0000000000000176                EBI_IRQHandler
+                0x0000000000000176                MCTM1CC_IRQHandler
+                0x0000000000000176                MCTM0BRK_IRQHandler
+                0x0000000000000176                BFTM0_IRQHandler
+                0x0000000000000176                EXTI7_IRQHandler
+                0x0000000000000176                EXTI1_IRQHandler
+                0x0000000000000176                SPI0_IRQHandler
+                0x0000000000000176                FLASH_IRQHandler
+                0x0000000000000176                MCTM0UP_IRQHandler
+                0x0000000000000176                USART1_IRQHandler
+                0x0000000000000176                EXTI10_IRQHandler
+                0x0000000000000176                PDMA_CH0_IRQHandler
+                0x0000000000000176                EXTI6_IRQHandler
+                0x0000000000000176                PDMA_CH6_IRQHandler
+                0x0000000000000176                PDMA_CH3_IRQHandler
+ .text          0x0000000000000178      0x298 ./main.o
+                0x00000000000001a8                main
+                0x00000000000001d0                CKCU_Configuration
+                0x0000000000000300                GPIO_Configuration
+                0x000000000000033c                USB_Configuration
+                0x0000000000000380                Suspend
+ .text          0x0000000000000410      0x164 ./system_ht32f165x.o
+                0x0000000000000410                SystemInit
+                0x00000000000004a8                SystemCoreClockUpdate
+ .text          0x0000000000000574      0x3d8 ./ht32_usbd_class.o
+                0x0000000000000574                USBDClass_Init
+ .text          0x000000000000094c       0x38 ./ht32_usbd_descriptor.o
+                0x000000000000094c                USBDDesc_Init
+ .text          0x0000000000000984       0x14 ./ht32f165x_it.o
+                0x0000000000000984                USB_IRQHandler
+ .text          0x0000000000000998       0x96 ./lib/ht32_retarget.o
+                0x0000000000000998                RETARGET_Configuration
+                0x00000000000009c6                __backspace
+                0x00000000000009da                fputc
+                0x00000000000009f6                fgetc
+                0x0000000000000a0c                _ttywrch
+                0x0000000000000a24                _sys_exit
+ .text          0x0000000000000a2e       0x58 ./lib/ht32_serial.o
+                0x0000000000000a2e                SERIAL_PutChar
+                0x0000000000000a62                SERIAL_GetChar
+ *fill*         0x0000000000000a86        0x2 
+ .text          0x0000000000000a88      0x994 ./lib/ht32_usbd_core.o
+                0x0000000000000a88                USBDCore_Init
+                0x0000000000000abc                USBDCore_IRQHandler
+                0x0000000000000c74                USBDCore_MainRoutine
+                0x0000000000000cb6                USBDCore_IsSuspend
+                0x0000000000000cde                USBDCore_GetRemoteWakeUpFeature
+                0x0000000000000d00                USBDCore_TriggerRemoteWakeup
+                0x0000000000000d16                USBDCore_GetStatus
+ .text          0x000000000000141c      0x6a4 ./lib/ht32f1655_56_ckcu.o
+                0x000000000000141c                CKCU_DeInit
+                0x0000000000001494                CKCU_HSECmd
+                0x00000000000014b4                CKCU_HSICmd
+                0x00000000000014d4                CKCU_PLLCmd
+                0x00000000000014f4                CKCU_WaitHSEReady
+                0x000000000000152a                CKCU_GetClockReadyStatus
+                0x0000000000001554                CKCU_PLLInit
+                0x000000000000158c                CKCU_SysClockConfig
+                0x00000000000015d8                CKCU_GetSysClockSource
+                0x00000000000015f4                CKCU_SetHCLKPrescaler
+                0x0000000000001614                CKCU_SetCKREFPrescaler
+                0x0000000000001640                CKCU_SetUSARTPrescaler
+                0x000000000000166c                CKCU_SetUSBPrescaler
+                0x0000000000001698                CKCU_SetADCPrescaler
+                0x00000000000016c4                CKCU_GetClocksFrequency
+                0x000000000000177c                CKCU_GetUSARTClockFreq
+                0x0000000000001794                CKCU_GetPLLFrequency
+                0x0000000000001814                CKCU_CKMCmd
+                0x0000000000001834                CKCU_PSRCWKUPCmd
+                0x0000000000001854                CKCU_CKOUTConfig
+                0x000000000000187c                CKCU_GetIntStatus
+                0x00000000000018a8                CKCU_ClearIntFlag
+                0x00000000000018cc                CKCU_IntConfig
+                0x0000000000001914                CKCU_SleepClockConfig
+                0x0000000000001950                CKCU_IS_PLL_USED
+                0x000000000000197c                CKCU_IS_HSI_USED
+                0x00000000000019a8                CKCU_IS_HSE_USED
+                0x00000000000019d4                CKCU_MCUDBGConfig
+                0x0000000000001a18                CKCU_BKISOCmd
+                0x0000000000001a44                CKCU_PeripClockConfig
+ .text          0x0000000000001ac0      0x310 ./lib/ht32f1655_56_exti.o
+                0x0000000000001ac0                EXTI_DeInit
+                0x0000000000001b3c                EXTI_Init
+                0x0000000000001b78                EXTI_IntConfig
+                0x0000000000001bc0                EXTI_WakeupEventConfig
+                0x0000000000001c3c                EXTI_WakeupEventIntConfig
+                0x0000000000001c74                EXTI_ClearEdgeFlag
+                0x0000000000001ca0                EXTI_ClearWakeupFlag
+                0x0000000000001cc8                EXTI_GetEdgeStatus
+                0x0000000000001d1c                EXTI_GetWakeupFlagStatus
+                0x0000000000001d54                EXTI_SWIntCmd
+                0x0000000000001d98                EXTI_GetSWCmdStatus
+ .text          0x0000000000001dd0      0x598 ./lib/ht32f1655_56_gpio.o
+                0x0000000000001dd0                GPIO_DeInit
+                0x0000000000001e58                GPIO_DirectionConfig
+                0x0000000000001e94                GPIO_PullResistorConfig
+                0x0000000000001f0e                GPIO_InputConfig
+                0x0000000000001f4a                GPIO_DriveConfig
+                0x0000000000001f86                GPIO_OpenDrainConfig
+                0x0000000000001fc2                GPIO_ReadInBit
+                0x0000000000001ff0                GPIO_ReadInData
+                0x000000000000200a                GPIO_ReadOutBit
+                0x0000000000002038                GPIO_ReadOutData
+                0x0000000000002056                GPIO_SetOutBits
+                0x0000000000002072                GPIO_ClearOutBits
+                0x000000000000208e                GPIO_WriteOutBits
+                0x00000000000020bc                GPIO_WriteOutData
+                0x00000000000020d8                GPIO_PinLock
+                0x00000000000020fc                GPIO_IsPortLocked
+                0x0000000000002124                GPIO_IsPinLocked
+                0x0000000000002152                AFIO_DeInit
+                0x000000000000217c                AFIO_GPxConfig
+                0x0000000000002240                AFIO_EXTISourceConfig
+                0x00000000000022ac                _GPIO_ClockControl
+                0x000000000000231c                _AFIO_ClockControl
+ .text          0x0000000000002368      0xfe8 ./lib/ht32f1655_56_mctm.o
+                0x0000000000002368                MCTM_DeInit
+                0x00000000000023b0                MCTM_TimeBaseInit
+                0x0000000000002418                MCTM_OutputInit
+                0x0000000000002526                MCTM_CaptureInit
+                0x0000000000002562                MCTM_PwmInputInit
+                0x00000000000025fa                MCTM_TimeBaseStructInit
+                0x000000000000262e                MCTM_OutputStructInit
+                0x000000000000267c                MCTM_CaptureStructInit
+                0x00000000000026ae                MCTM_Cmd
+                0x00000000000026e4                MCTM_ItiExternalClockConfig
+                0x000000000000270e                MCTM_ChExternalClockConfig
+                0x0000000000002772                MCTM_EtiExternalClockConfig
+                0x00000000000027a6                MCTM_EtiConfig
+                0x00000000000027ea                MCTM_PrescalerConfig
+                0x0000000000002812                MCTM_CounterModeConfig
+                0x000000000000284a                MCTM_StiConfig
+                0x0000000000002886                MCTM_DecoderConfig
+                0x0000000000002926                MCTM_ForcedOREF0
+                0x0000000000002950                MCTM_ForcedOREF1
+                0x000000000000297a                MCTM_ForcedOREF2
+                0x00000000000029a4                MCTM_ForcedOREF3
+                0x00000000000029ce                MCTM_CRRPreloadCmd
+                0x0000000000002a04                MCTM_CHCCRPreloadConfig
+                0x0000000000002a4c                MCTM_ClearOREFConfig
+                0x0000000000002a94                MCTM_ChPolarityConfig
+                0x0000000000002ad6                MCTM_ChNPolarityConfig
+                0x0000000000002b1a                MCTM_ImmActiveConfig
+                0x0000000000002b62                MCTM_ChannelConfig
+                0x0000000000002ba6                MCTM_ChannelNConfig
+                0x0000000000002bee                MCTM_OutputModeConfig
+                0x0000000000002c40                MCTM_UpdateCmd
+                0x0000000000002c76                MCTM_UEV1G_IntConfig
+                0x0000000000002cac                MCTM_HallInterfaceCmd
+                0x0000000000002ce2                MCTM_SinglePulseModeCmd
+                0x0000000000002d18                MCTM_MMSELConfig
+                0x0000000000002d3c                MCTM_SlaveModeConfig
+                0x0000000000002d62                MCTM_TimSyncCmd
+                0x0000000000002d98                MCTM_SetCounter
+                0x0000000000002db6                MCTM_SetCounterReload
+                0x0000000000002dd4                MCTM_SetCaptureCompare0
+                0x0000000000002df2                MCTM_SetCaptureCompare1
+                0x0000000000002e10                MCTM_SetCaptureCompare2
+                0x0000000000002e2e                MCTM_SetCaptureCompare3
+                0x0000000000002e4c                MCTM_SetAsymmetricCompare0
+                0x0000000000002e6a                MCTM_SetAsymmetricCompare1
+                0x0000000000002e88                MCTM_SetAsymmetricCompare2
+                0x0000000000002ea6                MCTM_SetAsymmetricCompare3
+                0x0000000000002ec4                MCTM_CHPSCConfig
+                0x0000000000002f02                MCTM_CKDIVConfig
+                0x0000000000002f30                MCTM_GetCaptureCompare0
+                0x0000000000002f48                MCTM_GetCaptureCompare1
+                0x0000000000002f60                MCTM_GetCaptureCompare2
+                0x0000000000002f78                MCTM_GetCaptureCompare3
+                0x0000000000002f90                MCTM_GetCounter
+                0x0000000000002fa8                MCTM_GetPrescaler
+                0x0000000000002fc0                MCTM_GenerateEvent
+                0x0000000000002fda                MCTM_GetFlagStatus
+                0x0000000000003000                MCTM_ClearFlag
+                0x0000000000003020                MCTM_IntConfig
+                0x000000000000305a                MCTM_GetIntStatus
+                0x0000000000003094                MCTM_ClearIntPendingBit
+                0x00000000000030b4                MCTM_InternalClockConfig
+                0x00000000000030d2                MCTM_CHMOECmd
+                0x0000000000003108                MCTM_CHBRKCTRConfig
+                0x000000000000317a                MCTM_CHBRKCTRStructInit
+                0x00000000000031cc                MCTM_COMPRECmd
+                0x0000000000003202                MCTM_COMUSConfig
+                0x0000000000003238                MCTM_CHCCDSConfig
+                0x000000000000326e                MCTM_PDMAConfig
+ .text          0x0000000000003350       0xec ./lib/ht32f1655_56_rstcu.o
+                0x0000000000003350                RSTCU_GetResetFlagStatus
+                0x0000000000003384                RSTCU_ClearResetFlag
+                0x00000000000033a8                RSTCU_ClearAllResetFlag
+                0x00000000000033c0                RSTCU_PeripReset
+ .text          0x000000000000343c      0x728 ./lib/ht32f1655_56_usart.o
+                0x000000000000343c                USART_DeInit
+                0x00000000000034ac                USART_Init
+                0x0000000000003500                USART_StructInit
+                0x0000000000003532                USART_SynClockInit
+                0x0000000000003572                USART_SynClockStructInit
+                0x000000000000359c                USART_SendData
+                0x00000000000035b8                USART_ReceiveData
+                0x00000000000035d0                USART_SetGuardTime
+                0x00000000000035f6                USART_GetLineStatus
+                0x000000000000361c                USART_GetFIFOStatus
+                0x0000000000003652                USART_GetModemStatus
+                0x000000000000366a                USART_ForceModemPinState
+                0x00000000000036a2                USART_IrDACmd
+                0x00000000000036d8                USART_IrDAConfig
+                0x000000000000370e                USART_SetIrDAPrescaler
+                0x0000000000003734                USART_IrDADirectionConfig
+                0x000000000000376a                USART_RS485TxEnablePolarityConfig
+                0x00000000000037a0                USART_ForceBreakCmd
+                0x00000000000037d6                USART_IntConfig
+                0x0000000000003810                USART_GetIntID
+                0x0000000000003828                USART_RFITLConfig
+                0x000000000000384c                USART_TFITLConfig
+                0x0000000000003870                USART_TimeOutIntConfig
+                0x00000000000038a6                USART_SetTimeOutValue
+                0x00000000000038ca                USART_FIFOReset
+                0x00000000000038ea                USART_StickParityCmd
+                0x0000000000003920                USART_StickParityConfig
+                0x0000000000003956                USART_TxCmd
+                0x000000000000398c                USART_RxCmd
+                0x00000000000039c2                USART_IrDAInvtOutputCmd
+                0x00000000000039f8                USART_IrDAInvtInputCmd
+                0x0000000000003a2e                USART_HardwareFlowControlCmd
+                0x0000000000003a64                USART_TxPDMACmd
+                0x0000000000003a9a                USART_RxPDMACmd
+                0x0000000000003ad0                USART_RS485NMMCmd
+                0x0000000000003b06                USART_RS485AADCmd
+                0x0000000000003b3c                USART_SetAddressMatchValue
+ .text          0x0000000000003b64      0x820 ./lib/ht32f1655_56_usbd.o
+                0x0000000000003b64                USBD_PreInit
+                0x0000000000003b90                USBD_Init
+                0x0000000000003baa                USBD_DPpullupCmd
+                0x0000000000003be4                USBD_DPWakeUpCmd
+                0x0000000000003c1c                USBD_DeInit
+                0x0000000000003c46                USBD_PowerUp
+                0x0000000000003cd0                USBD_PowerOff
+                0x0000000000003cec                USBD_PowerOn
+                0x0000000000003d08                USBD_SRAMResetConditionCmd
+                0x0000000000003d40                USBD_RemoteWakeup
+                0x0000000000003d5c                USBD_ReadSETUPData
+                0x0000000000003d88                USBD_SetAddress
+                0x0000000000003db0                USBD_EnableINT
+                0x0000000000003dd4                USBD_DisableINT
+                0x0000000000003df8                USBD_GetINT
+                0x0000000000003e1c                USBD_ClearINT
+                0x0000000000003e38                USBD_GetEPTnINTNumber
+                0x0000000000003e78                USBD_EPTInit
+                0x0000000000003ece                USBD_EPTReset
+                0x0000000000003ef8                USBD_EPTEnableINT
+                0x0000000000003f1c                USBD_EPTGetINT
+                0x0000000000003f48                USBD_EPTClearINT
+                0x0000000000003f6c                USBD_EPTGetHalt
+                0x0000000000003fc4                USBD_EPTSendSTALL
+                0x0000000000003fe6                USBD_EPTSetHalt
+                0x0000000000004018                USBD_EPTClearHalt
+                0x0000000000004042                USBD_EPTWaitSTALLSent
+                0x000000000000409e                USBD_EPTClearDTG
+                0x00000000000040c8                USBD_EPTGetBuffer0Addr
+                0x00000000000040f6                USBD_EPTGetBuffer1Addr
+                0x0000000000004132                USBD_EPTGetBufferLen
+                0x0000000000004158                USBD_EPTGetTransferCount
+                0x0000000000004188                USBD_EPTWriteINData
+                0x000000000000421c                USBD_EPTReadOUTData
+                0x0000000000004272                USBD_EPTReadMemory
+ .text          0x0000000000004384      0x5d8 ./lib/HT32_board/ht32f1656_dvb.o
+                0x00000000000043b4                HT32F_DVB_LEDInit
+                0x0000000000004440                HT32F_DVB_LEDOn
+                0x0000000000004478                HT32F_DVB_LEDOff
+                0x00000000000044b0                HT32F_DVB_LEDToggle
+                0x00000000000044fc                HT32F_DVB_PBInit
+                0x0000000000004614                HT32F_DVB_PBGetState
+                0x0000000000004650                HT32F_DVB_COMInit
+                0x0000000000004708                HT32F_DVB_BuzzerFun
+                0x00000000000048a0                HT32F_DVB_BuzzerOutputCmd
+ *(.plt)
+ *(.gnu.warning)
+ *(.glue_7t)
+ .glue_7t       0x000000000000495c        0x0 linker stubs
+ *(.glue_7)
+ .glue_7        0x000000000000495c        0x0 linker stubs
+ *(.vfp11_veneer)
+ .vfp11_veneer  0x000000000000495c        0x0 linker stubs
+ *(.rodata .rodata.* .gnu.linkonce.r.*)
+ .rodata        0x000000000000495c       0x2f ./ht32_usbd_class.o
+ *fill*         0x000000000000498b        0x1 
+ .rodata        0x000000000000498c       0x6e ./ht32_usbd_descriptor.o
+ *fill*         0x00000000000049fa        0x2 
+ .rodata        0x00000000000049fc       0x58 ./lib/HT32_board/ht32f1656_dvb.o
+                0x00000000000049fc                GPIO_PORT
+                0x0000000000004a10                LED_GPIO_ID
+                0x0000000000004a14                LED_GPIO_PIN
+                0x0000000000004a1c                LED_AFIO_MODE
+                0x0000000000004a20                BUTTON_GPIO_ID
+                0x0000000000004a24                BUTTON_GPIO_PIN
+                0x0000000000004a2c                BUTTON_AFIO_MODE
+                0x0000000000004a30                BUTTON_EXTI_CH
+                0x0000000000004a34                gCOMInfo
+ *(.ARM.extab* .gnu.linkonce.armextab.*)
+ .ARM.extab.cs3.reset
+                0x0000000000004a54        0x0 startup.o
+ *(.gcc_except_table)
+ *(.eh_frame_hdr)
+ *(.eh_frame)
+                0x0000000000004a54                . = ALIGN (0x4)
+ *(.init)
+                0x0000000000004a54                . = ALIGN (0x4)
+                0x0000000000004a54                __preinit_array_start = .
+ *(.preinit_array)
+                0x0000000000004a54                __preinit_array_end = .
+                0x0000000000004a54                . = ALIGN (0x4)
+                0x0000000000004a54                __init_array_start = .
+ *(SORT(.init_array.*))
+ *(.init_array)
+                0x0000000000004a54                __init_array_end = .
+                0x0000000000004a54                . = ALIGN (0x4)
+ *crtbegin.o(.ctors)
+ *(EXCLUDE_FILE(*crtend.o) .ctors)
+ *(SORT(.ctors.*))
+ *crtend.o(.ctors)
+                0x0000000000004a54                . = ALIGN (0x4)
+ *(.fini)
+                0x0000000000004a54                . = ALIGN (0x4)
+                0x0000000000004a54                __fini_array_start = .
+ *(.fini_array)
+ *(SORT(.fini_array.*))
+                0x0000000000004a54                __fini_array_end = .
+ *crtbegin.o(.dtors)
+ *(EXCLUDE_FILE(*crtend.o) .dtors)
+ *(SORT(.dtors.*))
+ *crtend.o(.dtors)
+                0x0000000000004a54                . = ALIGN (0x4)
+                0x0000000000004a54                __cs3_regions = .
+                0x0000000000004a54        0x4 LONG 0x0
+                0x0000000000004a58        0x4 LONG 0x4a70 __cs3_region_init_ram
+                0x0000000000004a5c        0x4 LONG 0x20000000 __cs3_region_start_ram
+                0x0000000000004a60        0x4 LONG 0x40 __cs3_region_init_size_ram
+                0x0000000000004a64        0x4 LONG 0x1b0 __cs3_region_zero_size_ram
+                0x0000000000004a68                . = ALIGN (0x8)
+                0x0000000000004a68                __exidx_start = .
+
+.v4_bx          0x0000000000004a68        0x0
+ .v4_bx         0x0000000000004a68        0x0 linker stubs
+
+.iplt           0x0000000000004a68        0x0
+ .iplt          0x0000000000004a68        0x0 startup.o
+
+.ARM.exidx      0x0000000000004a68        0x8
+ *(.ARM.exidx* .gnu.linkonce.armexidx.*)
+ .ARM.exidx.cs3.reset
+                0x0000000000004a68        0x8 startup.o
+                0x0000000000004a70                __exidx_end = .
+
+.rel.dyn        0x0000000000004a70        0x0
+ .rel.iplt      0x0000000000004a70        0x0 startup.o
+
+.text.align     0x0000000000004a70        0x0
+                0x0000000000004a70                . = ALIGN (0x8)
+                0x0000000000004a70                _etext = .
+                0x000000000003fc00                __cs3_region_size_rom = LENGTH (rom)
+                0x0000000000000001                __cs3_region_num = 0x1
+
+.data           0x0000000020000000       0x40 load address 0x0000000000004a70
+                0x0000000020000000                __cs3_region_start_ram = .
+ *(.cs3.region-head.ram)
+ *(.jcr)
+ *(.got.plt)
+ *(.got)
+ *(.shdata)
+ *(.data .data.* .gnu.linkonce.d.*)
+ .data          0x0000000020000000        0x0 startup.o
+ .data          0x0000000020000000        0x4 ./main.o
+                0x0000000020000000                gIsLowPowerAllowed
+ .data          0x0000000020000004        0x4 ./system_ht32f165x.o
+                0x0000000020000004                SystemCoreClock
+ .data          0x0000000020000008        0x4 ./ht32_usbd_class.o
+ .data          0x000000002000000c       0x2c ./ht32_usbd_descriptor.o
+                0x0000000020000028                gpStringDesc
+ .data          0x0000000020000038        0x0 ./ht32f165x_it.o
+ .data          0x0000000020000038        0x0 ./lib/ht32_retarget.o
+ .data          0x0000000020000038        0x0 ./lib/ht32_serial.o
+ .data          0x0000000020000038        0x0 ./lib/ht32_usbd_core.o
+ .data          0x0000000020000038        0x0 ./lib/ht32f1655_56_ckcu.o
+ .data          0x0000000020000038        0x0 ./lib/ht32f1655_56_exti.o
+ .data          0x0000000020000038        0x0 ./lib/ht32f1655_56_gpio.o
+ .data          0x0000000020000038        0x0 ./lib/ht32f1655_56_mctm.o
+ .data          0x0000000020000038        0x0 ./lib/ht32f1655_56_rstcu.o
+ .data          0x0000000020000038        0x0 ./lib/ht32f1655_56_usart.o
+ .data          0x0000000020000038        0x4 ./lib/ht32f1655_56_usbd.o
+ .data          0x000000002000003c        0x0 ./lib/HT32_board/ht32f1656_dvb.o
+ *(.ram)
+                0x0000000020000040                . = ALIGN (0x8)
+ *fill*         0x000000002000003c        0x4 
+                0x0000000020000040                _edata = .
+
+.igot.plt       0x0000000020000040        0x0 load address 0x0000000000004ab0
+ .igot.plt      0x0000000020000040        0x0 startup.o
+
+.bss            0x0000000020000040      0x1b0 load address 0x0000000000004ab0
+ *(.shbss)
+ *(.bss .bss.* .gnu.linkonce.b.*)
+ .bss           0x0000000020000040        0x0 startup.o
+ .bss           0x0000000020000040        0x0 ./main.o
+ .bss           0x0000000020000040        0x0 ./system_ht32f165x.o
+ .bss           0x0000000020000040       0xd4 ./ht32_usbd_class.o
+ .bss           0x0000000020000114        0x0 ./ht32_usbd_descriptor.o
+ .bss           0x0000000020000114        0x0 ./ht32f165x_it.o
+ .bss           0x0000000020000114        0x0 ./lib/ht32_retarget.o
+ .bss           0x0000000020000114        0x0 ./lib/ht32_serial.o
+ .bss           0x0000000020000114        0x0 ./lib/ht32_usbd_core.o
+ .bss           0x0000000020000114        0x0 ./lib/ht32f1655_56_ckcu.o
+ .bss           0x0000000020000114        0x0 ./lib/ht32f1655_56_exti.o
+ .bss           0x0000000020000114        0x0 ./lib/ht32f1655_56_gpio.o
+ .bss           0x0000000020000114        0x0 ./lib/ht32f1655_56_mctm.o
+ .bss           0x0000000020000114        0x0 ./lib/ht32f1655_56_rstcu.o
+ .bss           0x0000000020000114        0x0 ./lib/ht32f1655_56_usart.o
+ .bss           0x0000000020000114        0x0 ./lib/ht32f1655_56_usbd.o
+ .bss           0x0000000020000114        0x0 ./lib/HT32_board/ht32f1656_dvb.o
+ *(COMMON)
+ COMMON         0x0000000020000114       0xd4 ./main.o
+                0x0000000020000114                gUSBCore
+                0x00000000200001a4                gUSBDriver
+ COMMON         0x00000000200001e8        0x4 ./lib/ht32_usbd_core.o
+                0x00000000200001e8                pUSBCore
+ *(.ram.b)
+                0x00000000200001f0                . = ALIGN (0x8)
+ *fill*         0x00000000200001ec        0x4 
+                0x00000000200001f0                _end = .
+                0x00000000200001f0                __end = .
+
+.heap           0x00000000200001f0        0x0 load address 0x0000000000004ab0
+ *(.heap)
+ .heap          0x00000000200001f0        0x0 startup.o
+
+.stack          0x00000000200001f0      0x200 load address 0x0000000000004ab0
+ *(.stack)
+ .stack         0x00000000200001f0      0x200 startup.o
+                0x00000000200001f0                __cs3_stack_mem
+                0x00000000200003f0                __cs3_stack
+                0x0000000000004a70                __cs3_region_init_ram = LOADADDR (.data)
+                0x0000000000000040                __cs3_region_init_size_ram = (_edata - __cs3_region_start_ram)
+                0x00000000000001b0                __cs3_region_zero_size_ram = (_end - _edata)
+                0x0000000000008000                __cs3_region_size_ram = LENGTH (ram)
+                0x0000000000000001                __cs3_region_num = 0x1
+
+.stab
+ *(.stab)
+
+.stabstr
+ *(.stabstr)
+
+.debug
+ *(.debug)
+
+.line
+ *(.line)
+
+.debug_srcinfo
+ *(.debug_srcinfo)
+
+.debug_sfnames
+ *(.debug_sfnames)
+
+.debug_aranges
+ *(.debug_aranges)
+
+.debug_pubnames
+ *(.debug_pubnames)
+
+.debug_info
+ *(.debug_info .gnu.linkonce.wi.*)
+
+.debug_abbrev
+ *(.debug_abbrev)
+
+.debug_line
+ *(.debug_line)
+
+.debug_frame
+ *(.debug_frame)
+
+.debug_str
+ *(.debug_str)
+
+.debug_loc
+ *(.debug_loc)
+
+.debug_macinfo
+ *(.debug_macinfo)
+
+.debug_weaknames
+ *(.debug_weaknames)
+
+.debug_funcnames
+ *(.debug_funcnames)
+
+.debug_typenames
+ *(.debug_typenames)
+
+.debug_varnames
+ *(.debug_varnames)
+
+.note.gnu.arm.ident
+ *(.note.gnu.arm.ident)
+
+.ARM.attributes
+                0x0000000000000000       0x31
+ *(.ARM.attributes)
+ .ARM.attributes
+                0x0000000000000000       0x21 startup.o
+ .ARM.attributes
+                0x0000000000000021       0x33 ./main.o
+ .ARM.attributes
+                0x0000000000000054       0x33 ./system_ht32f165x.o
+ .ARM.attributes
+                0x0000000000000087       0x33 ./ht32_usbd_class.o
+ .ARM.attributes
+                0x00000000000000ba       0x33 ./ht32_usbd_descriptor.o
+ .ARM.attributes
+                0x00000000000000ed       0x33 ./ht32f165x_it.o
+ .ARM.attributes
+                0x0000000000000120       0x33 ./lib/ht32_retarget.o
+ .ARM.attributes
+                0x0000000000000153       0x33 ./lib/ht32_serial.o
+ .ARM.attributes
+                0x0000000000000186       0x30 ./lib/ht32_usbd_core.o
+ .ARM.attributes
+                0x00000000000001b6       0x33 ./lib/ht32f1655_56_ckcu.o
+ .ARM.attributes
+                0x00000000000001e9       0x33 ./lib/ht32f1655_56_exti.o
+ .ARM.attributes
+                0x000000000000021c       0x33 ./lib/ht32f1655_56_gpio.o
+ .ARM.attributes
+                0x000000000000024f       0x33 ./lib/ht32f1655_56_mctm.o
+ .ARM.attributes
+                0x0000000000000282       0x33 ./lib/ht32f1655_56_rstcu.o
+ .ARM.attributes
+                0x00000000000002b5       0x33 ./lib/ht32f1655_56_usart.o
+ .ARM.attributes
+                0x00000000000002e8       0x33 ./lib/ht32f1655_56_usbd.o
+ .ARM.attributes
+                0x000000000000031b       0x33 ./lib/HT32_board/ht32f1656_dvb.o
+
+/DISCARD/
+ *(.note.GNU-stack)
+LOAD startup.o
+LOAD ./main.o
+LOAD ./system_ht32f165x.o
+LOAD ./ht32_usbd_class.o
+LOAD ./ht32_usbd_descriptor.o
+LOAD ./ht32f165x_it.o
+LOAD ./lib/ht32_retarget.o
+LOAD ./lib/ht32_serial.o
+LOAD ./lib/ht32_usbd_core.o
+LOAD ./lib/ht32f1655_56_ckcu.o
+LOAD ./lib/ht32f1655_56_exti.o
+LOAD ./lib/ht32f1655_56_gpio.o
+LOAD ./lib/ht32f1655_56_mctm.o
+LOAD ./lib/ht32f1655_56_rstcu.o
+LOAD ./lib/ht32f1655_56_usart.o
+LOAD ./lib/ht32f1655_56_usbd.o
+LOAD ./lib/HT32_board/ht32f1656_dvb.o
+OUTPUT(./usbd.elf elf32-littlearm)
+
+.comment        0x0000000000000000       0x1d
+ .comment       0x0000000000000000       0x1d ./main.o
+                                         0x1e (size before relaxing)
+ .comment       0x000000000000001d       0x1e ./system_ht32f165x.o
+ .comment       0x000000000000001d       0x1e ./ht32_usbd_class.o
+ .comment       0x000000000000001d       0x1e ./ht32_usbd_descriptor.o
+ .comment       0x000000000000001d       0x1e ./ht32f165x_it.o
+ .comment       0x000000000000001d       0x1e ./lib/ht32_retarget.o
+ .comment       0x000000000000001d       0x1e ./lib/ht32_serial.o
+ .comment       0x000000000000001d       0x1e ./lib/ht32_usbd_core.o
+ .comment       0x000000000000001d       0x1e ./lib/ht32f1655_56_ckcu.o
+ .comment       0x000000000000001d       0x1e ./lib/ht32f1655_56_exti.o
+ .comment       0x000000000000001d       0x1e ./lib/ht32f1655_56_gpio.o
+ .comment       0x000000000000001d       0x1e ./lib/ht32f1655_56_mctm.o
+ .comment       0x000000000000001d       0x1e ./lib/ht32f1655_56_rstcu.o
+ .comment       0x000000000000001d       0x1e ./lib/ht32f1655_56_usart.o
+ .comment       0x000000000000001d       0x1e ./lib/ht32f1655_56_usbd.o
+ .comment       0x000000000000001d       0x1e ./lib/HT32_board/ht32f1656_dvb.o

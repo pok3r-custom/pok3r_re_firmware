@@ -1,13 +1,9 @@
 
-.text
-
-.cpu cortex-m3
-.thumb
-
-.global _start
-
 .equ _stack_top,    0x20000400
 .equ _stack_fill,   0xACACACAC
+
+/* interrupt vector table */
+.section ".vectors"
 
 _vectors:
     /* System Excpetions */
@@ -113,9 +109,13 @@ _vectors:
 
 .align 4
 
+/* reset and interrupt code */
+.section ".reset"
 
 /* entry point */
+.global _start
 .thumb_func
+
 _start:
     ldr r0, =_stack_top
     mov sp, r0
@@ -132,12 +132,14 @@ _start:
 
 /* generic interrupt handler */
 .thumb_func
+
 _generic_intr:
     b .
 
 
 /* memory initialization */
 .thumb_func
+
 _mem_init:
     /* stack */
     /* fill with 0xAC */
