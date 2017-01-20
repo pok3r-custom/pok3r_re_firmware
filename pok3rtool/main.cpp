@@ -393,16 +393,16 @@ int main(int _argc, char **_argv){
     ZArray<ZString> args;
     for(int i = 1; i < _argc; ++i){
         ZString arg = _argv[i];
-        if(arg == "--ok"){
+        if(arg == "--ok" || arg == "-ok"){
             ok = true;
-        } else if(arg == "--pok3r"){
+        } else if(arg == "--pok3r" || arg == "-pok3r"){
             if(device != 0){
                 LOG("Cannot specify multiple devices");
                 return 2;
             }
             LOG("Selected POK3R");
             device = 1;
-        } else if(arg == "--pok3r-rgb"){
+        } else if(arg == "--pok3r-rgb" || arg == "-pok3r-rgb"){
             if(device != 0){
                 LOG("Cannot specify multiple devices");
                 return 2;

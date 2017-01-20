@@ -5,7 +5,9 @@
 
 #include "rawhid/hid.h"
 
-#include <usb.h>
+#if PLATFORM == LINUX
+    #include <usb.h>
+#endif
 
 struct HIDDeviceData {
     hid_t *hid;
