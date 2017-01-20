@@ -7,7 +7,7 @@ PROJECT(Pok3r_Custom C ASM)
 
 SET(COMMON_SOURCES
     main.c
-    startup.s
+    ht32f165x.s
 
     board/ht32f165x_cpu.h
 

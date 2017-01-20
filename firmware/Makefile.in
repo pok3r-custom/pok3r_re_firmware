@@ -1,29 +1,29 @@
-# Makefile for ARM7 Cortex-M3
+# Makefile for Cortex-M3
 
+# App name
 APP_NAME = @OUT_NAME@
 
 # Directories
 SRC_DIR = @CMAKE_CURRENT_SOURCE_DIR@
 BIN_DIR = @CMAKE_CURRENT_BINARY_DIR@/$(APP_NAME)
-OUT_DIR = @CMAKE_BINARY_DIR@
 
-# Files
-OUT_ELF = $(BIN_DIR)/$(APP_NAME).elf
-OUT_BIN = $(OUT_DIR)/$(APP_NAME).bin
-OUT_MAP = $(BIN_DIR)/$(APP_NAME).map
+# Input Files
+LD_SCRIPT = $(SRC_DIR)/$(APP_NAME).ld
+STARTUP_S = $(SRC_DIR)/ht32f165x.s
 
-AS_SRCS = startup.s
 CC_SRCS = main.c usb/usb.c usb/descriptors.c
 
-#AS_SRCPATHS := $(addprefix $(SRC_DIR)/, $(AS_SRCS))
-#CC_SRCPATHS := $(addprefix $(SRC_DIR)/, $(CC_SRCS))
+# Output Files
+OUT_ELF = $(BIN_DIR)/$(APP_NAME).elf
+OUT_BIN = $(BIN_DIR)/$(APP_NAME).bin
+OUT_MAP = $(BIN_DIR)/$(APP_NAME).map
 
-#OBJ_NAMES = $(AS_SRCS:.s=.o) $(CC_SRCS:.c=.o)
+# Intermediary files
+STARTUP_OBJ = startup.o
 OBJ_NAMES = $(CC_SRCS:.c=.o)
-OBJS = $(addprefix $(BIN_DIR)/, $(OBJ_NAMES))
+CC_OBJS = $(addprefix $(BIN_DIR)/, $(OBJ_NAMES))
 
 # Config
-#ARM_CPU = arm7tdmi
 ARM_CPU = cortex-m3
 
 # Commands
@@ -36,26 +36,32 @@ RM = rm -f
 MKDIR = mkdir -p
 
 # Flags
-CC_FLAGS = -c -mcpu=$(ARM_CPU) -mthumb -std=c11 -nostdlib -nostartfiles -ffreestanding -Wall @C_DEFS@
-AS_FLAGS = -mcpu=$(ARM_CPU) -mthumb
-LD_FLAGS = -nostdlib -nostartfiles -T $(SRC_DIR)/$(APP_NAME).ld -Map $(OUT_MAP) -o $(OUT_ELF)
+CC_FLAGS += -c -mcpu=$(ARM_CPU) -mthumb -std=c11 -nostdlib -nostartfiles -ffreestanding -Wall
+CC_FLAGS += @C_DEFS@
+AS_FLAGS += -mcpu=$(ARM_CPU) -mthumb
+LD_FLAGS += -nostdlib -nostartfiles -T $(LD_SCRIPT) -Map $(OUT_MAP)
 
 # Targets
 all: $(OUT_BIN)
 
 $(OUT_BIN): $(OUT_ELF)
+	echo "BIN  $(notdir $@)"
 	$(OC) $(OUT_ELF) -O binary $(OUT_BIN)
 
-$(OUT_ELF): $(SRC_DIR)/$(APP_NAME).ld $(BIN_DIR)/startup.o | dirs $(OBJS)
-	$(LD) $(LD_FLAGS) startup.o $(OBJS)
+$(OUT_ELF): $(LD_SCRIPT) | dirs $(STARTUP_OBJ) $(CC_OBJS)
+	echo "LINK $(notdir $@)"
+	$(LD) $(LD_FLAGS) -o $@ $(STARTUP_OBJ) $(CC_OBJS)
 
-$(BIN_DIR)/startup.o: $(SRC_DIR)/startup.s
+$(STARTUP_OBJ): $(STARTUP_S)
+	echo "AS   $(notdir $<)"
 	$(AS) $(AS_FLAGS) -o $@ $<
 
 $(BIN_DIR)/%.o: $(SRC_DIR)/%.c
+	echo "CC   $(notdir $<)"
 	$(CC) $(CC_FLAGS) -o $@ $<
 
 dirs:
+	$(MKDIR) $(BIN_DIR)
 	$(MKDIR) $(BIN_DIR)/usb
 
 clean:
@@ -65,5 +71,4 @@ clean:
 	$(RM) *.o
 	$(RM) usb/*.o
 
-.PHONY: all clean dirs
-
+.PHONY: all dirs clean

@@ -29,3 +29,7 @@ void usb_init(USB_Device *dev){
     REG(USB_USBEPnCFGR(EP_2)) = (REG(USB_USBEPnCFGR(EP_2)) & ~(0x7f << 10)) | (64 << 10); // EPLEN
     REG(USB_USBEPnIER(EP_2)) = 0x02;
 }
+
+void usb_isr(){
+
+}

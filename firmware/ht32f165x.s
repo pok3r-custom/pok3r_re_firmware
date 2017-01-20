@@ -1,11 +1,15 @@
+/* Startup for Holtek HT32F165x (ARM Cortex-M3) */
+
+.thumb
 
 .equ _stack_top,    0x20000400
 .equ _stack_fill,   0xACACACAC
 
 /* interrupt vector table */
-.section ".vectors"
+/*.section ".vectors"*/
+/*.global _vector_table*/
 
-_vectors:
+_vector_table:
     /* System Excpetions */
     .word   _stack_top      /*         Stack Pointer */
     .word   _start          /*  1      Reset */
@@ -78,7 +82,7 @@ _vectors:
     .word   _generic_intr   /* 66  50  UART1 */
     .word   _generic_intr   /* 67  51  SCI */
     .word   _generic_intr   /* 68  52  I2C */
-    .word   _generic_intr   /* 69  53  USB */
+    .word   _usb_intr       /* 69  53  USB */
     .word   0 /* Reserved      70      */
     .word   _generic_intr   /* 71  55  PDMA_CH0 */
     .word   _generic_intr   /* 72  56  PDMA_CH1 */
@@ -95,7 +99,6 @@ _vectors:
     .word   0 /* Reserved      83      */
     .word   _generic_intr   /* 84  68  EBI */
 
-
 /* padding */
 .word   0
 .word   0
@@ -110,7 +113,7 @@ _vectors:
 .align 4
 
 /* reset and interrupt code */
-.section ".reset"
+/*.section ".reset"*/
 
 /* entry point */
 .global _start
@@ -135,6 +138,14 @@ _start:
 
 _generic_intr:
     b .
+
+
+/* usb interrupt handler */
+.thumb_func
+
+_usb_intr:
+    ldr r0, =usb_isr
+    bx r0
 
 
 /* memory initialization */

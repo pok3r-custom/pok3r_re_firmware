@@ -1,4 +1,4 @@
-/* GNU Linker Script for Cortex-M3 */
+/* GNU Linker Script for Holtek HT32F1655 (ARM Cortex-M3) */
 
 OUTPUT_FORMAT ("elf32-littlearm", "elf32-bigarm", "elf32-littlearm")
 OUTPUT_ARCH(arm)
@@ -9,6 +9,8 @@ MEMORY {
   flash (rx)  : ORIGIN = 0x00000000, LENGTH = 128K
   sram  (rwx) : ORIGIN = 0x20000000, LENGTH = 32K
 }
+
+IMAGE_BASE = 0x2c00;
 
 /* Various stack sizes */
 C_STACK_SIZE   = 1024;
@@ -22,9 +24,8 @@ UND_STACK_SIZE = 0;
 SECTIONS {
 
     /* vector table and reset code */
-    .reset : {
-        *(.vectors)
-        *(.reset)
+    .reset IMAGE_BASE : {
+        startup.o(.text)
         . = ALIGN(4);
     } > flash
 
@@ -47,7 +48,7 @@ SECTIONS {
         __stack_end = .;
     } > sram
 
-    /* uninitialized data */
+    /* uninitialized (zeroed) data */
     .bss : {
         __bss_start = .;
 
