@@ -1,11 +1,23 @@
-#include "board/pok3r_board.h"
+
+#if BOARD == 1
+    #include "board/pok3r_board.h"
+#elif BOARD == 2
+    #include "board/pok3r_rgb_board.h"
+#else
+    #error "Must specify a BOARD!"
+#endif
+
 #include "usb/usb.h"
 #include "usb/descriptors.h"
 
-void wdt_reload(){
-    // Reload unlock and set
-    REG(WDT_WDTCR) = 0x5fa00001;
-}
+void __attribute__((weak)) gptm0_isr(){}
+void __attribute__((weak)) gptm1_isr(){}
+
+void __attribute__((weak)) bftm0_isr(){}
+void __attribute__((weak)) bftm1_isr(){}
+
+void __attribute__((weak)) spi0_isr(){}
+void __attribute__((weak)) spi1_isr(){}
 
 void wdt_init(){
     // Enable watchdog register access
@@ -60,33 +72,6 @@ void ckcu_init(){
 
 void nvic_init(){
 
-}
-
-void gpio_set_input_enable(int port, int pin, int en){
-    if(en)
-        REG(GPIOn_PnINER(port)) |= (1 << pin);
-    else
-        REG(GPIOn_PnINER(port)) &= ~(1 << pin);
-}
-void gpio_set_pin_pull_up_down(int port, int pin, int mode){
-    if(mode == 0){
-        REG(GPIOn_PnPUR(port)) |= (1 << pin);
-    } else if(mode == 1){
-        REG(GPIOn_PnPDR(port)) |= (1 << pin);
-    } else {
-        REG(GPIOn_PnPUR(port)) &= ~(1 << pin);
-        REG(GPIOn_PnPDR(port)) &= ~(1 << pin);
-    }
-}
-
-void afio_pin_config(int port, int pin, int function){
-    if(pin & 0x8){
-        REG(AFIO_GPnCFGHR(port)) &= (0xf << ((pin & 0x7) * 4));
-        REG(AFIO_GPnCFGHR(port)) |= (function << ((pin & 0x7) * 4));
-    } else {
-        REG(AFIO_GPnCFGLR(port)) &= (0xf << (pin * 4));
-        REG(AFIO_GPnCFGLR(port)) |= (function << (pin * 4));
-    }
 }
 
 void afio_init(){

@@ -11,7 +11,11 @@ BIN_DIR = @CMAKE_CURRENT_BINARY_DIR@/$(APP_NAME)
 LD_SCRIPT = $(SRC_DIR)/$(APP_NAME).ld
 STARTUP_S = $(SRC_DIR)/ht32f165x.s
 
-CC_SRCS = main.c usb/usb.c usb/descriptors.c
+CC_SRCS = \
+	main.c \
+	board/cpu/ht32f165x.c \
+	usb/usb.c \
+	usb/descriptors.c
 
 # Output Files
 OUT_ELF = $(BIN_DIR)/$(APP_NAME).elf
@@ -37,7 +41,7 @@ MKDIR = mkdir -p
 
 # Flags
 CC_FLAGS += -c -mcpu=$(ARM_CPU) -mthumb -std=c11 -nostdlib -nostartfiles -ffreestanding -Wall
-CC_FLAGS += @C_DEFS@
+CC_FLAGS += -DBUILDING @C_DEFS@
 AS_FLAGS += -mcpu=$(ARM_CPU) -mthumb
 LD_FLAGS += -nostdlib -nostartfiles -T $(LD_SCRIPT) -Map $(OUT_MAP)
 
@@ -48,7 +52,7 @@ $(OUT_BIN): $(OUT_ELF)
 	echo "BIN  $(notdir $@)"
 	$(OC) $(OUT_ELF) -O binary $(OUT_BIN)
 
-$(OUT_ELF): $(LD_SCRIPT) | dirs $(STARTUP_OBJ) $(CC_OBJS)
+$(OUT_ELF): $(LD_SCRIPT) $(STARTUP_OBJ) | dirs $(CC_OBJS)
 	echo "LINK $(notdir $@)"
 	$(LD) $(LD_FLAGS) -o $@ $(STARTUP_OBJ) $(CC_OBJS)
 
@@ -58,10 +62,12 @@ $(STARTUP_OBJ): $(STARTUP_S)
 
 $(BIN_DIR)/%.o: $(SRC_DIR)/%.c
 	echo "CC   $(notdir $<)"
+	echo "$(CC_FLAGS)"
 	$(CC) $(CC_FLAGS) -o $@ $<
 
 dirs:
 	$(MKDIR) $(BIN_DIR)
+	$(MKDIR) $(BIN_DIR)/board/cpu
 	$(MKDIR) $(BIN_DIR)/usb
 
 clean:

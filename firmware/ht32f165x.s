@@ -64,18 +64,18 @@ _vector_table:
     .word   _generic_intr   /* 48  32  MCTM1_UP */
     .word   _generic_intr   /* 49  33  MCTM1_TR_UP2 */
     .word   _generic_intr   /* 50  34  MCTM1_CC */
-    .word   _generic_intr   /* 51  35  GPTM0 */
-    .word   _generic_intr   /* 52  36  GPTM1 */
+    .word   _gptm0_intr     /* 51  35  GPTM0 */
+    .word   _gptm1_intr     /* 52  36  GPTM1 */
     .word   0 /* Reserved      53      */
     .word   0 /* Reserved      54      */
     .word   0 /* Reserved      55      */
     .word   0 /* Reserved      56      */
-    .word   _generic_intr   /* 57  41  BFTM0 */
-    .word   _generic_intr   /* 58  42  BFTM1 */
+    .word   _bftm0_intr     /* 57  41  BFTM0 */
+    .word   _bftm1_intr     /* 58  42  BFTM1 */
     .word   _generic_intr   /* 59  43  I2C0 */
     .word   _generic_intr   /* 60  44  I2C1 */
-    .word   _generic_intr   /* 61  45  SPI0 */
-    .word   _generic_intr   /* 62  46  SPI1 */
+    .word   _spi0_intr      /* 61  45  SPI0 */
+    .word   _spi1_intr      /* 62  46  SPI1 */
     .word   _generic_intr   /* 63  47  USART0 */
     .word   _generic_intr   /* 64  48  USART1 */
     .word   _generic_intr   /* 65  49  UART0 */
@@ -135,14 +135,44 @@ _start:
 
 /* generic interrupt handler */
 .thumb_func
-
 _generic_intr:
     b .
 
+/* GPTM0 interrupt handler */
+.thumb_func
+_gptm0_intr:
+    ldr r0, =gptm0_isr
+    bx r0
+/* GPTM1 interrupt handler */
+.thumb_func
+_gptm1_intr:
+    ldr r0, =gptm1_isr
+    bx r0
+
+/* BFTM0 interrupt handler */
+.thumb_func
+_bftm0_intr:
+    ldr r0, =bftm0_isr
+    bx r0
+/* BFTM1 interrupt handler */
+.thumb_func
+_bftm1_intr:
+    ldr r0, =bftm1_isr
+    bx r0
+
+/* SPI0 interrupt handler */
+.thumb_func
+_spi0_intr:
+    ldr r0, =spi0_isr
+    bx r0
+/* SPI1 interrupt handler */
+.thumb_func
+_spi1_intr:
+    ldr r0, =spi1_isr
+    bx r0
 
 /* usb interrupt handler */
 .thumb_func
-
 _usb_intr:
     ldr r0, =usb_isr
     bx r0

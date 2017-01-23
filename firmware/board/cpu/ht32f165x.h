@@ -1,7 +1,7 @@
-#ifndef HT32F165X_CPU_H
-#define HT32F165X_CPU_H
+#ifndef HT32F165X_H
+#define HT32F165X_H
 
-#include "../types.h"
+#include "../../types.h"
 
 #define REG(A) (*(u32*)(A))
 
@@ -25,6 +25,12 @@
 // Alternate Function I/O Unit
 // ////////////////////////////////////////////////////////////////////////////////////////////////
 #define AFIO_BASE       0x40022000
+
+#define AFIO_ESSR0      AFIO_BASE + 0x0
+#define AFIO_ESSR1      AFIO_BASE + 0x4
+
+#define AFIO_GPnCFGLR(n)    AFIO_BASE + 0x20 + (n * 0x8)    // GPIO Port n Configuration 0
+#define AFIO_GPnCFGHR(n)    AFIO_BASE + 0x24 + (n * 0x8)    // GPIO Port n Configuration 1
 
 // External Interrupt/Event Controller
 // ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -102,6 +108,24 @@
 // Peripheral Direct Memory Access
 #define PDMA_BASE       0x40090000
 
+// General Purpose I/O
+// ////////////////////////////////////////////////////////////////////////////////////////////////
+#define GPIO_A_BASE     0x400B0000
+
+#define GPIO_A          0
+#define GPIOn_BASE(n)   GPIO_A_BASE + (n * 0x2000)
+
+#define GPIOn_PnDIRCR(n)    GPIOn_BASE(n) + 0x0     // Port n Data Direction Control
+#define GPIOn_PnINER(n)     GPIOn_BASE(n) + 0x4     // Port n Input Function Enable Control
+#define GPIOn_PnPUR(n)      GPIOn_BASE(n) + 0x8     // Port n Pull-Up Selection
+#define GPIOn_PnPDR(n)      GPIOn_BASE(n) + 0xC     // Port n Pull-Down Selection
+#define GPIOn_PnODR(n)      GPIOn_BASE(n) + 0x10    // Port n Open Drain Selection
+#define GPIOn_PnDRVR(n)     GPIOn_BASE(n) + 0x14    // Port n Drive Current Selection
+#define GPIOn_PnLOCKR(n)    GPIOn_BASE(n) + 0x18    // Port n Lock
+#define GPIOn_PnDINR(n)     GPIOn_BASE(n) + 0x1C    // Port n Data Input
+#define GPIOn_PnDOUTR(n)    GPIOn_BASE(n) + 0x20    // Port n Data Output
+#define GPIOn_PnSRR(n)      GPIOn_BASE(n) + 0x24    // Port n Output Set and Reset Control
+#define GPIOn_PnRR(n)       GPIOn_BASE(n) + 0x28    // Port n Output Reset Control
 
 // USART
 #define UART0_BASE      0x40001000
@@ -164,4 +188,11 @@
 // Nested Vectored Interrupt Controller
 #define NVIC_BASE       0xE000E000
 
-#endif // HT32F165X_CPU_H
+
+void wdt_reload();
+void gpio_set_input_enable(int port, int pin, int en);
+void gpio_set_pin_pull_up_down(int port, int pin, int mode);
+void afio_pin_config(int port, int pin, int function);
+
+
+#endif // HT32F165X_H
