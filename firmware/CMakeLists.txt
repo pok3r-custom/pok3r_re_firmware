@@ -10,6 +10,7 @@ SET(STARTUP_SOURCES
 )
 
 SET(COMMON_SOURCES
+    common.h
     main.c
 
     board/cpu/ht32.h

@@ -171,7 +171,7 @@ _spi1_intr:
     ldr r0, =spi1_isr
     bx r0
 
-/* usb interrupt handler */
+/* USB interrupt handler */
 .thumb_func
 _usb_intr:
     ldr r0, =usb_isr

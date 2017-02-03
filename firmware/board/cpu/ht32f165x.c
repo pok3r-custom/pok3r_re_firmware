@@ -1,4 +1,25 @@
 #include "ht32.h"
+#include "../../types.h"
+
+void ckcu_clocks_enable(int ahb_mask, int apb0_mask, int apb1_mask, int en){
+    u32 ahb = REG(CKCU_AHBCCR);
+    u32 apb0 = REG(CKCU_APBCCR0);
+    u32 apb1 = REG(CKCU_APBCCR1);
+
+    ahb &= ~ahb_mask;
+    apb0 &= ~apb0_mask;
+    apb1 &= ~apb1_mask;
+
+    if(en){
+        ahb |= ahb_mask;
+        apb0 |= apb0_mask;
+        apb1 |= apb1_mask;
+    }
+
+    REG(CKCU_AHBCCR) = ahb;
+    REG(CKCU_APBCCR0) = apb0;
+    REG(CKCU_APBCCR1) = apb1;
+}
 
 void wdt_reload(){
     // Reload unlock and set

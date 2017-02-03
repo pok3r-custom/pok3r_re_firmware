@@ -1,5 +1,7 @@
 #include "descriptors.h"
 
+extern USB_Device usb_dev;
+
 const u8 deviceDesc[] = {
     0x12,        // bLength
     0x01,        // bDescriptorType (Device)
@@ -115,16 +117,16 @@ const u8 *strDescs[] = {
     str1Desc,
 };
 
-void usb_init_descriptors(USB_Device *dev){
-    dev->deviceDesc = deviceDesc;
-    dev->configDesc = configDesc;
+void usb_init_descriptors(){
+    usb_dev.descriptors.deviceDesc = deviceDesc;
+    usb_dev.descriptors.configDesc = configDesc;
 
-    dev->interfaceDescs = ifaceDescs;
-    dev->numInterfaceDescs = sizeof(ifaceDescs) / sizeof(u8*);
+    usb_dev.descriptors.interfaceDescs = ifaceDescs;
+    usb_dev.descriptors.numInterfaceDescs = sizeof(ifaceDescs) / sizeof(u8*);
 
-    dev->endpointDescs = epDescs;
-    dev->numEndpointDescs = sizeof(epDescs) / sizeof(u8*);
+    usb_dev.descriptors.endpointDescs = epDescs;
+    usb_dev.descriptors.numEndpointDescs = sizeof(epDescs) / sizeof(u8*);
 
-    dev->stringDescs = strDescs;
-    dev->numStringDescs = sizeof(strDescs) / sizeof(u8*);
+    usb_dev.descriptors.stringDescs = strDescs;
+    usb_dev.descriptors.numStringDescs = sizeof(strDescs) / sizeof(u8*);
 }

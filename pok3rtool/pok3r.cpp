@@ -189,15 +189,10 @@ ZBinary Pok3r::dumpFlash(){
     return dump;
 }
 
-bool Pok3r::updateFirmware(ZString version, const ZBinary &fwbinin){
+bool Pok3r::writeFirmware(const ZBinary &fwbinin){
     ZBinary fwbin = fwbinin;
     // Encode the firmware for the POK3R
     encode_firmware(fwbin);
-
-    if(!enterBootloader())
-        return false;
-
-    LOG("Current Version: " << getVersion());
 
     // update reset
     if(!sendCmd(UPDATE_START_CMD, 0, 0, 0))
@@ -209,9 +204,6 @@ bool Pok3r::updateFirmware(ZString version, const ZBinary &fwbinin){
     }
     DLOG("recv:");
     DLOG(ZLog::RAW << data.dumpBytes(4, 8));
-
-    if(!clearVersion())
-        return false;
 
     LOG("Erase...");
     if(!eraseFlash(FW_ADDR, FW_ADDR + fwbin.size())){
@@ -245,12 +237,6 @@ bool Pok3r::updateFirmware(ZString version, const ZBinary &fwbinin){
         }
     }
 
-    if(!setVersion(version))
-        return false;
-
-    if(!enterFirmware())
-        return false;
-
     // update reset?
     if(!sendCmd(UPDATE_START_CMD, 0, 0, 0)){
         return false;
@@ -262,6 +248,28 @@ bool Pok3r::updateFirmware(ZString version, const ZBinary &fwbinin){
     DLOG("recv:");
     DLOG(ZLog::RAW << data.dumpBytes(4, 8));
 
+    return true;
+}
+
+bool Pok3r::update(ZString version, const ZBinary &fwbin){
+    // Reset to bootloader
+    if(!enterBootloader())
+        return false;
+
+    LOG("Current Version: " << getVersion());
+
+    if(!clearVersion())
+        return false;
+
+    if(!writeFirmware(fwbin))
+        return false;
+
+    if(!setVersion(version))
+        return false;
+
+    // Reset to firmware
+    if(!enterFirmware())
+        return false;
     return true;
 }
 

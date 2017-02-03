@@ -3,6 +3,79 @@
 
 #include "../types.h"
 
+// Request Data Direction
+#define REQUEST_DIR_MASK    0x80
+#define REQUEST_DIR_H2D     0x00
+#define REQUEST_DIR_D2H     0x80
+
+// Request Type
+#define REQUEST_TYPE_MASK       0x60
+#define REQUEST_TYPE_STANDARD   0x00
+#define REQUEST_TYPE_CLASS      0x20
+#define REQUEST_TYPE_VENDOR     0x40
+
+// Request Recipient
+#define REQUEST_RECIPIENT_MASK      0x1F
+#define REQUEST_RECIPIENT_DEVICE    0x00
+#define REQUEST_RECIPIENT_INTERFACE 0x01
+#define REQUEST_RECIPIENT_ENDPOINT  0x02
+#define REQUEST_RECIPIENT_OTHER     0x03
+
+// Standard Requests
+#define GET_STATUS          0x00
+#define CLEAR_FEATURE       0x01
+#define SET_FEATURE         0x03
+#define SET_ADDRESS         0x05
+#define GET_DESCRIPTOR      0x06
+#define SET_DESCRIPTOR      0x07
+#define GET_CONFIGURATION   0x08
+#define SET_CONFIGURATION   0x09
+#define GET_INTERFACE       0x0A
+#define SET_INTERFACE       0x11
+#define SYNCH_FRAME         0x12
+
+typedef enum {
+    H2D = 0,
+    D2H = 1,
+} Request_Direction;
+
+typedef enum {
+    STANDARD    = 0,
+    CLASS       = 1,
+    VENDOR      = 2,
+} Request_Type;
+
+typedef enum {
+    DEVICE      = 0,
+    INTERFACE   = 1,
+    ENDPOINT    = 2,
+    OTHER       = 3,
+} Request_Recipient;
+
+typedef enum {
+    DATA_IN,
+    DATA_OUT,
+    STALL,
+} Control_Action;
+
+typedef struct {
+    // Request Fields
+    u8 bmRequestType;
+    u8 bRequest;
+    u16 wValue;
+    u16 wIndex;
+    u16 wLength;
+
+    Request_Direction direction;
+    Request_Type type;
+    Request_Recipient recipient;
+
+    // Control Buffer
+    Control_Action action;
+    u8 controlLength;
+    u8 controlBuffer[64];
+} USB_Request;
+
 typedef struct {
     // Device descriptors
     const u8 *deviceDesc;
@@ -21,8 +94,28 @@ typedef struct {
     // String descriptors
     const u8 **stringDescs;
     u8 numStringDescs;
+} USB_Descriptors;
+
+typedef struct {
+    USB_Descriptors descriptors;
+
+    u8 deviceFeature;
 } USB_Device;
 
-void usb_init(USB_Device *dev);
+// API
+void usb_init();
+
+// Private Functions
+u32 usb_get_int_flags();
+void usb_clear_int_flags(u32 flags);
+u32 usb_get_ep_int_flags(int ep);
+void usb_clear_ep_int_flags(int ep, u32 flags);
+
+void usb_reset();
+void usb_suspend();
+void usb_resume();
+void usb_setup();
+
+void standard_get_status(USB_Request *request);
 
 #endif // USB_H

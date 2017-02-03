@@ -3,6 +3,6 @@
 
 #include "usb.h"
 
-void usb_init_descriptors(USB_Device *dev);
+void usb_init_descriptors();
 
 #endif // DESCRIPTORS_H

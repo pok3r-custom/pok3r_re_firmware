@@ -126,7 +126,9 @@ public:
     //! Dump the contents of flash.
     ZBinary dumpFlash();
     //! Update the firmware.
-    bool updateFirmware(ZString version, const ZBinary &fwbin);
+    bool writeFirmware(const ZBinary &fwbin);
+
+    bool update(ZString version, const ZBinary &fwbin);
 
     //! Erase flash pages starting at \a start, ending on the page of \a end.
     bool eraseFlash(zu32 start, zu32 end);

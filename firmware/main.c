@@ -1,12 +1,5 @@
 
-#if BOARD == 1
-    #include "board/pok3r_board.h"
-#elif BOARD == 2
-    #include "board/pok3r_rgb_board.h"
-#else
-    #error "Must specify a BOARD!"
-#endif
-
+#include "common.h"
 #include "usb/usb.h"
 #include "usb/descriptors.h"
 
@@ -21,7 +14,8 @@ void __attribute__((weak)) spi1_isr(){}
 
 void wdt_init(){
     // Enable watchdog register access
-    REG(CKCU_APBCCR1) |= 0x10;
+    ckcu_clocks_enable(0, 0, 0x10, 1);
+//    REG(CKCU_APBCCR1) |= 0x10;
 
     // Enable watchdog timer
     unsigned long en = (REG(WDT_WDTMR0) & 0xfff) | 0x1a000;
@@ -76,9 +70,10 @@ void nvic_init(){
 
 void afio_init(){
     // enable AFIO clock
-    REG(CKCU_APBCCR0) |= (1 << 14);
     // enable GPIO A clock
-    REG(CKCU_AHBCCR) |= (1 << 16);
+    ckcu_clocks_enable(1 << 16, 1 << 14, 0, 1);
+//    REG(CKCU_APBCCR0) |= (1 << 14);
+//    REG(CKCU_AHBCCR) |= (1 << 16);
 
     gpio_set_input_enable(GPIO_A, 14, 0);
     gpio_set_input_enable(GPIO_A, 15, 0);
@@ -100,7 +95,8 @@ void afio_init(){
     }
 
     // disable GPIO A clock
-    REG(CKCU_AHBCCR) &= ~(1 << 16);
+    ckcu_clocks_enable(1 << 16, 0, 0, 0);
+//    REG(CKCU_AHBCCR) &= ~(1 << 16);
 }
 
 int main(){
@@ -110,9 +106,8 @@ int main(){
     //nvic_init();
     afio_init();
 
-    USB_Device usbdev;
-    usb_init_descriptors(&usbdev);
-    usb_init(&usbdev);
+    usb_init_descriptors();
+    usb_init();
 
     while(1){
 

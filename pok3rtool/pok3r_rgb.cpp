@@ -223,16 +223,10 @@ ZBinary Pok3rRGB::dumpFlash(){
     return dump;
 }
 
-bool Pok3rRGB::updateFirmware(ZString version, const ZBinary &fwbinin){
+bool Pok3rRGB::writeFirmware(const ZBinary &fwbinin){
     ZBinary fwbin = fwbinin;
     // Encode the firmware for the POK3R RGB
     encode_firmware(fwbin);
-
-    if(!enterBootloader())
-        return false;
-
-    LOG("Current Version: " << getVersion());
-    LOG("New Version: " << version);
 
 //    zu32 ccrc = crcFlash(FW_ADDR, 0xc000);
     zu32 ccrc = crcFlash(FW_ADDR, fwbin.size());
@@ -240,9 +234,6 @@ bool Pok3rRGB::updateFirmware(ZString version, const ZBinary &fwbinin){
 
     zu32 crc1 = ZHash<ZBinary, ZHashBase::CRC32>(fwbin).hash();
     LOG("New CRC: " << ZString::ItoS((zu64)crc1, 16, 8));
-
-    if(!clearVersion())
-        return false;
 
     LOG("Erase...");
     if(!eraseFlash(FW_ADDR, fwbin.size()))
@@ -262,13 +253,30 @@ bool Pok3rRGB::updateFirmware(ZString version, const ZBinary &fwbinin){
         return false;
     }
 
+    return true;
+}
+
+bool Pok3rRGB::update(ZString version, const ZBinary &fwbin){
+    // Reset to bootloader
+    if(!enterBootloader())
+        return false;
+
+    LOG("Current Version: " << getVersion());
+
+    if(!clearVersion())
+        return false;
+
+    if(!writeFirmware(fwbin))
+        return false;
+
     if(!setVersion(version))
         return false;
 
+    // Reset to firmware
     if(!enterFirmware())
         return false;
-
     return true;
+
 }
 
 void Pok3rRGB::test(){

@@ -41,11 +41,16 @@ MKDIR = mkdir -p
 
 # Flags
 CC_FLAGS += -c -mcpu=$(ARM_CPU) -mthumb -std=c11 -nostdlib -nostartfiles -ffreestanding -Wall
-CC_FLAGS += -DBUILDING @C_DEFS@
+CC_FLAGS += -MT $@ -MMD -MP -MF $(BIN_DIR)/$*.Td
+CC_FLAGS += -DFW_BUILDING @C_DEFS@
+
 AS_FLAGS += -mcpu=$(ARM_CPU) -mthumb
 LD_FLAGS += -nostdlib -nostartfiles -T $(LD_SCRIPT) -Map $(OUT_MAP)
 
 # Targets
+
+#FIX_DEPEND = mv -f $(BIN_DIR)/$*.Td $(BIN_DIR)/$*.d
+
 all: $(OUT_BIN)
 
 $(OUT_BIN): $(OUT_ELF)
@@ -60,10 +65,11 @@ $(STARTUP_OBJ): $(STARTUP_S)
 	echo "AS   $(notdir $<)"
 	$(AS) $(AS_FLAGS) -o $@ $<
 
-$(BIN_DIR)/%.o: $(SRC_DIR)/%.c
+$(BIN_DIR)/%.o: $(SRC_DIR)/%.c $(BIN_DIR)/%.d
 	echo "CC   $(notdir $<)"
 	echo "$(CC_FLAGS)"
 	$(CC) $(CC_FLAGS) -o $@ $<
+	#$(FIX_DEPEND)
 
 dirs:
 	$(MKDIR) $(BIN_DIR)
