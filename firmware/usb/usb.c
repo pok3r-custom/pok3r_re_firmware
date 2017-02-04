@@ -1,7 +1,33 @@
 #include "usb.h"
+#include "descriptors.h"
 #include "../board/cpu/ht32.h"
 
 USB_Device usb_dev;
+
+// Functions
+u32 usb_get_int_flags();
+void usb_clear_int_flags(u32 flags);
+u32 usb_get_ep_int_flags(int ep);
+void usb_clear_ep_int_flags(int ep, u32 flags);
+
+void usb_reset();
+void usb_suspend();
+void usb_resume();
+
+// SETUP methods
+void usb_setup();
+void standard_get_status(USB_Request *request);
+void standard_set_feature(USB_Request *request, u8 set_clear);
+void standard_set_address(USB_Request *request);
+void standard_get_descriptor(USB_Request *request);
+void standard_get_configuration(USB_Request *request);
+void standard_set_configuration(USB_Request *request);
+void standard_get_interface(USB_Request *request);
+void standard_set_interface(USB_Request *request);
+void standard_synch_frame(USB_Request *request);
+
+void control_out();
+void control_in();
 
 void usb_init(){
     // backup domain register access
@@ -20,24 +46,34 @@ void usb_init(){
                       USBIER_URSTIE | USBIER_RSMIE | USBIER_SUSPIE;
 
     // ep 0
-    REG(USB_USBEPnCFGR(EP_0)) = (REG(USB_USBEPnCFGR(EP_0)) & ~0x3ff) | 0x8;                  // EPBUFA
-    REG(USB_USBEPnCFGR(EP_0)) = (REG(USB_USBEPnCFGR(EP_0)) & ~(0x7f << 10)) | (64 << 10);    // EPLEN
+    // EPBUFA
+    REG(USB_USBEPnCFGR(EP_0)) = (REG(USB_USBEPnCFGR(EP_0)) & ~0x3ff) | 0x8;
+    // EPLEN
+    REG(USB_USBEPnCFGR(EP_0)) = (REG(USB_USBEPnCFGR(EP_0)) & ~(0x7f << 10)) | (64 << 10);
 //    REG(USB_USBEPnIER(EP_0)) = 0x0212;
     REG(USB_USBEPnIER(EP_0)) = EPnIER_ODRXIE | EPnIER_IDTXIE | EPnIER_SDRXIE;
 
     // ep 1
-    REG(USB_USBEPnCFGR(EP_1)) = 1 << 31;                                                  // EPEN
-    REG(USB_USBEPnCFGR(EP_1)) = (REG(USB_USBEPnCFGR(EP_1)) & ~0x3ff) | 0x8;               // EPBUFA
-    REG(USB_USBEPnCFGR(EP_1)) = (REG(USB_USBEPnCFGR(EP_1)) & ~(0x7f << 10)) | (64 << 10); // EPLEN
+    // EPEN
+    REG(USB_USBEPnCFGR(EP_1)) = 1 << 31;
+    // EPBUFA
+    REG(USB_USBEPnCFGR(EP_1)) = (REG(USB_USBEPnCFGR(EP_1)) & ~0x3ff) | 0x8;
+    // EPLEN
+    REG(USB_USBEPnCFGR(EP_1)) = (REG(USB_USBEPnCFGR(EP_1)) & ~(0x7f << 10)) | (64 << 10);
 //    REG(USB_USBEPnIER(EP_1)) = 0x02;
     REG(USB_USBEPnIER(EP_1)) = EPnIER_ODRXIE;
 
     // ep 2
-    REG(USB_USBEPnCFGR(EP_2)) = 1 << 31;                                                  // EPEN
-    REG(USB_USBEPnCFGR(EP_2)) = (REG(USB_USBEPnCFGR(EP_2)) & ~0x3ff) | 0x8;               // EPBUFA
-    REG(USB_USBEPnCFGR(EP_2)) = (REG(USB_USBEPnCFGR(EP_2)) & ~(0x7f << 10)) | (64 << 10); // EPLEN
+    // EPEN
+    REG(USB_USBEPnCFGR(EP_2)) = 1 << 31;
+    // EPBUFA
+    REG(USB_USBEPnCFGR(EP_2)) = (REG(USB_USBEPnCFGR(EP_2)) & ~0x3ff) | 0x8;
+    // EPLEN
+    REG(USB_USBEPnCFGR(EP_2)) = (REG(USB_USBEPnCFGR(EP_2)) & ~(0x7f << 10)) | (64 << 10);
 //    REG(USB_USBEPnIER(EP_2)) = 0x02;
     REG(USB_USBEPnIER(EP_2)) = EPnIER_ODRXIE;
+
+    usb_dev.deviceFeature = REMOTE_WAKEUP;
 }
 
 void usb_isr(){
@@ -80,11 +116,12 @@ void usb_isr(){
         if(episr & EPnISR_ODRXIF){
             // Clear ISR bit first
             usb_clear_ep_int_flags(EP_0, EPnISR_ODRXIF);
+            control_out();
         }
 
         // IN Data Sent
         if(episr & EPnISR_IDTXIF){
-
+            control_in();
             usb_clear_ep_int_flags(EP_0, EPnISR_IDTXIF);
         }
 
@@ -158,18 +195,25 @@ void usb_setup(){
                             standard_get_status(&request);
                             break;
                         case CLEAR_FEATURE:
+                            standard_set_feature(&request, 0);
                             break;
                         case SET_FEATURE:
+                            standard_set_feature(&request, 1);
                             break;
                         case SET_ADDRESS:
+                            standard_set_address(&request);
                             break;
                         case GET_DESCRIPTOR:
+                            standard_get_descriptor(&request);
                             break;
                         case SET_DESCRIPTOR:
+                            // do i have to support this?
                             break;
                         case GET_CONFIGURATION:
+                            standard_get_configuration(&request);
                             break;
                         case SET_CONFIGURATION:
+                            standard_set_configuration(&request);
                             break;
                         default:
                             break;
@@ -183,12 +227,16 @@ void usb_setup(){
                             standard_get_status(&request);
                             break;
                         case CLEAR_FEATURE:
+                            standard_set_feature(&request, 0);
                             break;
                         case SET_FEATURE:
+                            standard_set_feature(&request, 1);
                             break;
                         case GET_INTERFACE:
+                            standard_get_interface(&request);
                             break;
                         case SET_INTERFACE:
+                            standard_set_interface(&request);
                             break;
                         default:
                             break;
@@ -202,10 +250,13 @@ void usb_setup(){
                             standard_get_status(&request);
                             break;
                         case CLEAR_FEATURE:
+                            standard_set_feature(&request, 0);
                             break;
                         case SET_FEATURE:
+                            standard_set_feature(&request, 1);
                             break;
                         case SYNCH_FRAME:
+                            standard_synch_frame(&request);
                             break;
                         default:
                             break;
@@ -260,8 +311,9 @@ void standard_get_status(USB_Request *request){
             break;
 
         case ENDPOINT: {
-            u32 dir = REG(USB_USBEPnCFGR(request->wIndex)) & EPnCFGR_EPDIR;
-            u32 halt = REG(USB_USBEPnCSR(request->wIndex)) & (dir ? EPnCSR_STLTX : EPnCSR_STLRX);
+            u8 ep = request->wIndex & 0xF;
+            u32 dir = REG(USB_USBEPnCFGR(ep)) & EPnCFGR_EPDIR;
+            u32 halt = REG(USB_USBEPnCSR(ep)) & (dir ? EPnCSR_STLTX : EPnCSR_STLRX);
             request->controlBuffer[0] = halt ? 1 : 0;
             request->controlBuffer[1] = 0;
             break;
@@ -271,6 +323,103 @@ void standard_get_status(USB_Request *request){
             return;
     }
 
+    request->controlData = request->controlBuffer;
     request->controlLength = 2;
     request->action = DATA_IN;
+}
+
+void standard_set_feature(USB_Request *request, u8 set_clear){
+    switch(request->recipient){
+        case DEVICE:
+            if(request->wValue == DEVICE_REMOTE_WAKEUP){
+                if(set_clear)
+                    usb_dev.deviceFeature |= FEAT_REMOTE_WAKEUP;
+                request->action = DATA_IN;
+            }
+            break;
+
+        case ENDPOINT:
+            u8 ep = request->wIndex & 0xF;
+            if(ep){
+                if(set_clear){
+                    // Set Halt
+                    REG(USB_USBEPnISR(ep)) = EPnISR_STLIF;
+                    u32 epcsr = ~REG(USB_USBEPnCSR(ep));
+                    epcsr &= (EPnCSR_STLTX | EPnCSR_STLRX);
+                    REG(USB_USBEPnCSR(ep)) = epcsr;
+
+                } else {
+                    // Clear Halt
+                    REG(USB_USBEPnCSR(ep)) &= (EPnCSR_STLTX | EPnCSR_STLRX);
+                    // Clear Data Toggle
+                    REG(USB_USBEPnCSR(ep)) &= (EPnCSR_DTGTX | EPnCSR_DTGRX);
+                }
+            }
+            break;
+
+        default:
+            return;
+    }
+}
+
+void standard_set_address(USB_Request *request){
+    REG(USB_USBCSR) |= USBCSR_ADRSET;
+    REG(USB_USBDEVA) = request->wValue & 0x7F;
+}
+
+void standard_get_descriptor(USB_Request *request){
+    switch(request->wValue >> 8){
+        case DESC_TYPE_DEVICE:
+            request->controlData = usb_dev.descriptors.deviceDesc;
+            request->controlLength = request->controlData[0];
+            request->action = DATA_IN;
+            break;
+
+        case DESC_TYPE_CONFIG:
+            request->controlData = usb_dev.descriptors.configDesc;
+            request->controlLength = request->controlData[0];
+            request->action = DATA_IN;
+            break;
+
+        case DESC_TYPE_STRING: {
+            u8 index = request->wValue & 0xFF;
+            if(index < usb_dev.descriptors.numStringDescs){
+                request->controlData = usb_dev.descriptors.stringDescs[index];
+                request->controlLength = request->controlData[0];
+                request->action = DATA_IN;
+            }
+            break;
+        }
+
+        default:
+            return;
+    }
+}
+
+void standard_get_configuration(USB_Request *request){
+
+}
+
+void standard_set_configuration(USB_Request *request){
+
+}
+
+void standard_get_interface(USB_Request *request){
+
+}
+
+void standard_set_interface(USB_Request *request){
+
+}
+
+void standard_synch_frame(USB_Request *request){
+
+}
+
+void control_out(){
+
+}
+
+void control_in(){
+
 }

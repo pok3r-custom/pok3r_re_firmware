@@ -99,12 +99,23 @@ void afio_init(){
 //    REG(CKCU_AHBCCR) &= ~(1 << 16);
 }
 
+void flash_version_clear(){
+    REG(FMC_TADR) = VERSION_ADDR;
+    REG(FMC_OCMR) = FMCOCMR_PAGE_ERASE;
+    REG(FMC_OPCR) = FMCOPCR_COMMIT;
+
+    while(REG(FMC_OPCR) != FMCOPCR_FINISHED);
+}
+
 int main(){
     //wdt_init();
     ckcu_init();
 
     //nvic_init();
     afio_init();
+
+    // Clear the version so we can get back to the bootloader
+    flash_version_clear();
 
     usb_init_descriptors();
     usb_init();

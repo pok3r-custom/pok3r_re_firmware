@@ -78,6 +78,17 @@
 #define FMC_SBVT2       FMC_BASE + 0x308    // SRAM Booting Vector 2 (NMI Handler)
 #define FMC_SBVT3       FMC_BASE + 0x30C    // SRAM Booting Vector 3 (Hard Fault Handler)
 
+// OCMR
+#define FMCOCMR_IDLE            0
+#define FMCOCMR_WORD_PROGRAM    0x4
+#define FMCOCMR_PAGE_ERASE      0x8
+#define FMCOCMR_MASS_ERASE      0xA
+
+// OPCR
+#define FMCOPCR_IDLE        (0x6 << 1)
+#define FMCOPCR_COMMIT      (0xA << 1)
+#define FMCOPCR_FINISHED    (0xE << 1)
+
 // Clock Control Unit
 // Reset Control Unit
 // ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -171,7 +182,7 @@
 #define USB_USBIER      USB_BASE + 0x4      // USB Interrupt Enable
 #define USB_USBISR      USB_BASE + 0x8      // USB Interrupt Status
 #define USB_USBFCR      USB_BASE + 0xC      // USB Frame Count
-#define USB_USBDEVAR    USB_BASE + 0x10     // USB Device Address
+#define USB_USBDEVA     USB_BASE + 0x10     // USB Device Address
 
 #define USB_USBEPnCSR(n)    EPn_BASE(n) + 0x14  // USB Endpoint n Control and Status
 #define USB_USBEPnIER(n)    EPn_BASE(n) + 0x18  // USB Endpoint n Interrupt Enable
@@ -179,37 +190,54 @@
 #define USB_USBEPnTCR(n)    EPn_BASE(n) + 0x20  // USB Endpoint n Transfer Count
 #define USB_USBEPnCFGR(n)   EPn_BASE(n) + 0x24  // USB Endpoint n Configuration
 
+// USBCSR
+#define USBCSR_FRES     ((u32)1 << 1)
+#define USBCSR_PDWN     ((u32)1 << 2)
+#define USBCSR_LPMODE   ((u32)1 << 3)
+#define USBCSR_GENRSM   ((u32)1 << 5)
+#define USBCSR_RXDP     ((u32)1 << 6)
+#define USBCSR_RXDM     ((u32)1 << 7)
+#define USBCSR_ADRSET   ((u32)1 << 8)
+#define USBCSR_SRAMRSTC ((u32)1 << 9)
+#define USBCSR_DPPUEN   ((u32)1 << 10)
+#define USBCSR_DPWKEN   ((u32)1 << 11)
+
 // USBIER
-#define USBIER_UGIE     ((u32)0x1)          // USB global Interrupt Enable
-#define USBIER_SOFIE    ((u32)0x2)          // Start Of Frame Interrupt Enable
-#define USBIER_URSTIE   ((u32)0x4)          // USB Reset Interrupt Enable
-#define USBIER_RSMIE    ((u32)0x8)          // Resume Interrupt Enable
-#define USBIER_SUSPIE   ((u32)0x10)         // Suspend Interrupt Enable
-#define USBIER_ESOFIE   ((u32)0x20)         // Expected Start Of Frame Enable
-#define USBIER_EP0IE    ((u32)0x100)        // Endpoint 0 Interrupt Enable
-#define USBIER_EP1IE    ((u32)0x200)        // Endpoint 1 Interrupt Enable
-#define USBIER_EP2IE    ((u32)0x400)        // Endpoint 2 Interrupt Enable
-#define USBIER_EP3IE    ((u32)0x800)        // Endpoint 3 Interrupt Enable
-#define USBIER_EP4IE    ((u32)0x1000)       // Endpoint 4 Interrupt Enable
-#define USBIER_EP5IE    ((u32)0x2000)       // Endpoint 5 Interrupt Enable
-#define USBIER_EP6IE    ((u32)0x4000)       // Endpoint 6 Interrupt Enable
-#define USBIER_EP7IE    ((u32)0x8000)       // Endpoint 7 Interrupt Enable
+#define USBIER_UGIE     ((u32)1 << 0)       // USB global Interrupt Enable
+#define USBIER_SOFIE    ((u32)1 << 1)       // Start Of Frame Interrupt Enable
+#define USBIER_URSTIE   ((u32)1 << 2)       // USB Reset Interrupt Enable
+#define USBIER_RSMIE    ((u32)1 << 3)       // Resume Interrupt Enable
+#define USBIER_SUSPIE   ((u32)1 << 4)       // Suspend Interrupt Enable
+#define USBIER_ESOFIE   ((u32)1 << 5)       // Expected Start Of Frame Enable
+#define USBIER_EP0IE    ((u32)1 << 8)       // Endpoint 0 Interrupt Enable
+#define USBIER_EP1IE    ((u32)1 << 9)       // Endpoint 1 Interrupt Enable
+#define USBIER_EP2IE    ((u32)1 << 10)      // Endpoint 2 Interrupt Enable
+#define USBIER_EP3IE    ((u32)1 << 11)      // Endpoint 3 Interrupt Enable
+#define USBIER_EP4IE    ((u32)1 << 12)      // Endpoint 4 Interrupt Enable
+#define USBIER_EP5IE    ((u32)1 << 13)      // Endpoint 5 Interrupt Enable
+#define USBIER_EP6IE    ((u32)1 << 14)      // Endpoint 6 Interrupt Enable
+#define USBIER_EP7IE    ((u32)1 << 15)      // Endpoint 7 Interrupt Enable
 
 // USBISR
-#define USBISR_SOFIF    ((u32)0x2)          // Start Of Frame Interrupt Flag
-#define USBISR_URSTIF   ((u32)0x4)          // USB Reset Interrupt Flag
-#define USBISR_RSMIF    ((u32)0x8)          // Resume Interrupt Flag
-#define USBISR_SUSPIF   ((u32)0x10)         // Suspend Interrupt Flag
-#define USBISR_ESOFIF   ((u32)0x20)         // Expected Start Of Frame Interrupt
-#define USBISR_EP0IF    ((u32)0x100)        // Endpoint 0 Interrupt flag
-#define USBISR_EP1IF    ((u32)0x200)        // Endpoint 1 Interrupt flag
-#define USBISR_EP2IF    ((u32)0x400)        // Endpoint 2 Interrupt flag
-#define USBISR_EP3IF    ((u32)0x800)        // Endpoint 3 Interrupt flag
-#define USBISR_EP4IF    ((u32)0x1000)       // Endpoint 4 Interrupt flag
-#define USBISR_EP5IF    ((u32)0x2000)       // Endpoint 5 Interrupt flag
-#define USBISR_EP6IF    ((u32)0x4000)       // Endpoint 6 Interrupt flag
-#define USBISR_EP7IF    ((u32)0x8000)       // Endpoint 7 Interrupt flag
-#define USBISR_EPnIF    ((u32)0xFF00)       // Endpoint n Interrupt flag
+#define USBISR_SOFIF    ((u32)1 << 1)       // Start Of Frame Interrupt Flag
+#define USBISR_URSTIF   ((u32)1 << 2)       // USB Reset Interrupt Flag
+#define USBISR_RSMIF    ((u32)1 << 3)       // Resume Interrupt Flag
+#define USBISR_SUSPIF   ((u32)1 << 4)       // Suspend Interrupt Flag
+#define USBISR_ESOFIF   ((u32)1 << 5)       // Expected Start Of Frame Interrupt
+#define USBISR_EP0IF    ((u32)1 << 8)       // Endpoint 0 Interrupt Flag
+#define USBISR_EP1IF    ((u32)1 << 9)       // Endpoint 1 Interrupt Flag
+#define USBISR_EP2IF    ((u32)1 << 10)      // Endpoint 2 Interrupt Flag
+#define USBISR_EP3IF    ((u32)1 << 11)      // Endpoint 3 Interrupt Flag
+#define USBISR_EP4IF    ((u32)1 << 12)      // Endpoint 4 Interrupt Flag
+#define USBISR_EP5IF    ((u32)1 << 13)      // Endpoint 5 Interrupt Flag
+#define USBISR_EP6IF    ((u32)1 << 14)      // Endpoint 6 Interrupt Flag
+#define USBISR_EP7IF    ((u32)1 << 15)      // Endpoint 7 Interrupt Flag
+#define USBISR_EPnIF    ((u32)0xFF00)       // Endpoint Interrupt Mask
+
+// USBCFGR
+#define USBCFGR_FRNUM   ((u32)0x3FF)        // Frame Number
+#define USBCFGR_SOFLCK  ((u32)1 << 16)      // Start-of-Frame Lock Flag
+#define USBCFGR_LSOF    ((u32)0x3 << 17)    // Lost Start-of-Frame Number
 
 // USBEPnCSR
 #define EPnCSR_DTGTX    ((u32)0x1)          // Data Toggle Status, for IN transfer
@@ -248,15 +276,15 @@
 #define EPnISR_ZLRXIF   ((u32)0x800)        // Zero Length Data Received Interrupt Flag
 
 // USBEPnTCR
-#define EPnTCR_TCNT     ((u32)0x1ff)        // Transfer Byte Count
+#define EPnTCR_TCNT     ((u32)0x1FF)        // Transfer Byte Count
 
 // USBEPnCFGR
-#define EPnCFGR_EPEN    ((u32)(0x1 << 31))  // Endpoint Enable
-#define EPnCFGR_EPTYPE  ((u32)(0x1 << 29))  // Transfer Type
-#define EPnCFGR_EPDIR   ((u32)(0x1 << 28))  // Transfer Direction
-#define EPnCFGR_EPADR   ((u32)(0xf << 24))  // Endpoint Address
-#define EPnCFGR_EPLEN   ((u32)(0x7f << 10)) // Buffer Length
-#define EPnCFGR_EPBUFA  ((u32)(0x3ff))      // Endpoint Buffer Address
+#define EPnCFGR_EPEN    ((u32)(1 << 31))    // Endpoint Enable
+#define EPnCFGR_EPTYPE  ((u32)(1 << 29))    // Transfer Type
+#define EPnCFGR_EPDIR   ((u32)(1 << 28))    // Transfer Direction
+#define EPnCFGR_EPADR   ((u32)(0xF << 24))  // Endpoint Address
+#define EPnCFGR_EPLEN   ((u32)(0x7F << 10)) // Buffer Length
+#define EPnCFGR_EPBUFA  ((u32)(0x3FF))      // Endpoint Buffer Address
 
 // Analog To Digital Converter
 // ////////////////////////////////////////////////////////////////////////////////////////////////

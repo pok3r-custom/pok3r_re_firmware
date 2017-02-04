@@ -34,6 +34,14 @@
 #define SET_INTERFACE       0x11
 #define SYNCH_FRAME         0x12
 
+// Device Features
+#define DEVICE_REMOTE_WAKEUP    1
+
+#define FEAT_SELF_POWERED       0x01
+#define FEAT_REMOTE_WAKEUP      0x02
+
+
+
 typedef enum {
     H2D = 0,
     D2H = 1,
@@ -73,6 +81,7 @@ typedef struct {
     // Control Buffer
     Control_Action action;
     u8 controlLength;
+    const u8 *controlData;
     u8 controlBuffer[64];
 } USB_Request;
 
@@ -104,18 +113,5 @@ typedef struct {
 
 // API
 void usb_init();
-
-// Private Functions
-u32 usb_get_int_flags();
-void usb_clear_int_flags(u32 flags);
-u32 usb_get_ep_int_flags(int ep);
-void usb_clear_ep_int_flags(int ep, u32 flags);
-
-void usb_reset();
-void usb_suspend();
-void usb_resume();
-void usb_setup();
-
-void standard_get_status(USB_Request *request);
 
 #endif // USB_H

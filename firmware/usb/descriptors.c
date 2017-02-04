@@ -1,4 +1,5 @@
 #include "descriptors.h"
+#include "usb.h"
 
 extern USB_Device usb_dev;
 

@@ -95,6 +95,7 @@ IF(CMAKE_SYSTEM_NAME MATCHES "Linux")
         COMMAND make -f ${POK3R_RGB_MAKE}
     )
 
+    # Firmware target
     ADD_CUSTOM_TARGET(firmware ALL
         DEPENDS ${POK3R_BIN} ${POK3R_RGB_BIN}
     )
