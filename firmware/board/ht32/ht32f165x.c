@@ -1,5 +1,5 @@
 #include "ht32.h"
-#include "../../types.h"
+#include "../types.h"
 
 void ckcu_clocks_enable(int ahb_mask, int apb0_mask, int apb1_mask, int en){
     u32 ahb = REG(CKCU_AHBCCR);

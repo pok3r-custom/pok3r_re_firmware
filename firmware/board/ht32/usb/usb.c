@@ -1,6 +1,6 @@
 #include "usb.h"
 #include "descriptors.h"
-#include "../board/cpu/ht32.h"
+#include "../ht32.h"
 
 USB_Device usb_dev;
 
@@ -30,28 +30,31 @@ void control_out();
 void control_in();
 
 void usb_init(){
-    // backup domain register access
+    usb_dev.deviceFeature = FEAT_REMOTE_WAKEUP;
+
     // enable USB clock
-    ckcu_clocks_enable(1 << 10, 0, 1 << 6, 1);
+    REG_CKCU->AHBCCR.USBEN = 1;
+    // backup domain register access
+    REG_CKCU->APBCCR1.BKPREN = 1;
+
+//    ckcu_clocks_enable(1 << 10, 0, 1 << 6, 1);
 //    REG(CKCU_APBCCR1) = (1 << 6);
 //    REG(CKCU_AHBCCR) |= (1 << 10);
 
-    // set SUB prescaler
-    REG(CKCU_GCFGR) = (REG(CKCU_GCFGR) & ~(0x3 << 22)) | (2 << 22);
-
-    // enable usb interrupts
-//    REG(USB_USBIER) = 0x071d;
-    REG(USB_USBIER) = USBIER_UGIE |
-                      USBIER_EP0IE | USBIER_EP1IE | USBIER_EP2IE |
-                      USBIER_URSTIE | USBIER_RSMIE | USBIER_SUSPIE;
+    // set usb prescaler
+    REG_CKCU->GCFGR.USBPRE = 2;
+//    REG(CKCU_GCFGR) = (REG(CKCU_GCFGR) & ~(0x3 << 22)) | (2 << 22);
 
     // ep 0
     // EPBUFA
-    REG(USB_USBEPnCFGR(EP_0)) = (REG(USB_USBEPnCFGR(EP_0)) & ~0x3ff) | 0x8;
+    REG_USB->USBEP0CFGR.EPBUFA = 8;
+//    REG(USB_USBEPnCFGR(EP_0)) = (REG(USB_USBEPnCFGR(EP_0)) & ~0x3ff) | 0x8;
     // EPLEN
-    REG(USB_USBEPnCFGR(EP_0)) = (REG(USB_USBEPnCFGR(EP_0)) & ~(0x7f << 10)) | (64 << 10);
+    REG_USB->USBEP0CFGR.EPLEN = 64;
+//    REG(USB_USBEPnCFGR(EP_0)) = (REG(USB_USBEPnCFGR(EP_0)) & ~(0x7f << 10)) | (64 << 10);
 //    REG(USB_USBEPnIER(EP_0)) = 0x0212;
-    REG(USB_USBEPnIER(EP_0)) = EPnIER_ODRXIE | EPnIER_IDTXIE | EPnIER_SDRXIE;
+    REG_USB->USBEP0IER.word = EPnIER_ODRXIE | EPnIER_IDTXIE | EPnIER_SDRXIE;
+//    REG(USB_USBEPnIER(EP_0)) =
 
     // ep 1
     // EPEN
@@ -73,7 +76,13 @@ void usb_init(){
 //    REG(USB_USBEPnIER(EP_2)) = 0x02;
     REG(USB_USBEPnIER(EP_2)) = EPnIER_ODRXIE;
 
-    usb_dev.deviceFeature = REMOTE_WAKEUP;
+    // enable usb interrupts
+//    REG(USB_USBIER) = 0x071d;
+    REG_USB->USBIER.word = USBIER_UGIE |
+                           USBIER_EP0IE | USBIER_EP1IE | USBIER_EP2IE |
+                           USBIER_URSTIE | USBIER_RSMIE | USBIER_SUSPIE;
+
+    // enable usb interrupt
 }
 
 void usb_isr(){
@@ -171,7 +180,7 @@ void usb_setup(){
 
     // Read SETUP Data
     for(int i = 0; i < 8; ++i)
-        setup[i] = ((u8*)USB_SRAM_BASE)[i];
+        setup[i] = ((u8 *)USB_SRAM_BASE)[i];
 
     request.bmRequestType = setup[0];
     request.bRequest = setup[1];
@@ -293,7 +302,8 @@ void usb_setup(){
         case STALL:
         default:
             // Send Control STALL
-            REG(USB_USBEPnCSR(EP_0)) = EPnCSR_STLTX;
+            REG_USB->USBEP0CSR.STLTX = 1;
+//            REG(USB_USBEPnCSR(EP_0)) = EPnCSR_STLTX;
             break;
     }
 }
@@ -338,7 +348,7 @@ void standard_set_feature(USB_Request *request, u8 set_clear){
             }
             break;
 
-        case ENDPOINT:
+        case ENDPOINT: {
             u8 ep = request->wIndex & 0xF;
             if(ep){
                 if(set_clear){
@@ -356,6 +366,7 @@ void standard_set_feature(USB_Request *request, u8 set_clear){
                 }
             }
             break;
+        }
 
         default:
             return;
@@ -363,8 +374,10 @@ void standard_set_feature(USB_Request *request, u8 set_clear){
 }
 
 void standard_set_address(USB_Request *request){
-    REG(USB_USBCSR) |= USBCSR_ADRSET;
-    REG(USB_USBDEVA) = request->wValue & 0x7F;
+    REG_USB->USBCSR.ADRSET = 1;
+    REG_USB->USBDEVAR.DEVA = request->wValue & 0x7F;
+//    REG(USB_USBCSR) |= USBCSR_ADRSET;
+//    REG(USB_USBDEVA) = request->wValue & 0x7F;
 }
 
 void standard_get_descriptor(USB_Request *request){

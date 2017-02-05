@@ -1,7 +1,7 @@
 #ifndef USB_H
 #define USB_H
 
-#include "../types.h"
+#include "../../types.h"
 
 // Request Data Direction
 #define REQUEST_DIR_MASK    0x80

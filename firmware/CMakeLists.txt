@@ -5,26 +5,26 @@ PROJECT(Pok3r_Custom C ASM)
 
 ### =================== SOURCES =================== ###
 
-SET(STARTUP_SOURCES
-    ht32f165x.s
-)
-
 SET(COMMON_SOURCES
     common.h
     main.c
 
-    board/cpu/ht32.h
-    board/cpu/ht32f165x.h
-    board/cpu/ht32f165x.c
-    board/cpu/ht32f1654.h
-    board/cpu/ht32f1654.c
-    board/cpu/ht32f1655.h
-    board/cpu/ht32f1655.c
+    board/types.h
 
-    usb/descriptors.h
-    usb/descriptors.c
-    usb/usb.h
-    usb/usb.c
+    board/ht32/ht32.h
+    board/ht32/ht32f165x.h
+    board/ht32/ht32f165x.c
+    board/ht32/ht32f1654.h
+    board/ht32/ht32f1654.c
+    board/ht32/ht32f1655.h
+    board/ht32/ht32f1655.c
+
+    board/ht32/startup.s
+
+    board/ht32/usb/descriptors.h
+    board/ht32/usb/descriptors.c
+    board/ht32/usb/usb.h
+    board/ht32/usb/usb.c
 )
 
 SET(POK3R_SOURCES
@@ -36,10 +36,8 @@ SET(POK3R_RGB_SOURCES
 )
 
 FILE(GLOB_RECURSE DEMO_FILES demo/*.c demo/*.h demo/*.s demo/*.ld)
-FILE(GLOB_RECURSE HT32_FILES ht32/*.c ht32/*.h ht32/*.s ht32/*.ld)
 
 SET(FILES
-    ${STARTUP_SOURCES}
     ${COMMON_SOURCES}
     ${POK3R_SOURCES}
     ${POK3R_RGB_SOURCES}
@@ -47,7 +45,6 @@ SET(FILES
     pok3r_rgb_custom.ld
     openocd.cfg
     ${DEMO_FILES}
-    ${HT32_FILES}
 )
 
 ### =================== CONFIG ==================== ###
@@ -64,10 +61,14 @@ SET(POK3R_RGB_MAKE  "pok3r_rgb.make")
 
 # Generate makefiles
 SET(OUT_NAME ${POK3R_NAME})
+SET(FIRMWARE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
+SET(FIRMWARE_BINARY_DIR "${POK3R_DIR}")
 SET(C_DEFS "-DBOARD=1 -DCPU=0x1655")
 CONFIGURE_FILE(Makefile.in ${POK3R_DIR}/${POK3R_MAKE} @ONLY)
 
 SET(OUT_NAME ${POK3R_RGB_NAME})
+SET(FIRMWARE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
+SET(FIRMWARE_BINARY_DIR "${POK3R_RGB_DIR}")
 SET(C_DEFS "-DBOARD=2 -DCPU=0x1654")
 CONFIGURE_FILE(Makefile.in ${POK3R_RGB_DIR}/${POK3R_RGB_MAKE} @ONLY)
 
@@ -97,7 +98,8 @@ IF(CMAKE_SYSTEM_NAME MATCHES "Linux")
 
     # Firmware target
     ADD_CUSTOM_TARGET(firmware ALL
-        DEPENDS ${POK3R_BIN} ${POK3R_RGB_BIN}
+        DEPENDS ${POK3R_BIN}
+        #DEPENDS ${POK3R_RGB_BIN}
     )
 
 ENDIF()

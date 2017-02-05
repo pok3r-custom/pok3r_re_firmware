@@ -1,21 +1,28 @@
 # Makefile for Cortex-M3
 
+# STOP EDITING THIS FILE RIGHT NOW
+# SERIOUSLY
+# PLEASE.
+# FUCK MAKE.
+
 # App name
 APP_NAME = @OUT_NAME@
 
 # Directories
-SRC_DIR = @CMAKE_CURRENT_SOURCE_DIR@
-BIN_DIR = .
+SRC_DIR = @FIRMWARE_SOURCE_DIR@
+BIN_DIR = @FIRMWARE_BINARY_DIR@
 
 # Input Files
 LD_SCRIPT = $(SRC_DIR)/$(APP_NAME).ld
-STARTUP_S = $(SRC_DIR)/ht32f165x.s
+STARTUP_S = board/ht32/startup.s
 
 CC_SRCS = \
 	main.c \
-	board/cpu/ht32f165x.c \
-	usb/usb.c \
-	usb/descriptors.c
+	board/ht32/ht32f1654.c \
+	board/ht32/ht32f1655.c \
+	board/ht32/ht32f165x.c \
+	board/ht32/usb/descriptors.c \
+	board/ht32/usb/usb.c
 
 # Output Files
 OUT_ELF = $(BIN_DIR)/$(APP_NAME).elf
@@ -24,16 +31,15 @@ OUT_MAP = $(BIN_DIR)/$(APP_NAME).map
 
 # Intermediary files
 STARTUP_OBJ = startup.o
-OBJ_NAMES = $(CC_SRCS:.c=.o)
-CC_OBJS = $(OBJ_NAMES)
-#CC_OBJS = $(addprefix $(BIN_DIR)/, $(OBJ_NAMES))
-CC_DEPS = $(CC_OBJS:.o=.d)
+CC_OBJS = $(addprefix $(BIN_DIR)/,$(CC_SRCS:.c=.o))
+CC_DEPS = $(CC_SRCS:.c=.d)
 
 # Config
 ARM_CPU = cortex-m3
 
 # Commands
 CC = arm-none-eabi-gcc
+CPP = arm-none-eabi-g++
 AS = arm-none-eabi-as
 LD = arm-none-eabi-ld
 OC = arm-none-eabi-objcopy
@@ -43,38 +49,46 @@ MKDIR = mkdir -p
 
 # Flags
 CC_FLAGS += -c -mcpu=$(ARM_CPU) -mthumb -std=c11 -nostdlib -nostartfiles -ffreestanding -Wall
-CC_FLAGS += -MT $@ -MMD -MP -MF $(BIN_DIR)/$*.d
+CC_FLAGS += -MT $@ -MMD -MP -MF $*.d
 CC_FLAGS += -DFW_BUILDING @C_DEFS@
 
+CPP_FLAGS += -c -mcpu=$(ARM_CPU) -mthumb -std=c11 -nostdlib -nostartfiles -ffreestanding -Wall
+CPP_FLAGS += -MT $@ -MMD -MP -MF $*.d
+CPP_FLAGS += -DFW_BUILDING @C_DEFS@
+
 AS_FLAGS += -mcpu=$(ARM_CPU) -mthumb
+
 LD_FLAGS += -nostdlib -nostartfiles -T $(LD_SCRIPT) -Map $(OUT_MAP)
 
 # Targets
-
 all: $(OUT_BIN)
 
 $(OUT_BIN): $(OUT_ELF)
 	echo "BIN  $(notdir $@)"
 	$(OC) $(OUT_ELF) -O binary $(OUT_BIN)
 
-$(OUT_ELF): $(LD_SCRIPT) $(STARTUP_OBJ) | dirs $(CC_OBJS)
+$(OUT_ELF): $(LD_SCRIPT) | dirs $(STARTUP_OBJ) $(CC_OBJS)
 	echo "LINK $(notdir $@)"
 	$(LD) $(LD_FLAGS) -o $@ $(STARTUP_OBJ) $(CC_OBJS)
 
-$(STARTUP_OBJ): $(STARTUP_S)
+$(STARTUP_OBJ): $(SRC_DIR)/$(STARTUP_S)
 	echo "AS   $(notdir $<)"
 	$(AS) $(AS_FLAGS) -o $@ $<
 
-%.o: $(SRC_DIR)/%.c
+$(BIN_OBJ)/%.o: $(SRC_DIR)/%.s
+	echo "AS   $(notdir $<)"
+	$(AS) $(AS_FLAGS) -o $@ $<
+
+$(BIN_DIR)/%.o: $(SRC_DIR)/%.c
 	echo "CC   $(notdir $<)"
-	#echo "$(CC_FLAGS)"
-	#echo "$(CC_DEPS)"
 	$(CC) $(CC_FLAGS) -o $@ $<
 
+$(BIN_DIR)/%.o: $(SRC_DIR)/%.cpp
+	echo "CPP  $(notdir $<)"
+	$(CPP) $(CPP_FLAGS) -o $@ $<
+
 dirs:
-	$(MKDIR) $(BIN_DIR)
-	$(MKDIR) $(BIN_DIR)/board/cpu
-	$(MKDIR) $(BIN_DIR)/usb
+	$(foreach dir,$(CC_SRCS),$(MKDIR) $(dir $(dir));)
 
 clean:
 	$(RM) $(OUT_ELF)

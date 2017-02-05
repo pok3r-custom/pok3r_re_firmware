@@ -1,7 +1,7 @@
 
 #include "common.h"
-#include "usb/usb.h"
-#include "usb/descriptors.h"
+#include "board/ht32/usb/usb.h"
+#include "board/ht32/usb/descriptors.h"
 
 void __attribute__((weak)) gptm0_isr(){}
 void __attribute__((weak)) gptm1_isr(){}
@@ -39,8 +39,10 @@ void wdt_init(){
 
 void ckcu_init(){
     // Backup domain
-    REG(CKCU_LPCR) = 1;
+    REG_CKCU->LPCR = 1;
+//    REG(CKCU_LPCR) = 1;
     // Backup domain register access
+    REG_CKCU->APBCCR1.BKPREN = 1;
 //    REG(CKCU_APBCCR1) = (1 << 6);
 
     // USB
@@ -51,7 +53,8 @@ void ckcu_init(){
 //    REG(CKCU_APBCCR0) |= (1 << 15);
 
     // PLL VCO output clock feedback divider to 9
-    REG(CKCU_PLLCFCR) = (REG(CKCU_PLLCFCR) & ~(0x3f << 23)) | (9 << 23);
+    REG_CKCU->PLLCFGR.PFBD = 9;
+//    REG(CKCU_PLLCFCR) = (REG(CKCU_PLLCFCR) & ~(0x3f << 23)) | (9 << 23);
 
     // Flash wait-state 2
     REG(FMC_CFCR) = (REG(FMC_CFCR) & ~7) | 3;
@@ -112,16 +115,18 @@ int main(){
     ckcu_init();
 
     //nvic_init();
-    afio_init();
+//    afio_init();
 
     // Clear the version so we can get back to the bootloader
     flash_version_clear();
 
-    usb_init_descriptors();
-    usb_init();
+//    usb_init_descriptors();
+//    usb_init();
+
+    u32 count = 0;
 
     while(1){
-
+        count = count + 1;
     }
 
     return 0;
