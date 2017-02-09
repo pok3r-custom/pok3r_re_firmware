@@ -12,19 +12,23 @@
 #define STRUCT_REGISTER_END __attribute__((__packed__)); u32 word; }
 
 // General Purpose Timers
+// ////////////////////////////////////////////////////////////////////////////////////////////////
 #define GPTM0_BASE      0x4006E000
 #define GPTM1_BASE      0x4006F000
 
 // Basic Function Timers
+// ////////////////////////////////////////////////////////////////////////////////////////////////
 #define BFTM0_BASE      0x40076000
 #define BFTM1_BASE      0x40077000
 
 // Motor Control Timers
+// ////////////////////////////////////////////////////////////////////////////////////////////////
 #define MCTM0_BASE      0x4002C000
 #define MCTM1_BASE      0x4002D000
 
 // Operational Amplifier
 // Comparator
+// ////////////////////////////////////////////////////////////////////////////////////////////////
 #define OPA_BASE        0x40018000
 #define CMP_BASE        0x40018000
 
@@ -56,6 +60,7 @@
 
 // Real Time Clock
 // Power Control Unit
+// ////////////////////////////////////////////////////////////////////////////////////////////////
 #define RTC_BASE        0x4006A000
 #define PWRCU_BASE      0x4006A000
 
@@ -166,28 +171,35 @@ STRUCT_SIZE_ASSERT(FMC_map, 0x310);
 #define GPIOn_PnRR(n)       GPIOn_BASE(n) + 0x28    // Port n Output Reset Control
 
 // USART
+// ////////////////////////////////////////////////////////////////////////////////////////////////
 #define UART0_BASE      0x40001000
 #define UART1_BASE      0x40041000
 
 // UART
+// ////////////////////////////////////////////////////////////////////////////////////////////////
 #define USART0_BASE     0x40000000
 #define USART1_BASE     0x40040000
 
 // SPI
+// ////////////////////////////////////////////////////////////////////////////////////////////////
 #define SPI0_BASE       0x40004000
 #define SPI1_BASE       0x40044000
 
 // I2C
+// ////////////////////////////////////////////////////////////////////////////////////////////////
 #define I2C0_BASE       0x40048000
 #define I2C1_BASE       0x40049000
 
 // Inter-IC Sound
+// ////////////////////////////////////////////////////////////////////////////////////////////////
 #define I2S_BASE        0x40026000
 
 // Smart Card Interface
+// ////////////////////////////////////////////////////////////////////////////////////////////////
 #define SCI_BASE        0x40043000
 
 // Extend Bus Interface
+// ////////////////////////////////////////////////////////////////////////////////////////////////
 #define EBI_BASE        0x40098000
 
 // USB
@@ -218,47 +230,47 @@ STRUCT_SIZE_ASSERT(FMC_map, 0x310);
 #define USB_USBEPnCFGR(n)   EPn_BASE(n) + 0x24  // USB Endpoint n Configuration
 
 // USBCSR
-#define USBCSR_FRES     ((u32)1 << 1)       // Force USB Reset Control
-#define USBCSR_PDWN     ((u32)1 << 2)       // Power Down Mode Control
-#define USBCSR_LPMODE   ((u32)1 << 3)       // Low-Power Mode Control
-#define USBCSR_GENRSM   ((u32)1 << 5)       // Resume Request Generation Control
-#define USBCSR_RXDP     ((u32)1 << 6)       // Received DP Line Status
-#define USBCSR_RXDM     ((u32)1 << 7)       // Received DM Line Status
-#define USBCSR_ADRSET   ((u32)1 << 8)       // Device Address Setting Control
-#define USBCSR_SRAMRSTC ((u32)1 << 9)       // USB SRAM Reset Condition
-#define USBCSR_DPPUEN   ((u32)1 << 10)      // DP Pull Up Enable
-#define USBCSR_DPWKEN   ((u32)1 << 11)      // DP Wake Up Enable
+#define USBCSR_FRES     ((u32)0x002)        // Force USB Reset Control
+#define USBCSR_PDWN     ((u32)0x004)        // Power Down Mode Control
+#define USBCSR_LPMODE   ((u32)0x008)        // Low-Power Mode Control
+#define USBCSR_GENRSM   ((u32)0x020)        // Resume Request Generation Control
+#define USBCSR_RXDP     ((u32)0x040)        // Received DP Line Status
+#define USBCSR_RXDM     ((u32)0x080)        // Received DM Line Status
+#define USBCSR_ADRSET   ((u32)0x100)        // Device Address Setting Control
+#define USBCSR_SRAMRSTC ((u32)0x200)        // USB SRAM Reset Condition
+#define USBCSR_DPPUEN   ((u32)0x400)        // DP Pull Up Enable
+#define USBCSR_DPWKEN   ((u32)0x800)        // DP Wake Up Enable
 
 // USBIER
-#define USBIER_UGIE     ((u32)1 << 0)       // USB global Interrupt Enable
-#define USBIER_SOFIE    ((u32)1 << 1)       // Start Of Frame Interrupt Enable
-#define USBIER_URSTIE   ((u32)1 << 2)       // USB Reset Interrupt Enable
-#define USBIER_RSMIE    ((u32)1 << 3)       // Resume Interrupt Enable
-#define USBIER_SUSPIE   ((u32)1 << 4)       // Suspend Interrupt Enable
-#define USBIER_ESOFIE   ((u32)1 << 5)       // Expected Start Of Frame Enable
-#define USBIER_EP0IE    ((u32)1 << 8)       // Endpoint 0 Interrupt Enable
-#define USBIER_EP1IE    ((u32)1 << 9)       // Endpoint 1 Interrupt Enable
-#define USBIER_EP2IE    ((u32)1 << 10)      // Endpoint 2 Interrupt Enable
-#define USBIER_EP3IE    ((u32)1 << 11)      // Endpoint 3 Interrupt Enable
-#define USBIER_EP4IE    ((u32)1 << 12)      // Endpoint 4 Interrupt Enable
-#define USBIER_EP5IE    ((u32)1 << 13)      // Endpoint 5 Interrupt Enable
-#define USBIER_EP6IE    ((u32)1 << 14)      // Endpoint 6 Interrupt Enable
-#define USBIER_EP7IE    ((u32)1 << 15)      // Endpoint 7 Interrupt Enable
+#define USBIER_UGIE     ((u32)0x0001)       // USB global Interrupt Enable
+#define USBIER_SOFIE    ((u32)0x0002)       // Start Of Frame Interrupt Enable
+#define USBIER_URSTIE   ((u32)0x0004)       // USB Reset Interrupt Enable
+#define USBIER_RSMIE    ((u32)0x0008)       // Resume Interrupt Enable
+#define USBIER_SUSPIE   ((u32)0x0010)       // Suspend Interrupt Enable
+#define USBIER_ESOFIE   ((u32)0x0020)       // Expected Start Of Frame Enable
+#define USBIER_EP0IE    ((u32)0x0100)       // Endpoint 0 Interrupt Enable
+#define USBIER_EP1IE    ((u32)0x0200)       // Endpoint 1 Interrupt Enable
+#define USBIER_EP2IE    ((u32)0x0400)       // Endpoint 2 Interrupt Enable
+#define USBIER_EP3IE    ((u32)0x0800)       // Endpoint 3 Interrupt Enable
+#define USBIER_EP4IE    ((u32)0x1000)       // Endpoint 4 Interrupt Enable
+#define USBIER_EP5IE    ((u32)0x2000)       // Endpoint 5 Interrupt Enable
+#define USBIER_EP6IE    ((u32)0x4000)       // Endpoint 6 Interrupt Enable
+#define USBIER_EP7IE    ((u32)0x8000)       // Endpoint 7 Interrupt Enable
 
 // USBISR
-#define USBISR_SOFIF    ((u32)1 << 1)       // Start Of Frame Interrupt Flag
-#define USBISR_URSTIF   ((u32)1 << 2)       // USB Reset Interrupt Flag
-#define USBISR_RSMIF    ((u32)1 << 3)       // Resume Interrupt Flag
-#define USBISR_SUSPIF   ((u32)1 << 4)       // Suspend Interrupt Flag
-#define USBISR_ESOFIF   ((u32)1 << 5)       // Expected Start Of Frame Interrupt
-#define USBISR_EP0IF    ((u32)1 << 8)       // Endpoint 0 Interrupt Flag
-#define USBISR_EP1IF    ((u32)1 << 9)       // Endpoint 1 Interrupt Flag
-#define USBISR_EP2IF    ((u32)1 << 10)      // Endpoint 2 Interrupt Flag
-#define USBISR_EP3IF    ((u32)1 << 11)      // Endpoint 3 Interrupt Flag
-#define USBISR_EP4IF    ((u32)1 << 12)      // Endpoint 4 Interrupt Flag
-#define USBISR_EP5IF    ((u32)1 << 13)      // Endpoint 5 Interrupt Flag
-#define USBISR_EP6IF    ((u32)1 << 14)      // Endpoint 6 Interrupt Flag
-#define USBISR_EP7IF    ((u32)1 << 15)      // Endpoint 7 Interrupt Flag
+#define USBISR_SOFIF    ((u32)0x0002)       // Start Of Frame Interrupt Flag
+#define USBISR_URSTIF   ((u32)0x0004)       // USB Reset Interrupt Flag
+#define USBISR_RSMIF    ((u32)0x0008)       // Resume Interrupt Flag
+#define USBISR_SUSPIF   ((u32)0x0010)       // Suspend Interrupt Flag
+#define USBISR_ESOFIF   ((u32)0x0020)       // Expected Start Of Frame Interrupt
+#define USBISR_EP0IF    ((u32)0x0100)       // Endpoint 0 Interrupt Flag
+#define USBISR_EP1IF    ((u32)0x0200)       // Endpoint 1 Interrupt Flag
+#define USBISR_EP2IF    ((u32)0x0400)       // Endpoint 2 Interrupt Flag
+#define USBISR_EP3IF    ((u32)0x0800)       // Endpoint 3 Interrupt Flag
+#define USBISR_EP4IF    ((u32)0x1000)       // Endpoint 4 Interrupt Flag
+#define USBISR_EP5IF    ((u32)0x2000)       // Endpoint 5 Interrupt Flag
+#define USBISR_EP6IF    ((u32)0x4000)       // Endpoint 6 Interrupt Flag
+#define USBISR_EP7IF    ((u32)0x8000)       // Endpoint 7 Interrupt Flag
 #define USBISR_EPnIF    ((u32)0xFF00)       // Endpoint Interrupt Mask
 
 // USBCFGR
@@ -267,36 +279,36 @@ STRUCT_SIZE_ASSERT(FMC_map, 0x310);
 #define USBCFGR_LSOF    ((u32)0x3 << 17)    // Lost Start-of-Frame Number
 
 // USBEPnCSR
-#define EPnCSR_DTGTX    ((u32)0x1)          // Data Toggle Status, for IN transfer
-#define EPnCSR_NAKTX    ((u32)0x2)          // NAK Status, for IN transfer
-#define EPnCSR_STLTX    ((u32)0x4)          // STALL Status, for IN transfer
-#define EPnCSR_DTGRX    ((u32)0x8)          // Data Toggle Status, for OUT transfer
+#define EPnCSR_DTGTX    ((u32)0x01)         // Data Toggle Status, for IN transfer
+#define EPnCSR_NAKTX    ((u32)0x02)         // NAK Status, for IN transfer
+#define EPnCSR_STLTX    ((u32)0x04)         // STALL Status, for IN transfer
+#define EPnCSR_DTGRX    ((u32)0x08)         // Data Toggle Status, for OUT transfer
 #define EPnCSR_NAKRX    ((u32)0x10)         // NAK Status, for OUT transfer
 #define EPnCSR_STLRX    ((u32)0x20)         // STALL Status, for OUT transfer
 
 // USBEPnIER
-#define EPnIER_OTRXIE   ((u32)0x1)          // OUT Token Received Interrupt Enable
-#define EPnIER_ODRXIE   ((u32)0x2)          // OUT Data Received Interrupt Enable
-#define EPnIER_ODOVIE   ((u32)0x4)          // OUT Data Buffer Overrun Interrupt Enable
-#define EPnIER_ITRXIE   ((u32)0x8)          // IN Token Received Interrupt Enable
-#define EPnIER_IDTXIE   ((u32)0x10)         // IN Data Transmitted Interrupt Enable
-#define EPnIER_NAKIE    ((u32)0x20)         // NAK Transmitted Interrupt Enable
-#define EPnIER_STLIE    ((u32)0x40)         // STALL Transmitted Interrupt Enable
-#define EPnIER_UERIE    ((u32)0x80)         // USB Error Interrupt Enable
+#define EPnIER_OTRXIE   ((u32)0x001)        // OUT Token Received Interrupt Enable
+#define EPnIER_ODRXIE   ((u32)0x002)        // OUT Data Received Interrupt Enable
+#define EPnIER_ODOVIE   ((u32)0x004)        // OUT Data Buffer Overrun Interrupt Enable
+#define EPnIER_ITRXIE   ((u32)0x008)        // IN Token Received Interrupt Enable
+#define EPnIER_IDTXIE   ((u32)0x010)        // IN Data Transmitted Interrupt Enable
+#define EPnIER_NAKIE    ((u32)0x020)        // NAK Transmitted Interrupt Enable
+#define EPnIER_STLIE    ((u32)0x040)        // STALL Transmitted Interrupt Enable
+#define EPnIER_UERIE    ((u32)0x080)        // USB Error Interrupt Enable
 #define EPnIER_STRXIE   ((u32)0x100)        // SETUP Token Received Interrupt Enable
 #define EPnIER_SDRXIE   ((u32)0x200)        // SETUP Data Received Interrupt Enable
 #define EPnIER_SDERIE   ((u32)0x400)        // SETUP Data Error Interrupt Enable
 #define EPnIER_ZLRXIE   ((u32)0x800)        // Zero Length Data Received Interrupt Enable
 
 // USBEPnISR
-#define EPnISR_OTRXIF   ((u32)0x1)          // OUT Token Received Interrupt Flag
-#define EPnISR_ODRXIF   ((u32)0x2)          // OUT Data Received Interrupt Flag
-#define EPnISR_ODOVIF   ((u32)0x4)          // OUT Data Buffer Overrun Interrupt Flag
-#define EPnISR_ITRXIF   ((u32)0x8)          // IN Token Received Interrupt Flag
-#define EPnISR_IDTXIF   ((u32)0x10)         // IN Data Transmitted Interrupt Flag
-#define EPnISR_NAKIF    ((u32)0x20)         // NAK Transmitted Interrupt Flag
-#define EPnISR_STLIF    ((u32)0x40)         // STALL Transmitted Interrupt Flag
-#define EPnISR_UERIF    ((u32)0x80)         // USB Error Interrupt Flag
+#define EPnISR_OTRXIF   ((u32)0x001)        // OUT Token Received Interrupt Flag
+#define EPnISR_ODRXIF   ((u32)0x002)        // OUT Data Received Interrupt Flag
+#define EPnISR_ODOVIF   ((u32)0x004)        // OUT Data Buffer Overrun Interrupt Flag
+#define EPnISR_ITRXIF   ((u32)0x008)        // IN Token Received Interrupt Flag
+#define EPnISR_IDTXIF   ((u32)0x010)        // IN Data Transmitted Interrupt Flag
+#define EPnISR_NAKIF    ((u32)0x020)        // NAK Transmitted Interrupt Flag
+#define EPnISR_STLIF    ((u32)0x040)        // STALL Transmitted Interrupt Flag
+#define EPnISR_UERIF    ((u32)0x080)        // USB Error Interrupt Flag
 #define EPnISR_STRXIF   ((u32)0x100)        // SETUP Token Received Interrupt Flag
 #define EPnISR_SDRXIF   ((u32)0x200)        // SETUP Data Received Interrupt Flag
 #define EPnISR_SDERIF   ((u32)0x400)        // SETUP Data Error Interrupt Flag

@@ -2,6 +2,7 @@
 #define USB_H
 
 #include "../../types.h"
+#include "../ht32f165x.h"
 
 // Request Data Direction
 #define REQUEST_DIR_MASK    0x80
@@ -39,7 +40,6 @@
 
 #define FEAT_SELF_POWERED       0x01
 #define FEAT_REMOTE_WAKEUP      0x02
-
 
 
 typedef enum {
@@ -105,10 +105,27 @@ typedef struct {
     u8 numStringDescs;
 } USB_Descriptors;
 
+typedef enum {
+    POWERED     = 0,    //!< Device is powered.
+    SUSPENDED   = 1,    //!< Device is suspended.
+    ADDRESS     = 2,    //!< Device has address.
+    CONFIGURED  = 3,    //!< Device is configured.
+} USB_Status;
+
 typedef struct {
-    USB_Descriptors descriptors;
+    USB_Status currStatus;
+    USB_Status prevStatus;
 
     u8 deviceFeature;
+
+    USBEP0CFGR_reg ep0cfgr;
+    USBEP0IER_reg ep0ier;
+    USBEPnCFGR_1_3_reg ep1cfgr;
+    USBEPnIER_1_3_reg ep1ier;
+    USBEPnCFGR_1_3_reg ep2cfgr;
+    USBEPnIER_1_3_reg ep2ier;
+
+    USB_Descriptors descriptors;
 } USB_Device;
 
 // API

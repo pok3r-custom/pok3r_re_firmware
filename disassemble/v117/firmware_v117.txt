@@ -6458,7 +6458,7 @@ function_17:
     6698:   f000 fb0d   bl 0x6cb6               ; call
     669c:   2801        cmp r0, #1
     669e:   d1f1        bne.n 0x6684            ; branch if r0 != 1
-    66a0:   f000 fb31   bl 0x6d06               ; call
+    66a0:   f000 fb31   bl 0x6d06               ; call gen_remote_wakeup
     66a4:   e7ee        b.n 0x6684              ; branch
   0x66a6:   e8bd 81f0   ldmia.w sp!, {r4, r5, r6, r7, r8, pc}
     66aa:   0000
@@ -6991,21 +6991,28 @@ usb_entry:
     ; r0 = pointer_3
   0x6af2:   e92d 41f0   stmdb sp!, {r4, r5, r6, r7, r8, lr}
     6af6:   4604        mov r4, r0              ; r4 = r0
+
     6af8:   f000 fa60   bl 0x6fbc               ; call usb_get_intr_flags()
     6afc:   4605        mov r5, r0              ; r5 = r0
+
+    ; Test SOF flag
     6afe:   0780        lsls r0, r0, #30        ; r0 = r0 << 30
-    6b00:   d506        bpl.n 0x6b10            ; branch if N==0
+    6b00:   d506        bpl.n 0x6b10
+
     6b02:   6ce1        ldr r1, [r4, #76]       ; r1 = [r4 + 0x4c]
     6b04:   b109        cbz r1, 0x6b0a          ; branch if r1 == 0
     6b06:   6d20        ldr r0, [r4, #80]       ; r0 = [r4 + 0x50]
     6b08:   4788        blx r1                  ; branch r1
 
+    ; Clear SOFIF
   0x6b0a:   2002        movs r0, #2             ; r0 = 2
     6b0c:   f000 f910   bl 0x6d30               ; call usb_set_intr_flags(2)
 
+    ; Test suspend flag
   0x6b10:   06e8        lsls r0, r5, #27        ; r0 = r5 << 27
     6b12:   d50e        bpl.n 0x6b32
 
+    ; Clear SUSPIF
     6b14:   2010        movs r0, #16            ; r0 = 0x10
     6b16:   f000 f90b   bl 0x6d30               ; call usb_set_intr_flags(0x10)
 
@@ -7021,9 +7028,12 @@ usb_entry:
     6b2c:   2003        movs r0, #3             ; r0 = 3
     6b2e:   f804 0932   strb.w r0, [r4], #-50   ; [r4] = r0
                                                 ; r4 = r4 - 0x32
+
+    ; Test USB reset flag
   0x6b32:   0768        lsls r0, r5, #29        ; r0 = r5 << 29
     6b34:   f04f 0700   mov.w r7, #0            ; r7 = 0
     6b38:   d523        bpl.n 0x6b82
+
     6b3a:   f104 0420   add.w r4, r4, #32       ; r4 = r4 + 0x20
     6b3e:   f04f 30ff   mov.w r0, #4294967295   ; r9 = 0xffffffff
     6b42:   6e66        ldr r6, [r4, #100]      ; r6 = [r4 + 0x64]
@@ -7038,6 +7048,7 @@ usb_entry:
     6b58:   61a7        str r7, [r4, #24]       ; [r4 + 0x18] = r7
 
     6b5a:   f000 f937   bl 0x6dcc               ; call usb_ckcu_voodoo()
+
     6b5e:   f000 fa3f   bl 0x6fe0               ; call usb_clear_csr()
 
     6b62:   2000        movs r0, #0             ; r0 = 0
@@ -7047,15 +7058,18 @@ usb_entry:
     6b6a:   6830        ldr r0, [r6, #0]        ; r0 = [r6]
     6b6c:   f000 fa0e   bl 0x6f8c               ; call usb_enable_intr(r0)
 
+    ; reset callback
     6b70:   6a61        ldr r1, [r4, #36]       ; r1 = [r4 + 0x24]
     6b72:   f1a4 0420   sub.w r4, r4, #32       ; r4 = r4 - 0x20
     6b76:   b109        cbz r1, 0x6b7c          ; branch if r1 == 0
     6b78:   6ca0        ldr r0, [r4, #72]       ; r0 = [r4 + 0x48]
     6b7a:   4788        blx r1                  ; call r1
 
+    ; Clear URSTIF
   0x6b7c:   2004        movs r0, #4             ; r0 = 4
     6b7e:   f000 f8d7   bl 0x6d30               ; call usb_set_intr_flags(4)
 
+    ; Test resume flag
     6b82:   0728        lsls r0, r5, #28        ; r0 = r5 << 28
     6b84:   d508        bpl.n 0x6b98
 
@@ -7064,9 +7078,11 @@ usb_entry:
     6b8a:   f894 0033   ldrb.w r0, [r4, #51]    ; r0 = [r4 + 0x33]
     6b8e:   f884 0032   strb.w r0, [r4, #50]    ; [r4 + 0x32] = r0
 
+    ; Clear RSMIF
     6b92:   2008        movs r0, #8             ; r0 = 8
     6b94:   f000 f8cc   bl 0x6d30               ; call usb_set_intr_flags(8)
 
+    ; Test EP0 flag
   0x6b98:   05e8        lsls r0, r5, #23        ; r0 = r5 << 23
     6b9a:   f44f 7680   mov.w r6, #256          ; r6 = 0x100
     6b9e:   d57a        bpl.n 0x6c96
@@ -7163,7 +7179,9 @@ usb_entry:
     6c62:   f000 f8c7   bl 0x6df4               ; call usb_set_ep_intr
     6c66:   4630        mov r0, r6
     6c68:   f000 f862   bl 0x6d30               ; call usb_set_intr_flags(r0 = r6)
-    6c6c:   e013        b.n 0x6c96
+
+    ; EP1~EP7 flags
+    6c6c:   e013        b.n 0x6c96              ; enter loop
   0x6c6e:   4628        mov r0, r5              ; r0 = r5
     6c70:   f000 f8f8   bl 0x6e64               ; call usb_get_ep_intr
     6c74:   f010 0f12   tst.w r0, #18
@@ -7178,11 +7196,13 @@ usb_entry:
     6c90:   b109        cbz r1, 0x6c96
     6c92:   4628        mov r0, r5              ; r0 = r5
     6c94:   4788        blx r1
+
     6c96:   f000 f991   bl 0x6fbc               ; call usb_get_intr_flags()
     6c9a:   f000 f97f   bl 0x6f9c               ; call function_e_75
     6c9e:   4605        mov r5, r0              ; r5 = r0
     6ca0:   1c40        adds r0, r0, #1         ; r0 = r0 + 1
-    6ca2:   d1e4        bne.n 0x6c6e
+    6ca2:   d1e4        bne.n 0x6c6e            ; loop
+
     6ca4:   e8bd 81f0   ldmia.w sp!, {r4, r5, r6, r7, r8, pc}
 
 function_23:
@@ -7228,7 +7248,7 @@ function_75:
     6d02:   4708        bx r1                   ; jump r1
   0x6d04:   bd10        pop {r4, pc}
 
-function_7:
+gen_remote_wakeup:
   0x6d06:   b510        push {r4, lr}
     6d08:   f000 f96a   bl 0x6fe0               ; call usb_clear_csr
     6d0c:   e8bd 4010   ldmia.w sp!, {r4, lr}

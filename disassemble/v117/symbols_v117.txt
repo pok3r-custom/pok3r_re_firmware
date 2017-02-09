@@ -318,6 +318,7 @@ function_17                         @ 0x6624
     watchdog_reload_timer
     exti_check_wakup
     function_3
+    gen_remote_wakeup
 clock_init                          @ 0x66b8
 function_e_56                       @ 0x6718
     usb_copy_send
@@ -370,7 +371,7 @@ function_23                         @ 0x6ca8
     jump_1
 function_75                         @ 0x6cc6
     function_28
-function_7                          @ 0x6d06
+gen_remote_wakeup                   @ 0x6d06
     usb_clear_csr
     usb_set_genrsm
 ptr_set_desc_ptr                    @ 0x6d14

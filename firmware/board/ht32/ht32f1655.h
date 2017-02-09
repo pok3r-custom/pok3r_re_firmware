@@ -7,7 +7,6 @@
 #define SRAM_SIZE       0x8000  // 32k
 
 // Clock Control Unit
-// Reset Control Unit
 // ////////////////////////////////////////////////////////////////////////////////////////////////
 #define CKCU_GCFGR      CKCU_BASE + 0x0     // Global Clock Configuration
 #define CKCU_GCCR       CKCU_BASE + 0x4     // Global Clock Control
@@ -145,6 +144,88 @@ typedef struct {
 STRUCT_SIZE_ASSERT(CKCU_map, 0x308);
 
 #define REG_CKCU ((volatile CKCU_map *)CKCU_BASE)
+
+// Reset Control Unit
+// ////////////////////////////////////////////////////////////////////////////////////////////////
+#define RSTCU_GPSR          RSTCU_BASE + 0x100  // Global Reset Status
+#define RSTCU_AHBPRSTR      RSTCU_BASE + 0x104  // AHB Peripheral Reset
+#define RSTCU_APBPRSTR0     RSTCU_BASE + 0x108  // APB Peripheral Reset 0
+#define RSTCU_APBPRSTR1     RSTCU_BASE + 0x10C  // APB Peripheral Reset 1
+
+STRUCT_REGISTER_START {
+    u32 SYSRSTF : 1;    //!< System Reset Flag
+    u32 EXTRSTF : 1;    //!< External Pin Reset Flag
+    u32 WDTRSTF : 1;    //!< Watchdog Timer Reset Flag
+    u32 PORSTF  : 1;    //!< Core 1.8V Power On Reset Flag
+    u32         : 28;
+} STRUCT_REGISTER_END GPSR_reg;
+STRUCT_SIZE_ASSERT(GPSR_reg, 4);
+
+STRUCT_REGISTER_START {
+    u32 DMARST  : 1;    //!< PDMA Reset Control
+    u32         : 4;
+    u32 USBRST  : 1;    //!< USB Reset Control
+    u32 EBIRST  : 1;    //!< EBI Reset Control
+    u32 CRCRST  : 1;    //!< CRC Reset Control
+    u32 PARST   : 1;    //!< GPIO Port A Reset Control
+    u32 PBRST   : 1;    //!< GPIO Port B Reset Control
+    u32 PCRST   : 1;    //!< GPIO Port C Reset Control
+    u32 PDRST   : 1;    //!< GPIO Port D Reset Control
+    u32 PERST   : 1;    //!< GPIO Port E Reset Control
+    u32         : 19;
+} STRUCT_REGISTER_END AHBPRSTR_reg;
+STRUCT_SIZE_ASSERT(AHBPRSTR_reg, 4);
+
+STRUCT_REGISTER_START {
+    u32 I2C0RST : 1;    //!< I2C 0 Reset Control
+    u32 I2C1RST : 1;    //!< I2C 1 Reset Control
+    u32         : 2;
+    u32 SPI0RST : 1;    //!< SPI 0 Reset Control
+    u32 SPI1RST : 1;    //!< SPI 1 Reset Control
+    u32         : 2;
+    u32 USR0RST : 1;    //!< USART 0 Reset Control
+    u32 USR1RST : 1;    //!< USART 1 Reset Control
+    u32 UR0RST  : 1;    //!< UART 0 Reset Control
+    u32 UR1RST  : 1;    //!< UART 1 Reset Control
+    u32         : 2;
+    u32 AFIORST : 1;    //!< Alternate Function Reset Control
+    u32 EXTIRST : 1;    //!< External Interface Reset Control
+    u32         : 8;
+    u32 SCIRST  : 1;    //!< SCI Reset Control
+    u32 I2SRST  : 1;    //!< I2S Reset Control
+    u32         : 6;
+} STRUCT_REGISTER_END APBPRSTR0_reg;
+STRUCT_SIZE_ASSERT(APBPRSTR0_reg, 4);
+
+STRUCT_REGISTER_START {
+    u32 MCTM0RST    : 1;    //!< MCTM 0 Reset Control
+    u32 MCTM1RST    : 1;    //!< MCTM 1 Reset Control
+    u32             : 2;
+    u32 WDTRST      : 1;    //!< Watchdog Reset Control
+    u32             : 3;
+    u32 GPTM0RST    : 1;    //!< GPTM 0 Reset Control
+    u32 GPTM1RST    : 1;    //!< GPTM 1 Reset Control
+    u32             : 6;
+    u32 BFTM0RST    : 1;    //!< BFTM 0 Reset Control
+    u32 BFTM1RST    : 1;    //!< BFTM 1 Reset Control
+    u32             : 4;
+    u32 OPA0RST     : 1;    //!< Comparator and OPA 0 Controller Reset Control
+    u32 OPA1RST     : 1;    //!< Comparator and OPA 1 Controller Reset Control
+    u32 ADCRST      : 1;    //!< A/D Converter Reset Control
+    u32             : 7;
+} STRUCT_REGISTER_END APBPRSTR1_reg;
+STRUCT_SIZE_ASSERT(APBPRSTR1_reg, 4);
+
+typedef struct {
+    u8 _pad1[0x100];
+    GPSR_reg GPSR;              //!< Global Reset Status
+    AHBPRSTR_reg AHBPRSTR;      //!< AHB Peripheral Reset
+    APBPRSTR0_reg APBPRSTR0;    //!< APB Peripheral Reset 0
+    APBPRSTR1_reg APBPRSTR1;    //!< APB Peripheral Reset 1
+} RSTCU_map;
+STRUCT_SIZE_ASSERT(RSTCU_map, 0x110);
+
+#define REG_RSTCU ((volatile RSTCU_map *)RSTCU_BASE)
 
 // General Purpose I/O
 // ////////////////////////////////////////////////////////////////////////////////////////////////
