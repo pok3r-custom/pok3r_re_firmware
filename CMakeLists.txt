@@ -37,6 +37,9 @@ SET(FILES
     disassemble/v130/sram-variables_v130.txt
     disassemble/v130/patch_v130.txt
     disassemble/v130/fw_xor_decode.c
+
+    disassemble/core/firmware_v104.bin
+    disassemble/core/firmware_v104.txt
 )
 
 ### =================== BUILD =================== ###

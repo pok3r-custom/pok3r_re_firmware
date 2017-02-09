@@ -48,11 +48,11 @@ RM = rm -f
 MKDIR = mkdir -p
 
 # Flags
-CC_FLAGS += -c -mcpu=$(ARM_CPU) -mthumb -std=c11 -nostdlib -nostartfiles -ffreestanding -Wall
+CC_FLAGS += -c -mcpu=$(ARM_CPU) -mthumb -std=c11 -nostdlib -nostartfiles -ffreestanding -g -Wall
 CC_FLAGS += -MT $@ -MMD -MP -MF $*.d
 CC_FLAGS += -DFW_BUILDING @C_DEFS@
 
-CPP_FLAGS += -c -mcpu=$(ARM_CPU) -mthumb -std=c11 -nostdlib -nostartfiles -ffreestanding -Wall
+CPP_FLAGS += -c -mcpu=$(ARM_CPU) -mthumb -std=c11 -nostdlib -nostartfiles -ffreestanding -g -Wall
 CPP_FLAGS += -MT $@ -MMD -MP -MF $*.d
 CPP_FLAGS += -DFW_BUILDING @C_DEFS@
 

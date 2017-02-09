@@ -118,6 +118,8 @@ typedef struct {
 
     u8 deviceFeature;
 
+    USBIER_reg ier;
+
     USBEP0CFGR_reg ep0cfgr;
     USBEP0IER_reg ep0ier;
     USBEPnCFGR_1_3_reg ep1cfgr;

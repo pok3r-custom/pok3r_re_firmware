@@ -47,54 +47,50 @@ void usb_init(){
     REG_CKCU->GCFGR.USBPRE = 2;
 
     // ep 0
-    usb_dev.ep0cfgr = REG_USB->USBEP0CFGR;
+    usb_dev.ep0cfgr.word = 0;
     usb_dev.ep0cfgr.EPBUFA = 0x8;
     usb_dev.ep0cfgr.EPLEN = 64;
     REG_USB->USBEP0CFGR = usb_dev.ep0cfgr;
-//    REG_USB->USBEP0CFGR.EPBUFA = 0x8;
-//    REG_USB->USBEP0CFGR.EPLEN = 64;
-    REG_USB->USBEP0ISR.word = 0xFFFFFFFF;
-    usb_dev.ep0ier = REG_USB->USBEP0IER;
+
+    usb_dev.ep0ier.word = 0;
     usb_dev.ep0ier.ODRXIE = 1;
     usb_dev.ep0ier.IDTXIE = 1;
     usb_dev.ep0ier.SDRXIE = 1;
     REG_USB->USBEP0IER = usb_dev.ep0ier;
-//    REG_USB->USBEP0IER.word = EPnIER_ODRXIE | EPnIER_IDTXIE | EPnIER_SDRXIE;
+
+    REG_USB->USBEP0ISR.word = 0xFFFFFFFF;
 
     // ep 1
-    usb_dev.ep1cfgr = REG_USB->USBEP1CFGR;
+    usb_dev.ep1cfgr.word = 0;
     usb_dev.ep1cfgr.EPEN = 1;
     usb_dev.ep1cfgr.EPBUFA = 0x88;
     usb_dev.ep1cfgr.EPLEN = 64;
     REG_USB->USBEP1CFGR = usb_dev.ep1cfgr;
-//    REG_USB->USBEP1CFGR.EPEN = 1;
-//    REG_USB->USBEP1CFGR.EPBUFA = 0x88;
-//    REG_USB->USBEP1CFGR.EPLEN = 64;
-    REG_USB->USBEP1ISR.word = 0xFFFFFFFF;
-    usb_dev.ep1ier = REG_USB->USBEP1IER;
+
+    usb_dev.ep1ier.word = 0;
     usb_dev.ep1ier.ODRXIE = 1;
     REG_USB->USBEP1IER = usb_dev.ep1ier;
-//    REG_USB->USBEP1IER.word = EPnIER_ODRXIE;
+
+    REG_USB->USBEP1ISR.word = 0xFFFFFFFF;
 
     // ep 2
-    usb_dev.ep2cfgr = REG_USB->USBEP2CFGR;
+    usb_dev.ep2cfgr.word = 0;
     usb_dev.ep2cfgr.EPEN = 1;
     usb_dev.ep2cfgr.EPBUFA = 0xc8;
     usb_dev.ep2cfgr.EPLEN = 64;
     REG_USB->USBEP2CFGR = usb_dev.ep2cfgr;
-//    REG_USB->USBEP2CFGR.EPEN = 1;
-//    REG_USB->USBEP2CFGR.EPBUFA = 0xc8;
-//    REG_USB->USBEP2CFGR.EPLEN = 64;
-    REG_USB->USBEP2ISR.word = 0xFFFFFFFF;
-    usb_dev.ep2ier = REG_USB->USBEP2IER;
+
+    usb_dev.ep2ier.word = 0;
     usb_dev.ep2ier.ODRXIE = 1;
     REG_USB->USBEP2IER = usb_dev.ep2ier;
-//    REG_USB->USBEP2IER.word = EPnIER_ODRXIE;
+
+    REG_USB->USBEP2ISR.word = 0xFFFFFFFF;
 
     // enable usb interrupts
-    REG_USB->USBIER.word = USBIER_UGIE |
-                           USBIER_EP0IE | USBIER_EP1IE | USBIER_EP2IE |
-                           USBIER_URSTIE | USBIER_RSMIE | USBIER_SUSPIE;
+    usb_dev.ier.word = USBIER_UGIE |
+                       USBIER_EP0IE | USBIER_EP1IE | USBIER_EP2IE |
+                       USBIER_URSTIE | USBIER_RSMIE | USBIER_SUSPIE;
+    REG_USB->USBIER = usb_dev.ier;
 
     // enable usb interrupt
 }
@@ -191,10 +187,20 @@ void usb_power_on(){
 }
 
 void usb_reset(){
+    usb_dev.currStatus = POWERED;
+
     // Reset USB
     REG_RSTCU->AHBPRSTR.USBRST = 1;
     usb_power_on();
 
+    // Reset EP0 config
+    REG_USB->USBEP0CFGR = usb_dev.ep0cfgr;
+    REG_USB->USBEP0IER = usb_dev.ep0ier;
+    REG_USB->USBEP0ISR.word = 0xFFFFFFFF;
+    REG_USB->USBEP0CSR.word &= EPnCSR_DTGTX | EPnCSR_DTGRX | EPnCSR_NAKRX;
+
+    // Set IER
+    REG_USB->USBIER = usb_dev.ier;
 }
 
 void usb_suspend(){
