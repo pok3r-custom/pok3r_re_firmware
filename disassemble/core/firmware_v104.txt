@@ -4716,17 +4716,21 @@ entry:
     5f98:   bf20        wfe
     5f9a:   4770        bx lr
     5f9c:   ed10 e000   ldc 0, cr14, [r0, #-0]
-    5fa0:   b570        push {r4, r5, r6, lr}
+
+handle_frame:
+  0x5fa0:   b570        push {r4, r5, r6, lr}
     5fa2:   4e35        ldr r6, [pc, #212]    ; (0x6078)
     5fa4:   7830        ldrb r0, [r6, #0]
     5fa6:   2801        cmp r0, #1
     5fa8:   d15c        bne.n 0x6064
+
     5faa:   4d34        ldr r5, [pc, #208]    ; (0x607c)
     5fac:   2400        movs r4, #0
     5fae:   4628        mov r0, r5
     5fb0:   782a        ldrb r2, [r5, #0]
     5fb2:   7840        ldrb r0, [r0, #1]
     5fb4:   4621        mov r1, r4
+
     5fb6:   2a10        cmp r2, #16
     5fb8:   d004        beq.n 0x5fc4
     5fba:   2a11        cmp r2, #17
@@ -4734,31 +4738,38 @@ entry:
     5fbe:   2a12        cmp r2, #18
     5fc0:   d151        bne.n 0x6066
     5fc2:   e007        b.n 0x5fd4
+
     5fc4:   2802        cmp r0, #2
     5fc6:   d14e        bne.n 0x6066
     5fc8:   6069        str r1, [r5, #4]
     5fca:   2104        movs r1, #4
     5fcc:   e03c        b.n 0x6048
+
     5fce:   f000 f859   bl 0x6084
     5fd2:   e03d        b.n 0x6050
+
     5fd4:   f44f 6380   mov.w r3, #1024    ; 0x400
     5fd8:   2820        cmp r0, #32
     5fda:   d30e        bcc.n 0x5ffa
+
     5fdc:   f1a0 021f   sub.w r2, r0, #31
     5fe0:   ebc2 1202   rsb r2, r2, r2, lsl #4
     5fe4:   ebb3 0f82   cmp.w r3, r2, lsl #2
     5fe8:   db07        blt.n 0x5ffa
+
     5fea:   ebc0 1000   rsb r0, r0, r0, lsl #4
     5fee:   f44f 5122   mov.w r1, #10368    ; 0x2880
     5ff2:   eb01 0080   add.w r0, r1, r0, lsl #2
     5ff6:   213c        movs r1, #60    ; 0x3c
     5ff8:   e027        b.n 0x604a
+
     5ffa:   b120        cbz r0, 0x6006
     5ffc:   2801        cmp r0, #1
     5ffe:   d01d        beq.n 0x603c
     6000:   2802        cmp r0, #2
     6002:   d130        bne.n 0x6066
     6004:   e01e        b.n 0x6044
+
     6006:   f891 010f   ldrb.w r0, [r1, #271]    ; 0x10f
     600a:   28aa        cmp r0, #170    ; 0xaa
     600c:   d011        beq.n 0x6032
@@ -4766,10 +4777,12 @@ entry:
     6010:   4618        mov r0, r3
     6012:   2a04        cmp r2, #4
     6014:   d010        beq.n 0x6038
+
     6016:   2220        movs r2, #32
     6018:   4619        mov r1, r3
     601a:   1d28        adds r0, r5, #4
     601c:   f7fd facc   bl 0x35b8
+
     6020:   4817        ldr r0, [pc, #92]    ; (0x6080)
     6022:   f8d0 1180   ldr.w r1, [r0, #384]    ; 0x180
     6026:   6269        str r1, [r5, #36]    ; 0x24
@@ -4777,16 +4790,21 @@ entry:
     602c:   2128        movs r1, #40    ; 0x28
     602e:   62a8        str r0, [r5, #40]    ; 0x28
     6030:   e00a        b.n 0x6048
+
     6032:   2110        movs r1, #16
     6034:   0108        lsls r0, r1, #4
     6036:   e008        b.n 0x604a
+
     6038:   2134        movs r1, #52    ; 0x34
     603a:   e006        b.n 0x604a
+
     603c:   2104        movs r1, #4
     603e:   f44f 5070   mov.w r0, #15360    ; 0x3c00
     6042:   e002        b.n 0x604a
+
     6044:   2101        movs r1, #1
     6046:   7129        strb r1, [r5, #4]
+
     6048:   1d28        adds r0, r5, #4
     604a:   f000 f85d   bl 0x6108
     604e:   2401        movs r4, #1
@@ -4794,26 +4812,29 @@ entry:
     6052:   2801        cmp r0, #1
     6054:   d106        bne.n 0x6064
     6056:   b134        cbz r4, 0x6066
+
     6058:   213c        movs r1, #60    ; 0x3c
     605a:   1d28        adds r0, r5, #4
     605c:   f7fd fac5   bl 0x35ea
+
     6060:   2002        movs r0, #2
     6062:   7030        strb r0, [r6, #0]
     6064:   bd70        pop {r4, r5, r6, pc}
+
     6066:   6828        ldr r0, [r5, #0]
     6068:   6068        str r0, [r5, #4]
     606a:   f64a 20ff   movw r0, #43775    ; 0xaaff
     606e:   6028        str r0, [r5, #0]
+
     6070:   4802        ldr r0, [pc, #8]    ; (0x607c)
     6072:   2138        movs r1, #56    ; 0x38
     6074:   3008        adds r0, #8
     6076:   e7f1        b.n 0x605c
-    6078:   002e        movs r6, r5
-    607a:   2000        movs r0, #0
-    607c:   0604        lsls r4, r0, #24
-    607e:   2000        movs r0, #0
-    6080:   0000        movs r0, r0
-    6082:   4008        ands r0, r1
+
+  0x6078:   0x2000002e
+  0x607c:   0x20000604
+  0x6080:   0x40080000
+
     6084:   b510        push {r4, lr}
     6086:   491b        ldr r1, [pc, #108]    ; (0x60f4)
     6088:   b168        cbz r0, 0x60a6

@@ -40,6 +40,7 @@ SET(FILES
 
     disassemble/core/firmware_v104.bin
     disassemble/core/firmware_v104.txt
+    disassemble/core/patch_v104.txt
 )
 
 ### =================== BUILD =================== ###
