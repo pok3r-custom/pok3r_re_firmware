@@ -5,37 +5,87 @@
 
 #define REG(A) (*(volatile u32*)(A))
 
-#define STRUCT_ASSERT_MSG(N) "incorrect packed struct " #N " size"
-#define STRUCT_SIZE_ASSERT(N, S) _Static_assert(sizeof(N) == S, STRUCT_ASSERT_MSG(N))
+#define STRUCT_SIZE_ASSERT(N, S) _Static_assert(sizeof(N) == S, "incorrect packed struct size")
+#define STRUCT_ADDR_ASSERT(F, A) _Static_assert((u32)&(F) == (A), "incorrect packed struct field address")
+#define STRUCT_REG_CHECK(M, R) STRUCT_ADDR_ASSERT(REG_##M->R, M##_##R)
 
 #define STRUCT_REGISTER_START typedef union { struct
-#define STRUCT_REGISTER_END __attribute__((__packed__)); u32 word; }
+#define STRUCT_REGISTER_END __attribute__((packed)) __attribute__ ((aligned(4))); u32 word; }
 
-// General Purpose Timers
+// Peripherals
 // ////////////////////////////////////////////////////////////////////////////////////////////////
+
+#define CKCU_BASE       0x40088000
+#define NVIC_BASE       0xE000E000
+#define WDT_BASE        0x40068000
+#define PWRCU_BASE      0x4006A000
+#define FMC_BASE        0x40080000
+
+#define RSTCU_BASE      0x40088000
+#define CRC_BASE        0x4008A000
+
+#define PDMA_BASE       0x40090000
+
+// Timers
 #define GPTM0_BASE      0x4006E000
 #define GPTM1_BASE      0x4006F000
 
-// Basic Function Timers
-// ////////////////////////////////////////////////////////////////////////////////////////////////
 #define BFTM0_BASE      0x40076000
 #define BFTM1_BASE      0x40077000
 
-// Motor Control Timers
-// ////////////////////////////////////////////////////////////////////////////////////////////////
 #define MCTM0_BASE      0x4002C000
 #define MCTM1_BASE      0x4002D000
+
+#define RTC_BASE        0x4006A000
+
+// I/O
+#define GPIO_A_BASE     0x400B0000
+
+#define AFIO_BASE       0x40022000
+#define EXTI_BASE       0x40024000
+
+// Analog I/O
+#define ADC_BASE        0x40010000
+
+#define OPA_BASE        0x40018000
+#define CMP_BASE        0x40018000
+
+// Serial I/O
+#define UART0_BASE      0x40001000
+#define UART1_BASE      0x40041000
+
+#define USART0_BASE     0x40000000
+#define USART1_BASE     0x40040000
+
+#define SPI0_BASE       0x40004000
+#define SPI1_BASE       0x40044000
+
+#define I2C0_BASE       0x40048000
+#define I2C1_BASE       0x40049000
+
+#define I2S_BASE        0x40026000
+#define SCI_BASE        0x40043000
+
+#define USB_BASE        0x400A8000
+#define USB_SRAM_BASE   0x400AA000
+
+#define EBI_BASE        0x40098000
+
+// General Purpose Timers
+// ////////////////////////////////////////////////////////////////////////////////////////////////
+
+// Basic Function Timers
+// ////////////////////////////////////////////////////////////////////////////////////////////////
+
+// Motor Control Timers
+// ////////////////////////////////////////////////////////////////////////////////////////////////
 
 // Operational Amplifier
 // Comparator
 // ////////////////////////////////////////////////////////////////////////////////////////////////
-#define OPA_BASE        0x40018000
-#define CMP_BASE        0x40018000
 
 // Alternate Function I/O Unit
 // ////////////////////////////////////////////////////////////////////////////////////////////////
-#define AFIO_BASE       0x40022000
-
 #define AFIO_ESSR0      AFIO_BASE + 0x0
 #define AFIO_ESSR1      AFIO_BASE + 0x4
 
@@ -44,12 +94,9 @@
 
 // External Interrupt/Event Controller
 // ////////////////////////////////////////////////////////////////////////////////////////////////
-#define EXTI_BASE       0x40024000
 
 // Watchdog Timer
 // ////////////////////////////////////////////////////////////////////////////////////////////////
-#define WDT_BASE        0x40068000
-
 #define WDT_WDTCR       WDT_BASE + 0x0      // Watchdog Timer Control
 #define WDT_WDTMR0      WDT_BASE + 0x4      // Watchdog Timer Mode 0
 #define WDT_WDTMR1      WDT_BASE + 0x8      // Watchdog Timer Mode 1
@@ -61,21 +108,18 @@
 // Real Time Clock
 // Power Control Unit
 // ////////////////////////////////////////////////////////////////////////////////////////////////
-#define RTC_BASE        0x4006A000
-#define PWRCU_BASE      0x4006A000
 
 // Flash Memory Controller
 // ////////////////////////////////////////////////////////////////////////////////////////////////
-#define FMC_BASE        0x40080000
-
 #define FMC_TADR        FMC_BASE + 0x0      // Flash Target Address
 #define FMC_WRDR        FMC_BASE + 0x4      // Flash Write Data
 #define FMC_OCMR        FMC_BASE + 0xC      // Flash Operation Command
 #define FMC_OPCR        FMC_BASE + 0x10     // Flash Operation Control
 #define FMC_OIER        FMC_BASE + 0x14     // Flash Operation Interrupt Enable
-#define FMC_OISE        FMC_BASE + 0x18     // Flash Operation Interrupt Status
+#define FMC_OISR        FMC_BASE + 0x18     // Flash Operation Interrupt Status
 
-#define FMC_PPSR_0      FMC_BASE + 0x20     // Flash Pages Erase / Program Protection Status
+#define FMC_PPSR        FMC_BASE + 0x20     // Flash Pages Erase / Program Protection Status
+#define FMC_PPSR_0      FMC_BASE + 0x20
 #define FMC_PPSR_1      FMC_BASE + 0x24
 #define FMC_PPSR_2      FMC_BASE + 0x28
 #define FMC_PPSR_3      FMC_BASE + 0x2C
@@ -138,23 +182,35 @@ typedef struct {
 } FMC_map;
 STRUCT_SIZE_ASSERT(FMC_map, 0x310);
 
+#define REG_FMC ((volatile FMC_map *)FMC_BASE)
+
+STRUCT_REG_CHECK(FMC, TADR);
+STRUCT_REG_CHECK(FMC, WRDR);
+STRUCT_REG_CHECK(FMC, OCMR);
+STRUCT_REG_CHECK(FMC, OPCR);
+STRUCT_REG_CHECK(FMC, OIER);
+STRUCT_REG_CHECK(FMC, OISR);
+STRUCT_REG_CHECK(FMC, PPSR);
+STRUCT_REG_CHECK(FMC, CPSR);
+STRUCT_REG_CHECK(FMC, VMCR);
+STRUCT_REG_CHECK(FMC, CFCR);
+STRUCT_REG_CHECK(FMC, SBVT0);
+STRUCT_REG_CHECK(FMC, SBVT1);
+STRUCT_REG_CHECK(FMC, SBVT2);
+STRUCT_REG_CHECK(FMC, SBVT3);
+
 // Clock Control Unit
 // Reset Control Unit
 // ////////////////////////////////////////////////////////////////////////////////////////////////
-#define CKCU_BASE       0x40088000
-#define RSTCU_BASE      0x40088000
 
 // CRC
 // ////////////////////////////////////////////////////////////////////////////////////////////////
-#define CRC_BASE        0x4008A000
 
 // Peripheral Direct Memory Access
-#define PDMA_BASE       0x40090000
+// ////////////////////////////////////////////////////////////////////////////////////////////////
 
 // General Purpose I/O
 // ////////////////////////////////////////////////////////////////////////////////////////////////
-#define GPIO_A_BASE     0x400B0000
-
 #define GPIO_A          0
 #define GPIOn_BASE(n)   GPIO_A_BASE + (n * 0x2000)
 
@@ -172,41 +228,27 @@ STRUCT_SIZE_ASSERT(FMC_map, 0x310);
 
 // USART
 // ////////////////////////////////////////////////////////////////////////////////////////////////
-#define UART0_BASE      0x40001000
-#define UART1_BASE      0x40041000
 
 // UART
 // ////////////////////////////////////////////////////////////////////////////////////////////////
-#define USART0_BASE     0x40000000
-#define USART1_BASE     0x40040000
 
 // SPI
 // ////////////////////////////////////////////////////////////////////////////////////////////////
-#define SPI0_BASE       0x40004000
-#define SPI1_BASE       0x40044000
 
 // I2C
 // ////////////////////////////////////////////////////////////////////////////////////////////////
-#define I2C0_BASE       0x40048000
-#define I2C1_BASE       0x40049000
 
 // Inter-IC Sound
 // ////////////////////////////////////////////////////////////////////////////////////////////////
-#define I2S_BASE        0x40026000
 
 // Smart Card Interface
 // ////////////////////////////////////////////////////////////////////////////////////////////////
-#define SCI_BASE        0x40043000
 
 // Extend Bus Interface
 // ////////////////////////////////////////////////////////////////////////////////////////////////
-#define EBI_BASE        0x40098000
 
 // USB
 // ////////////////////////////////////////////////////////////////////////////////////////////////
-#define USB_BASE        0x400A8000
-#define USB_SRAM_BASE   0x400AA000
-
 #define EP_0            0
 #define EP_1            1
 #define EP_2            2
@@ -668,11 +710,9 @@ STRUCT_SIZE_ASSERT(USB_map, 0xB4);
 
 // Analog To Digital Converter
 // ////////////////////////////////////////////////////////////////////////////////////////////////
-#define ADC_BASE        0x40010000
 
 // Nested Vectored Interrupt Controller
 // ////////////////////////////////////////////////////////////////////////////////////////////////
-#define NVIC_BASE       0xE000E000
 
 
 void ckcu_clocks_enable(int ahb_mask, int apb0_mask, int apb1_mask, int en);

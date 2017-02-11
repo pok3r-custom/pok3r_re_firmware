@@ -13,7 +13,7 @@
 #define CKCU_GCSR       CKCU_BASE + 0x8     // Global Clock Status
 #define CKCU_GCIR       CKCU_BASE + 0xC     // Global Clock Interrupt
 
-#define CKCU_PLLCFCR    CKCU_BASE + 0x18    // PLL Configuration
+#define CKCU_PLLCFGR    CKCU_BASE + 0x18    // PLL Configuration
 #define CKCU_PLLCR      CKCU_BASE + 0x1C    // PLL Control
 #define CKCU_AHBCFGR    CKCU_BASE + 0x20    // AHB Configuration
 #define CKCU_AHBCCR     CKCU_BASE + 0x24    // AHB Clock Control
@@ -145,6 +145,21 @@ STRUCT_SIZE_ASSERT(CKCU_map, 0x308);
 
 #define REG_CKCU ((volatile CKCU_map *)CKCU_BASE)
 
+STRUCT_REG_CHECK(CKCU, GCFGR);
+STRUCT_REG_CHECK(CKCU, GCCR);
+STRUCT_REG_CHECK(CKCU, GCSR);
+STRUCT_REG_CHECK(CKCU, GCIR);
+STRUCT_REG_CHECK(CKCU, PLLCFGR);
+STRUCT_REG_CHECK(CKCU, PLLCR);
+STRUCT_REG_CHECK(CKCU, AHBCFGR);
+STRUCT_REG_CHECK(CKCU, AHBCCR);
+STRUCT_REG_CHECK(CKCU, APBCFGR);
+STRUCT_REG_CHECK(CKCU, APBCCR0);
+STRUCT_REG_CHECK(CKCU, APBCCR1);
+STRUCT_REG_CHECK(CKCU, CKST);
+STRUCT_REG_CHECK(CKCU, LPCR);
+STRUCT_REG_CHECK(CKCU, MCUDBGCR);
+
 // Reset Control Unit
 // ////////////////////////////////////////////////////////////////////////////////////////////////
 #define RSTCU_GPSR          RSTCU_BASE + 0x100  // Global Reset Status
@@ -226,6 +241,11 @@ typedef struct {
 STRUCT_SIZE_ASSERT(RSTCU_map, 0x110);
 
 #define REG_RSTCU ((volatile RSTCU_map *)RSTCU_BASE)
+
+STRUCT_REG_CHECK(RSTCU, GPSR);
+STRUCT_REG_CHECK(RSTCU, AHBPRSTR);
+STRUCT_REG_CHECK(RSTCU, APBPRSTR0);
+STRUCT_REG_CHECK(RSTCU, APBPRSTR1);
 
 // General Purpose I/O
 // ////////////////////////////////////////////////////////////////////////////////////////////////
