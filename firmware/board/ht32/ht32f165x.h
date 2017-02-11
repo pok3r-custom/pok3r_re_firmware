@@ -1,24 +1,13 @@
 #ifndef HT32F165X_H
 #define HT32F165X_H
 
-#include "../types.h"
-
-#define REG(A) (*(volatile u32*)(A))
-
-#define STRUCT_SIZE_ASSERT(N, S) _Static_assert(sizeof(N) == S, "incorrect packed struct size")
-#define STRUCT_ADDR_ASSERT(F, A) _Static_assert((u32)&(F) == (A), "incorrect packed struct field address")
-#define STRUCT_REG_CHECK(M, R) STRUCT_ADDR_ASSERT(REG_##M->R, M##_##R)
-
-#define STRUCT_REGISTER_START typedef union { struct
-#define STRUCT_REGISTER_END __attribute__((packed)) __attribute__ ((aligned(4))); u32 word; }
+#include "../board.h"
 
 // Peripherals
 // ////////////////////////////////////////////////////////////////////////////////////////////////
-
-#define CKCU_BASE       0x40088000
-#define NVIC_BASE       0xE000E000
-#define WDT_BASE        0x40068000
 #define PWRCU_BASE      0x4006A000
+#define CKCU_BASE       0x40088000
+#define WDT_BASE        0x40068000
 #define FMC_BASE        0x40080000
 
 #define RSTCU_BASE      0x40088000
@@ -71,6 +60,298 @@
 
 #define EBI_BASE        0x40098000
 
+// Power Control Unit
+// ////////////////////////////////////////////////////////////////////////////////////////////////
+#define PWRCU_BAKSR     PWRCU_BASE + 0x100  // Backup Domain Status
+#define PWRCU_BAKCR     PWRCU_BASE + 0x104  // Backup Domain Control
+#define PWRCU_BAKTEST   PWRCU_BASE + 0x108  // Backup Domain Test
+#define PWRCU_HSIRCR    PWRCU_BASE + 0x10C  // HSI Ready Counter Control
+#define PWRCU_LVDCSR    PWRCU_BASE + 0x110  // Low Voltage/Brown Out Detect Control and Status
+
+#define PWRCU_BAKREG0   PWRCU_BASE + 0x200  // Backup Register 0
+#define PWRCU_BAKREG1   PWRCU_BASE + 0x204  // Backup Register 1
+#define PWRCU_BAKREG2   PWRCU_BASE + 0x208  // Backup Register 2
+#define PWRCU_BAKREG3   PWRCU_BASE + 0x20C  // Backup Register 3
+#define PWRCU_BAKREG4   PWRCU_BASE + 0x210  // Backup Register 4
+#define PWRCU_BAKREG5   PWRCU_BASE + 0x214  // Backup Register 5
+#define PWRCU_BAKREG6   PWRCU_BASE + 0x218  // Backup Register 6
+#define PWRCU_BAKREG7   PWRCU_BASE + 0x21C  // Backup Register 7
+#define PWRCU_BAKREG8   PWRCU_BASE + 0x220  // Backup Register 8
+#define PWRCU_BAKREG9   PWRCU_BASE + 0x224  // Backup Register 9
+
+// BAKSR
+STRUCT_REGISTER_START {
+    u32 BAKPORF     : 1;    //!< Backup Domain Reset Flag
+    u32 PDF         : 1;    //!< Power Down Flag
+    u32             : 6;
+    u32 WUPF        : 1;    //!< External WAKEUP Pin Flag
+    u32             : 23;
+} STRUCT_REGISTER_END BAKSR_reg;
+STRUCT_SIZE_ASSERT(BAKSR_reg, 4);
+
+// BAKCR
+STRUCT_REGISTER_START {
+    u32 BAKRST      : 1;    //!< Backup Domain Software Reset
+    u32             : 2;
+    u32 LDOOFF      : 1;    //!< LDO Operating Mode Control
+    u32             : 3;
+    u32 DMOSON      : 1;    //!< DMOS Control
+    u32 WUPEN       : 1;    //!< External WAKEUP Pin Enable
+    u32 WUPIEN      : 1;    //!< External WAKEUP Pin Interrupt Enable
+    u32             : 2;
+    u32 V18RDYSC    : 1;    //!< VDD18 Ready Source Selection
+    u32             : 2;
+    u32 DMOSSTS     : 1;    //!< Depletion MOS Status
+    u32             : 16;
+} STRUCT_REGISTER_END BAKCR_reg;
+STRUCT_SIZE_ASSERT(BAKCR_reg, 4);
+
+// BAKTEST
+STRUCT_REGISTER_START {
+    const u32 BAKTEST   : 8;    //!< Backup Domain Test Bits
+    u32                 : 24;
+} STRUCT_REGISTER_END BAKTEST_reg;
+STRUCT_SIZE_ASSERT(BAKTEST_reg, 4);
+
+// HSIRCR
+STRUCT_REGISTER_START {
+    u32 HSIRCBL     : 2;    //!< HSI Ready Counter Bit Length
+    u32             : 30;
+} STRUCT_REGISTER_END HSIRCR_reg;
+STRUCT_SIZE_ASSERT(HSIRCR_reg, 4);
+
+// LVDCSR
+STRUCT_REGISTER_START {
+    u32 BODEN       : 1;    //!< Brown Out Detect Enable
+    u32 BODRIS      : 1;    //!< BOD Reset or Interrupt Selection
+    u32             : 1;
+    const u32 BODF  : 1;    //!< Brown Out Detection Flag
+    u32             : 12;
+    u32 LVDEN       : 1;    //!< Low Voltage Detect Enable
+    u32 LVDS1       : 2;    //!< Low Voltage Detect Level Selection [0:1]
+    const u32 LVDF  : 1;    //!< Low Voltage Detect Status Flag
+    u32 LVDIWEN     : 1;    //!< LVD Interrupt Wakeup Enable
+    u32 LVDEWEN     : 1;    //!< LVD Event Wakeup Enable
+    u32 LVDS2       : 1;    //!< Low Voltage Detect Level Selection [2]
+    u32             : 9;
+} STRUCT_REGISTER_END LVDCSR_reg;
+STRUCT_SIZE_ASSERT(LVDCSR_reg, 4);
+
+typedef struct {
+    u8 _pad1[0x100];
+
+    // 0x100
+    BAKSR_reg BAKSR;        //!< Backup Domain Status
+    BAKCR_reg BAKCR;        //!< Backup Domain Control
+    BAKTEST_reg BAKTEST;    //!< Backup Domain Test
+    HSIRCR_reg HSIRCR;      //!< HSI Ready Counter Control
+    LVDCSR_reg LVDCSR;      //!< Low Voltage/Brown Out Detect Control and Status
+    u8 _pad2[0xEC];
+
+    // 0x200
+    u32 BAKREG0;            //!< Backup Register 0
+    u32 BAKREG1;            //!< Backup Register 1
+    u32 BAKREG2;            //!< Backup Register 2
+    u32 BAKREG3;            //!< Backup Register 3
+    u32 BAKREG4;            //!< Backup Register 4
+    u32 BAKREG5;            //!< Backup Register 5
+    u32 BAKREG6;            //!< Backup Register 6
+    u32 BAKREG7;            //!< Backup Register 7
+    u32 BAKREG8;            //!< Backup Register 8
+    u32 BAKREG9;            //!< Backup Register 9
+} PWRCU_map;
+STRUCT_SIZE_ASSERT(PWRCU_map, 0x228);
+
+#define REG_PWRCU STRUCT_REG_PTR(PWRCU)
+
+STRUCT_REG_CHECK(PWRCU, BAKSR);
+STRUCT_REG_CHECK(PWRCU, BAKCR);
+STRUCT_REG_CHECK(PWRCU, BAKTEST);
+STRUCT_REG_CHECK(PWRCU, HSIRCR);
+STRUCT_REG_CHECK(PWRCU, LVDCSR);
+
+STRUCT_REG_CHECK(PWRCU, BAKREG0);
+STRUCT_REG_CHECK(PWRCU, BAKREG1);
+STRUCT_REG_CHECK(PWRCU, BAKREG2);
+STRUCT_REG_CHECK(PWRCU, BAKREG3);
+STRUCT_REG_CHECK(PWRCU, BAKREG4);
+STRUCT_REG_CHECK(PWRCU, BAKREG5);
+STRUCT_REG_CHECK(PWRCU, BAKREG6);
+STRUCT_REG_CHECK(PWRCU, BAKREG7);
+STRUCT_REG_CHECK(PWRCU, BAKREG8);
+STRUCT_REG_CHECK(PWRCU, BAKREG9);
+
+// Real Time Clock
+// ////////////////////////////////////////////////////////////////////////////////////////////////
+
+// Flash Memory Controller
+// ////////////////////////////////////////////////////////////////////////////////////////////////
+#define FMC_TADR        FMC_BASE + 0x0      // Flash Target Address
+#define FMC_WRDR        FMC_BASE + 0x4      // Flash Write Data
+#define FMC_OCMR        FMC_BASE + 0xC      // Flash Operation Command
+#define FMC_OPCR        FMC_BASE + 0x10     // Flash Operation Control
+#define FMC_OIER        FMC_BASE + 0x14     // Flash Operation Interrupt Enable
+#define FMC_OISR        FMC_BASE + 0x18     // Flash Operation Interrupt Status
+
+#define FMC_PPSR        FMC_BASE + 0x20     // Flash Pages Erase / Program Protection Status
+#define FMC_PPSR_0      FMC_BASE + 0x20
+#define FMC_PPSR_1      FMC_BASE + 0x24
+#define FMC_PPSR_2      FMC_BASE + 0x28
+#define FMC_PPSR_3      FMC_BASE + 0x2C
+
+#define FMC_CPSR        FMC_BASE + 0x30     // Flash Security Protection Status
+#define FMC_VMCR        FMC_BASE + 0x100    // Flash Vector Mapping Control
+#define FMC_CFCR        FMC_BASE + 0x200    // Flash Cache and Pre-fetch Control
+
+#define FMC_SBVT0       FMC_BASE + 0x300    // SRAM Booting Vector 0 (Stack Point)
+#define FMC_SBVT1       FMC_BASE + 0x304    // SRAM Booting Vector 1 (Program Counter)
+#define FMC_SBVT2       FMC_BASE + 0x308    // SRAM Booting Vector 2 (NMI Handler)
+#define FMC_SBVT3       FMC_BASE + 0x30C    // SRAM Booting Vector 3 (Hard Fault Handler)
+
+// OCMR
+#define OCMR_IDLE           0
+#define OCMR_WORD_PROGRAM   0x4
+#define OCMR_PAGE_ERASE     0x8
+#define OCMR_MASS_ERASE     0xA
+
+// OPCR
+#define OPCR_IDLE           0x6
+#define OPCR_COMMIT         0xA
+#define OPCR_FINISHED       0xE
+
+// TADB
+STRUCT_REGISTER_START {
+    u32 TADB    : 32;   //!< Flash Target Address Bits
+} STRUCT_REGISTER_END TADR_reg;
+STRUCT_SIZE_ASSERT(TADR_reg, 4);
+
+// WRDB
+STRUCT_REGISTER_START {
+    u32 WRDB    : 32;   //!< Flash Write Data Bits
+} STRUCT_REGISTER_END WRDR_reg;
+STRUCT_SIZE_ASSERT(WRDR_reg, 4);
+
+// OCMR
+STRUCT_REGISTER_START {
+    u32 CMD     : 4;    //!< Flash Operation Command
+    u32         : 28;
+} STRUCT_REGISTER_END OCMR_reg;
+STRUCT_SIZE_ASSERT(OCMR_reg, 4);
+
+// OPCR
+STRUCT_REGISTER_START {
+    u32         : 1;
+    u32 OPM     : 4;    //!< Operation Mode
+    u32         : 27;
+} STRUCT_REGISTER_END OPCR_reg;
+STRUCT_SIZE_ASSERT(OPCR_reg, 4);
+
+// OIER
+STRUCT_REGISTER_START {
+    u32 ORFIEN  : 1;    //!< Operation Finished Interrupt Enable
+    u32 ITADIEN : 1;    //!< Invalid Target Address Interrupt Enable
+    u32 OBEIEN  : 1;    //!< Option Byte Check Sum Error Interrupt Enable
+    u32 IOCMIEN : 1;    //!< Invalid Operation Command Interrupt Enable
+    u32 OREIEN  : 1;    //!< Operation Error Interrupt Enable
+    u32         : 27;
+} STRUCT_REGISTER_END OIER_reg;
+STRUCT_SIZE_ASSERT(OIER_reg, 4);
+
+// OISR
+STRUCT_REGISTER_START {
+    u32 ORFF        : 1;    //!< Operation Finished Flag
+    u32 ITADF       : 1;    //!< Invalid Target Address Flag
+    u32 OBEF        : 1;    //!< Option Byte Checksum Error Flag
+    u32 IOCMF       : 1;    //!< Invalid Operation Command Flag
+    u32 OREF        : 1;    //!< Operation Error Flag
+    u32             : 11;
+    const u32 RORFF : 1;    //!< Raw Operation Finished Flag
+    const u32 PPEF  : 1;    //!< Page Erase/Program Portected Error Flag
+    u32             : 14;
+} STRUCT_REGISTER_END OISR_reg;
+STRUCT_SIZE_ASSERT(OISR_reg, 4);
+
+// CPSR
+STRUCT_REGISTER_START {
+    const u32 CPSB  : 1;    //!< Flash Memory Security Protection Status Bit
+    const u32 OBPSB : 1;    //!< Option Byte Page Erase/Program Protection Status Bit
+    u32             : 30;
+} STRUCT_REGISTER_END CPSR_reg;
+STRUCT_SIZE_ASSERT(CPSR_reg, 4);
+
+// VMCR
+STRUCT_REGISTER_START {
+    u32 VMCB    : 2;    //!< Vector Mapping Control Bit
+    u32         : 30;
+} STRUCT_REGISTER_END VMCR_reg;
+STRUCT_SIZE_ASSERT(VMCR_reg, 4);
+
+// CFCR
+STRUCT_REGISTER_START {
+    u32 WAIT    : 3;    //!< Flash Wait-state Setting
+    u32         : 1;
+    u32 PFBE    : 1;    //!< Pre-fetch Buffer Enable Bit
+    u32         : 2;
+    u32 DCDB    : 1;    //!< DCODE data Cacheable Enable Bit
+    u32         : 4;
+    u32 CE      : 1;    //!< Branch Cache Enable Bit
+    u32         : 2;
+    u32 FHLAEN  : 1;    //!< Flash Memory Half-cycle Access Enable Bit
+    u32 FZWPSEN : 1;    //!< Flash Zero Wait-state Power Saving Enable Bit
+    u32         : 15;
+} STRUCT_REGISTER_END CFCR_reg;
+STRUCT_SIZE_ASSERT(CFCR_reg, 4);
+
+typedef struct {
+    TADR_reg TADR;      //!< Flash Target Address
+    WRDR_reg WRDR;      //!< Flash Write Data
+    u8 _pad1[4];
+
+    // 0x00C
+    OCMR_reg OCMR;      //!< Flash Operation Command
+    OPCR_reg OPCR;      //!< Flash Operation Control
+    OIER_reg OIER;      //!< Flash Operation Interrupt Enable
+    OISR_reg OISR;      //!< Flash Operation Interrupt Status
+    u8 _pad2[4];
+
+    // 0x020
+    const u32 PPSR[4];  //!< Flash Page Erase/Program Protection Status Register
+    CPSR_reg CPSR;      //!< Flash Security Protection Status
+    u8 _pad3[0xCC];
+
+    // 0x100
+    VMCR_reg VMCR;      //!< Flash Vector Mapping Control
+    u8 _pad4[0xFC];
+
+    // 0x200
+    CFCR_reg CFCR;      //!< Flash Cache and Pre-fetch Control
+    u8 _pad5[0xFC];
+
+    // 0x300
+    u32 SBVT0;          //!< SRAM Booting Vector 0 (Stack Point)
+    u32 SBVT1;          //!< SRAM Booting Vector 1 (Program Counter)
+    u32 SBVT2;          //!< SRAM Booting Vector 2 (NMI Handler)
+    u32 SBVT3;          //!< SRAM Booting Vector 3 (Hard Fault Handler)
+} FMC_map;
+STRUCT_SIZE_ASSERT(FMC_map, 0x310);
+
+#define REG_FMC ((volatile FMC_map *)FMC_BASE)
+
+STRUCT_REG_CHECK(FMC, TADR);
+STRUCT_REG_CHECK(FMC, WRDR);
+STRUCT_REG_CHECK(FMC, OCMR);
+STRUCT_REG_CHECK(FMC, OPCR);
+STRUCT_REG_CHECK(FMC, OIER);
+STRUCT_REG_CHECK(FMC, OISR);
+STRUCT_REG_CHECK(FMC, PPSR);
+STRUCT_REG_CHECK(FMC, CPSR);
+STRUCT_REG_CHECK(FMC, VMCR);
+STRUCT_REG_CHECK(FMC, CFCR);
+STRUCT_REG_CHECK(FMC, SBVT0);
+STRUCT_REG_CHECK(FMC, SBVT1);
+STRUCT_REG_CHECK(FMC, SBVT2);
+STRUCT_REG_CHECK(FMC, SBVT3);
+
 // General Purpose Timers
 // ////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -104,100 +385,6 @@
 #define WDT_WDTPR       WDT_BASE + 0x10     // Watchdog Timer Protection
 #define WDT_WDTCNTR     WDT_BASE + 0x14     // Watchdog Timer Counter
 #define WDT_WDTCSR      WDT_BASE + 0x18     // Watchdog Timer Clock Selection
-
-// Real Time Clock
-// Power Control Unit
-// ////////////////////////////////////////////////////////////////////////////////////////////////
-
-// Flash Memory Controller
-// ////////////////////////////////////////////////////////////////////////////////////////////////
-#define FMC_TADR        FMC_BASE + 0x0      // Flash Target Address
-#define FMC_WRDR        FMC_BASE + 0x4      // Flash Write Data
-#define FMC_OCMR        FMC_BASE + 0xC      // Flash Operation Command
-#define FMC_OPCR        FMC_BASE + 0x10     // Flash Operation Control
-#define FMC_OIER        FMC_BASE + 0x14     // Flash Operation Interrupt Enable
-#define FMC_OISR        FMC_BASE + 0x18     // Flash Operation Interrupt Status
-
-#define FMC_PPSR        FMC_BASE + 0x20     // Flash Pages Erase / Program Protection Status
-#define FMC_PPSR_0      FMC_BASE + 0x20
-#define FMC_PPSR_1      FMC_BASE + 0x24
-#define FMC_PPSR_2      FMC_BASE + 0x28
-#define FMC_PPSR_3      FMC_BASE + 0x2C
-
-#define FMC_CPSR        FMC_BASE + 0x30     // Flash Security Protection Status
-#define FMC_VMCR        FMC_BASE + 0x100    // Flash Vector Mapping Control
-#define FMC_CFCR        FMC_BASE + 0x200    // Flash Cache and Pre-fetch Control
-
-#define FMC_SBVT0       FMC_BASE + 0x300    // SRAM Booting Vector 0 (Stack Point)
-#define FMC_SBVT1       FMC_BASE + 0x304    // SRAM Booting Vector 1 (Program Counter)
-#define FMC_SBVT2       FMC_BASE + 0x308    // SRAM Booting Vector 2 (NMI Handler)
-#define FMC_SBVT3       FMC_BASE + 0x30C    // SRAM Booting Vector 3 (Hard Fault Handler)
-
-// OCMR
-#define FMCOCMR_IDLE            0
-#define FMCOCMR_WORD_PROGRAM    0x4
-#define FMCOCMR_PAGE_ERASE      0x8
-#define FMCOCMR_MASS_ERASE      0xA
-
-// OPCR
-#define FMCOPCR_IDLE        (0x6 << 1)
-#define FMCOPCR_COMMIT      (0xA << 1)
-#define FMCOPCR_FINISHED    (0xE << 1)
-
-STRUCT_REGISTER_START {
-
-} STRUCT_REGISTER_END TADR_reg;
-STRUCT_SIZE_ASSERT(TADR_reg, 4);
-
-typedef struct {
-    u32 TADR;
-    u32 WRDR;
-    u8 _pad1[4];
-
-    // 0x00C
-    u32 OCMR;
-    u32 OPCR;
-    u32 OIER;
-    u32 OISR;
-    u8 _pad2[4];
-
-    // 0x020
-    u32 PPSR[4];
-    u32 CPSR;
-    u8 _pad3[0xCC];
-
-    // 0x100
-    u32 VMCR;
-    u8 _pad4[0xFC];
-
-    // 0x200
-    u32 CFCR;
-    u8 _pad5[0xFC];
-
-    // 0x300
-    u32 SBVT0;
-    u32 SBVT1;
-    u32 SBVT2;
-    u32 SBVT3;
-} FMC_map;
-STRUCT_SIZE_ASSERT(FMC_map, 0x310);
-
-#define REG_FMC ((volatile FMC_map *)FMC_BASE)
-
-STRUCT_REG_CHECK(FMC, TADR);
-STRUCT_REG_CHECK(FMC, WRDR);
-STRUCT_REG_CHECK(FMC, OCMR);
-STRUCT_REG_CHECK(FMC, OPCR);
-STRUCT_REG_CHECK(FMC, OIER);
-STRUCT_REG_CHECK(FMC, OISR);
-STRUCT_REG_CHECK(FMC, PPSR);
-STRUCT_REG_CHECK(FMC, CPSR);
-STRUCT_REG_CHECK(FMC, VMCR);
-STRUCT_REG_CHECK(FMC, CFCR);
-STRUCT_REG_CHECK(FMC, SBVT0);
-STRUCT_REG_CHECK(FMC, SBVT1);
-STRUCT_REG_CHECK(FMC, SBVT2);
-STRUCT_REG_CHECK(FMC, SBVT3);
 
 // Clock Control Unit
 // Reset Control Unit
@@ -263,13 +450,61 @@ STRUCT_REG_CHECK(FMC, SBVT3);
 #define USB_USBIER      USB_BASE + 0x4      // USB Interrupt Enable
 #define USB_USBISR      USB_BASE + 0x8      // USB Interrupt Status
 #define USB_USBFCR      USB_BASE + 0xC      // USB Frame Count
-#define USB_USBDEVA     USB_BASE + 0x10     // USB Device Address
+#define USB_USBDEVAR    USB_BASE + 0x10     // USB Device Address
 
 #define USB_USBEPnCSR(n)    EPn_BASE(n) + 0x14  // USB Endpoint n Control and Status
 #define USB_USBEPnIER(n)    EPn_BASE(n) + 0x18  // USB Endpoint n Interrupt Enable
 #define USB_USBEPnISR(n)    EPn_BASE(n) + 0x1C  // USB Endpoint n Interrupt Status
 #define USB_USBEPnTCR(n)    EPn_BASE(n) + 0x20  // USB Endpoint n Transfer Count
 #define USB_USBEPnCFGR(n)   EPn_BASE(n) + 0x24  // USB Endpoint n Configuration
+
+#define USB_USBEP0CSR   USB_USBEPnCSR(0)
+#define USB_USBEP0IER   USB_USBEPnIER(0)
+#define USB_USBEP0ISR   USB_USBEPnISR(0)
+#define USB_USBEP0TCR   USB_USBEPnTCR(0)
+#define USB_USBEP0CFGR  USB_USBEPnCFGR(0)
+
+#define USB_USBEP1CSR   USB_USBEPnCSR(1)
+#define USB_USBEP1IER   USB_USBEPnIER(1)
+#define USB_USBEP1ISR   USB_USBEPnISR(1)
+#define USB_USBEP1TCR   USB_USBEPnTCR(1)
+#define USB_USBEP1CFGR  USB_USBEPnCFGR(1)
+
+#define USB_USBEP2CSR   USB_USBEPnCSR(2)
+#define USB_USBEP2IER   USB_USBEPnIER(2)
+#define USB_USBEP2ISR   USB_USBEPnISR(2)
+#define USB_USBEP2TCR   USB_USBEPnTCR(2)
+#define USB_USBEP2CFGR  USB_USBEPnCFGR(2)
+
+#define USB_USBEP3CSR   USB_USBEPnCSR(3)
+#define USB_USBEP3IER   USB_USBEPnIER(3)
+#define USB_USBEP3ISR   USB_USBEPnISR(3)
+#define USB_USBEP3TCR   USB_USBEPnTCR(3)
+#define USB_USBEP3CFGR  USB_USBEPnCFGR(3)
+
+#define USB_USBEP4CSR   USB_USBEPnCSR(4)
+#define USB_USBEP4IER   USB_USBEPnIER(4)
+#define USB_USBEP4ISR   USB_USBEPnISR(4)
+#define USB_USBEP4TCR   USB_USBEPnTCR(4)
+#define USB_USBEP4CFGR  USB_USBEPnCFGR(4)
+
+#define USB_USBEP5CSR   USB_USBEPnCSR(5)
+#define USB_USBEP5IER   USB_USBEPnIER(5)
+#define USB_USBEP5ISR   USB_USBEPnISR(5)
+#define USB_USBEP5TCR   USB_USBEPnTCR(5)
+#define USB_USBEP5CFGR  USB_USBEPnCFGR(5)
+
+#define USB_USBEP6CSR   USB_USBEPnCSR(6)
+#define USB_USBEP6IER   USB_USBEPnIER(6)
+#define USB_USBEP6ISR   USB_USBEPnISR(6)
+#define USB_USBEP6TCR   USB_USBEPnTCR(6)
+#define USB_USBEP6CFGR  USB_USBEPnCFGR(6)
+
+#define USB_USBEP7CSR   USB_USBEPnCSR(7)
+#define USB_USBEP7IER   USB_USBEPnIER(7)
+#define USB_USBEP7ISR   USB_USBEPnISR(7)
+#define USB_USBEP7TCR   USB_USBEPnTCR(7)
+#define USB_USBEP7CFGR  USB_USBEPnCFGR(7)
 
 // USBCSR
 #define USBCSR_FRES     ((u32)0x002)        // Force USB Reset Control
@@ -707,6 +942,60 @@ typedef struct {
 STRUCT_SIZE_ASSERT(USB_map, 0xB4);
 
 #define REG_USB ((volatile USB_map *)USB_BASE)
+
+STRUCT_REG_CHECK(USB, USBCSR);
+STRUCT_REG_CHECK(USB, USBIER);
+STRUCT_REG_CHECK(USB, USBISR);
+STRUCT_REG_CHECK(USB, USBFCR);
+STRUCT_REG_CHECK(USB, USBDEVAR);
+
+STRUCT_REG_CHECK(USB, USBEP0CSR);
+STRUCT_REG_CHECK(USB, USBEP0IER);
+STRUCT_REG_CHECK(USB, USBEP0ISR);
+STRUCT_REG_CHECK(USB, USBEP0TCR);
+STRUCT_REG_CHECK(USB, USBEP0CFGR);
+
+STRUCT_REG_CHECK(USB, USBEP1CSR);
+STRUCT_REG_CHECK(USB, USBEP1IER);
+STRUCT_REG_CHECK(USB, USBEP1ISR);
+STRUCT_REG_CHECK(USB, USBEP1TCR);
+STRUCT_REG_CHECK(USB, USBEP1CFGR);
+
+STRUCT_REG_CHECK(USB, USBEP2CSR);
+STRUCT_REG_CHECK(USB, USBEP2IER);
+STRUCT_REG_CHECK(USB, USBEP2ISR);
+STRUCT_REG_CHECK(USB, USBEP2TCR);
+STRUCT_REG_CHECK(USB, USBEP2CFGR);
+
+STRUCT_REG_CHECK(USB, USBEP3CSR);
+STRUCT_REG_CHECK(USB, USBEP3IER);
+STRUCT_REG_CHECK(USB, USBEP3ISR);
+STRUCT_REG_CHECK(USB, USBEP3TCR);
+STRUCT_REG_CHECK(USB, USBEP3CFGR);
+
+STRUCT_REG_CHECK(USB, USBEP4CSR);
+STRUCT_REG_CHECK(USB, USBEP4IER);
+STRUCT_REG_CHECK(USB, USBEP4ISR);
+STRUCT_REG_CHECK(USB, USBEP4TCR);
+STRUCT_REG_CHECK(USB, USBEP4CFGR);
+
+STRUCT_REG_CHECK(USB, USBEP5CSR);
+STRUCT_REG_CHECK(USB, USBEP5IER);
+STRUCT_REG_CHECK(USB, USBEP5ISR);
+STRUCT_REG_CHECK(USB, USBEP5TCR);
+STRUCT_REG_CHECK(USB, USBEP5CFGR);
+
+STRUCT_REG_CHECK(USB, USBEP6CSR);
+STRUCT_REG_CHECK(USB, USBEP6IER);
+STRUCT_REG_CHECK(USB, USBEP6ISR);
+STRUCT_REG_CHECK(USB, USBEP6TCR);
+STRUCT_REG_CHECK(USB, USBEP6CFGR);
+
+STRUCT_REG_CHECK(USB, USBEP7CSR);
+STRUCT_REG_CHECK(USB, USBEP7IER);
+STRUCT_REG_CHECK(USB, USBEP7ISR);
+STRUCT_REG_CHECK(USB, USBEP7TCR);
+STRUCT_REG_CHECK(USB, USBEP7CFGR);
 
 // Analog To Digital Converter
 // ////////////////////////////////////////////////////////////////////////////////////////////////

@@ -1,7 +1,6 @@
 #ifndef USB_H
 #define USB_H
 
-#include "../../types.h"
 #include "../ht32f165x.h"
 
 // Request Data Direction

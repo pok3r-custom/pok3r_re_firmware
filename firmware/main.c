@@ -39,32 +39,24 @@ void wdt_init(){
 
 void ckcu_init(){
     // Backup domain
-    REG_CKCU->LPCR = 1;
-//    REG(CKCU_LPCR) = 1;
+    REG_CKCU->LPCR.BKISO = 1;
     // Backup domain register access
     REG_CKCU->APBCCR1.BKPREN = 1;
-//    REG(CKCU_APBCCR1) = (1 << 6);
-
-    // USB
-//    REG(CKCU_AHBCCR) |= (1 << 10);
-    // AFIO
-//    REG(CKCU_APBCCR0) |= (1 << 14);
-    // EXTI
-//    REG(CKCU_APBCCR0) |= (1 << 15);
 
     // PLL VCO output clock feedback divider to 9
     REG_CKCU->PLLCFGR.PFBD = 9;
-//    REG(CKCU_PLLCFCR) = (REG(CKCU_PLLCFCR) & ~(0x3f << 23)) | (9 << 23);
 
-    // Flash wait-state 2
-    REG(FMC_CFCR) = (REG(FMC_CFCR) & ~7) | 3;
+    // Flash wait status 2 (48MHz <= HCLK <= 72MHz)
+    REG_FMC->CFCR.WAIT = 3;
 
     // Set AHB prescaler (CK_AHB = CK_SYS / 2)
-    REG(CKCU_AHBCFGR) = 1;
+    REG_CKCU->AHBCFGR.AHBPRE = 1;
 
     // Set clock source to PLL
-    REG(CKCU_GCCR) = (REG(CKCU_GCCR) & ~3) | 1;
-    while(REG(CKCU_CKST) >> 30 != 1);
+    REG_CKCU->GCCR.SW = 1;
+
+    // Wait for clock switch
+    while(REG_CKCU->CKST.CKSWST != 1);
 }
 
 void nvic_init(){
@@ -103,18 +95,22 @@ void afio_init(){
 }
 
 void flash_version_clear(){
-    REG(FMC_TADR) = VERSION_ADDR;
-    REG(FMC_OCMR) = FMCOCMR_PAGE_ERASE;
-    REG(FMC_OPCR) = FMCOPCR_COMMIT;
+    REG_FMC->TADR.TADB = VERSION_ADDR;
+    REG_FMC->OCMR.CMD = OCMR_PAGE_ERASE;
+    REG_FMC->OPCR.OPM = OPCR_COMMIT;
+//    REG(FMC_TADR) = VERSION_ADDR;
+//    REG(FMC_OCMR) = OCMR_PAGE_ERASE;
+//    REG(FMC_OPCR) = OPCR_COMMIT;
 
-    while(REG(FMC_OPCR) != FMCOPCR_FINISHED);
+    while(REG_FMC->OPCR.OPM != OPCR_FINISHED);
+//    while(REG(FMC_OPCR) != OPCR_FINISHED);
 }
 
 int main(){
     //wdt_init();
     ckcu_init();
+    nvic_init();
 
-    //nvic_init();
 //    afio_init();
 
     // Clear the version so we can get back to the bootloader

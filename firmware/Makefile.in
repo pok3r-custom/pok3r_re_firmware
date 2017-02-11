@@ -25,12 +25,13 @@ CC_SRCS = \
 	board/ht32/usb/usb.c
 
 # Output Files
-OUT_ELF = $(BIN_DIR)/$(APP_NAME).elf
-OUT_BIN = $(BIN_DIR)/$(APP_NAME).bin
-OUT_MAP = $(BIN_DIR)/$(APP_NAME).map
+OUT_ELF = $(APP_NAME).elf
+OUT_BIN = $(APP_NAME).bin
+OUT_MAP = $(APP_NAME).map
 
 # Intermediary files
 STARTUP_OBJ = startup.o
+#CC_OBJS = $(CC_SRCS:.c=.o)
 CC_OBJS = $(addprefix $(BIN_DIR)/,$(CC_SRCS:.c=.o))
 CC_DEPS = $(CC_SRCS:.c=.d)
 
@@ -49,11 +50,14 @@ MKDIR = mkdir -p
 
 # Flags
 CC_FLAGS += -c -std=c11 -Wall -g
-CC_FLAGS += -mcpu=$(ARM_CPU) -mthumb -nostdlib -nostartfiles -ffreestanding
+CC_FLAGS += -mcpu=$(ARM_CPU) -mthumb -nostdlib -nostartfiles
+CC_FLAGS += -ffreestanding -fstrict-volatile-bitfields
 CC_FLAGS += -MT $@ -MMD -MP -MF $*.d
 CC_FLAGS += -DFW_BUILDING @C_DEFS@
 
-CPP_FLAGS += -c -mcpu=$(ARM_CPU) -mthumb -std=c11 -nostdlib -nostartfiles -ffreestanding -g -Wall
+CPP_FLAGS += -c -std=c++11 -Wall -g
+CPP_FLAGS += -mcpu=$(ARM_CPU) -mthumb -nostdlib -nostartfiles
+CPP_FLAGS += -ffreestanding -fstrict-volatile-bitfields
 CPP_FLAGS += -MT $@ -MMD -MP -MF $*.d
 CPP_FLAGS += -DFW_BUILDING @C_DEFS@
 
@@ -62,13 +66,13 @@ AS_FLAGS += -mcpu=$(ARM_CPU) -mthumb
 LD_FLAGS += -nostdlib -nostartfiles -T $(LD_SCRIPT) -Map $(OUT_MAP)
 
 # Targets
-all: $(OUT_BIN)
+all: | dirs $(OUT_BIN)
 
 $(OUT_BIN): $(OUT_ELF)
 	echo "BIN  $(notdir $@)"
 	$(OC) $(OUT_ELF) -O binary $(OUT_BIN)
 
-$(OUT_ELF): $(LD_SCRIPT) | dirs $(STARTUP_OBJ) $(CC_OBJS)
+$(OUT_ELF): $(LD_SCRIPT) $(STARTUP_OBJ) $(CC_OBJS)
 	echo "LINK $(notdir $@)"
 	$(LD) $(LD_FLAGS) -o $@ $(STARTUP_OBJ) $(CC_OBJS)
 
@@ -76,7 +80,7 @@ $(STARTUP_OBJ): $(SRC_DIR)/$(STARTUP_S)
 	echo "AS   $(notdir $<)"
 	$(AS) $(AS_FLAGS) -o $@ $<
 
-$(BIN_OBJ)/%.o: $(SRC_DIR)/%.s
+$(BIN_DIR)/%.o: $(SRC_DIR)/%.s
 	echo "AS   $(notdir $<)"
 	$(AS) $(AS_FLAGS) -o $@ $<
 

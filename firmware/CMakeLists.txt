@@ -9,7 +9,8 @@ SET(COMMON_SOURCES
     common.h
     main.c
 
-    board/types.h
+    board/board.h
+    board/cortex-m3.h
 
     board/ht32/ht32.h
     board/ht32/ht32f165x.h
