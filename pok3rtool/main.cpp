@@ -76,6 +76,9 @@ void encode_package_data(ZBinary &bin){
 #define V124_HASH   0x882CB0E4ECE25454
 #define V130_HASH   0x6CFF0BB4F4086C2F
 
+// CORE
+#define V104_HASH   0x51BFA86A7FAF4EEA
+
 int decode_updater(ZPath exe, ZPath out){
     LOG("Extract from " << exe);
     ZFile file;
@@ -116,8 +119,10 @@ int decode_updater(ZPath exe, ZPath out){
 
         case V124_HASH:
         case V130_HASH:
+        case V104_HASH:
             type = 2;
             strings_len = 0xB24; // from IDA disassembly in sub_403830 of v130 updater
+                                 // same size in v104
 
             offset_company = 0x22E;
             offset_product = 0x436;
@@ -163,7 +168,7 @@ int decode_updater(ZPath exe, ZPath out){
     LOG("Signature:   " << ZString(strs.raw() + offset_sig, strings_len - offset_sig));
 
 //    LOG("String Dump:");
-//    RLOG(strs.dumpBytes(4, 8));
+    RLOG(strs.dumpBytes(4, 8));
 
     // Decode other encrypted sections
 
@@ -420,7 +425,7 @@ int main(int _argc, char **_argv){
             if(!ok) warning();
             // Read Version
             ZPointer<UpdateInterface> kb = openDevice(device);
-            if(kb.ptr()){
+            if(kb.get()){
                 LOG("Version: " << kb->getVersion());
                 return 0;
             }
@@ -431,7 +436,7 @@ int main(int _argc, char **_argv){
                 if(!ok) warning();
                 // Set Version
                 ZPointer<UpdateInterface> kb = openDevice(device);
-                if(kb.ptr()){
+                if(kb.get()){
                     LOG("Old Version: " << kb->getVersion());
                     LOG(kb->setVersion(args[1]));
                     LOG(kb->enterFirmware());
@@ -447,7 +452,7 @@ int main(int _argc, char **_argv){
             if(!ok) warning();
             // Get Info
             ZPointer<UpdateInterface> kb = openDevice(device);
-            if(kb.ptr()){
+            if(kb.get()){
                 LOG(kb->getInfo());
                 return 0;
             }
@@ -457,7 +462,7 @@ int main(int _argc, char **_argv){
             if(!ok) warning();
             // Reset to Firmware
             ZPointer<UpdateInterface> kb = openDevice(device);
-            if(kb.ptr()){
+            if(kb.get()){
                 LOG(kb->enterFirmware());
                 // Read version
                 LOG("Version: " << kb->getVersion());
@@ -469,7 +474,7 @@ int main(int _argc, char **_argv){
             if(!ok) warning();
             // Reset to Bootloader
             ZPointer<UpdateInterface> kb = openDevice(device);
-            if(kb.ptr()){
+            if(kb.get()){
                 LOG(kb->enterBootloader());
                 // Read version
                 LOG("Version: " << kb->getVersion());
@@ -482,7 +487,7 @@ int main(int _argc, char **_argv){
                 if(!ok) warning();
                 // Dump Flash
                 ZPointer<UpdateInterface> kb = openDevice(device);
-                if(kb.ptr()){
+                if(kb.get()){
                     LOG("Dump Flash");
                     ZBinary bin = kb->dumpFlash();
                     RLOG(bin.dumpBytes(4, 8));
@@ -505,12 +510,12 @@ int main(int _argc, char **_argv){
                     return 2;
                 }
                 ZPointer<UpdateInterface> kb = openDevice(device);
-                if(kb.ptr()){
+                if(kb.get()){
                     LOG("Update Firmware: " << args[2]);
                     ZBinary fwbin;
                     if(!ZFile::readBinary(args[2], fwbin))
                         return -3;
-                    LOG(kb->updateFirmware(args[1], fwbin));
+                    LOG(kb->update(args[1], fwbin));
                     return 0;
                 }
                 return -1;

@@ -1,32 +1,47 @@
-# Makefile for ARM7 Cortex-M3
+# Makefile for Cortex-M3
 
+# STOP EDITING THIS FILE RIGHT NOW
+# SERIOUSLY
+# PLEASE.
+# FUCK MAKE.
+
+# App name
 APP_NAME = @OUT_NAME@
 
 # Directories
-SRC_DIR = @CMAKE_CURRENT_SOURCE_DIR@
-BIN_DIR = @CMAKE_CURRENT_BINARY_DIR@/$(APP_NAME)
-OUT_DIR = @CMAKE_BINARY_DIR@
+SRC_DIR = @FIRMWARE_SOURCE_DIR@
+BIN_DIR = @FIRMWARE_BINARY_DIR@
 
-# Files
-OUT_ELF = $(BIN_DIR)/$(APP_NAME).elf
-OUT_BIN = $(OUT_DIR)/$(APP_NAME).bin
-OUT_MAP = $(BIN_DIR)/$(APP_NAME).map
+# Input Files
+LD_SCRIPT = $(SRC_DIR)/$(APP_NAME).ld
+STARTUP_S = board/ht32/startup.s
 
-AS_SRCS = startup.s
-CC_SRCS = main.c usb/usb.c usb/descriptors.c
+CC_SRCS = \
+	main.c \
+	board/cortex-m3.c \
+	board/ht32/ht32f165x.c \
+	board/ht32/ht32f1654.c \
+	board/ht32/ht32f1655.c \
+	board/ht32/usb/descriptors.c \
+	board/ht32/usb/usb.c
 
-#AS_SRCPATHS := $(addprefix $(SRC_DIR)/, $(AS_SRCS))
-#CC_SRCPATHS := $(addprefix $(SRC_DIR)/, $(CC_SRCS))
+# Output Files
+OUT_ELF = $(APP_NAME).elf
+OUT_BIN = $(APP_NAME).bin
+OUT_MAP = $(APP_NAME).map
 
-#OBJ_NAMES = $(AS_SRCS:.s=.o) $(CC_SRCS:.c=.o)
-OBJ_NAMES = $(CC_SRCS:.c=.o)
-OBJS = $(addprefix $(BIN_DIR)/, $(OBJ_NAMES))
+# Intermediary files
+STARTUP_OBJ = startup.o
+#CC_OBJS = $(CC_SRCS:.c=.o)
+CC_OBJS = $(addprefix $(BIN_DIR)/,$(CC_SRCS:.c=.o))
+CC_DEPS = $(CC_SRCS:.c=.d)
 
 # Config
-ARM_CPU = arm7tdmi
+ARM_CPU = cortex-m3
 
 # Commands
 CC = arm-none-eabi-gcc
+CPP = arm-none-eabi-g++
 AS = arm-none-eabi-as
 LD = arm-none-eabi-ld
 OC = arm-none-eabi-objcopy
@@ -35,27 +50,51 @@ RM = rm -f
 MKDIR = mkdir -p
 
 # Flags
-CC_FLAGS = -c -mcpu=$(ARM_CPU) -mthumb -std=c11 -nostdlib -nostartfiles -ffreestanding -Wall @C_DEFS@
-AS_FLAGS = -mcpu=$(ARM_CPU)
-LD_FLAGS = -T $(SRC_DIR)/$(APP_NAME).ld -Map $(OUT_MAP) -o $(OUT_ELF)
+CC_FLAGS += -c -std=c11 -Wall -g
+CC_FLAGS += -mcpu=$(ARM_CPU) -mthumb -nostdlib -nostartfiles
+CC_FLAGS += -ffreestanding -fstrict-volatile-bitfields
+CC_FLAGS += -MT $@ -MMD -MP -MF $*.d
+CC_FLAGS += -DFW_BUILDING @C_DEFS@
+
+CPP_FLAGS += -c -std=c++11 -Wall -g
+CPP_FLAGS += -mcpu=$(ARM_CPU) -mthumb -nostdlib -nostartfiles
+CPP_FLAGS += -ffreestanding -fstrict-volatile-bitfields
+CPP_FLAGS += -MT $@ -MMD -MP -MF $*.d
+CPP_FLAGS += -DFW_BUILDING @C_DEFS@
+
+AS_FLAGS += -mcpu=$(ARM_CPU) -mthumb
+
+LD_FLAGS += -nostdlib -nostartfiles -T $(LD_SCRIPT) -Map $(OUT_MAP)
 
 # Targets
-all: $(OUT_BIN)
+all: | dirs $(OUT_BIN)
 
 $(OUT_BIN): $(OUT_ELF)
+	echo "BIN  $(notdir $@)"
 	$(OC) $(OUT_ELF) -O binary $(OUT_BIN)
 
-$(OUT_ELF): $(SRC_DIR)/$(APP_NAME).ld $(BIN_DIR)/startup.o | dirs $(OBJS)
-	$(LD) $(LD_FLAGS) startup.o $(OBJS)
+$(OUT_ELF): $(LD_SCRIPT) $(STARTUP_OBJ) $(CC_OBJS)
+	echo "LINK $(notdir $@)"
+	$(LD) $(LD_FLAGS) -o $@ $(STARTUP_OBJ) $(CC_OBJS)
 
-$(BIN_DIR)/startup.o: $(SRC_DIR)/startup.s
+$(STARTUP_OBJ): $(SRC_DIR)/$(STARTUP_S)
+	echo "AS   $(notdir $<)"
+	$(AS) $(AS_FLAGS) -o $@ $<
+
+$(BIN_DIR)/%.o: $(SRC_DIR)/%.s
+	echo "AS   $(notdir $<)"
 	$(AS) $(AS_FLAGS) -o $@ $<
 
 $(BIN_DIR)/%.o: $(SRC_DIR)/%.c
+	echo "CC   $(notdir $<)"
 	$(CC) $(CC_FLAGS) -o $@ $<
 
+$(BIN_DIR)/%.o: $(SRC_DIR)/%.cpp
+	echo "CPP  $(notdir $<)"
+	$(CPP) $(CPP_FLAGS) -o $@ $<
+
 dirs:
-	$(MKDIR) $(BIN_DIR)/usb
+	$(foreach dir,$(CC_SRCS),$(MKDIR) $(dir $(dir));)
 
 clean:
 	$(RM) $(OUT_ELF)
@@ -64,5 +103,6 @@ clean:
 	$(RM) *.o
 	$(RM) usb/*.o
 
-.PHONY: all clean dirs
+-include $(CC_DEPS)
 
+.PHONY: all dirs clean

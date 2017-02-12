@@ -67,7 +67,9 @@ public:
     //! Dump the contents of flash.
     ZBinary dumpFlash();
     //! Update the firmware.
-    bool updateFirmware(ZString version, const ZBinary &fwbin);
+    bool writeFirmware(const ZBinary &fwbin);
+
+    bool update(ZString version, const ZBinary &fwbin);
 
     void test();
 

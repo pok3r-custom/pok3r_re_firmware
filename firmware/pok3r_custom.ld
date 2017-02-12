@@ -1,4 +1,4 @@
-/* GNU Linker Script for Cortex-M3 */
+/* GNU Linker Script for Holtek HT32F1655 (ARM Cortex-M3) */
 
 OUTPUT_FORMAT ("elf32-littlearm", "elf32-bigarm", "elf32-littlearm")
 OUTPUT_ARCH(arm)
@@ -9,6 +9,8 @@ MEMORY {
   flash (rx)  : ORIGIN = 0x00000000, LENGTH = 128K
   sram  (rwx) : ORIGIN = 0x20000000, LENGTH = 32K
 }
+
+IMAGE_BASE = 0x2c00;
 
 /* Various stack sizes */
 C_STACK_SIZE   = 1024;
@@ -21,10 +23,8 @@ UND_STACK_SIZE = 0;
 /* Sections */
 SECTIONS {
 
-    . = 0;
-
     /* vector table and reset code */
-    .reset : {
+    .reset IMAGE_BASE : {
         startup.o(.text)
         . = ALIGN(4);
     } > flash
@@ -40,32 +40,35 @@ SECTIONS {
 
     /* stack */
     .stack : {
+        . = ALIGN(4);
         __stack_start = .;
 
         . += C_STACK_SIZE;
-        . = ALIGN (4);
 
+        . = ALIGN (4);
         __stack_end = .;
     } > sram
 
-    /* uninitialized data */
+    /* uninitialized (zeroed) data */
     .bss : {
+        . = ALIGN(4);
         __bss_start = .;
 
         *(.bss .bss.*)
-        . = ALIGN (8);
 
+        . = ALIGN (4);
         __bss_end = .;
     } > sram
 
     /* data loaded from flash to sram */
     .data : {
-        __data_load = LOADADDR(.data);
+        . = ALIGN(4);
+        __data_load = (LOADADDR(.data) + 4 - 1) & ~(4 - 1);
         __data_start = .;
 
         *(.data .data.*)
-        . = ALIGN (4);
 
+        . = ALIGN (4);
         __data_end = .;
     } > sram AT > flash
 
