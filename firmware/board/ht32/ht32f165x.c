@@ -1,5 +1,22 @@
 #include "ht32.h"
 
+#define DEFAULT_ISR(N) void __attribute__((weak)) N(){ _generic_intr(); }
+
+// Default ISRs
+
+DEFAULT_ISR(gptm0_isr)
+DEFAULT_ISR(gptm1_isr)
+
+DEFAULT_ISR(bftm0_isr)
+DEFAULT_ISR(bftm1_isr)
+
+DEFAULT_ISR(spi0_isr)
+DEFAULT_ISR(spi1_isr)
+
+DEFAULT_ISR(usb_isr)
+
+// Functions
+
 void ckcu_clocks_enable(int ahb_mask, int apb0_mask, int apb1_mask, int en){
     u32 ahb = REG(CKCU_AHBCCR);
     u32 apb0 = REG(CKCU_APBCCR0);

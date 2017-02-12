@@ -14,33 +14,33 @@ SET(FILES
     disassemble/build.sh
     disassemble/unas.sh
 
-    disassemble/builtin/firmware_builtin.bin
-    disassemble/builtin/firmware_builtin.txt
-    disassemble/builtin/symbols_builtin.txt
-    disassemble/builtin/sram-variables_builtin.txt
+    disassemble/pok3r/builtin/firmware_builtin.bin
+    disassemble/pok3r/builtin/firmware_builtin.txt
+    disassemble/pok3r/builtin/symbols_builtin.txt
+    disassemble/pok3r/builtin/sram-variables_builtin.txt
 
-    disassemble/builtin_rgb/firmware_builtin_rgb.bin
-    disassemble/builtin_rgb/firmware_builtin_rgb.txt
-    disassemble/builtin_rgb/symbols_builtin_rgb.txt
-    disassemble/builtin_rgb/sram-variables_builtin_rgb.txt
+    disassemble/pok3r/v117/firmware_v117.bin
+    disassemble/pok3r/v117/firmware_v117.txt
+    disassemble/pok3r/v117/symbols_v117.txt
+    disassemble/pok3r/v117/sram-variables_v117.txt
+    disassemble/pok3r/v117/patch_v117.txt
+    disassemble/pok3r/v117/descriptors.h
 
-    disassemble/v117/firmware_v117.bin
-    disassemble/v117/firmware_v117.txt
-    disassemble/v117/symbols_v117.txt
-    disassemble/v117/sram-variables_v117.txt
-    disassemble/v117/patch_v117.txt
-    disassemble/v117/descriptors.h
+    disassemble/pok3r_rgb/builtin_rgb/firmware_builtin_rgb.bin
+    disassemble/pok3r_rgb/builtin_rgb/firmware_builtin_rgb.txt
+    disassemble/pok3r_rgb/builtin_rgb/symbols_builtin_rgb.txt
+    disassemble/pok3r_rgb/builtin_rgb/sram-variables_builtin_rgb.txt
 
-    disassemble/v130/firmware_v130.bin
-    disassemble/v130/firmware_v130.txt
-    disassemble/v130/symbols_v130.txt
-    disassemble/v130/sram-variables_v130.txt
-    disassemble/v130/patch_v130.txt
-    disassemble/v130/fw_xor_decode.c
+    disassemble/pok3r_rgb/v130/firmware_v130.bin
+    disassemble/pok3r_rgb/v130/firmware_v130.txt
+    disassemble/pok3r_rgb/v130/symbols_v130.txt
+    disassemble/pok3r_rgb/v130/sram-variables_v130.txt
+    disassemble/pok3r_rgb/v130/patch_v130.txt
+    disassemble/pok3r_rgb/v130/fw_xor_decode.c
 
-    disassemble/core/firmware_v104.bin
-    disassemble/core/firmware_v104.txt
-    disassemble/core/patch_v104.txt
+    disassemble/core/v104/firmware_v104.bin
+    disassemble/core/v104/firmware_v104.txt
+    disassemble/core/v104/patch_v104.txt
 )
 
 ### =================== BUILD =================== ###

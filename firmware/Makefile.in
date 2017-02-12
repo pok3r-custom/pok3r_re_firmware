@@ -18,9 +18,10 @@ STARTUP_S = board/ht32/startup.s
 
 CC_SRCS = \
 	main.c \
+	board/cortex-m3.c \
+	board/ht32/ht32f165x.c \
 	board/ht32/ht32f1654.c \
 	board/ht32/ht32f1655.c \
-	board/ht32/ht32f165x.c \
 	board/ht32/usb/descriptors.c \
 	board/ht32/usb/usb.c
 

@@ -81,7 +81,7 @@ _vector_table:
     .word   _generic_intr   /* 65  49  UART0 */
     .word   _generic_intr   /* 66  50  UART1 */
     .word   _generic_intr   /* 67  51  SCI */
-    .word   _generic_intr   /* 68  52  I2C */
+    .word   _generic_intr   /* 68  52  I2S */
     .word   _usb_intr       /* 69  53  USB */
     .word   0 /* Reserved      70      */
     .word   _generic_intr   /* 71  55  PDMA_CH0 */
@@ -130,10 +130,11 @@ _start:
     blx r0
 
     /* just loop if main exits */
-    b _start
+    b .
 
 
 /* generic interrupt handler */
+.global _generic_intr
 .thumb_func
 _generic_intr:
     b .

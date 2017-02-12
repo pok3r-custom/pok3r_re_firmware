@@ -40,32 +40,35 @@ SECTIONS {
 
     /* stack */
     .stack : {
+        . = ALIGN(4);
         __stack_start = .;
 
         . += C_STACK_SIZE;
-        . = ALIGN (4);
 
+        . = ALIGN (4);
         __stack_end = .;
     } > sram
 
     /* uninitialized (zeroed) data */
     .bss : {
+        . = ALIGN(4);
         __bss_start = .;
 
         *(.bss .bss.*)
-        . = ALIGN (8);
 
+        . = ALIGN (4);
         __bss_end = .;
     } > sram
 
     /* data loaded from flash to sram */
     .data : {
-        __data_load = LOADADDR(.data);
+        . = ALIGN(4);
+        __data_load = (LOADADDR(.data) + 4 - 1) & ~(4 - 1);
         __data_start = .;
 
         *(.data .data.*)
-        . = ALIGN (4);
 
+        . = ALIGN (4);
         __data_end = .;
     } > sram AT > flash
 

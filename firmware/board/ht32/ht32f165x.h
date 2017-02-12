@@ -2,6 +2,72 @@
 #define HT32F165X_H
 
 #include "../board.h"
+#include "../cortex-m3.h"
+
+// IRQs
+// ////////////////////////////////////////////////////////////////////////////////////////////////
+#define CKRDY_IRQ           0
+#define LVD_IRQ             1
+#define BOD_IRQ             2
+#define WDT_IRQ             3
+#define RTC_IRQ             4
+#define FMC_IRQ             5
+#define EVWUP_IRQ           6
+#define LPWUP_IRQ           7
+#define EXTI0_IRQ           8
+#define EXTI1_IRQ           9
+#define EXTI2_IRQ           10
+#define EXTI3_IRQ           11
+#define EXTI4_IRQ           12
+#define EXTI5_IRQ           13
+#define EXTI6_IRQ           14
+#define EXTI7_IRQ           15
+#define EXTI8_IRQ           16
+#define EXTI9_IRQ           17
+#define EXTI10_IRQ          18
+#define EXTI11_IRQ          19
+#define EXTI12_IRQ          20
+#define EXTI13_IRQ          21
+#define EXTI14_IRQ          22
+#define EXTI15_IRQ          23
+#define COMP_IRQ            24
+#define ADC_IRQ             25
+
+#define MCTM0_BRK_IRQ       27
+#define MCTM0_UP_IRQ        28
+#define MCTM0_TR_UP2_IRQ    29
+#define MCTM0_CC_IRQ        30
+#define MCTM1_BRK_IRQ       31
+#define MCTM1_UP_IRQ        32
+#define MCTM1_TR_UP2_IRQ    33
+#define MCTM1_CC_IRQ        34
+#define GPTM0_IRQ           35
+#define GPTM1_IRQ           36
+
+#define BFTM0_IRQ           41
+#define BFTM1_IRQ           42
+#define I2C0_IRQ            43
+#define I2C1_IRQ            44
+#define SPI0_IRQ            45
+#define SPI1_IRQ            46
+#define USART0_IRQ          47
+#define USART1_IRQ          48
+#define UART0_IRQ           49
+#define UART1_IRQ           50
+#define SCI_IRQ             51
+#define I2C_IRQ             52
+#define USB_IRQ             53
+
+#define PDMA_CH0_IRQ        55
+#define PDMA_CH1_IRQ        56
+#define PDMA_CH2_IRQ        57
+#define PDMA_CH3_IRQ        58
+#define PDMA_CH4_IRQ        59
+#define PDMA_CH5_IRQ        60
+#define PDMA_CH6_IRQ        61
+#define PDMA_CH7_IRQ        62
+
+#define EBI_IRQ             68
 
 // Peripherals
 // ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -610,8 +676,8 @@ STRUCT_REGISTER_START {
     u32 LPMODE      : 1;    //!< Low-Power Mode Control
     u32             : 1;
     u32 GENRSM      : 1;    //!< Resume Request Generation Control
-    u32 RXDP        : 1;    //!< Received DP Line Status
-    u32 RXDM        : 1;    //!< Received DM Line Status
+    const u32 RXDP  : 1;    //!< Received DP Line Status
+    const u32 RXDM  : 1;    //!< Received DM Line Status
     u32 ADRSET      : 1;    //!< Device Address Setting Control
     u32 SRAMRSTC    : 1;    //!< USB SRAM Reset Condition
     u32 DPPUEN      : 1;    //!< DP Pull Up Enable
@@ -664,11 +730,11 @@ STRUCT_SIZE_ASSERT(USBISR_reg, 4);
 
 // USBFCR
 STRUCT_REGISTER_START {
-    u32 FRNUM       : 11;   //!< Frame Number
-    u32             : 5;
-    u32 SOFLCK      : 1;    //!< Start-of-Frame Lock Flag
-    u32 LSOF        : 2;    //!< Lost Start-of-Frame Number
-    u32             : 13;
+    const u32 FRNUM     : 11;   //!< Frame Number
+    u32                 : 5;
+    const u32 SOFLCK    : 1;    //!< Start-of-Frame Lock Flag
+    const u32 LSOF      : 2;    //!< Lost Start-of-Frame Number
+    u32                 : 13;
 } STRUCT_REGISTER_END USBFCR_reg;
 STRUCT_SIZE_ASSERT(USBFCR_reg, 4);
 
@@ -731,7 +797,7 @@ STRUCT_SIZE_ASSERT(USBEP0ISR_reg, 4);
 STRUCT_REGISTER_START {
     u32 TXCNT       : 7;    //!< Transmission Byte Count
     u32             : 9;
-    u32 RXCNT       : 7;    //!< Reception Byte Count
+    const u32 RXCNT : 7;    //!< Reception Byte Count
     u32             : 9;
 } STRUCT_REGISTER_END USBEP0TCR_reg;
 STRUCT_SIZE_ASSERT(USBEP0TCR_reg, 4);
@@ -741,12 +807,39 @@ STRUCT_REGISTER_START {
     u32 EPBUFA      : 10;   //!< Endpoint Buffer Address
     u32 EPLEN       : 7;    //!< Endpoint Buffer Length
     u32             : 7;
-    u32 EPADR       : 4;    //!< Endpoint Address
+    const u32 EPADR : 4;    //!< Endpoint Address
     u32             : 3;
-    u32 EPEN        : 1;    //!< Endpoint Enable Control
+    const u32 EPEN  : 1;    //!< Endpoint Enable Control
 } STRUCT_REGISTER_END USBEP0CFGR_reg;
-
 STRUCT_SIZE_ASSERT(USBEP0CFGR_reg, 4);
+
+// USBEPnIER
+STRUCT_REGISTER_START {
+    u32 OTRXIE      : 1;    //!< OUT Token Received Interrupt Enable
+    u32 ODRXIE      : 1;    //!< OUT Data Received Interrupt Enable
+    u32 ODOVIE      : 1;    //!< OUT Data Buffer Overrun Interrupt Enable
+    u32 ITRXIE      : 1;    //!< IN Token Received Interrupt Enable
+    u32 IDTXIE      : 1;    //!< IN Data Transmitted Interrupt Enable
+    u32 NAKIE       : 1;    //!< NAK Transmitted Interrupt Enable
+    u32 STLIE       : 1;    //!< STALL Transmitted Interrupt Enable
+    u32 UERIE       : 1;    //!< USB Error Interrupt Enable
+    u32             : 24;
+} STRUCT_REGISTER_END USBEPnIER_reg;
+STRUCT_SIZE_ASSERT(USBEPnIER_reg, 4);
+
+// USBEPnISR
+STRUCT_REGISTER_START {
+    u32 OTRXIF      : 1;    //!< OUT Token Received Interrupt Flag
+    u32 ODRXIF      : 1;    //!< OUT Data Received Interrupt Flag
+    u32 ODOVIF      : 1;    //!< OUT Data Buffer Overrun Interrupt Flag
+    u32 ITRXIF      : 1;    //!< IN Token Received Interrupt Flag
+    u32 IDTXIF      : 1;    //!< IN Data Transmitted Interrupt Flag
+    u32 NAKIF       : 1;    //!< NAK Transmitted Interrupt Flag
+    u32 STLIF       : 1;    //!< STALL Transmitted Interrupt Flag
+    u32 UERIF       : 1;    //!< USB Error Interrupt Flag
+    u32             : 24;
+} STRUCT_REGISTER_END USBEPnISR_reg;
+STRUCT_SIZE_ASSERT(USBEPnISR_reg, 4);
 
 // USBEPnCSR_1_3
 STRUCT_REGISTER_START {
@@ -758,45 +851,13 @@ STRUCT_REGISTER_START {
     u32 STLRX       : 1;    //!< STALL Status, for OUT transfer
     u32             : 26;
 } STRUCT_REGISTER_END USBEPnCSR_1_3_reg;
-
 STRUCT_SIZE_ASSERT(USBEPnCSR_1_3_reg, 4);
-
-// USBEPnIER_1_3
-STRUCT_REGISTER_START {
-    u32 OTRXIE      : 1;    //!< OUT Token Received Interrupt Enable
-    u32 ODRXIE      : 1;    //!< OUT Data Received Interrupt Enable
-    u32 ODOVIE      : 1;    //!< OUT Data Buffer Overrun Interrupt Enable
-    u32 ITRXIE      : 1;    //!< IN Token Received Interrupt Enable
-    u32 IDTXIE      : 1;    //!< IN Data Transmitted Interrupt Enable
-    u32 NAKIE       : 1;    //!< NAK Transmitted Interrupt Enable
-    u32 STLIE       : 1;    //!< STALL Transmitted Interrupt Enable
-    u32 UERIE       : 1;    //!< USB Error Interrupt Enable
-    u32             : 24;
-} STRUCT_REGISTER_END USBEPnIER_1_3_reg;
-
-STRUCT_SIZE_ASSERT(USBEPnIER_1_3_reg, 4);
-
-// USBEPnISR_1_3
-STRUCT_REGISTER_START {
-    u32 OTRXIF      : 1;    //!< OUT Token Received Interrupt Flag
-    u32 ODRXIF      : 1;    //!< OUT Data Received Interrupt Flag
-    u32 ODOVIF      : 1;    //!< OUT Data Buffer Overrun Interrupt Flag
-    u32 ITRXIF      : 1;    //!< IN Token Received Interrupt Flag
-    u32 IDTXIF      : 1;    //!< IN Data Transmitted Interrupt Flag
-    u32 NAKIF       : 1;    //!< NAK Transmitted Interrupt Flag
-    u32 STLIF       : 1;    //!< STALL Transmitted Interrupt Flag
-    u32 UERIF       : 1;    //!< USB Error Interrupt Flag
-    u32             : 24;
-} STRUCT_REGISTER_END USBEPnISR_1_3_reg;
-
-STRUCT_SIZE_ASSERT(USBEPnISR_1_3_reg, 4);
 
 // USBEPnTCR_1_3
 STRUCT_REGISTER_START {
     u32 TCNT        : 9;    //!< Transfer Byte Count
     u32             : 23;
 } STRUCT_REGISTER_END USBEPnTCR_1_3_reg;
-
 STRUCT_SIZE_ASSERT(USBEPnTCR_1_3_reg, 4);
 
 // USBEPnCFGR_1_3
@@ -810,7 +871,6 @@ STRUCT_REGISTER_START {
     u32             : 1;
     u32 EPEN        : 1;    //!< Enable Control
 } STRUCT_REGISTER_END USBEPnCFGR_1_3_reg;
-
 STRUCT_SIZE_ASSERT(USBEPnCFGR_1_3_reg, 4);
 
 // USBEPnCSR_4_7
@@ -825,38 +885,7 @@ STRUCT_REGISTER_START {
     u32 UDBTG       : 1;    //!< USB Double Buffer Toggle
     u32             : 24;
 } STRUCT_REGISTER_END USBEPnCSR_4_7_reg;
-
 STRUCT_SIZE_ASSERT(USBEPnCSR_4_7_reg, 4);
-
-// USBEPnIER_4_7
-STRUCT_REGISTER_START {
-    u32 OTRXIE      : 1;    //!< OUT Token Received Interrupt Enable
-    u32 ODRXIE      : 1;    //!< OUT Data Received Interrupt Enable
-    u32 ODOVIE      : 1;    //!< OUT Data Buffer Overrun Interrupt Enable
-    u32 ITRXIE      : 1;    //!< IN Token Received Interrupt Enable
-    u32 IDTXIE      : 1;    //!< IN Data Transmitted Interrupt Enable
-    u32 NAKIE       : 1;    //!< NAK Transmitted Interrupt Enable
-    u32 STLIE       : 1;    //!< STALL Transmitted Interrupt Enable
-    u32 UERIE       : 1;    //!< USB Error Interrupt Enable
-    u32             : 24;
-} STRUCT_REGISTER_END USBEPnIER_4_7_reg;
-
-STRUCT_SIZE_ASSERT(USBEPnIER_4_7_reg, 4);
-
-// USBEPnISR_4_7
-STRUCT_REGISTER_START {
-    u32 OTRXIF      : 1;    //!< OUT Token Received Interrupt Flag
-    u32 ODRXIF      : 1;    //!< OUT Data Received Interrupt Flag
-    u32 ODOVIF      : 1;    //!< OUT Data Buffer Overrun Interrupt Flag
-    u32 ITRXIF      : 1;    //!< IN Token Received Interrupt Flag
-    u32 IDTXIF      : 1;    //!< IN Data Transmitted Interrupt Flag
-    u32 NAKIF       : 1;    //!< NAK Transmitted Interrupt Flag
-    u32 STLIF       : 1;    //!< STALL Transmitted Interrupt Flag
-    u32 UERIF       : 1;    //!< USB Error Interrupt Flag
-    u32             : 24;
-} STRUCT_REGISTER_END USBEPnISR_4_7_reg;
-
-STRUCT_SIZE_ASSERT(USBEPnISR_4_7_reg, 4);
 
 // USBEPnTCR_4_7
 STRUCT_REGISTER_START {
@@ -865,7 +894,6 @@ STRUCT_REGISTER_START {
     u32 TCNT1       : 10;   //!< Buffer 1 Transfer Byte Count
     u32             : 6;
 } STRUCT_REGISTER_END USBEPnTCR_4_7_reg;
-
 STRUCT_SIZE_ASSERT(USBEPnTCR_4_7_reg, 4);
 
 // USBEPnCFGR_4_7
@@ -880,7 +908,6 @@ STRUCT_REGISTER_START {
     u32             : 1;
     u32 EPEN        : 1;    //!< Endpoint Enable Control
 } STRUCT_REGISTER_END USBEPnCFGR_4_7_reg;
-
 STRUCT_SIZE_ASSERT(USBEPnCFGR_4_7_reg, 4);
 
 // USB
@@ -888,7 +915,7 @@ typedef struct {
     USBCSR_reg   USBCSR;            //!< USB Control and Status
     USBIER_reg   USBIER;            //!< USB Interrupt Enable
     USBISR_reg   USBISR;            //!< USB Interrupt Status
-    USBFCR_reg   USBFCR;            //!< USB Frame Count
+    const USBFCR_reg USBFCR;        //!< USB Frame Count
     USBDEVAR_reg USBDEVAR;          //!< USB Device Address
 
     USBEP0CSR_reg  USBEP0CSR;       //!< USB Endpoint 0 Control and Status
@@ -898,44 +925,44 @@ typedef struct {
     USBEP0CFGR_reg USBEP0CFGR;      //!< USB Endpoint 0 Configuration
 
     USBEPnCSR_1_3_reg  USBEP1CSR;   //!< USB Endpoint 1 Control and Status
-    USBEPnIER_1_3_reg  USBEP1IER;   //!< USB Endpoint 1 Interrupt Enable
-    USBEPnISR_1_3_reg  USBEP1ISR;   //!< USB Endpoint 1 Interrupt Status
+    USBEPnIER_reg      USBEP1IER;   //!< USB Endpoint 1 Interrupt Enable
+    USBEPnISR_reg      USBEP1ISR;   //!< USB Endpoint 1 Interrupt Status
     USBEPnTCR_1_3_reg  USBEP1TCR;   //!< USB Endpoint 1 Transfer Count
     USBEPnCFGR_1_3_reg USBEP1CFGR;  //!< USB Endpoint 1 Configuration
 
     USBEPnCSR_1_3_reg  USBEP2CSR;   //!< USB Endpoint 2 Control and Status
-    USBEPnIER_1_3_reg  USBEP2IER;   //!< USB Endpoint 2 Interrupt Enable
-    USBEPnISR_1_3_reg  USBEP2ISR;   //!< USB Endpoint 2 Interrupt Status
+    USBEPnIER_reg      USBEP2IER;   //!< USB Endpoint 2 Interrupt Enable
+    USBEPnISR_reg      USBEP2ISR;   //!< USB Endpoint 2 Interrupt Status
     USBEPnTCR_1_3_reg  USBEP2TCR;   //!< USB Endpoint 2 Transfer Count
     USBEPnCFGR_1_3_reg USBEP2CFGR;  //!< USB Endpoint 2 Configuration
 
     USBEPnCSR_1_3_reg  USBEP3CSR;   //!< USB Endpoint 3 Control and Status
-    USBEPnIER_1_3_reg  USBEP3IER;   //!< USB Endpoint 3 Interrupt Enable
-    USBEPnISR_1_3_reg  USBEP3ISR;   //!< USB Endpoint 3 Interrupt Status
+    USBEPnIER_reg      USBEP3IER;   //!< USB Endpoint 3 Interrupt Enable
+    USBEPnISR_reg      USBEP3ISR;   //!< USB Endpoint 3 Interrupt Status
     USBEPnTCR_1_3_reg  USBEP3TCR;   //!< USB Endpoint 3 Transfer Count
     USBEPnCFGR_1_3_reg USBEP3CFGR;  //!< USB Endpoint 3 Configuration
 
     USBEPnCSR_4_7_reg  USBEP4CSR;   //!< USB Endpoint 4 Control and Status
-    USBEPnIER_4_7_reg  USBEP4IER;   //!< USB Endpoint 4 Interrupt Enable
-    USBEPnISR_4_7_reg  USBEP4ISR;   //!< USB Endpoint 4 Interrupt Status
+    USBEPnIER_reg      USBEP4IER;   //!< USB Endpoint 4 Interrupt Enable
+    USBEPnISR_reg      USBEP4ISR;   //!< USB Endpoint 4 Interrupt Status
     USBEPnTCR_4_7_reg  USBEP4TCR;   //!< USB Endpoint 4 Transfer Count
     USBEPnCFGR_4_7_reg USBEP4CFGR;  //!< USB Endpoint 4 Configuration
 
     USBEPnCSR_4_7_reg  USBEP5CSR;   //!< USB Endpoint 5 Control and Status
-    USBEPnIER_4_7_reg  USBEP5IER;   //!< USB Endpoint 5 Interrupt Enable
-    USBEPnISR_4_7_reg  USBEP5ISR;   //!< USB Endpoint 5 Interrupt Status
+    USBEPnIER_reg      USBEP5IER;   //!< USB Endpoint 5 Interrupt Enable
+    USBEPnISR_reg      USBEP5ISR;   //!< USB Endpoint 5 Interrupt Status
     USBEPnTCR_4_7_reg  USBEP5TCR;   //!< USB Endpoint 5 Transfer Count
     USBEPnCFGR_4_7_reg USBEP5CFGR;  //!< USB Endpoint 5 Configuration
 
     USBEPnCSR_4_7_reg  USBEP6CSR;   //!< USB Endpoint 6 Control and Status
-    USBEPnIER_4_7_reg  USBEP6IER;   //!< USB Endpoint 6 Interrupt Enable
-    USBEPnISR_4_7_reg  USBEP6ISR;   //!< USB Endpoint 6 Interrupt Status
+    USBEPnIER_reg      USBEP6IER;   //!< USB Endpoint 6 Interrupt Enable
+    USBEPnISR_reg      USBEP6ISR;   //!< USB Endpoint 6 Interrupt Status
     USBEPnTCR_4_7_reg  USBEP6TCR;   //!< USB Endpoint 6 Transfer Count
     USBEPnCFGR_4_7_reg USBEP6CFGR;  //!< USB Endpoint 6 Configuration
 
     USBEPnCSR_4_7_reg  USBEP7CSR;   //!< USB Endpoint 7 Control and Status
-    USBEPnIER_4_7_reg  USBEP7IER;   //!< USB Endpoint 7 Interrupt Enable
-    USBEPnISR_4_7_reg  USBEP7ISR;   //!< USB Endpoint 7 Interrupt Status
+    USBEPnIER_reg      USBEP7IER;   //!< USB Endpoint 7 Interrupt Enable
+    USBEPnISR_reg      USBEP7ISR;   //!< USB Endpoint 7 Interrupt Status
     USBEPnTCR_4_7_reg  USBEP7TCR;   //!< USB Endpoint 7 Transfer Count
     USBEPnCFGR_4_7_reg USBEP7CFGR;  //!< USB Endpoint 7 Configuration
 } USB_map;
@@ -1003,6 +1030,7 @@ STRUCT_REG_CHECK(USB, USBEP7CFGR);
 // Nested Vectored Interrupt Controller
 // ////////////////////////////////////////////////////////////////////////////////////////////////
 
+void _generic_intr();
 
 void ckcu_clocks_enable(int ahb_mask, int apb0_mask, int apb1_mask, int en);
 

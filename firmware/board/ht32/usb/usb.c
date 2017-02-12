@@ -29,62 +29,80 @@ void standard_synch_frame(USB_Request *request);
 void control_out();
 void control_in();
 
+void usb_ep_init(u8 ep, u8 eplen){
+    static u32 ep_adr = 0x8;
+    u32 wcfgr;
+    u32 wier;
+
+    if(ep == EP_0){
+        USBEP0CFGR_reg cfgr = {0};
+        cfgr.EPBUFA = ep_adr;
+        cfgr.EPLEN = eplen;
+
+        USBEP0IER_reg ier = {0};
+        ier.ODRXIE = 1; // OUT data received
+        ier.IDTXIE = 1; // IN data transmitted
+        ier.SDRXIE = 1; // SETUP data received
+
+        wcfgr = cfgr.word;
+        wier = ier.word;
+    } else {
+        if(ep < EP_4){
+            USBEPnCFGR_1_3_reg cfgr = {0};
+            cfgr.EPEN = 1;
+            cfgr.EPBUFA = ep_adr;
+            cfgr.EPLEN = eplen;
+
+            wcfgr = cfgr.word;
+        } else {
+            USBEPnCFGR_4_7_reg cfgr = {0};
+            cfgr.EPEN = 1;
+            cfgr.EPBUFA = ep_adr;
+            cfgr.EPLEN = eplen;
+
+            wcfgr = cfgr.word;
+        }
+
+        USBEPnIER_reg ier = {0};
+        ier.ODRXIE = 1; // OUT data received
+
+        wier = ier.word;
+    }
+
+    usb_dev.ep[ep].enable = 1;
+    usb_dev.ep[ep].length = eplen;
+    usb_dev.ep[ep].buffer = (volatile u8 *)(USB_SRAM_BASE + ep_adr);
+
+    ep_adr += eplen;
+
+    // backup ep config
+    usb_dev.ep[ep].cfgr = wcfgr;
+    usb_dev.ep[ep].ier = wier;
+
+    // set ep config
+    REG(USB_USBEPnCFGR(ep)) = wcfgr;
+    REG(USB_USBEPnIER(ep)) = wier;
+    REG(USB_USBEPnISR(ep)) = 0xFFFFFFFF;
+}
+
 void usb_init(){
+    // init global struct
     usb_dev.deviceFeature = FEAT_REMOTE_WAKEUP;
     usb_dev.currStatus = POWERED;
     usb_dev.prevStatus = POWERED;
 
+    for(int i = 0; i < 8; ++i)
+        usb_dev.ep[i].enable = 0;
+
     // enable USB clock
     REG_CKCU->AHBCCR.USBEN = 1;
-    // backup domain register access
-    REG_CKCU->APBCCR1.BKPREN = 1;
-
-//    ckcu_clocks_enable(1 << 10, 0, 1 << 6, 1);
-//    REG(CKCU_APBCCR1) = (1 << 6);
-//    REG(CKCU_AHBCCR) |= (1 << 10);
-
     // set usb prescaler
     REG_CKCU->GCFGR.USBPRE = 2;
 
-    // ep 0
-    usb_dev.ep0cfgr.word = 0;
-    usb_dev.ep0cfgr.EPBUFA = 0x8;
-    usb_dev.ep0cfgr.EPLEN = 64;
-    REG_USB->USBEP0CFGR = usb_dev.ep0cfgr;
-
-    usb_dev.ep0ier.word = 0;
-    usb_dev.ep0ier.ODRXIE = 1;
-    usb_dev.ep0ier.IDTXIE = 1;
-    usb_dev.ep0ier.SDRXIE = 1;
-    REG_USB->USBEP0IER = usb_dev.ep0ier;
-
-    REG_USB->USBEP0ISR.word = 0xFFFFFFFF;
-
-    // ep 1
-    usb_dev.ep1cfgr.word = 0;
-    usb_dev.ep1cfgr.EPEN = 1;
-    usb_dev.ep1cfgr.EPBUFA = 0x88;
-    usb_dev.ep1cfgr.EPLEN = 64;
-    REG_USB->USBEP1CFGR = usb_dev.ep1cfgr;
-
-    usb_dev.ep1ier.word = 0;
-    usb_dev.ep1ier.ODRXIE = 1;
-    REG_USB->USBEP1IER = usb_dev.ep1ier;
-
-    REG_USB->USBEP1ISR.word = 0xFFFFFFFF;
-
-    // ep 2
-    usb_dev.ep2cfgr.word = 0;
-    usb_dev.ep2cfgr.EPEN = 1;
-    usb_dev.ep2cfgr.EPBUFA = 0xc8;
-    usb_dev.ep2cfgr.EPLEN = 64;
-    REG_USB->USBEP2CFGR = usb_dev.ep2cfgr;
-
-    usb_dev.ep2ier.word = 0;
-    usb_dev.ep2ier.ODRXIE = 1;
-    REG_USB->USBEP2IER = usb_dev.ep2ier;
-
-    REG_USB->USBEP2ISR.word = 0xFFFFFFFF;
+    // init endpoints
+    usb_ep_init(EP_0, 64);
+    usb_ep_init(EP_1, 64);
+    usb_ep_init(EP_2, 64);
 
     // enable usb interrupts
     usb_dev.ier.word = USBIER_UGIE |
@@ -92,7 +110,8 @@ void usb_init(){
                        USBIER_URSTIE | USBIER_RSMIE | USBIER_SUSPIE;
     REG_USB->USBIER = usb_dev.ier;
 
-    // enable usb interrupt
+    // enable usb IRQ
+    nvic_enable_intr(USB_IRQ);
 }
 
 void usb_isr(){
@@ -175,6 +194,10 @@ void usb_clear_ep_int_flags(int ep, u32 flags){
     REG(USB_USBEPnISR(ep)) = flags;
 }
 
+void usb_pull_up(char en){
+    REG_USB->USBCSR.DPPUEN = en;
+}
+
 void usb_power_off(){
     // Enter low power mode, power down
     REG_USB->USBCSR.LPMODE = 1;
@@ -194,8 +217,8 @@ void usb_reset(){
     usb_power_on();
 
     // Reset EP0 config
-    REG_USB->USBEP0CFGR = usb_dev.ep0cfgr;
-    REG_USB->USBEP0IER = usb_dev.ep0ier;
+    REG_USB->USBEP0CFGR.word = usb_dev.ep[0].cfgr;
+    REG_USB->USBEP0IER.word = usb_dev.ep[0].ier;
     REG_USB->USBEP0ISR.word = 0xFFFFFFFF;
     REG_USB->USBEP0CSR.word &= EPnCSR_DTGTX | EPnCSR_DTGRX | EPnCSR_NAKRX;
 

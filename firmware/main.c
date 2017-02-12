@@ -1,41 +1,6 @@
-
-#include "common.h"
+#include "main.h"
 #include "board/ht32/usb/usb.h"
 #include "board/ht32/usb/descriptors.h"
-
-void __attribute__((weak)) gptm0_isr(){}
-void __attribute__((weak)) gptm1_isr(){}
-
-void __attribute__((weak)) bftm0_isr(){}
-void __attribute__((weak)) bftm1_isr(){}
-
-void __attribute__((weak)) spi0_isr(){}
-void __attribute__((weak)) spi1_isr(){}
-
-void wdt_init(){
-    // Enable watchdog register access
-    ckcu_clocks_enable(0, 0, 0x10, 1);
-//    REG(CKCU_APBCCR1) |= 0x10;
-
-    // Enable watchdog timer
-    unsigned long en = (REG(WDT_WDTMR0) & 0xfff) | 0x1a000;
-    for(unsigned i = 0; i < 7200000; ++i){
-        REG(WDT_WDTMR0) = en;
-        if(REG(WDT_WDTMR0) == 0x10000)
-            break;
-    }
-
-    // Set watchdog timer prescaler to 1/32
-    REG(WDT_WDTMR1) = (REG(WDT_WDTMR1) & 0xfff) | 0x5000;
-
-    // Set watchdog timer to 2000
-    REG(WDT_WDTMR0) = (REG(WDT_WDTMR0) & 0x1f000) | 0x7d0;
-
-    wdt_reload();
-
-    // Disable watchdog timer register protection
-    REG(WDT_WDTPR) = 0x35ca;
-}
 
 void ckcu_init(){
     // Backup domain
@@ -60,7 +25,36 @@ void ckcu_init(){
 }
 
 void nvic_init(){
+    // Set vector table address
+    nvic_set_vtor(FIRMWARE_ADDR);
+}
 
+void wdt_init(){
+    // Enable watchdog register access
+    ckcu_clocks_enable(0, 0, 0x10, 1);
+//    REG(CKCU_APBCCR1) |= 0x10;
+
+    // Enable watchdog timer
+    unsigned long en = (REG(WDT_WDTMR0) & 0xfff) | 0x1a000;
+    for(unsigned i = 0; i < 7200000; ++i){
+        REG(WDT_WDTMR0) = en;
+        if(REG(WDT_WDTMR0) == 0x10000)
+            break;
+    }
+
+    // Set watchdog timer prescaler to 1/32
+    REG(WDT_WDTMR1) = (REG(WDT_WDTMR1) & 0xfff) | 0x5000;
+
+    // Set watchdog timer to 2000
+    REG(WDT_WDTMR0) = (REG(WDT_WDTMR0) & 0x1f000) | 0x7d0;
+
+    wdt_reload();
+
+    // Disable watchdog timer register protection
+    REG(WDT_WDTPR) = 0x35ca;
+
+    // Enable watchdog debug mode
+    REG_CKCU->MCUDBGCR.DBWDT = 1;
 }
 
 void afio_init(){
@@ -98,31 +92,37 @@ void flash_version_clear(){
     REG_FMC->TADR.TADB = VERSION_ADDR;
     REG_FMC->OCMR.CMD = OCMR_PAGE_ERASE;
     REG_FMC->OPCR.OPM = OPCR_COMMIT;
-//    REG(FMC_TADR) = VERSION_ADDR;
-//    REG(FMC_OCMR) = OCMR_PAGE_ERASE;
-//    REG(FMC_OPCR) = OPCR_COMMIT;
 
     while(REG_FMC->OPCR.OPM != OPCR_FINISHED);
-//    while(REG(FMC_OPCR) != OPCR_FINISHED);
+}
+
+void onSuspend(){
+
 }
 
 int main(){
-    //wdt_init();
+    // Basic init
     ckcu_init();
     nvic_init();
 
+    // Watchdog
+    wdt_init();
+
 //    afio_init();
 
-    // Clear the version so we can get back to the bootloader
+    // Clear the version so the board resets to the bootloader
     flash_version_clear();
 
-//    usb_init_descriptors();
-//    usb_init();
+    // USB
+    usb_init_descriptors();
+    usb_init();
+    // Enable D+ pull-up
+    usb_pull_up(1);
 
     u32 count = 0;
-
     while(1){
         count = count + 1;
+        wdt_reload();
     }
 
     return 0;

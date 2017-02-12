@@ -6,11 +6,12 @@ PROJECT(Pok3r_Custom C ASM)
 ### =================== SOURCES =================== ###
 
 SET(COMMON_SOURCES
-    common.h
+    main.h
     main.c
 
     board/board.h
     board/cortex-m3.h
+    board/cortex-m3.c
 
     board/ht32/ht32.h
     board/ht32/ht32f165x.h

@@ -3778,6 +3778,7 @@ main:
     1f22:   4d19        ldr r5, [pc, #100]      ; r5 = (0x1f88)
     1f24:   4c19        ldr r4, [pc, #100]      ; r4 =(0x1f8c)
     1f26:   2601        movs r6, #1
+
   0x1f28:   6860        ldr r0, [r4, #4]
     1f2a:   b938        cbnz r0, 0x1f3c
     1f2c:   f895 0032   ldrb.w r0, [r5, #50]    ; 0x32

@@ -112,6 +112,16 @@ typedef enum {
 } USB_Status;
 
 typedef struct {
+    u8 enable;
+    u8 length;
+    volatile u8 *buffer;
+
+    // endpoint config backup
+    u32 cfgr;
+    u32 ier;
+} USB_Endpoint;
+
+typedef struct {
     USB_Status currStatus;
     USB_Status prevStatus;
 
@@ -119,17 +129,12 @@ typedef struct {
 
     USBIER_reg ier;
 
-    USBEP0CFGR_reg ep0cfgr;
-    USBEP0IER_reg ep0ier;
-    USBEPnCFGR_1_3_reg ep1cfgr;
-    USBEPnIER_1_3_reg ep1ier;
-    USBEPnCFGR_1_3_reg ep2cfgr;
-    USBEPnIER_1_3_reg ep2ier;
-
+    USB_Endpoint ep[8];
     USB_Descriptors descriptors;
 } USB_Device;
 
 // API
 void usb_init();
+void usb_pull_up(char en);
 
 #endif // USB_H
