@@ -62,10 +62,10 @@ void gpio_set_pin_pull_up_down(int port, int pin, int mode){
 
 void afio_pin_config(int port, int pin, int function){
     if(pin & 0x8){
-        REG(AFIO_GPnCFGHR(port)) &= (0xf << ((pin & 0x7) * 4));
-        REG(AFIO_GPnCFGHR(port)) |= (function << ((pin & 0x7) * 4));
+        REG(AFIO_GPxCFGHR(port)) &= (0xf << ((pin & 0x7) * 4));
+        REG(AFIO_GPxCFGHR(port)) |= (function << ((pin & 0x7) * 4));
     } else {
-        REG(AFIO_GPnCFGLR(port)) &= (0xf << (pin * 4));
-        REG(AFIO_GPnCFGLR(port)) |= (function << (pin * 4));
+        REG(AFIO_GPxCFGLR(port)) &= (0xf << (pin * 4));
+        REG(AFIO_GPxCFGLR(port)) |= (function << (pin * 4));
     }
 }

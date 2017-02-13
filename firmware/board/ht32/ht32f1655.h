@@ -6,6 +6,20 @@
 #define FLASH_SIZE      0x20000 // 128k
 #define SRAM_SIZE       0x8000  // 32k
 
+// Peripherals
+// ////////////////////////////////////////////////////////////////////////////////////////////////
+#define GPIO_A          0
+#define GPIO_B          1
+#define GPIO_C          2
+#define GPIO_D          3
+#define GPIO_E          4
+
+#define GPIO_A_BASE     0x400B0000
+#define GPIO_B_BASE     0x400B2000
+#define GPIO_C_BASE     0x400B4000
+#define GPIO_D_BASE     0x400B6000
+#define GPIO_E_BASE     0x400B8000
+
 // Clock Control Unit
 // ////////////////////////////////////////////////////////////////////////////////////////////////
 #define CKCU_GCFGR      CKCU_BASE + 0x0     // Global Clock Configuration
@@ -367,14 +381,264 @@ STRUCT_REG_CHECK(RSTCU, APBPRSTR1);
 
 // General Purpose I/O
 // ////////////////////////////////////////////////////////////////////////////////////////////////
-#define GPIO_B_BASE     0x400B2000
-#define GPIO_C_BASE     0x400B4000
-#define GPIO_D_BASE     0x400B6000
-#define GPIO_E_BASE     0x400B8000
+#define GPIOn_BASE(n)   GPIO_A_BASE + (n * 0x2000)
 
-#define GPIO_B          1
-#define GPIO_C          2
-#define GPIO_D          3
-#define GPIO_E          4
+#define GPIOn_PnDIRCR(n)    GPIOn_BASE(n) + 0x0     // Port n Data Direction Control
+#define GPIOn_PnINER(n)     GPIOn_BASE(n) + 0x4     // Port n Input Function Enable Control
+#define GPIOn_PnPUR(n)      GPIOn_BASE(n) + 0x8     // Port n Pull-Up Selection
+#define GPIOn_PnPDR(n)      GPIOn_BASE(n) + 0xC     // Port n Pull-Down Selection
+#define GPIOn_PnODR(n)      GPIOn_BASE(n) + 0x10    // Port n Open Drain Selection
+#define GPIOn_PnDRVR(n)     GPIOn_BASE(n) + 0x14    // Port n Drive Current Selection
+#define GPIOn_PnLOCKR(n)    GPIOn_BASE(n) + 0x18    // Port n Lock
+#define GPIOn_PnDINR(n)     GPIOn_BASE(n) + 0x1C    // Port n Data Input
+#define GPIOn_PnDOUTR(n)    GPIOn_BASE(n) + 0x20    // Port n Data Output
+#define GPIOn_PnSRR(n)      GPIOn_BASE(n) + 0x24    // Port n Output Set and Reset Control
+#define GPIOn_PnRR(n)       GPIOn_BASE(n) + 0x28    // Port n Output Reset Control
+
+// Alternate Function I/O Unit
+// ////////////////////////////////////////////////////////////////////////////////////////////////
+#define AFIO_ESSR0      AFIO_BASE + 0x0
+#define AFIO_ESSR1      AFIO_BASE + 0x4
+
+#define AFIO_GPxCFGLR(n)    AFIO_BASE + 0x20 + (n * 0x8)    // GPIO Port n Configuration 0
+#define AFIO_GPxCFGHR(n)    AFIO_BASE + 0x24 + (n * 0x8)    // GPIO Port n Configuration 1
+
+#define AFIO_GPACFGLR   AFIO_GPxCFGLR(GPIO_A)
+#define AFIO_GPACFGHR   AFIO_GPxCFGHR(GPIO_A)
+
+#define AFIO_GPBCFGLR   AFIO_GPxCFGLR(GPIO_B)
+#define AFIO_GPBCFGHR   AFIO_GPxCFGHR(GPIO_B)
+
+#define AFIO_GPCCFGLR   AFIO_GPxCFGLR(GPIO_C)
+#define AFIO_GPCCFGHR   AFIO_GPxCFGHR(GPIO_C)
+
+#define AFIO_GPDCFGLR   AFIO_GPxCFGLR(GPIO_D)
+#define AFIO_GPDCFGHR   AFIO_GPxCFGHR(GPIO_D)
+
+#define AFIO_GPECFGLR   AFIO_GPxCFGLR(GPIO_E)
+#define AFIO_GPECFGHR   AFIO_GPxCFGHR(GPIO_E)
+
+// ESSR0
+STRUCT_REGISTER_START {
+    u32 EXTI0PIN    : 4;    //!< EXTI0 Pin Selection
+    u32 EXTI1PIN    : 4;    //!< EXTI1 Pin Selection
+    u32 EXTI2PIN    : 4;    //!< EXTI2 Pin Selection
+    u32 EXTI3PIN    : 4;    //!< EXTI3 Pin Selection
+    u32 EXTI4PIN    : 4;    //!< EXTI4 Pin Selection
+    u32 EXTI5PIN    : 4;    //!< EXTI5 Pin Selection
+    u32 EXTI6PIN    : 4;    //!< EXTI6 Pin Selection
+    u32 EXTI7PIN    : 4;    //!< EXTI7 Pin Selection
+} STRUCT_REGISTER_END ESSR0_reg;
+STRUCT_SIZE_ASSERT(ESSR0_reg, 4);
+
+// ESSR1
+STRUCT_REGISTER_START {
+    u32 EXTI8PIN    : 4;    //!< EXTI8 Pin Selection
+    u32 EXTI9PIN    : 4;    //!< EXTI9 Pin Selection
+    u32 EXTI10PIN   : 4;    //!< EXTI10 Pin Selection
+    u32 EXTI11PIN   : 4;    //!< EXTI11 Pin Selection
+    u32 EXTI12PIN   : 4;    //!< EXTI12 Pin Selection
+    u32 EXTI13PIN   : 4;    //!< EXTI13 Pin Selection
+    u32 EXTI14PIN   : 4;    //!< EXTI14 Pin Selection
+    u32 EXTI15PIN   : 4;    //!< EXTI15 Pin Selection
+} STRUCT_REGISTER_END ESSR1_reg;
+STRUCT_SIZE_ASSERT(ESSR1_reg, 4);
+
+// GPxCFGLR
+STRUCT_REGISTER_START {
+    u32 PxCFG0      : 4;    //!< Alternate Function Select for Port x Pin 0
+    u32 PxCFG1      : 4;    //!< Alternate Function Select for Port x Pin 1
+    u32 PxCFG2      : 4;    //!< Alternate Function Select for Port x Pin 2
+    u32 PxCFG3      : 4;    //!< Alternate Function Select for Port x Pin 3
+    u32 PxCFG4      : 4;    //!< Alternate Function Select for Port x Pin 4
+    u32 PxCFG5      : 4;    //!< Alternate Function Select for Port x Pin 5
+    u32 PxCFG6      : 4;    //!< Alternate Function Select for Port x Pin 6
+    u32 PxCFG7      : 4;    //!< Alternate Function Select for Port x Pin 7
+} STRUCT_REGISTER_END GPxCFGLR_reg;
+STRUCT_SIZE_ASSERT(GPxCFGLR_reg, 4);
+
+// GPxCFGHR
+STRUCT_REGISTER_START {
+    u32 PxCFG8      : 4;    //!< Alternate Function Select for Port x Pin 8
+    u32 PxCFG9      : 4;    //!< Alternate Function Select for Port x Pin 9
+    u32 PxCFG10     : 4;    //!< Alternate Function Select for Port x Pin 10
+    u32 PxCFG11     : 4;    //!< Alternate Function Select for Port x Pin 11
+    u32 PxCFG12     : 4;    //!< Alternate Function Select for Port x Pin 12
+    u32 PxCFG13     : 4;    //!< Alternate Function Select for Port x Pin 13
+    u32 PxCFG14     : 4;    //!< Alternate Function Select for Port x Pin 14
+    u32 PxCFG15     : 4;    //!< Alternate Function Select for Port x Pin 15
+} STRUCT_REGISTER_END GPxCFGHR_reg;
+STRUCT_SIZE_ASSERT(GPxCFGHR_reg, 4);
+
+typedef struct {
+    ESSR0_reg ESSR0;
+    ESSR1_reg ESSR1;
+    u8 _pad1[0x18];
+
+    GPxCFGLR_reg GPACFGLR;
+    GPxCFGHR_reg GPACFGHR;
+
+    GPxCFGLR_reg GPBCFGLR;
+    GPxCFGHR_reg GPBCFGHR;
+
+    GPxCFGLR_reg GPCCFGLR;
+    GPxCFGHR_reg GPCCFGHR;
+
+    GPxCFGLR_reg GPDCFGLR;
+    GPxCFGHR_reg GPDCFGHR;
+
+    GPxCFGLR_reg GPECFGLR;
+    GPxCFGHR_reg GPECFGHR;
+} AFIO_map;
+STRUCT_SIZE_ASSERT(AFIO_map, 0x48);
+
+#define REG_AFIO ((volatile AFIO_map *)AFIO_BASE)
+
+STRUCT_REG_CHECK(AFIO, ESSR0);
+STRUCT_REG_CHECK(AFIO, ESSR1);
+STRUCT_REG_CHECK(AFIO, GPACFGLR);
+STRUCT_REG_CHECK(AFIO, GPACFGHR);
+STRUCT_REG_CHECK(AFIO, GPBCFGLR);
+STRUCT_REG_CHECK(AFIO, GPBCFGHR);
+STRUCT_REG_CHECK(AFIO, GPCCFGLR);
+STRUCT_REG_CHECK(AFIO, GPCCFGHR);
+STRUCT_REG_CHECK(AFIO, GPDCFGLR);
+STRUCT_REG_CHECK(AFIO, GPDCFGHR);
+STRUCT_REG_CHECK(AFIO, GPECFGLR);
+STRUCT_REG_CHECK(AFIO, GPECFGHR);
+
+// SPI
+// ////////////////////////////////////////////////////////////////////////////////////////////////
+#define SPI_SPICR0      SPI0_BASE + 0x0     // SPI Control Register 0
+#define SPI_SPICR1      SPI0_BASE + 0x4     // SPI Control Register 1
+#define SPI_SPIIER      SPI0_BASE + 0x8     // SPI Interrupt Enable Register
+#define SPI_SPICPR      SPI0_BASE + 0xC     // SPI Clock Prescaler Register
+#define SPI_SPIDR       SPI0_BASE + 0x10    // SPI Data Register
+#define SPI_SPISR       SPI0_BASE + 0x14    // SPI Status Register
+#define SPI_SPIFCR      SPI0_BASE + 0x18    // SPI FIFI Control Register
+#define SPI_SPIFSR      SPI0_BASE + 0x1C    // SPI FIFO Status Register
+#define SPI_SPIFTOCR    SPI0_BASE + 0x20    // SPI FIFO Time Out Register
+
+// SPICR0
+STRUCT_REGISTER_START {
+    u32 SPIEN   : 1;    //!< SPI Enable
+    u32 TXDMAE  : 1;    //!< TX PDMA Request Enable
+    u32 RXDMAE  : 1;    //!< RX PDMA Request Enable
+    u32 SELOEN  : 1;    //!< Slave Select Output Enable
+    u32 SSELC   : 1;    //!< Software Slave Select Control
+    u32         : 1;
+    u32 DUALEN  : 1;    //!< Dual Port Enable
+    u32 GUADTEN : 1;    //!< Guard Time Enable
+    u32 GUADT   : 4;    //!< Guard Time
+    u32 SELHT   : 4;    //!< Chip Select Hold Time
+    u32         : 16;
+} STRUCT_REGISTER_END SPICR0_reg;
+STRUCT_SIZE_ASSERT(SPICR0_reg, 4);
+
+// SPICR1
+STRUCT_REGISTER_START {
+    u32 DFL         : 4;    //!< Data Frame Length
+    u32             : 4;
+    u32 FORMAT      : 3;    //!< SPI Data Transfer Format
+    u32 SELAP       : 1;    //!< Slave Select Active Priority
+    u32 FIRSTBIT    : 1;    //!< LSB or MSB Transmitted First
+    u32 SELM        : 1;    //!< Slave Select Mode
+    u32 MODE        : 1;    //!< Master or Slave Mode
+    u32             : 17;
+} STRUCT_REGISTER_END SPICR1_reg;
+STRUCT_SIZE_ASSERT(SPICR1_reg, 4);
+
+// SPIIER
+STRUCT_REGISTER_START {
+    u32 TXBEIEN     : 1;    //!< TX Buffer Empty Interrupt Enable
+    u32 TXEIEN      : 1;    //!< TX Empty Interrupt Enable
+    u32 RXBNEIEN    : 1;    //!< RX Buffer Not Empty Interrupt Enable
+    u32 WCIEN       : 1;    //!< Write Collison Interrupt Enable
+    u32 ROIEN       : 1;    //!< Read Overrun Interrupt Enable
+    u32 MFIEN       : 1;    //!< Mode Fault Interrupt Enable
+    u32 SAIEN       : 1;    //!< Slave Abort Interrupt Enable
+    u32 TOIEN       : 1;    //!< Time Out Interrupt Enable
+    u32             : 24;
+} STRUCT_REGISTER_END SPIIER_reg;
+STRUCT_SIZE_ASSERT(SPIIER_reg, 4);
+
+// SPICPR
+STRUCT_REGISTER_START {
+    u32 CP  : 16;    //!< SPI Clock Prescaler
+    u32     : 16;
+} STRUCT_REGISTER_END SPICPR_reg;
+STRUCT_SIZE_ASSERT(SPICPR_reg, 4);
+
+// SPIDR
+STRUCT_REGISTER_START {
+    u32 DR  : 16;    //!< Data Register
+    u32     : 16;
+} STRUCT_REGISTER_END SPIDR_reg;
+STRUCT_SIZE_ASSERT(SPIDR_reg, 4);
+
+// SPISR
+STRUCT_REGISTER_START {
+    const u32 TXBE  : 1;    //!< Transmit Buffer Empty Flag
+    const u32 TXE   : 1;    //!< Transmission Register Empty Flag
+    const u32 RXBNE : 1;    //!< Receive Buffer Not Empty Flag
+    u32 WC          : 1;    //!< Write Collision Flag
+    u32 RO          : 1;    //!< Read Overrun Flag
+    u32 MF          : 1;    //!< Mode Fault Flag
+    u32 SA          : 1;    //!< Slave Abort Flag
+    u32 TO          : 1;    //!< Time Out Flag
+    const u32 BUSY  : 1;    //!< SPI Busy Flag
+    u32             : 23;
+} STRUCT_REGISTER_END SPISR_reg;
+STRUCT_SIZE_ASSERT(SPISR_reg, 4);
+
+// SPIFCR
+STRUCT_REGISTER_START {
+    u32 TXFTLS  : 4;    //!< TX FIFO Trigger Level Select
+    u32 RXFTLS  : 4;    //!< RX FIFO Trigger Level Select
+    u32         : 2;
+    u32 FIFOEN  : 1;    //!< FIFO Enable
+    u32         : 21;
+} STRUCT_REGISTER_END SPIFCR_reg;
+STRUCT_SIZE_ASSERT(SPIFCR_reg, 4);
+
+// SPIFSR
+STRUCT_REGISTER_START {
+    u32 TXFS    : 4;    //!< TX FIFO Status
+    u32 RXFS    : 4;    //!< RX FIFO Status
+    u32         : 24;
+} STRUCT_REGISTER_END SPIFSR_reg;
+STRUCT_SIZE_ASSERT(SPIFSR_reg, 4);
+
+// SPIFTOCR
+STRUCT_REGISTER_START {
+    u32 TOC     : 32;    //!< Time Out Counter
+} STRUCT_REGISTER_END SPIFTOCR_reg;
+STRUCT_SIZE_ASSERT(SPIFTOCR_reg, 4);
+
+typedef struct {
+    SPICR0_reg SPICR0;
+    SPICR1_reg SPICR1;
+    SPIIER_reg SPIIER;
+    SPICPR_reg SPICPR;
+    SPIDR_reg SPIDR;
+    SPISR_reg SPISR;
+    SPIFCR_reg SPIFCR;
+    SPIFSR_reg SPIFSR;
+    SPIFTOCR_reg SPIFTOCR;
+} SPI_map;
+STRUCT_SIZE_ASSERT(SPI_map, 0x24);
+
+#define REG_SPI0 ((volatile SPI_map *)SPI0_BASE)
+#define REG_SPI1 ((volatile SPI_map *)SPI1_BASE)
+
+STRUCT_ADDR_ASSERT(REG_SPI0->SPICR0, SPI_SPICR0);
+STRUCT_ADDR_ASSERT(REG_SPI0->SPICR1, SPI_SPICR1);
+STRUCT_ADDR_ASSERT(REG_SPI0->SPIIER, SPI_SPIIER);
+STRUCT_ADDR_ASSERT(REG_SPI0->SPICPR, SPI_SPICPR);
+STRUCT_ADDR_ASSERT(REG_SPI0->SPIDR, SPI_SPIDR);
+STRUCT_ADDR_ASSERT(REG_SPI0->SPISR, SPI_SPISR);
+STRUCT_ADDR_ASSERT(REG_SPI0->SPIFCR, SPI_SPIFCR);
+STRUCT_ADDR_ASSERT(REG_SPI0->SPIFSR, SPI_SPIFSR);
+STRUCT_ADDR_ASSERT(REG_SPI0->SPIFTOCR, SPI_SPIFTOCR);
 
 #endif // HT32F1655_H

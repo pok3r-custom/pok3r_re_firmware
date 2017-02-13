@@ -3767,7 +3767,7 @@ function_11:
     4d5c:   bd7c        pop {r2, r3, r4, r5, r6, pc}
     4d5e:   0000        movs r0, r0
 
-  0x4d60:   0x400b2000
+  0x4d60:   0x400b2000  ; GPIO B
 
 function_29:
   0x4d64:   b570        push {r4, r5, r6, lr}
@@ -3798,15 +3798,15 @@ function_29:
     4d9e:   900a        str r0, [sp, #40]   ; 0x28
     4da0:   4669        mov r1, sp
     4da2:   4630        mov r0, r6
-    4da4:   f001 fbf2   bl 0x658c                   ; call function_e_54
+    4da4:   f001 fbf2   bl 0x658c                   ; call function_e_54(SPI1, sp)
     4da8:   2101        movs r1, #1
     4daa:   4630        mov r0, r6
-    4dac:   f001 fc20   bl 0x65f0                   ; call function_e_55
+    4dac:   f001 fc20   bl 0x65f0                   ; call spi_slave_select_output(SPI1, 1)
     4db0:   4808        ldr r0, [pc, #32]   ; (0x4dd4)
     4db2:   6245        str r5, [r0, #36]   ; 0x24
     4db4:   2101        movs r1, #1
     4db6:   4630        mov r0, r6
-    4db8:   f001 fbde   bl 0x6578                   ; call function_e_53
+    4db8:   f001 fbde   bl 0x6578                   ; call spi_enable(SPI1, 1)
     4dbc:   f000 f840   bl 0x4e40
     4dc0:   2002        movs r0, #2
     4dc2:   7020        strb r0, [r4, #0]
@@ -3902,7 +3902,7 @@ pinmux_b789_spi:
 
 pinmux_b789_gpio:
   0x4e84:   b570        push {r4, r5, r6, lr}
-    4e86:   f000 f88b   bl 0x4fa0               ; call function_42
+    4e86:   f000 f88b   bl 0x4fa0               ; call spi_flash_deep_power_down
     4e8a:   4d0f        ldr r5, [pc, #60]       ; r5 = (0x4ec8)
     4e8c:   f44f 6480   mov.w r4, #1024         ; r4 = 0x400
     4e90:   2200        movs r2, #0
@@ -3930,10 +3930,10 @@ pinmux_b789_gpio:
 
   0x4ec8:   0x400b2000  ; GPIO B
 
-function_e_38:
-    ; r0 =
-    ; r1 =
-    ; r2 =
+spi_flash_page_program:
+    ; r0 = src ptr
+    ; r1 = addr
+    ; r2 = len
   0x4ecc:   e92d 43f8   stmdb sp!, {r3, r4, r5, r6, r7, r8, r9, lr}
     4ed0:   4607        mov r7, r0
     4ed2:   460c        mov r4, r1
@@ -3942,6 +3942,7 @@ function_e_38:
     4eda:   4e0e        ldr r6, [pc, #56]   ; (0x4f14)
     4edc:   f44f 6580   mov.w r5, #1024   ; 0x400
     4ee0:   62b5        str r5, [r6, #40]   ; 0x28
+
     4ee2:   2002        movs r0, #2
     4ee4:   f88d 0000   strb.w r0, [sp]
     4ee8:   0c20        lsrs r0, r4, #16
@@ -3963,7 +3964,7 @@ function_e_38:
 
   0x4f14:   0x400b2000  ; GPIO B
 
-function_e_39:
+spi_flash_sector_erase:
     ; r0 =
   0x4f18:   b5f8        push {r3, r4, r5, r6, r7, lr}
     4f1a:   4604        mov r4, r0
@@ -3972,12 +3973,12 @@ function_e_39:
     4f22:   f44f 6580   mov.w r5, #1024   ; 0x400
     4f26:   62b5        str r5, [r6, #40]   ; 0x28
     4f28:   2020        movs r0, #32
-    4f2a:   f88d 0000   strb.w r0, [sp]
+    4f2a:   f88d 0000   strb.w r0, [sp]     ; [sp + 0] = 0x20
     4f2e:   0c20        lsrs r0, r4, #16
-    4f30:   f88d 0001   strb.w r0, [sp, #1]
+    4f30:   f88d 0001   strb.w r0, [sp, #1] ; [sp + 1] = a0 >> 16
     4f34:   0a20        lsrs r0, r4, #8
-    4f36:   f88d 0002   strb.w r0, [sp, #2]
-    4f3a:   f88d 4003   strb.w r4, [sp, #3]
+    4f36:   f88d 0002   strb.w r0, [sp, #2] ; [sp + 2] = a0 >> 8
+    4f3a:   f88d 4003   strb.w r4, [sp, #3] ; [sp + 3] = a0
     4f3e:   2204        movs r2, #4
     4f40:   2100        movs r1, #0
     4f42:   4668        mov r0, sp
@@ -3987,7 +3988,7 @@ function_e_39:
 
   0x4f4c:   0x400b2000  ; GPIO B
 
-function_76:
+spi_flash_write_status_register:
     ; r0 =
   0x4f50:   b5f8        push {r3, r4, r5, r6, r7, lr}
     4f52:   4606        mov r6, r0              ; r6 = r0
@@ -4010,9 +4011,10 @@ function_76:
 function_78:
   0x4f7c:   b510        push {r4, lr}
     4f7e:   243c        movs r4, #60            ; 0x3c
-    4f80:   f7ff ffa4   bl 0x4ecc               ; call funtion_e_38
+    4f80:   f7ff ffa4   bl 0x4ecc               ; call spi_flash_page_program(r0, r1, r2)
     4f84:   e005        b.n 0x4f92
-    4f86:   2064        movs r0, #100           ; 0x64
+
+  0x4f86:   2064        movs r0, #100           ; 0x64
     4f88:   f7fe f9a0   bl 0x32cc               ; call spin_wait_maybe(100)
     4f8c:   f7ff ff24   bl 0x4dd8               ; call function_10
     4f90:   b118        cbz r0, 0x4f9a
@@ -4020,11 +4022,12 @@ function_78:
     4f94:   1c60        adds r0, r4, #1
     4f96:   d1f6        bne.n 0x4f86
     4f98:   bd10        pop {r4, pc}
-    4f9a:   2001        movs r0, #1
+
+  0x4f9a:   2001        movs r0, #1
     4f9c:   bd10        pop {r4, pc}
     4f9e:   0000
 
-function_42:
+spi_flash_deep_power_down:
   0x4fa0:   b538        push {r3, r4, r5, lr}
     4fa2:   4c08        ldr r4, [pc, #32]       ; (0x4fc4)
     4fa4:   20b9        movs r0, #185           ; 0xb9
@@ -4042,16 +4045,17 @@ function_42:
 
   0x4fc4:   0x400b2000  ; GPIO B
 
-function_25:
-    ; r0 =
-    ; r1 =
-    ; r2 =
+spi_flash_read_data:
+    ; r0 = dest ptr
+    ; r1 = addr
+    ; r2 = len
   0x4fc8:   b5f8        push {r3, r4, r5, r6, r7, lr}
     4fca:   4d0e        ldr r5, [pc, #56]       ; r5 = (0x5004)
     4fcc:   f44f 6480   mov.w r4, #1024         ; r4 = 0x400
     4fd0:   4607        mov r7, r0
     4fd2:   4616        mov r6, r2
     4fd4:   62ac        str r4, [r5, #40]       ; 0x28
+
     4fd6:   2003        movs r0, #3
     4fd8:   f88d 0000   strb.w r0, [sp]
     4fdc:   0c08        lsrs r0, r1, #16
@@ -4097,7 +4101,7 @@ spi_write_read:
     5026:   6048        str r0, [r1, #4]        ; [r1 + 4] = r0
     5028:   f002 f88c   bl 0x7144               ; call watchdog_reload_timer
 
-                                                ; r0 = max(r7, 8)
+                                                ; r0 = min(r7, 8)
   0x502c:   2f08        cmp r7, #8
     502e:   d901        bls.n 0x5034            ; branch if r7 < 8
     5030:   2008        movs r0, #8             ; r0 = 8
@@ -4170,9 +4174,10 @@ spi_write_read:
   0x509c:   0x40044000  ; SPI1 registers
 
 function_e_40:
+    ; r0 =
   0x50a0:   b570        push {r4, r5, r6, lr}
     50a2:   f240 142d   movw r4, #301   ; 0x12d
-    50a6:   f7ff ff37   bl 0x4f18               ; call function_e_39
+    50a6:   f7ff ff37   bl 0x4f18               ; call spi_flash_sector_erase(r0)
     50aa:   f44f 757a   mov.w r5, #1000   ; 0x3e8
     50ae:   e005        b.n 0x50bc
     50b0:   4628        mov r0, r5
@@ -4274,11 +4279,11 @@ function_77:
 function_28:
   0x518c:   b510        push {r4, lr}
     518e:   f44f 74cd   mov.w r4, #410   ; 0x19a
-    5192:   f7ff fedd   bl 0x4f50
+    5192:   f7ff fedd   bl 0x4f50               ; call spi_flash_write_status_register
     5196:   e005        b.n 0x51a4
     5198:   2064        movs r0, #100   ; 0x64
     519a:   f7fe f897   bl 0x32cc               ; spin_wait_maybe(100)
-    519e:   f7ff fe1b   bl 0x4dd8               ; function_10
+    519e:   f7ff fe1b   bl 0x4dd8               ; call function_10
     51a2:   b118        cbz r0, 0x51ac
     51a4:   1e64        subs r4, r4, #1
     51a6:   1c60        adds r0, r4, #1
@@ -6331,7 +6336,9 @@ function_e_52:
   0x6570:   0x8d34      ; data_15
   0x6574:   0x20002e2c
 
-function_e_53:
+spi_enable:
+    ; r0 = SPI registers
+    ; r1 = 1
   0x6578:   2900        cmp r1, #0
     657a:   6801        ldr r1, [r0, #0]
     657c:   d002        beq.n 0x6584
@@ -6342,25 +6349,35 @@ function_e_53:
     658a:   4770        bx lr
 
 function_e_54:
+    ; r0 = SPI registers
+    ; r1 = ptr
   0x658c:   b530        push {r4, r5, lr}
     658e:   694a        ldr r2, [r1, #20]
     6590:   f5b2 6f80   cmp.w r2, #1024   ; 0x400
     6594:   d001        beq.n 0x659a
     6596:   b15a        cbz r2, 0x65b0
     6598:   e00c        b.n 0x65b4
-    659a:   698a        ldr r2, [r1, #24]
+
+    ; if r1[20] == 0x400
+  0x659a:   698a        ldr r2, [r1, #24]
     659c:   b112        cbz r2, 0x65a4
     659e:   2a01        cmp r2, #1
     65a0:   d003        beq.n 0x65aa
     65a2:   e007        b.n 0x65b4
-    65a4:   f44f 62c0   mov.w r2, #1536   ; 0x600
+        ; if r1[24] == 0
+  0x65a4:   f44f 62c0   mov.w r2, #1536   ; 0x600
     65a8:   e006        b.n 0x65b8
-    65aa:   f44f 62a0   mov.w r2, #1280   ; 0x500
+        ; if r1[24] == 1
+  0x65aa:   f44f 62a0   mov.w r2, #1280   ; 0x500
     65ae:   e003        b.n 0x65b8
-    65b0:   698a        ldr r2, [r1, #24]
+
+    ; if r1[20] == 0
+  0x65b0:   698a        ldr r2, [r1, #24]
     65b2:   b1d2        cbz r2, 0x65ea
-    65b4:   f44f 7200   mov.w r2, #512   ; 0x200
-    65b8:   688c        ldr r4, [r1, #8]
+    ; else
+  0x65b4:   f44f 7200   mov.w r2, #512   ; 0x200
+
+  0x65b8:   688c        ldr r4, [r1, #8]
     65ba:   680b        ldr r3, [r1, #0]
     65bc:   4323        orrs r3, r4
     65be:   e9d1 4503   ldrd r4, r5, [r1, #12]
@@ -6369,22 +6386,25 @@ function_e_54:
     65c6:   69cc        ldr r4, [r1, #28]
     65c8:   4323        orrs r3, r4
     65ca:   4313        orrs r3, r2
-    65cc:   6043        str r3, [r0, #4]
+    65cc:   6043        str r3, [r0, #4]    ; set SPICR1
     65ce:   6a4b        ldr r3, [r1, #36]   ; 0x24
     65d0:   684a        ldr r2, [r1, #4]
     65d2:   431a        orrs r2, r3
     65d4:   6a0b        ldr r3, [r1, #32]
     65d6:   ea42 1203   orr.w r2, r2, r3, lsl #4
-    65da:   6182        str r2, [r0, #24]
+    65da:   6182        str r2, [r0, #24]   ; set SPIFCR
     65dc:   6a89        ldr r1, [r1, #40]   ; 0x28
     65de:   f04f 32ff   mov.w r2, #4294967295   ; 0xffffffff
     65e2:   eb02 0151   add.w r1, r2, r1, lsr #1
-    65e6:   60c1        str r1, [r0, #12]
+    65e6:   60c1        str r1, [r0, #12]   ; set SPICPR
     65e8:   bd30        pop {r4, r5, pc}
-    65ea:   f44f 7280   mov.w r2, #256   ; 0x100
+
+  0x65ea:   f44f 7280   mov.w r2, #256   ; 0x100
     65ee:   e7e3        b.n 0x65b8
 
-function_e_55:
+spi_slave_select_output:
+    ; r0 = SPI registers
+    ; r1 = 1
   0x65f0:   2900        cmp r1, #0
     65f2:   6801        ldr r1, [r0, #0]
     65f4:   d002        beq.n 0x65fc
@@ -8331,7 +8351,7 @@ function_e_82:
     75c8:   f850 0c08   ldr.w r0, [r0, #-8]
     75cc:   eb00 2106   add.w r1, r0, r6, lsl #8
     75d0:   486a        ldr r0, [pc, #424]          ; (0x777c)
-    75d2:   f7fd fcf9   bl 0x4fc8                   ; call function_25
+    75d2:   f7fd fcf9   bl 0x4fc8                   ; call spi_flash_read_data
     75d6:   4869        ldr r0, [pc, #420]          ; (0x777c)
     75d8:   7844        ldrb r4, [r0, #1]
     75da:   4620        mov r0, r4
@@ -8355,7 +8375,7 @@ function_e_82:
     7618:   f888 4036   strb.w r4, [r8, #54]    ; 0x36
     761c:   f888 5037   strb.w r5, [r8, #55]    ; 0x37
     7620:   4856        ldr r0, [pc, #344]      ; r0 = (0x777c)
-    7622:   f7fd fcd1   bl 0x4fc8               ; call function_25
+    7622:   f7fd fcd1   bl 0x4fc8               ; call spi_flash_read_data
     7626:   e000        b.n 0x762a
     7628:   e03d        b.n 0x76a6
   0x762a:   f898 0024   ldrb.w r0, [r8, #36]   ; 0x24
@@ -8388,7 +8408,7 @@ function_e_82:
     7672:   f850 0c04   ldr.w r0, [r0, #-4]
     7676:   eb00 2106   add.w r1, r0, r6, lsl #8
     767a:   4840        ldr r0, [pc, #256]          ; r0 = (0x777c)
-    767c:   f7fd fca4   bl 0x4fc8                   ; call function_25
+    767c:   f7fd fca4   bl 0x4fc8                   ; call spi_flash_read_data
     7680:   483e        ldr r0, [pc, #248]          ; r0 = (0x777c)
     7682:   7845        ldrb r5, [r0, #1]
     7684:   4628        mov r0, r5
@@ -8469,7 +8489,7 @@ function_e_82:
     7746:   2202        movs r2, #2
     7748:   eb00 2106   add.w r1, r0, r6, lsl #8
     774c:   480b        ldr r0, [pc, #44]           ; r0 = (0x777c)
-    774e:   f7fd fc3b   bl 0x4fc8                   ; call function_25
+    774e:   f7fd fc3b   bl 0x4fc8                   ; call spi_flash_read_data
     7752:   480a        ldr r0, [pc, #40]           ; r0 = (0x777c)
     7754:   7840        ldrb r0, [r0, #1]
     7756:   f884 8023   strb.w r8, [r4, #35]   ; 0x23
@@ -8646,7 +8666,7 @@ function_e_85:
     78e2:   f850 1024   ldr.w r1, [r0, r4, lsl #2]
     78e6:   480b        ldr r0, [pc, #44]           ; (0x7914)
     78e8:   f501 617f   add.w r1, r1, #4080         ; 0xff0
-    78ec:   f7fd fb6c   bl 0x4fc8                   ; call function_25
+    78ec:   f7fd fb6c   bl 0x4fc8                   ; call spi_flash_read_data
     78f0:   4808        ldr r0, [pc, #32]           ; (0x7914)
     78f2:   7800        ldrb r0, [r0, #0]
     78f4:   7028        strb r0, [r5, #0]
@@ -8906,7 +8926,7 @@ function_24:
   0x7b72:   2201        movs r2, #1
     7b74:   4401        add r1, r0
     7b76:   4806        ldr r0, [pc, #24]           ; r0 = (0x7b90)
-    7b78:   f7fd fa26   bl 0x4fc8                   ; call function_25
+    7b78:   f7fd fa26   bl 0x4fc8                   ; call spi_flash_read_data
     7b7c:   4804        ldr r0, [pc, #16]           ; r0 = (0x7b90)
     7b7e:   7800        ldrb r0, [r0, #0]
     7b80:   bd10        pop {r4, pc}
@@ -10361,7 +10381,7 @@ function_e_97:
     8950:   4601        mov r1, r0
     8952:   464a        mov r2, r9
     8954:   480f        ldr r0, [pc, #60]       ; r0 = (0x8994)
-    8956:   f7fc fb37   bl 0x4fc8               ; call function_25
+    8956:   f7fc fb37   bl 0x4fc8               ; call spi_flash_read_data
     895a:   f7fe fbf3   bl 0x7144               ; call watchdog_reload_timer
     895e:   4640        mov r0, r8
     8960:   f7fc fb9e   bl 0x50a0               ; call function_e_40

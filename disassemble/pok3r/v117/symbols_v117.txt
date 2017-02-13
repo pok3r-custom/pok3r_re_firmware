@@ -181,8 +181,8 @@ function_11                         @ 0x4d3c
 function_29                         @ 0x4d64
     ckcu_apb0_clock_enable
     function_e_54
-    function_e_55
-    function_e_53
+    spi_slave_select_output
+    spi_enable
 function_10                         @ 0x4dd8
     function_11
 function_82                         @ 0x4de4
@@ -200,25 +200,25 @@ pinmux_b789_gpio                    @ 0x4e84
     gpio_set_pin_pull_up_down
     afio_pin_config
 
-function_e_38                       @ 0x4ecc
+spi_flash_page_program                       @ 0x4ecc
     spi_write_read
-function_e_39                       @ 0x4f18
+spi_flash_sector_erase              @ 0x4f18
     spi_write_read
-function_76                         @ 0x4f50
+spi_flash_write_status_register     @ 0x4f50
     spi_write_read
 function_78                         @ 0x4f7c
-    function_e_38
+    spi_flash_page_program
     spin_wait_maybe
     function_10
-function_42                         @ 0x4fa0
+spi_flash_deep_power_down           @ 0x4fa0
     spi_write_read
     spin_wait_maybe
-function_25                         @ 0x4fc8
+spi_flash_read_data                         @ 0x4fc8
     spi_write_read
 spi_write_read                      @ 0x5008
     watchdog_reload_timer
 function_e_40                       @ 0x50a0
-    function_e_39
+    spi_flash_sector_erase
     spin_wait_maybe
     function_10
     spi_write_read
@@ -305,9 +305,9 @@ function_e_50                       @ 0x6414
 function_e_51                       @ 0x6478
 function_e_6                        @ 0x64cc
 function_e_52                       @ 0x6520
-function_e_53                       @ 0x6578
+spi_enable                          @ 0x6578
 function_e_54                       @ 0x658c
-function_e_55                       @ 0x65f0
+spi_slave_select_output             @ 0x65f0
 function_e_4                        @ 0x6604
     // this function has something to do with the
     // system control space and device debugging
@@ -457,13 +457,13 @@ function_e_81_unsued                @ 0x74b0
 sram_stack_zero                     @ 0x74c0
 function_e_82                       @ 0x74d0
     function_e_84
-    function_25
+    spi_flash_read_data
     function_e_89
 function_e_83                       @ 0x7780
     function_e_84
 function_e_84                       @ 0x77b8
 function_e_85                       @ 0x7848
-    function_25
+    spi_flash_read_data
     function_e_25
     function_e_18
     function_e_83
@@ -489,7 +489,7 @@ function_e_91                       @ 0x7ac4
     function_e_18
     function_e_97
 function_24                         @ 0x7b50
-    function_25
+    spi_flash_read_data
 
 main                                @ 0x7b94
     setup_intr_priority
@@ -549,7 +549,7 @@ function_80                         @ 0x88bc
 function_26                         @ 0x88ec
 function_e_97                       @ 0x8934
     watchdog_reload_timer
-    function_25
+    spi_flash_read_data
     function_e_40
     function_27
 

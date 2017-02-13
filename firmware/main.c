@@ -2,6 +2,8 @@
 #include "board/ht32/usb/usb.h"
 #include "board/ht32/usb/descriptors.h"
 
+#define REG_SPI_FLASH REG_SPI1
+
 void ckcu_init(){
     // Backup domain
     REG_CKCU->LPCR.BKISO = 1;
@@ -96,7 +98,42 @@ void flash_version_clear(){
     while(REG_FMC->OPCR.OPM != OPCR_FINISHED);
 }
 
-void onSuspend(){
+u8 flash_data[1024];
+
+void spi_read(){
+    // enable SPI 1 clock
+    REG_CKCU->APBCCR0.SPI1EN = 1;
+
+    REG_SPI_FLASH->SPICR0.SPIEN = 1;    // enable
+    REG_SPI_FLASH->SPICR0.SELOEN = 1;   // chip select output
+
+    REG_SPI_FLASH->SPICR1.DFL = 8;      // 8 bits
+    REG_SPI_FLASH->SPICR1.FORMAT = 1;   // clock low, first edge
+    REG_SPI_FLASH->SPICR1.FIRSTBIT = 0; // msb first
+    REG_SPI_FLASH->SPICR1.MODE = 1;     // master mode
+
+    REG_SPI_FLASH->SPICPR.CP = 1;       // prescaler
+
+    REG_SPI_FLASH->SPIFCR.FIFOEN = 1;   // fifo enable
+    REG_SPI_FLASH->SPIFCR.RXFTLS = 4;
+    REG_SPI_FLASH->SPIFCR.TXFTLS = 4;
+
+    u8 cmd[8] = {0};
+    u32 len = 8;
+
+    for(int i = 0; i < len; ++i){
+        REG_SPI_FLASH->SPIDR.DR = cmd[i];
+    }
+
+    for(int i = 0; i < len; ++i){
+        while(REG_SPI_FLASH->SPIFSR.RXFS == 0);
+        u32 data = REG_SPI_FLASH->SPIDR.DR;
+        flash_data[i] = data & 0xFF;
+    }
+
+}
+
+void on_suspend(){
 
 }
 
@@ -113,11 +150,13 @@ int main(){
     // Clear the version so the board resets to the bootloader
     flash_version_clear();
 
+    spi_read();
+
     // USB
-    usb_init_descriptors();
-    usb_init();
+//    usb_init_descriptors();
+//    usb_init();
     // Enable D+ pull-up
-    usb_pull_up(1);
+//    usb_pull_up(1);
 
     u32 count = 0;
     while(1){
