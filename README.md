@@ -29,10 +29,11 @@ tools, `pok3rtool` implements the firmware update protocol over USB for the POK3
 The `pok3rtool` executable is built with CMake. You will need the LibChaos submodule cloned to
 build it. After it is compiled, it should have no runtime dependencies, and can be run portably.
 
-**WARNING: THIS TOOL IS RELATIVELY UNTESTED, AND HAS A VERY REAL RISK OF CORRUPTING YOUR
-KEYBOARD, MAKING IT UNUSABLE WIHOUT EXPENSIVE DEVELOPMENT TOOLS. PROCEED AT YOUR OWN RISK.**
+**WARNING: THIS TOOL CAN VERY EASILY BRICK YOUR KEYBOARD IF USED INCORRECTLY, MAKING IT
+UNUSABLE WITHOUT EXPENSIVE DEVELOPMENT TOOLS. READ THE DOCUMENTATION, POSSIBLY READ THE
+CODE, AND PROCEED AT YOUR OWN RISK.**
 
-[See the wiki for pok3rtool usage.]
+[See the wiki for pok3rtool usage, warnings, etc.]
 (https://github.com/ChaoticConundrum/pok3r_re_firmware/wiki/pok3rtool-Usage)
 
 ### POK3R Firmware Patch
