@@ -1,6 +1,7 @@
 #include "vortex_core.h"
 #include "pok3r_rgb.h"
 #include "zlog.h"
+#include "zfile.h"
 
 #define UPDATE_USAGE_PAGE   0xff00
 #define UPDATE_USAGE        0x01
@@ -354,7 +355,8 @@ bool VortexCORE::eraseFlash(zu32 start, zu32 length){
 bool VortexCORE::readFlash(zu32 addr, ZBinary &bin){
     DLOG("readFlash " << addr);
     ZBinary data;
-    if(!sendRecvCmd(READ, READ_ADDR, data, addr))
+    data.writeleu32(addr);
+    if(!sendRecvCmd(READ, READ_ADDR, data, 0))
         return false;
 
     bin.write(data.raw() + 4, 60);
