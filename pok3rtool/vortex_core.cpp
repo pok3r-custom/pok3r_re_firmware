@@ -1,3 +1,4 @@
+#include "vortex_core.h"
 #include "pok3r_rgb.h"
 #include "zlog.h"
 
@@ -14,31 +15,31 @@
 
 #define WAIT_SLEEP          2
 
-Pok3rRGB::Pok3rRGB() : debug(false), nop(false){
+VortexCORE::VortexCORE() : debug(false), nop(false){
 
 }
 
-Pok3rRGB::~Pok3rRGB(){
+VortexCORE::~VortexCORE(){
 
 }
 
-bool Pok3rRGB::open(){
+bool VortexCORE::open(){
     // Try firmware vid and pid
-    if(HIDDevice::open(HOLTEK_VID, POK3R_RGB_PID, UPDATE_USAGE_PAGE, UPDATE_USAGE)){
-        LOG("Opened POK3R RGB");
+    if(HIDDevice::open(HOLTEK_VID, VORTEX_CORE_PID, UPDATE_USAGE_PAGE, UPDATE_USAGE)){
+        LOG("Opened Vortex CORE");
         builtin = false;
         return true;
     }
     // Try builtin vid and pid
-    if(HIDDevice::open(HOLTEK_VID, POK3R_RGB_BOOT_PID, UPDATE_USAGE_PAGE, UPDATE_USAGE)){
-        LOG("Opened POK3R RGB (builtin)");
+    if(HIDDevice::open(HOLTEK_VID, VORTEX_CORE_BOOT_PID, UPDATE_USAGE_PAGE, UPDATE_USAGE)){
+        LOG("Opened Vortex CORE (builtin)");
         builtin = true;
         return true;
     }
     return false;
 }
 
-bool Pok3rRGB::enterFirmware(){
+bool VortexCORE::enterFirmware(){
     if(!builtin){
 //        LOG("In Firmware");
         return true;
@@ -61,7 +62,7 @@ bool Pok3rRGB::enterFirmware(){
     return true;
 }
 
-bool Pok3rRGB::enterBootloader(){
+bool VortexCORE::enterBootloader(){
     if(builtin){
 //        LOG("In Bootloader");
         return true;
@@ -84,7 +85,7 @@ bool Pok3rRGB::enterBootloader(){
     return true;
 }
 
-bool Pok3rRGB::getInfo(){
+bool VortexCORE::getInfo(){
     ZBinary bin;
 
     for(zu8 i = 0x20; i < 0x31; ++i){
@@ -99,7 +100,7 @@ bool Pok3rRGB::getInfo(){
     return true;
 }
 
-ZString Pok3rRGB::getVersion(){
+ZString VortexCORE::getVersion(){
     ZBinary data;
 
     // version 1
@@ -127,7 +128,7 @@ ZString Pok3rRGB::getVersion(){
     return ver;
 }
 
-bool Pok3rRGB::clearVersion(){
+bool VortexCORE::clearVersion(){
     DLOG("clearVersion");
     if(!enterBootloader())
         return false;
@@ -151,12 +152,12 @@ bool Pok3rRGB::clearVersion(){
 
 const zu32 ver2[15] = {
     0x00800004, 0x00010300, 0x00000041, 0xefffffff,
-    0x00000001, 0x00000000, 0x016704d9, 0xffffffff,
+    0x00000001, 0x00000000, 0x017504d9, 0xffffffff,
     0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff,
     0xffffffff, 0xffffffff, 0x001c5aa5,
 };
 
-bool Pok3rRGB::setVersion(ZString version){
+bool VortexCORE::setVersion(ZString version){
     DLOG("setVersion " << version);
     if(!clearVersion())
         return false;
@@ -205,7 +206,7 @@ bool Pok3rRGB::setVersion(ZString version){
     return true;
 }
 
-ZBinary Pok3rRGB::dumpFlash(){
+ZBinary VortexCORE::dumpFlash(){
     ZBinary dump;
     for(zu16 i = 0; i < FLASH_LEN - 60; i += 60){
         if(!readFlash(i, dump))
@@ -223,9 +224,9 @@ ZBinary Pok3rRGB::dumpFlash(){
     return dump;
 }
 
-bool Pok3rRGB::writeFirmware(const ZBinary &fwbinin){
+bool VortexCORE::writeFirmware(const ZBinary &fwbinin){
     ZBinary fwbin = fwbinin;
-    // Encode the firmware for the POK3R RGB
+    // Encode the firmware
     encode_firmware(fwbin);
 
 //    zu32 ccrc = crcFlash(FW_ADDR, 0xc000);
@@ -256,7 +257,7 @@ bool Pok3rRGB::writeFirmware(const ZBinary &fwbinin){
     return true;
 }
 
-bool Pok3rRGB::update(ZString version, const ZBinary &fwbin){
+bool VortexCORE::update(ZString version, const ZBinary &fwbin){
     // Reset to bootloader
     if(!enterBootloader())
         return false;
@@ -279,7 +280,7 @@ bool Pok3rRGB::update(ZString version, const ZBinary &fwbin){
 
 }
 
-void Pok3rRGB::test(){
+void VortexCORE::test(){
     ZBinary bin;
 
     LOG("READ_400");
@@ -333,7 +334,7 @@ void Pok3rRGB::test(){
     LOG("CRC " << ZString::ItoS((zu64)bin.readleu32(), 16));
 }
 
-bool Pok3rRGB::eraseFlash(zu32 start, zu32 length){
+bool VortexCORE::eraseFlash(zu32 start, zu32 length){
     DLOG("eraseFlash " << start << " " << length);
     if(start < VER_ADDR){
         ELOG("bad address");
@@ -350,7 +351,7 @@ bool Pok3rRGB::eraseFlash(zu32 start, zu32 length){
     return true;
 }
 
-bool Pok3rRGB::readFlash(zu32 addr, ZBinary &bin){
+bool VortexCORE::readFlash(zu32 addr, ZBinary &bin){
     DLOG("readFlash " << addr);
     ZBinary data;
     if(!sendRecvCmd(READ, READ_ADDR, data, addr))
@@ -360,7 +361,7 @@ bool Pok3rRGB::readFlash(zu32 addr, ZBinary &bin){
     return true;
 }
 
-bool Pok3rRGB::writeFlash(zu32 addr, ZBinary bin){
+bool VortexCORE::writeFlash(zu32 addr, ZBinary bin){
     DLOG("writeFlash " << addr << " " << bin.size());
     if(addr < VER_ADDR){
         ELOG("bad address");
@@ -397,7 +398,7 @@ bool Pok3rRGB::writeFlash(zu32 addr, ZBinary bin){
     return true;
 }
 
-zu32 Pok3rRGB::crcFlash(zu32 addr, zu32 len){
+zu32 VortexCORE::crcFlash(zu32 addr, zu32 len){
     if(addr < VER_ADDR){
         ELOG("bad address");
         return 0;
@@ -417,7 +418,7 @@ zu32 Pok3rRGB::crcFlash(zu32 addr, zu32 len){
     return data.readleu32();
 }
 
-bool Pok3rRGB::sendCmd(zu8 cmd, zu8 a1, zu16 a2, ZBinary data){
+bool VortexCORE::sendCmd(zu8 cmd, zu8 a1, zu16 a2, ZBinary data){
     if(data.size() > 52){
         ELOG("bad data size");
         return false;
@@ -441,7 +442,7 @@ bool Pok3rRGB::sendCmd(zu8 cmd, zu8 a1, zu16 a2, ZBinary data){
     return true;
 }
 
-bool Pok3rRGB::sendRecvCmd(zu8 cmd, zu8 a1, ZBinary &data, zu16 a2){
+bool VortexCORE::sendRecvCmd(zu8 cmd, zu8 a1, ZBinary &data, zu16 a2){
     if(!sendCmd(cmd, a1, a2, data))
         return false;
 
@@ -467,40 +468,10 @@ bool Pok3rRGB::sendRecvCmd(zu8 cmd, zu8 a1, ZBinary &data, zu16 a2){
     return true;
 }
 
-// POK3R RGB XOR encryption/decryption key
-// Somone somewhere thought a random XOR key was any better than the one they
-// used in the POK3R firmware. Yeah, good one.
-// See fw_xor_decode.c for the hilarious way this key was obtained.
-static const zu32 xor_key[] = {
-    0xe7c29474,
-    0x79084b10,
-    0x53d54b0d,
-    0xfc1e8f32,
-    0x48e81a9b,
-    0x773c808e,
-    0xb7483552,
-    0xd9cb8c76,
-    0x2a8c8bc6,
-    0x0967ada8,
-    0xd4520f5c,
-    0xd0c3279d,
-    0xeac091c5,
-};
-
-// Decode the encryption scheme used by the POK3R RGB firmware
-// Just XOR encryption with 52-byte key seen above.
-void xor_decode_encode(ZBinary &bin){
-    // XOR decryption
-    zu32 *words = (zu32 *)bin.raw();
-    for(zu64 i = 0; i < bin.size() / 4; ++i){
-        words[i] = words[i] ^ xor_key[i % 13];
-    }
+void VortexCORE::decode_firmware(ZBinary &bin){
+    Pok3rRGB::decode_firmware(bin);
 }
 
-void Pok3rRGB::decode_firmware(ZBinary &bin){
-    xor_decode_encode(bin);
-}
-
-void Pok3rRGB::encode_firmware(ZBinary &bin){
-    xor_decode_encode(bin);
+void VortexCORE::encode_firmware(ZBinary &bin){
+    Pok3rRGB::encode_firmware(bin);
 }

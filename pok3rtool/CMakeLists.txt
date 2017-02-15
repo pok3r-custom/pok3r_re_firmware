@@ -15,6 +15,8 @@ SET(POK3RTOOL_SOURCES
     pok3r.cpp
     pok3r_rgb.h
     pok3r_rgb.cpp
+    vortex_core.h
+    vortex_core.cpp
 
     hiddevice.h
     hiddevice.cpp

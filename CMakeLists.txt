@@ -38,6 +38,9 @@ SET(FILES
     disassemble/pok3r_rgb/v130/patch_v130.txt
     disassemble/pok3r_rgb/v130/fw_xor_decode.c
 
+    disassemble/core/builtin_core/firmware_builtin_core.bin
+    disassemble/core/builtin_core/firmware_builtin_core.txt
+
     disassemble/core/v104/firmware_v104.bin
     disassemble/core/v104/firmware_v104.txt
     disassemble/core/v104/patch_v104.txt

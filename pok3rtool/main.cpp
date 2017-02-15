@@ -1,5 +1,6 @@
 #include "pok3r.h"
 #include "pok3r_rgb.h"
+#include "vortex_core.h"
 #include "hiddevice.h"
 
 #include "zlog.h"
@@ -361,7 +362,7 @@ ZPointer<UpdateInterface> openDevice(int device){
     ZPointer<UpdateInterface> kb;
 
     if(device == 0)
-        device = 1 | 2;
+        device = 1 | 2 | 4;
 
     // POK3R
     if(device & 1){
@@ -374,6 +375,14 @@ ZPointer<UpdateInterface> openDevice(int device){
     // POK3R RGB
     if(device & 2){
         kb = new Pok3rRGB();
+        if(kb->open()){
+            return kb;
+        }
+    }
+
+    // Vortex CORE
+    if(device & 4){
+        kb = new VortexCORE();
         if(kb->open()){
             return kb;
         }
@@ -400,20 +409,27 @@ int main(int _argc, char **_argv){
         ZString arg = _argv[i];
         if(arg == "--ok" || arg == "-ok"){
             ok = true;
-        } else if(arg == "--pok3r" || arg == "-pok3r"){
+        } else if(arg == "--pok3r"){
             if(device != 0){
                 LOG("Cannot specify multiple devices");
                 return 2;
             }
             LOG("Selected POK3R");
             device = 1;
-        } else if(arg == "--pok3r-rgb" || arg == "-pok3r-rgb"){
+        } else if(arg == "--pok3r-rgb"){
             if(device != 0){
                 LOG("Cannot specify multiple devices");
                 return 2;
             }
             LOG("Selected POK3R RGB");
             device = 2;
+        } else if(arg == "--vortex-core"){
+            if(device != 0){
+                LOG("Cannot specify multiple devices");
+                return 2;
+            }
+            LOG("Selected Vortex CORE");
+            device = 4;
         } else {
             args.push(arg);
         }
