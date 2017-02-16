@@ -163,37 +163,48 @@ void spi_flash_command(u8 *cmd, int writelen, int readlen){
     if(writelen > 8 || readlen > 8)
         return;
 
+    // chip select low
+    gpio_pin_set_reset(GPIO_B, 10, 0);
+
     // Send command bytes
     for(int i = 0; i < writelen; ++i){
         REG_SPI_FLASH->SPIDR.DR = cmd[i];
     }
+
     // Send dummy bytes
-    for(int i = 0; i < readlen - writelen; ++i){
+    for(int i = 0; i < readlen; ++i){
         REG_SPI_FLASH->SPIDR.DR = 0;
     }
 
     // Read data
-    for(int i = 0; i < readlen; ++i){
+    for(int i = 0; i < writelen + readlen; ++i){
         // wait for recv data
         while(REG_SPI_FLASH->SPIFSR.RXFS == 0);
         // read data
         u32 data = REG_SPI_FLASH->SPIDR.DR;
         flash_data[i] = data & 0xFF;
     }
+
+    // chip select high
+    gpio_pin_set_reset(GPIO_B, 10, 1);
 }
 
 void spi_read(){
     pinmux_spi();
 
-    u32 addr = 0;
-
     u8 cmd[4];
+
+    cmd[0] = GD25Q_RDID;
+    spi_flash_command(cmd, 1, 3);
+
+    return;
+
+    u32 addr = 0;
     cmd[0] = GD25Q_READ;
     cmd[1] = (addr >> 16) & 0xFF;
     cmd[2] = (addr >> 8) & 0xFF;
     cmd[3] = addr & 0xFF;
-
-    spi_flash_command(cmd, 4, 8);
+    spi_flash_command(cmd, 4, 4);
 }
 
 void on_suspend(){

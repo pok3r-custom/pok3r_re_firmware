@@ -176,7 +176,7 @@ function_e_29                       @ 0x4c6c
 clear_some_mem                      @ 0x4cde
 function_e_30                       @ 0x4cf6
 function_e_31                       @ 0x4d26
-function_11                         @ 0x4d3c
+spi_flash_read_status                         @ 0x4d3c
     spi_write_read
 function_29                         @ 0x4d64
     ckcu_apb0_clock_enable
@@ -184,7 +184,7 @@ function_29                         @ 0x4d64
     spi_slave_select_output
     spi_enable
 function_10                         @ 0x4dd8
-    function_11
+    spi_flash_read_status
 function_82                         @ 0x4de4
     ckcu_ahb_clock_enable
 pinmux_select_b789                  @ 0x4e34
@@ -239,7 +239,7 @@ ppb_set_nvic_priority               @ 0x5272
 nvic_set_vtor                       @ 0x5294
 function_12                         @ 0x52a8
     function_29
-    function_11
+    spi_flash_read_status
     function_28
 jump_2                              @ 0x5308
     pinmux_select_b789
