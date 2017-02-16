@@ -187,7 +187,7 @@ function_10                         @ 0x4dd8
     function_11
 function_82                         @ 0x4de4
     ckcu_ahb_clock_enable
-pinmux_select_b789                         @ 0x4e34
+pinmux_select_b789                  @ 0x4e34
     pinmux_b789_spi
     pinmux_b789_gpio
 
@@ -195,12 +195,13 @@ pinmux_b789_spi                     @ 0x4e40
     gpio_set_input_output
     gpio_set_pin_pull_up_down
     afio_pin_config
+    spi_flash_release_sleep
 pinmux_b789_gpio                    @ 0x4e84
     gpio_set_input_output
     gpio_set_pin_pull_up_down
     afio_pin_config
 
-spi_flash_page_program                       @ 0x4ecc
+spi_flash_page_program              @ 0x4ecc
     spi_write_read
 spi_flash_sector_erase              @ 0x4f18
     spi_write_read
@@ -213,7 +214,7 @@ function_78                         @ 0x4f7c
 spi_flash_deep_power_down           @ 0x4fa0
     spi_write_read
     spin_wait_maybe
-spi_flash_read_data                         @ 0x4fc8
+spi_flash_read_data                 @ 0x4fc8
     spi_write_read
 spi_write_read                      @ 0x5008
     watchdog_reload_timer
@@ -223,7 +224,8 @@ function_e_40                       @ 0x50a0
     function_10
     spi_write_read
 function_27                         @ 0x50f0
-function_77                         @ 0x5168
+spi_flash_release_sleep             @ 0x50c8
+spi_flash_write_enable              @ 0x5168
     spi_write_read
 function_28                         @ 0x518c
     function_9

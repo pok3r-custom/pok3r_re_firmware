@@ -18,6 +18,11 @@
 #define GPIO_C_BASE     0x400B4000
 #define GPIO_D_BASE     0x400B6000
 
+#define CLOCK_PA        TYPE_AHB | (1 << 16)
+#define CLOCK_PB        TYPE_AHB | (1 << 17)
+#define CLOCK_PC        TYPE_AHB | (1 << 18)
+#define CLOCK_PD        TYPE_AHB | (1 << 19)
+
 // Clock Control Unit
 // Reset Control Unit
 // ////////////////////////////////////////////////////////////////////////////////////////////////

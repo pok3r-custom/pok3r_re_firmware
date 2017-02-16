@@ -3872,14 +3872,16 @@ pinmux_b789_spi:
   0x4e40:   b570        push {r4, r5, r6, lr}
     4e42:   2201        movs r2, #1             ; r2 = 1
     4e44:   4d0e        ldr r5, [pc, #56]       ; r5 = (0x4e80)
+
+    ; Set pin PB10 output mode, disable pull
     4e46:   0294        lsls r4, r2, #10        ; r4 = r2 << 10
     4e48:   4621        mov r1, r4
     4e4a:   4628        mov r0, r5
-    4e4c:   f7fe fb66   bl 0x351c               ; call gpio_set_input_output
+    4e4c:   f7fe fb66   bl 0x351c               ; call gpio_set_input_output(GPIO B, 1 << 10, 1)
     4e50:   2202        movs r2, #2
     4e52:   4621        mov r1, r4
     4e54:   4628        mov r0, r5
-    4e56:   f7fe fb81   bl 0x355c               ; call gpio_set_pin_pull_up_down
+    4e56:   f7fe fb81   bl 0x355c               ; call gpio_set_pin_pull_up_down(GPIO B, 1 << 10, 2)
 
     ; Select AF5 (SPI) for GPIO B pins 7,8,9
     4e5a:   2205        movs r2, #5
@@ -3896,7 +3898,7 @@ pinmux_b789_spi:
     4e74:   f7fe fa16   bl 0x32a4               ; call afio_pin_config
 
     4e78:   e8bd 4070   ldmia.w sp!, {r4, r5, r6, lr}
-    4e7c:   f000 b924   b.w 0x50c8
+    4e7c:   f000 b924   b.w 0x50c8              ; spi_flash_release_sleep
 
   0x4e80:   0x400b2000  ; GPIO B
 
@@ -3905,6 +3907,8 @@ pinmux_b789_gpio:
     4e86:   f000 f88b   bl 0x4fa0               ; call spi_flash_deep_power_down
     4e8a:   4d0f        ldr r5, [pc, #60]       ; r5 = (0x4ec8)
     4e8c:   f44f 6480   mov.w r4, #1024         ; r4 = 0x400
+
+    ; Set pin PB10 pull-up, input mode
     4e90:   2200        movs r2, #0
     4e92:   4621        mov r1, r4
     4e94:   4628        mov r0, r5
@@ -3913,6 +3917,7 @@ pinmux_b789_gpio:
     4e9c:   4621        mov r1, r4
     4e9e:   4628        mov r0, r5
     4ea0:   f7fe fb3c   bl 0x351c               ; call gpio_set_input_output
+
     4ea4:   2200        movs r2, #0
     4ea6:   2107        movs r1, #7
     4ea8:   2001        movs r0, #1
@@ -4083,8 +4088,8 @@ spi_write_read:
 
     ; Write a0 to SPI1
     ; Read a1 from SPI1
-    ; Write a0 to SPI1 again
-    ; Read from SPI1 again and write to the end of a1
+    ; Write a0 + a2 to SPI1
+    ; Read a1 + a2 from SPI1
   0x5008:   e92d 41f0   stmdb sp!, {r4, r5, r6, r7, r8, lr}
     500c:   460e        mov r6, r1              ; r6 = r1
     500e:   4922        ldr r1, [pc, #136]      ; r1 = (0x5098) pointer_4
@@ -4097,6 +4102,7 @@ spi_write_read:
     501c:   1bc0        subs r0, r0, r7         ; r0 = r0 + r7
     501e:   6048        str r0, [r1, #4]        ; [r1 + 4] = r0
     5020:   e004        b.n 0x502c
+
   0x5022:   f44f 607a   mov.w r0, #4000         ; r0 = 0xfa0
     5026:   6048        str r0, [r1, #4]        ; [r1 + 4] = r0
     5028:   f002 f88c   bl 0x7144               ; call watchdog_reload_timer
@@ -4120,7 +4126,6 @@ spi_write_read:
   0x5048:   1c52        adds r2, r2, #1         ; r2 = r2 + 1
   0x504a:   4282        cmp r2, r0
     504c:   d3f7        bcc.n 0x503e            ; branch if r2 < r0
-
     504e:   e010        b.n 0x5072
                                                 ; If a0 pointer is 0, write 0 to SPI1
   0x5050:   610b        str r3, [r1, #16]       ; [r1 + 0x10] = r3 = 0 Write SPI1 Data Register
@@ -4133,14 +4138,12 @@ spi_write_read:
     505a:   d0fb        beq.n 0x5054            ; branch if r2 == 0
     505c:   690a        ldr r2, [r1, #16]       ; r2 = [r1 + 0x10] Read SPI1 Data Register
     505e:   b2d2        uxtb r2, r2             ; zero extend r2
-
                                                 ; If a0 == 0 write 0 to SPI1
     5060:   b155        cbz r5, 0x5078          ; branch if r5 == 0
                                                 ; Write a0 to SPI1
     5062:   f815 c000   ldrb.w ip, [r5, r0]     ; ip = [r5 + r0]
     5066:   f8c1 c010   str.w ip, [r1, #16]     ; [r1 + 0x10] = ip Write SPI1 Data Register
   0x506a:   1c40        adds r0, r0, #1         ; r0 = r0 + 1
-
                                                 ; Save r2 back to a1
     506c:   b106        cbz r6, 0x5070          ; branch if r6 == 0
     506e:   5532        strb r2, [r6, r4]       ; [r6 + r4] = r2
@@ -4159,7 +4162,6 @@ spi_write_read:
     5082:   d0fb        beq.n 0x507c            ; branch if r2 == 0
     5084:   6908        ldr r0, [r1, #16]       ; r0 = [r1 + 0x10] Read SPI1 Data Register
     5086:   b2c0        uxtb r0, r0             ; zero extend r0
-
                                                 ; Save r0 back to a1
     5088:   b106        cbz r6, 0x508c          ; branch if r6 == 0
     508a:   5530        strb r0, [r6, r4]       ; [r6 + r4] = r0
@@ -4190,7 +4192,9 @@ function_e_40:
     50c2:   bd70        pop {r4, r5, r6, pc}
     50c4:   2001        movs r0, #1
     50c6:   bd70        pop {r4, r5, r6, pc}
-    50c8:   b538        push {r3, r4, r5, lr}
+
+spi_flash_release_sleep:
+  0x50c8:   b538        push {r3, r4, r5, lr}
     50ca:   4c08        ldr r4, [pc, #32]   ; (0x50ec)
     50cc:   20ab        movs r0, #171   ; 0xab
     50ce:   f88d 0000   strb.w r0, [sp]
@@ -4259,7 +4263,7 @@ function_27:
     5164:   2001        movs r0, #1
     5166:   e7fb        b.n 0x5160
 
-function_77:
+spi_flash_write_enable:
   0x5168:   b538        push {r3, r4, r5, lr}
     516a:   4c07        ldr r4, [pc, #28]   ; (0x5188)
     516c:   2006        movs r0, #6

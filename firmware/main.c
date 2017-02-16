@@ -61,18 +61,25 @@ void wdt_init(){
 
 void afio_init(){
     // enable AFIO clock
+    ckcu_clock_enable(CLOCK_AFIO, 1);
     // enable GPIO A clock
-    ckcu_clocks_enable(1 << 16, 1 << 14, 0, 1);
+    ckcu_clock_enable(CLOCK_PA, 1);
+    ckcu_clock_enable(CLOCK_PB, 1);
+    ckcu_clock_enable(CLOCK_PC, 1);
+
+//    REG_CKCU->APBCCR0.AFIOEN = 1;
+//    REG_CKCU->AHBCCR.PAEN = 1;
+//    ckcu_clocks_enable(1 << 16, 1 << 14, 0, 1);
 //    REG(CKCU_APBCCR0) |= (1 << 14);
 //    REG(CKCU_AHBCCR) |= (1 << 16);
 
-    gpio_set_input_enable(GPIO_A, 14, 0);
-    gpio_set_input_enable(GPIO_A, 15, 0);
-    gpio_set_pin_pull_up_down(GPIO_A, 14, 2);
-    gpio_set_pin_pull_up_down(GPIO_A, 15, 2);
+    gpio_pin_input_enable(GPIO_A, 14, 0);
+    gpio_pin_input_enable(GPIO_A, 15, 0);
+    gpio_pin_pull(GPIO_A, 14, 2);
+    gpio_pin_pull(GPIO_A, 15, 2);
 
-    gpio_set_input_enable(GPIO_A, 11, 0);
-    gpio_set_pin_pull_up_down(GPIO_A, 11, 2);
+    gpio_pin_input_enable(GPIO_A, 11, 0);
+    gpio_pin_pull(GPIO_A, 11, 2);
 
     afio_pin_config(GPIO_A, 11, 1);
     afio_pin_config(GPIO_C, 13, 1);
@@ -86,7 +93,7 @@ void afio_init(){
     }
 
     // disable GPIO A clock
-    ckcu_clocks_enable(1 << 16, 0, 0, 0);
+//    ckcu_clocks_enable(1 << 16, 0, 0, 0);
 //    REG(CKCU_AHBCCR) &= ~(1 << 16);
 }
 
@@ -98,9 +105,42 @@ void flash_version_clear(){
     while(REG_FMC->OPCR.OPM != OPCR_FINISHED);
 }
 
+void pinmux_spi(){
+    gpio_pin_direction(GPIO_B, 10, PIN_OUTPUT);
+    gpio_pin_pull(GPIO_B, 10, PULL_DISABLE);
+    // Select AF5 (SPI) for GPIO B pins 7,8,9 (LQFP-64 pins 58,59,60)
+    afio_pin_config(GPIO_B, 7, 5);
+    afio_pin_config(GPIO_B, 8, 5);
+    afio_pin_config(GPIO_B, 9, 5);
+}
+
 u8 flash_data[1024];
 
-void spi_read(){
+#define GD25Q40_SECTORS         128
+#define GD25Q40_SECTOR_BYTES    4096
+
+#define GD24Q40_PAGES           2048
+#define GD25Q40_PAGE_BYTES      256
+
+#define GD24Q40_BYTES           (GD25Q40_SECTORS * GD25Q40_SECTOR_BYTES)
+
+#define GD25Q_WREN      0x06    // Write Enable
+#define GD25Q_WRDI      0x04    // Write Disable
+#define GD25Q_RDSR_L    0x05    // Read Status Register S7~S0
+#define GD25Q_RDSR_H    0x35    // Read Status Register S15~S8
+#define GD25Q_READ      0x03    // Read Data Bytes
+#define GD25Q_FAST_READ 0x0B    // Read Data Bytes At Higher Speed
+#define GD25Q_PP        0x02    // Page Program
+#define GD25Q_SE        0x20    // Sector Erase
+#define GD25Q_BE_32K    0x52    // 32KB Block Erase
+#define GD25Q_BE_64K    0xD8    // 64KB Block Erase
+#define GD25Q_CE        0xC7    // Chip Erase
+#define GD25Q_DP        0xB9    // Deep Power-Down
+#define GD25Q_RDI       0xAB    // Release From Deep Power-Down
+#define GD25Q_REMS      0x90    // Read Maufacturer/Device ID
+#define GD25Q_RDID      0x9F    // Read Identification
+
+void spi_init(){
     // enable SPI 1 clock
     REG_CKCU->APBCCR0.SPI1EN = 1;
 
@@ -114,23 +154,46 @@ void spi_read(){
 
     REG_SPI_FLASH->SPICPR.CP = 1;       // prescaler
 
-    REG_SPI_FLASH->SPIFCR.FIFOEN = 1;   // fifo enable
-    REG_SPI_FLASH->SPIFCR.RXFTLS = 4;
-    REG_SPI_FLASH->SPIFCR.TXFTLS = 4;
+//    REG_SPI_FLASH->SPIFCR.FIFOEN = 1;   // fifo enable
+//    REG_SPI_FLASH->SPIFCR.RXFTLS = 4;
+//    REG_SPI_FLASH->SPIFCR.TXFTLS = 4;
+}
 
-    u8 cmd[8] = {0};
-    u32 len = 8;
+void spi_flash_command(u8 *cmd, int writelen, int readlen){
+    if(writelen > 8 || readlen > 8)
+        return;
 
-    for(int i = 0; i < len; ++i){
+    // Send command bytes
+    for(int i = 0; i < writelen; ++i){
         REG_SPI_FLASH->SPIDR.DR = cmd[i];
     }
+    // Send dummy bytes
+    for(int i = 0; i < readlen - writelen; ++i){
+        REG_SPI_FLASH->SPIDR.DR = 0;
+    }
 
-    for(int i = 0; i < len; ++i){
+    // Read data
+    for(int i = 0; i < readlen; ++i){
+        // wait for recv data
         while(REG_SPI_FLASH->SPIFSR.RXFS == 0);
+        // read data
         u32 data = REG_SPI_FLASH->SPIDR.DR;
         flash_data[i] = data & 0xFF;
     }
+}
 
+void spi_read(){
+    pinmux_spi();
+
+    u32 addr = 0;
+
+    u8 cmd[4];
+    cmd[0] = GD25Q_READ;
+    cmd[1] = (addr >> 16) & 0xFF;
+    cmd[2] = (addr >> 8) & 0xFF;
+    cmd[3] = addr & 0xFF;
+
+    spi_flash_command(cmd, 4, 8);
 }
 
 void on_suspend(){
@@ -145,10 +208,12 @@ int main(){
     // Watchdog
     wdt_init();
 
-//    afio_init();
-
     // Clear the version so the board resets to the bootloader
     flash_version_clear();
+
+    // I/O init
+    afio_init();
+    spi_init();
 
     spi_read();
 

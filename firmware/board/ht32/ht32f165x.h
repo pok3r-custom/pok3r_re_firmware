@@ -124,6 +124,48 @@
 
 #define EBI_BASE        0x40098000
 
+// Clocks
+// ////////////////////////////////////////////////////////////////////////////////////////////////
+#define TYPE_AHB        (1 << 28)
+#define TYPE_APB0       (2 << 28)
+#define TYPE_APB1       (3 << 28)
+
+#define CLOCK_FMC       TYPE_AHB | (1 << 0)
+#define CLOCK_SRAM      TYPE_AHB | (1 << 2)
+#define CLOCK_PDMAEN    TYPE_AHB | (1 << 4)
+#define CLOCK_BMEN      TYPE_AHB | (1 << 5)
+#define CLOCK_APB0EN    TYPE_AHB | (1 << 6)
+#define CLOCK_APB1EN    TYPE_AHB | (1 << 7)
+#define CLOCK_USBEN     TYPE_AHB | (1 << 10)
+#define CLOCK_CKREF     TYPE_AHB | (1 << 11)
+#define CLOCK_EBI       TYPE_AHB | (1 << 12)
+#define CLOCK_CRC       TYPE_AHB | (1 << 13)
+
+#define CLOCK_I2C0      TYPE_APB0 | (1 << 0)
+#define CLOCK_I2C1      TYPE_APB0 | (1 << 1)
+#define CLOCK_SPI0      TYPE_APB0 | (1 << 4)
+#define CLOCK_SPI1      TYPE_APB0 | (1 << 5)
+#define CLOCK_USR0      TYPE_APB0 | (1 << 8)
+#define CLOCK_USR1      TYPE_APB0 | (1 << 9)
+#define CLOCK_UR0       TYPE_APB0 | (1 << 10)
+#define CLOCK_UR1       TYPE_APB0 | (1 << 11)
+#define CLOCK_AFIO      TYPE_APB0 | (1 << 14)
+#define CLOCK_EXTI      TYPE_APB0 | (1 << 15)
+#define CLOCK_SCI       TYPE_APB0 | (1 << 24)
+#define CLOCK_I2S       TYPE_APB0 | (1 << 25)
+
+#define CLOCK_MCTM0     TYPE_APB1 | (1 << 0)
+#define CLOCK_MCTM1     TYPE_APB1 | (1 << 1)
+#define CLOCK_WDT       TYPE_APB1 | (1 << 4)
+#define CLOCK_BKP       TYPE_APB1 | (1 << 6)
+#define CLOCK_GPTM0     TYPE_APB1 | (1 << 8)
+#define CLOCK_GPTM1     TYPE_APB1 | (1 << 9)
+#define CLOCK_BFTM0     TYPE_APB1 | (1 << 16)
+#define CLOCK_BFTM1     TYPE_APB1 | (1 << 17)
+#define CLOCK_OPA0      TYPE_APB1 | (1 << 22)
+#define CLOCK_OPA1      TYPE_APB1 | (1 << 23)
+#define CLOCK_ADC       TYPE_APB1 | (1 << 24)
+
 // Power Control Unit
 // ////////////////////////////////////////////////////////////////////////////////////////////////
 #define PWRCU_BAKSR     PWRCU_BASE + 0x100  // Backup Domain Status
@@ -997,15 +1039,56 @@ STRUCT_REG_CHECK(USB, USBEP7CFGR);
 // Analog To Digital Converter
 // ////////////////////////////////////////////////////////////////////////////////////////////////
 
+// Types
+
+typedef enum {
+    PIN_INPUT = 0,
+    PIN_OUTPUT,
+} PinDir;
+
+typedef enum {
+    DRIVE_4mA = 0,
+    DRIVE_8mA,
+} DriveMode;
+
+typedef enum {
+    PULL_DISABLE = 0,
+    PULL_UP,
+    PULL_DOWN,
+} PullMode;
+
+// Functions
+
+// declaration for function in startup assembly
 void _generic_intr();
 
+void ckcu_clock_enable(u32 clock, int en);
 void ckcu_clocks_enable(int ahb_mask, int apb0_mask, int apb1_mask, int en);
 
 void wdt_reload();
 
-void gpio_set_input_enable(int port, int pin, int en);
-void gpio_set_pin_pull_up_down(int port, int pin, int mode);
+void gpio_pin_direction(int port, int pin, PinDir dir);
 
+void gpio_pin_input_enable(int port, int pin, int en);
+
+void gpio_pin_drive(int port, int pin, DriveMode mode);
+
+void gpio_pin_open_drain(int port, int pin, int en);
+
+/*! Set the resistor pull direction on a GPIO pin.
+ * \param port GPIO port.
+ * \param pin Port pin number.
+ * \param mode Pull mode.
+ */
+void gpio_pin_pull(int port, int pin, PullMode mode);
+
+void gpio_pin_set_reset(int port, int pin, int set);
+
+/*! Set the alternate function on a GPIO pin.
+ * \param port GPIO port.
+ * \param pin Port pin number.
+ * \param function Alternate function number.
+ */
 void afio_pin_config(int port, int pin, int function);
 
 

@@ -20,6 +20,12 @@
 #define GPIO_D_BASE     0x400B6000
 #define GPIO_E_BASE     0x400B8000
 
+#define CLOCK_PA        TYPE_AHB | (1 << 16)
+#define CLOCK_PB        TYPE_AHB | (1 << 17)
+#define CLOCK_PC        TYPE_AHB | (1 << 18)
+#define CLOCK_PD        TYPE_AHB | (1 << 19)
+#define CLOCK_PE        TYPE_AHB | (1 << 20)
+
 // Clock Control Unit
 // ////////////////////////////////////////////////////////////////////////////////////////////////
 #define CKCU_GCFGR      CKCU_BASE + 0x0     // Global Clock Configuration
