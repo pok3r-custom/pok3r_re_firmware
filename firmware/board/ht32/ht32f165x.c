@@ -119,11 +119,12 @@ void gpio_pin_set_reset(int port, int pin, int set){
 }
 
 void afio_pin_config(int port, int pin, int function){
-    if(pin & 0x8){
-        REG(AFIO_GPxCFGHR(port)) &= (0xf << ((pin & 0x7) * 4));
-        REG(AFIO_GPxCFGHR(port)) |= (function << ((pin & 0x7) * 4));
+    const u8 shift = (pin & 0x7) << 2;
+    if(pin >= 8){
+        REG(AFIO_GPxCFGHR(port)) &= ~(0xf << shift);
+        REG(AFIO_GPxCFGHR(port)) |= (function << shift);
     } else {
-        REG(AFIO_GPxCFGLR(port)) &= (0xf << (pin * 4));
-        REG(AFIO_GPxCFGLR(port)) |= (function << (pin * 4));
+        REG(AFIO_GPxCFGLR(port)) &= ~(0xf << shift);
+        REG(AFIO_GPxCFGLR(port)) |= (function << shift);
     }
 }

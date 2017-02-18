@@ -1525,7 +1525,7 @@ function_59:
 
 function_60:
   0x37ac:   b500        push {lr}
-    37ae:   f000 f80b   bl 0x37c8
+    37ae:   f000 f80b   bl 0x37c8           ; call function_61
     37b2:   4804        ldr r0, [pc, #16]   ; (0x37c4)
     37b4:   7801        ldrb r1, [r0, #0]
     37b6:   2901        cmp r1, #1
@@ -1640,57 +1640,59 @@ exti_check_wakup:
 function_74:
   0x3884:   b570        push {r4, r5, r6, lr}
     3886:   b086        sub sp, #24
-    3888:   f7ff ff90   bl 0x37ac
-    388c:   f001 fd0c   bl 0x52a8                   ; call function_12
+    3888:   f7ff ff90   bl 0x37ac                   ; call function_60
+    388c:   f001 fd0c   bl 0x52a8                   ; call spi_flash_init
     3890:   4c2a        ldr r4, [pc, #168]          ; (0x393c)
     3892:   4e29        ldr r6, [pc, #164]          ; (0x3938)
     3894:   2203        movs r2, #3
     3896:   f894 0026   ldrb.w r0, [r4, #38]        ; 0x26
     389a:   f856 1020   ldr.w r1, [r6, r0, lsl #2]
     389e:   4828        ldr r0, [pc, #160]          ; (0x3940)
-    38a0:   f601 71fb   addw r1, r1, #4091      ; 0xffb
+    38a0:   f601 71fb   addw r1, r1, #4091          ; 0xffb
     38a4:   f001 fb90   bl 0x4fc8
-    38a8:   4d25        ldr r5, [pc, #148]      ; (0x3940)
+    38a8:   4d25        ldr r5, [pc, #148]          ; (0x3940)
     38aa:   7828        ldrb r0, [r5, #0]
-    38ac:   2856        cmp r0, #86             ; 0x56
+    38ac:   2856        cmp r0, #86                 ; 0x56
     38ae:   d105        bne.n 0x38bc
     38b0:   7868        ldrb r0, [r5, #1]
-    38b2:   2831        cmp r0, #49             ; 0x31
+    38b2:   2831        cmp r0, #49                 ; 0x31
     38b4:   d102        bne.n 0x38bc
     38b6:   78a8        ldrb r0, [r5, #2]
-    38b8:   2834        cmp r0, #52             ; 0x34
+    38b8:   2834        cmp r0, #52                 ; 0x34
     38ba:   d006        beq.n 0x38ca
     38bc:   f004 fade   bl 0x7e7c                   ; call function_e_95
-    38c0:   f894 0039   ldrb.w r0, [r4, #57]    ; 0x39
+  0x38c0:   f894 0039   ldrb.w r0, [r4, #57]        ; 0x39
     38c4:   2801        cmp r0, #1
     38c6:   d012        beq.n 0x38ee
     38c8:   e01a        b.n 0x3900
-    38ca:   f894 0026   ldrb.w r0, [r4, #38]    ; 0x26
-    38ce:   f44f 627f   mov.w r2, #4080         ; 0xff0
+
+    38ca:   f894 0026   ldrb.w r0, [r4, #38]        ; 0x26
+    38ce:   f44f 627f   mov.w r2, #4080             ; 0xff0
     38d2:   f856 1020   ldr.w r1, [r6, r0, lsl #2]
-    38d6:   481a        ldr r0, [pc, #104]      ; (0x3940)
-    38d8:   f501 617f   add.w r1, r1, #4080     ; 0xff0
+    38d6:   481a        ldr r0, [pc, #104]          ; (0x3940)
+    38d8:   f501 617f   add.w r1, r1, #4080         ; 0xff0
     38dc:   f001 fb74   bl 0x4fc8
     38e0:   7828        ldrb r0, [r5, #0]
     38e2:   7620        strb r0, [r4, #24]
-    38e4:   f894 0026   ldrb.w r0, [r4, #38]    ; 0x26
+    38e4:   f894 0026   ldrb.w r0, [r4, #38]        ; 0x26
     38e8:   f000 ffba   bl 0x4860                   ; call function_e_25
     38ec:   e7e8        b.n 0x38c0
-    38ee:   f8b4 0046   ldrh.w r0, [r4, #70]    ; 0x46
+
+    38ee:   f8b4 0046   ldrh.w r0, [r4, #70]        ; 0x46
     38f2:   b928        cbnz r0, 0x3900
-    38f4:   f8b4 0048   ldrh.w r0, [r4, #72]    ; 0x48
+    38f4:   f8b4 0048   ldrh.w r0, [r4, #72]        ; 0x48
     38f8:   b910        cbnz r0, 0x3900
     38fa:   20c8        movs r0, #200   ; 0xc8
-    38fc:   f8a4 0048   strh.w r0, [r4, #72]    ; 0x48
+    38fc:   f8a4 0048   strh.w r0, [r4, #72]        ; 0x48
 
-    3900:   4810        ldr r0, [pc, #64]       ; r0 = (0x3944) data_9
-    3902:   9003        str r0, [sp, #12]       ; [sp + 0xc] = r0
+  0x3900:   4810        ldr r0, [pc, #64]           ; r0 = (0x3944) data_9
+    3902:   9003        str r0, [sp, #12]           ; [sp + 0xc] = r0
 
-    3904:   2009        movs r0, #9             ; r0 = 9
+    3904:   2009        movs r0, #9                 ; r0 = 9
     3906:   f88d 0013   strb.w r0, [sp, #19]
-    390a:   f44f 7002   mov.w r0, #520          ; 0x208
+    390a:   f44f 7002   mov.w r0, #520              ; 0x208
     390e:   f8ad 0010   strh.w r0, [sp, #16]
-    3912:   480d        ldr r0, [pc, #52]       ; (0x3948)
+    3912:   480d        ldr r0, [pc, #52]           ; (0x3948)
     3914:   9000        str r0, [sp, #0]
     3916:   2001        movs r0, #1
     3918:   f88d 0012   strb.w r0, [sp, #18]
@@ -1701,7 +1703,7 @@ function_74:
     3922:   4668        mov r0, sp
     3924:   f002 fbcc   bl 0x60c0                   ; call function_e_48(sp)
 
-    3928:   f894 0039   ldrb.w r0, [r4, #57]   ; 0x39
+    3928:   f894 0039   ldrb.w r0, [r4, #57]        ; 0x39
     392c:   f000 fb30   bl 0x3f90                   ; call function_e_18
     3930:   f000 ff78   bl 0x4824                   ; call function_e_24
     3934:   b006        add sp, #24
@@ -3769,18 +3771,19 @@ spi_flash_read_status:
 
   0x4d60:   0x400b2000  ; GPIO B
 
-function_29:
+spi_init:
   0x4d64:   b570        push {r4, r5, r6, lr}
     4d66:   b08c        sub sp, #48   ; 0x30
-    4d68:   f000 f83c   bl 0x4de4
-    4d6c:   4c17        ldr r4, [pc, #92]   ; (0x4dcc)
+    4d68:   f000 f83c   bl 0x4de4               ; call spi_gpio_init
+    4d6c:   4c17        ldr r4, [pc, #92]       ; (0x4dcc)
     4d6e:   7820        ldrb r0, [r4, #0]
     4d70:   2801        cmp r0, #1
     4d72:   d127        bne.n 0x4dc4
+    ; Enable SPI1 clock
     4d74:   2101        movs r1, #1
     4d76:   2020        movs r0, #32
-    4d78:   f7fe fb60   bl 0x343c               ; call ckcu_apb0_clock_enable
-    4d7c:   f44f 4080   mov.w r0, #16384   ; 0x4000
+    4d78:   f7fe fb60   bl 0x343c               ; call ckcu_apb0_clock_enable(0x20, 1)
+    4d7c:   f44f 4080   mov.w r0, #16384        ; 0x4000
     4d80:   1105        asrs r5, r0, #4
     4d82:   e9cd 0500   strd r0, r5, [sp]
     4d86:   2008        movs r0, #8
@@ -3792,21 +3795,21 @@ function_29:
     4d92:   9006        str r0, [sp, #24]
     4d94:   9007        str r0, [sp, #28]
     4d96:   2004        movs r0, #4
-    4d98:   4e0d        ldr r6, [pc, #52]   ; (0x4dd0)
+    4d98:   4e0d        ldr r6, [pc, #52]       ; (0x4dd0)
     4d9a:   9008        str r0, [sp, #32]
-    4d9c:   9009        str r0, [sp, #36]   ; 0x24
-    4d9e:   900a        str r0, [sp, #40]   ; 0x28
+    4d9c:   9009        str r0, [sp, #36]       ; 0x24
+    4d9e:   900a        str r0, [sp, #40]       ; 0x28
     4da0:   4669        mov r1, sp
     4da2:   4630        mov r0, r6
-    4da4:   f001 fbf2   bl 0x658c                   ; call function_e_54(SPI1, sp)
+    4da4:   f001 fbf2   bl 0x658c               ; call spi_config(SPI1, sp)
     4da8:   2101        movs r1, #1
     4daa:   4630        mov r0, r6
-    4dac:   f001 fc20   bl 0x65f0                   ; call spi_slave_select_output(SPI1, 1)
-    4db0:   4808        ldr r0, [pc, #32]   ; (0x4dd4)
-    4db2:   6245        str r5, [r0, #36]   ; 0x24
+    4dac:   f001 fc20   bl 0x65f0               ; call spi_slave_select_output(SPI1, 1)
+    4db0:   4808        ldr r0, [pc, #32]       ; (0x4dd4)
+    4db2:   6245        str r5, [r0, #36]       ; 0x24
     4db4:   2101        movs r1, #1
     4db6:   4630        mov r0, r6
-    4db8:   f001 fbde   bl 0x6578                   ; call spi_enable(SPI1, 1)
+    4db8:   f001 fbde   bl 0x6578               ; call spi_enable(SPI1, 1)
     4dbc:   f000 f840   bl 0x4e40
     4dc0:   2002        movs r0, #2
     4dc2:   7020        strb r0, [r4, #0]
@@ -3819,41 +3822,43 @@ function_29:
   0x4dd0:   0x40044000  ; SPI 1
   0x4dd4:   0x400b2000  ; GPIO B
 
-function_10:
+spi_flash_read_wip:
   0x4dd8:   b510        push {r4, lr}
     4dda:   f7ff ffaf   bl 0x4d3c               ; call spi_flash_read_status
     4dde:   f3c0 0000   ubfx r0, r0, #0, #1
     4de2:   bd10        pop {r4, pc}
 
-function_82:
+spi_gpio_init:
   0x4de4:   b570        push {r4, r5, r6, lr}
     4de6:   4c11        ldr r4, [pc, #68]       ; (0x4e2c)
     4de8:   7820        ldrb r0, [r4, #0]
     4dea:   b9e0        cbnz r0, 0x4e26
+    ; Enable GPIO B clock
     4dec:   2101        movs r1, #1             ; r1 = 1
     4dee:   0448        lsls r0, r1, #17        ; r0 = 0x20000
     4df0:   f7fe fb18   bl 0x3424               ; call ckcu_ahb_clock_enable
+
     4df4:   4e0e        ldr r6, [pc, #56]       ; (0x4e30)
     4df6:   f44f 6580   mov.w r5, #1024         ; 0x400
     4dfa:   2200        movs r2, #0
     4dfc:   4629        mov r1, r5
     4dfe:   4630        mov r0, r6
-    4e00:   f7fe fbac   bl 0x355c               ; call gpio_set_pin_pull_up_down
+    4e00:   f7fe fbac   bl 0x355c               ; call gpio_set_pin_pull_up_down(GPIO B, pin 10, up)
     4e04:   2201        movs r2, #1
     4e06:   4629        mov r1, r5
     4e08:   4630        mov r0, r6
-    4e0a:   f7fe fb8f   bl 0x352c               ; call gpio_set_output_current
+    4e0a:   f7fe fb8f   bl 0x352c               ; call gpio_set_output_current(GPIO B, pin 10, 8mA)
     4e0e:   2201        movs r2, #1
     4e10:   2180        movs r1, #128           ; 0x80
     4e12:   4630        mov r0, r6
-    4e14:   f7fe fb8a   bl 0x352c               ; call gpio_set_output_current
+    4e14:   f7fe fb8a   bl 0x352c               ; call gpio_set_output_current(GPIO B, pin 7, 8mA)
     4e18:   2201        movs r2, #1
     4e1a:   0211        lsls r1, r2, #8
     4e1c:   4630        mov r0, r6
-    4e1e:   f7fe fb85   bl 0x352c               ; call gpio_set_output_current
+    4e1e:   f7fe fb85   bl 0x352c               ; call gpio_set_output_current(GPIO B, pin 8, 8mA)
     4e22:   2001        movs r0, #1
     4e24:   7020        strb r0, [r4, #0]
-    4e26:   2001        movs r0, #1
+  0x4e26:   2001        movs r0, #1
     4e28:   bd70        pop {r4, r5, r6, pc}
     4e2a:   0000
 
@@ -3943,7 +3948,7 @@ spi_flash_page_program:
     4ed0:   4607        mov r7, r0
     4ed2:   460c        mov r4, r1
     4ed4:   4690        mov r8, r2
-    4ed6:   f000 f947   bl 0x5168
+    4ed6:   f000 f947   bl 0x5168           ; call spi_flash_write_enable
     4eda:   4e0e        ldr r6, [pc, #56]   ; (0x4f14)
     4edc:   f44f 6580   mov.w r5, #1024   ; 0x400
     4ee0:   62b5        str r5, [r6, #40]   ; 0x28
@@ -3973,7 +3978,7 @@ spi_flash_sector_erase:
     ; r0 =
   0x4f18:   b5f8        push {r3, r4, r5, r6, r7, lr}
     4f1a:   4604        mov r4, r0
-    4f1c:   f000 f924   bl 0x5168
+    4f1c:   f000 f924   bl 0x5168           ; call spi_flash_write_enable
     4f20:   4e0a        ldr r6, [pc, #40]   ; (0x4f4c)
     4f22:   f44f 6580   mov.w r5, #1024   ; 0x400
     4f26:   62b5        str r5, [r6, #40]   ; 0x28
@@ -3997,7 +4002,7 @@ spi_flash_write_status_register:
     ; r0 =
   0x4f50:   b5f8        push {r3, r4, r5, r6, r7, lr}
     4f52:   4606        mov r6, r0              ; r6 = r0
-    4f54:   f000 f908   bl 0x5168               ; call
+    4f54:   f000 f908   bl 0x5168               ; call spi_flash_write_enable
     4f58:   4c07        ldr r4, [pc, #28]       ; r4 = (0x4f78)
     4f5a:   f44f 6580   mov.w r5, #1024         ; r5 = 0x400
     4f5e:   62a5        str r5, [r4, #40]       ; [r4 + 0x28] = r5
@@ -4021,7 +4026,7 @@ function_78:
 
   0x4f86:   2064        movs r0, #100           ; 0x64
     4f88:   f7fe f9a0   bl 0x32cc               ; call spin_wait_maybe(100)
-    4f8c:   f7ff ff24   bl 0x4dd8               ; call function_10
+    4f8c:   f7ff ff24   bl 0x4dd8               ; call spi_flash_read_wip
     4f90:   b118        cbz r0, 0x4f9a
     4f92:   1e64        subs r4, r4, #1
     4f94:   1c60        adds r0, r4, #1
@@ -4184,7 +4189,7 @@ function_e_40:
     50ae:   e005        b.n 0x50bc
     50b0:   4628        mov r0, r5
     50b2:   f7fe f90b   bl 0x32cc               ; call spin_wait_maybe
-    50b6:   f7ff fe8f   bl 0x4dd8               ; call function_10
+    50b6:   f7ff fe8f   bl 0x4dd8               ; call spi_flash_read_wip
     50ba:   b118        cbz r0, 0x50c4
     50bc:   1e64        subs r4, r4, #1
     50be:   1c60        adds r0, r4, #1
@@ -4280,20 +4285,22 @@ spi_flash_write_enable:
 
   0x5188:   0x400b2000  ; GPIO B
 
-function_28:
+spi_flash_set_status_reg:
   0x518c:   b510        push {r4, lr}
     518e:   f44f 74cd   mov.w r4, #410   ; 0x19a
-    5192:   f7ff fedd   bl 0x4f50               ; call spi_flash_write_status_register
+    5192:   f7ff fedd   bl 0x4f50               ; call spi_flash_write_status_register(a0)
     5196:   e005        b.n 0x51a4
-    5198:   2064        movs r0, #100   ; 0x64
+
+  0x5198:   2064        movs r0, #100   ; 0x64
     519a:   f7fe f897   bl 0x32cc               ; spin_wait_maybe(100)
-    519e:   f7ff fe1b   bl 0x4dd8               ; call function_10
+    519e:   f7ff fe1b   bl 0x4dd8               ; call spi_flash_read_wip
     51a2:   b118        cbz r0, 0x51ac
-    51a4:   1e64        subs r4, r4, #1
+  0x51a4:   1e64        subs r4, r4, #1
     51a6:   1c60        adds r0, r4, #1
     51a8:   d1f6        bne.n 0x5198
     51aa:   bd10        pop {r4, pc}
-    51ac:   2001        movs r0, #1
+
+  0x51ac:   2001        movs r0, #1
     51ae:   bd10        pop {r4, pc}
 
 setup_intr_priority:
@@ -4416,42 +4423,45 @@ nvic_set_vtor:
   0x52a0:   0x1fffff80  ; Address mask
   0x52a4:   0xe000ed08  ; NVIC VTOR register
 
-function_12:
+spi_flash_init:
   0x52a8:   b510        push {r4, lr}
-    52aa:   f000 f821   bl 0x52f0
+    52aa:   f000 f821   bl 0x52f0               ; call spi_gpio_setup
     52ae:   4c0f        ldr r4, [pc, #60]   ; (0x52ec)
     52b0:   7820        ldrb r0, [r4, #0]
     52b2:   2801        cmp r0, #1
     52b4:   d117        bne.n 0x52e6
-    52b6:   f7ff fd55   bl 0x4d64               ; call function_29
+    52b6:   f7ff fd55   bl 0x4d64               ; call spi_init
     52ba:   2801        cmp r0, #1
     52bc:   d10f        bne.n 0x52de
     52be:   f7ff fd3d   bl 0x4d3c               ; call spi_flash_read_status
     52c2:   b120        cbz r0, 0x52ce
     52c4:   2000        movs r0, #0
-    52c6:   f7ff ff61   bl 0x518c               ; call function_28
+    52c6:   f7ff ff61   bl 0x518c               ; call spi_flash_set_status_reg(0)
     52ca:   2801        cmp r0, #1
     52cc:   d107        bne.n 0x52de
-    52ce:   f7ff fd35   bl 0x4d3c               ; call spi_flash_read_status
+  0x52ce:   f7ff fd35   bl 0x4d3c               ; call spi_flash_read_status
     52d2:   b130        cbz r0, 0x52e2
     52d4:   2000        movs r0, #0
-    52d6:   f7ff ff59   bl 0x518c               ; call function_28
+    52d6:   f7ff ff59   bl 0x518c               ; call spi_flash_set_status_reg(0)
     52da:   2801        cmp r0, #1
     52dc:   d001        beq.n 0x52e2
-    52de:   2000        movs r0, #0
+  0x52de:   2000        movs r0, #0
     52e0:   bd10        pop {r4, pc}
-    52e2:   2002        movs r0, #2
+
+  0x52e2:   2002        movs r0, #2
     52e4:   7020        strb r0, [r4, #0]
     52e6:   2001        movs r0, #1
     52e8:   bd10        pop {r4, pc}
-    52ea:   0000        movs r0, r0
-    52ec:   0228        lsls r0, r5, #8
-    52ee:   2000        movs r0, #0
-    52f0:   b510        push {r4, lr}
+    52ea:   0000
+
+  0x52ec:   0x20000228
+
+spi_gpio_setup:
+  0x52f0:   b510        push {r4, lr}
     52f2:   4c04        ldr r4, [pc, #16]   ; (0x5304)
     52f4:   7820        ldrb r0, [r4, #0]
     52f6:   b918        cbnz r0, 0x5300
-    52f8:   f7ff fd74   bl 0x4de4
+    52f8:   f7ff fd74   bl 0x4de4           ; call spi_gpio_init
     52fc:   2001        movs r0, #1
     52fe:   7020        strb r0, [r4, #0]
     5300:   2001        movs r0, #1
@@ -6352,7 +6362,7 @@ spi_enable:
     6588:   6001        str r1, [r0, #0]
     658a:   4770        bx lr
 
-function_e_54:
+spi_config:
     ; r0 = SPI registers
     ; r1 = ptr
   0x658c:   b530        push {r4, r5, lr}
@@ -7252,7 +7262,7 @@ function_75:
     6ccc:   7920        ldrb r0, [r4, #4]       ; r0 = [r4 + 4]
     6cce:   f3c0 0100   ubfx r1, r0, #0, #1     ; r1 = r0 & 1
     6cd2:   6d60        ldr r0, [r4, #84]       ; r0 = [r4 + 0x54]
-    6cd4:   f000 f98c   bl 0x6ff0               ; call function_28
+    6cd4:   f000 f98c   bl 0x6ff0               ; call function_82
     6cd8:   78a0        ldrb r0, [r4, #2]       ; r0 = [r4 + 2]
     6cda:   f1a4 0430   sub.w r4, r4, #48       ; r4 = r4 - 0x30
     6cde:   2803        cmp r0, #3
@@ -7668,7 +7678,7 @@ usb_clear_csr:
 
   0x6fec:   0x400a8000  ; USB Registers
 
-function_28:
+function_82:
   0x6ff0:   b510        push {r4, lr}
     6ff2:   4604        mov r4, r0
     6ff4:   4819        ldr r0, [pc, #100]      ; (0x705c)
@@ -7698,7 +7708,7 @@ function_28:
     7030:   2000        movs r0, #0
     7032:   f7fe ff41   bl 0x5eb8               ; call function_3
     7036:   2000        movs r0, #0
-    7038:   f7ff feac   bl 0x6d94               ; call function_29
+    7038:   f7ff feac   bl 0x6d94               ; call spi_init
     703c:   6820        ldr r0, [r4, #0]
     703e:   f7ff ffa5   bl 0x6f8c               ; call usb_enable_intr
     7042:   2000        movs r0, #0

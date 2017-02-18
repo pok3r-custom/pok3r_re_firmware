@@ -42,21 +42,21 @@ pointer_37                              @ 0x20000044
     ptr_set_desc_ptr
 
 variable_sram_e_1                       @ 0x20000058
-    0x6:    byte
-    0x14:   byte
-    0x22:   byte
-    0x24:   byte
-    0x26:   byte
-    0x29:   byte
-    0x39:   byte
-    0x3d:   byte
-    0x3e:   byte
-    0x46:   half
-    0x48:   half
-    0x4a:   half
-    0x4c:   half
-    0xf8:   word
-    0xfc:   word
+    0x6:  b
+    0x14: b
+    0x22: b
+    0x24: b
+    0x26: b
+    0x29: b
+    0x39: b
+    0x3d: b
+    0x3e: b
+    0x46: h
+    0x48: h
+    0x4a: h
+    0x4c: h
+    0xf8: w
+    0xfc: w
 
     function_e_5
     function_e_7
@@ -163,7 +163,7 @@ pointer_29                              @ 0x2000021e
     function_e_37
 
 pointer_4                               @ 0x20000220
-    0x0:
+    0x0:  b GPIO B init state
     0x4: a0 of spi_write_read
     spi_write_read
 

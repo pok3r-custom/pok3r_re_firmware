@@ -113,7 +113,7 @@ function_13                         @ 0x37e0
 exti_set_wakup                      @ 0x3860
 exti_check_wakup                    @ 0x3870
 function_74                         @ 0x3884
-    function_12
+    spi_flash_init
     function_e_95
     function_e_25
     function_e_48
@@ -176,16 +176,16 @@ function_e_29                       @ 0x4c6c
 clear_some_mem                      @ 0x4cde
 function_e_30                       @ 0x4cf6
 function_e_31                       @ 0x4d26
-spi_flash_read_status                         @ 0x4d3c
+spi_flash_read_status               @ 0x4d3c
     spi_write_read
-function_29                         @ 0x4d64
+spi_init                            @ 0x4d64
     ckcu_apb0_clock_enable
-    function_e_54
+    spi_config
     spi_slave_select_output
     spi_enable
-function_10                         @ 0x4dd8
+spi_flash_read_wip                         @ 0x4dd8
     spi_flash_read_status
-function_82                         @ 0x4de4
+spi_gpio_init                       @ 0x4de4
     ckcu_ahb_clock_enable
 pinmux_select_b789                  @ 0x4e34
     pinmux_b789_spi
@@ -210,7 +210,7 @@ spi_flash_write_status_register     @ 0x4f50
 function_78                         @ 0x4f7c
     spi_flash_page_program
     spin_wait_maybe
-    function_10
+    spi_flash_read_wip
 spi_flash_deep_power_down           @ 0x4fa0
     spi_write_read
     spin_wait_maybe
@@ -221,15 +221,15 @@ spi_write_read                      @ 0x5008
 function_e_40                       @ 0x50a0
     spi_flash_sector_erase
     spin_wait_maybe
-    function_10
+    spi_flash_read_wip
     spi_write_read
 function_27                         @ 0x50f0
 spi_flash_release_sleep             @ 0x50c8
 spi_flash_write_enable              @ 0x5168
     spi_write_read
-function_28                         @ 0x518c
+spi_flash_set_status_reg                         @ 0x518c
     function_9
-    function_10
+    spi_flash_read_wip
 
 setup_intr_priority                 @ 0x51b0
     calc_nvic_priority
@@ -237,10 +237,12 @@ setup_intr_priority                 @ 0x51b0
 calc_nvic_priority                  @ 0x5240
 ppb_set_nvic_priority               @ 0x5272
 nvic_set_vtor                       @ 0x5294
-function_12                         @ 0x52a8
-    function_29
+spi_flash_init                      @ 0x52a8
+    spi_init
     spi_flash_read_status
-    function_28
+    spi_flash_set_status_reg
+spi_gpio_setup                      @ 0x52f0
+    spi_gpio_init
 jump_2                              @ 0x5308
     pinmux_select_b789
 function_e_41                       @ 0x530c
@@ -308,7 +310,7 @@ function_e_51                       @ 0x6478
 function_e_6                        @ 0x64cc
 function_e_52                       @ 0x6520
 spi_enable                          @ 0x6578
-function_e_54                       @ 0x658c
+spi_config                          @ 0x658c
 spi_slave_select_output             @ 0x65f0
 function_e_4                        @ 0x6604
     // this function has something to do with the
@@ -372,7 +374,7 @@ usb_entry                           @ 0x6af2
 function_23                         @ 0x6ca8
     jump_1
 function_75                         @ 0x6cc6
-    function_28
+    spi_flash_set_status_reg
 gen_remote_wakeup                   @ 0x6d06
     usb_clear_csr
     usb_set_genrsm
@@ -419,9 +421,9 @@ jump_1                              @ 0x6fcc
     ptr_write_data
 usb_set_lpmode_pdwn                 @ 0x6fd0
 usb_clear_csr                       @ 0x6fe0
-function_28                         @ 0x6ff0
+function_82                         @ 0x6ff0
     function_3
-    function_29
+    spi_init
     usb_enable_intr
     usb_dp_pull_up
 ptr_write_data                      @ 0x7064
