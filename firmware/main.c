@@ -1,6 +1,4 @@
 #include "main.h"
-#include "board/ht32/usb/usb.h"
-#include "board/ht32/usb/descriptors.h"
 
 #define REG_SPI_FLASH REG_SPI1
 
@@ -274,6 +272,13 @@ void on_suspend(){
 
 }
 
+void on_configuration(u8 config){
+    if(config == 1){
+        usb_ep_init(EP_1, 64, EPnIER_ODRXIE);
+        usb_ep_init(EP_2, 64, EPnIER_ODRXIE);
+    }
+}
+
 int main(){
     // Basic init
     ckcu_init();
@@ -292,9 +297,10 @@ int main(){
 //    spi_read();
 
     // USB
-    usb_init_descriptors();
     usb_init();
+    usb_init_descriptors();
     usb_callback_suspend(on_suspend);
+    usb_callback_configuration(on_configuration);
 
     // Enable D+ pull-up
     usb_pull_up(1);

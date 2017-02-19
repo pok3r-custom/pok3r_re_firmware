@@ -5,47 +5,66 @@ PROJECT(Pok3r_Custom C ASM)
 
 ### =================== SOURCES =================== ###
 
-SET(COMMON_SOURCES
+SET(COMMON_HEADERS
     main.h
-    main.c
 
     board/board.h
     board/cortex-m3.h
-    board/cortex-m3.c
 
     board/ht32/ht32.h
     board/ht32/ht32f165x.h
-    board/ht32/ht32f165x.c
     board/ht32/ht32f1654.h
-    board/ht32/ht32f1654.c
     board/ht32/ht32f1655.h
-    board/ht32/ht32f1655.c
-
-    board/ht32/startup.s
-
-    board/ht32/usb/descriptors.h
-    board/ht32/usb/descriptors.c
     board/ht32/usb/usb.h
+
+    board/pok3r_board.h
+    board/pok3r_rgb_board.h
+    board/vortex_core_board.h
+)
+
+SET(STARTUP_SOURCE
+    board/ht32/startup.s
+)
+
+SET(COMMON_SOURCES
+    main.c
+    descriptor.c
+
+    board/cortex-m3.c
+
+    board/ht32/ht32f165x.c
     board/ht32/usb/usb.c
 )
 
 SET(POK3R_SOURCES
-    board/pok3r_board.h
+    ${COMMON_SOURCES}
+    board/ht32/ht32f1655.c
 )
 
 SET(POK3R_RGB_SOURCES
-    board/pok3r_rgb_board.h
+    ${COMMON_SOURCES}
+    board/ht32/ht32f1654.c
+)
+
+SET(VORTEX_CORE_SOURCES
+    ${COMMON_SOURCES}
+    board/ht32/ht32f1654.c
 )
 
 FILE(GLOB_RECURSE DEMO_FILES demo/*.c demo/*.h demo/*.s demo/*.ld)
 
 SET(FILES
+    ${COMMON_HEADERS}
     ${COMMON_SOURCES}
+
     ${POK3R_SOURCES}
     ${POK3R_RGB_SOURCES}
-    pok3r_custom.ld
-    pok3r_rgb_custom.ld
+    ${VORTEX_CORE_SOURCES}
+
+    ht32f1654.ld
+    ht32f1655.ld
     openocd.cfg
+
     ${DEMO_FILES}
 )
 
@@ -53,26 +72,48 @@ SET(FILES
 
 SET(CMAKE_VERBOSE_MAKEFILE ON)
 
-SET(POK3R_NAME      "pok3r_custom")
-SET(POK3R_DIR       "${CMAKE_CURRENT_BINARY_DIR}/${POK3R_NAME}")
-SET(POK3R_MAKE      "pok3r.make")
+FUNCTION(ConfigureBoard NAME SRCS LINK DEFS)
+    MESSAGE(STATUS "Configure ${NAME}")
 
-SET(POK3R_RGB_NAME  "pok3r_rgb_custom")
-SET(POK3R_RGB_DIR   "${CMAKE_CURRENT_BINARY_DIR}/${POK3R_RGB_NAME}")
-SET(POK3R_RGB_MAKE  "pok3r_rgb.make")
+    # Variables for makefile configure
+    SET(OUT_NAME ${NAME})
+    SET(SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
+    SET(BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}/${NAME}")
+    SET(LD_FILE ${LINK})
+    SET(C_DEFS ${DEFS})
+    STRING(REPLACE ";" " " C_SRCS "${SRCS}")
 
-# Generate makefiles
-SET(OUT_NAME ${POK3R_NAME})
-SET(FIRMWARE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
-SET(FIRMWARE_BINARY_DIR "${POK3R_DIR}")
-SET(C_DEFS "-DBOARD=1 -DCPU=0x1655")
-CONFIGURE_FILE(Makefile.in ${POK3R_DIR}/${POK3R_MAKE} @ONLY)
+    # Configure makefile
+    SET(BOARD_DIR "${CMAKE_CURRENT_BINARY_DIR}/${NAME}")
+    SET(BOARD_MAKE "${BOARD_DIR}/${NAME}.make")
+    CONFIGURE_FILE(Makefile.in "${BOARD_MAKE}" @ONLY)
 
-SET(OUT_NAME ${POK3R_RGB_NAME})
-SET(FIRMWARE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
-SET(FIRMWARE_BINARY_DIR "${POK3R_RGB_DIR}")
-SET(C_DEFS "-DBOARD=2 -DCPU=0x1654")
-CONFIGURE_FILE(Makefile.in ${POK3R_RGB_DIR}/${POK3R_RGB_MAKE} @ONLY)
+    # Custom make command
+    SET(BOARD_BIN "${BOARD_DIR}/${NAME}.bin")
+    ADD_CUSTOM_COMMAND(OUTPUT ${BOARD_BIN}
+        DEPENDS ${COMMON_HEADERS} ${STARTUP_SOURCE} ${SRCS}
+        WORKING_DIRECTORY ${BOARD_DIR}
+        COMMAND make -f ${BOARD_MAKE}
+    )
+
+    SET(${NAME}_BIN "${BOARD_BIN}" PARENT_SCOPE)
+ENDFUNCTION()
+
+ConfigureBoard("pok3r_custom"
+    "${POK3R_SOURCES}"
+    ht32f1655.ld
+    "-DBOARD=1 -DCPU=0x1655"
+)
+ConfigureBoard("pok3r_rgb_custom"
+    "${POK3R_RGB_SOURCES}"
+    ht32f1654.ld
+    "-DBOARD=2 -DCPU=0x1654"
+)
+ConfigureBoard("vortex_core_custom"
+    "${VORTEX_CORE_SOURCES}"
+    ht32f1654.ld
+    "-DBOARD=3 -DCPU=0x1654"
+)
 
 ### =================== BUILD =================== ###
 
@@ -80,28 +121,11 @@ ADD_CUSTOM_TARGET(firmware-dummy SOURCES ${FILES})
 
 IF(CMAKE_SYSTEM_NAME MATCHES "Linux")
 
-    # POK3R
-    SET(POK3R_BIN "${POK3R_DIR}/${POK3R_NAME}.bin")
-
-    ADD_CUSTOM_COMMAND(OUTPUT ${POK3R_BIN}
-        DEPENDS ${STARTUP_SOURCES} ${COMMON_SOURCES} ${POK3R_SOURCES}
-        WORKING_DIRECTORY ${POK3R_DIR}
-        COMMAND make -f ${POK3R_MAKE}
-    )
-
-    # POK3R RGB
-    SET(POK3R_RGB_BIN "${POK3R_RGB_DIR}/${POK3R_RGB_NAME}.bin")
-
-    ADD_CUSTOM_COMMAND(OUTPUT ${POK3R_RGB_BIN}
-        DEPENDS ${STARTUP_SOURCES} ${COMMON_SOURCES} ${POK3R_RGB_SOURCES}
-        WORKING_DIRECTORY ${POK3R_RGB_DIR}
-        COMMAND make -f ${POK3R_RGB_MAKE}
-    )
-
     # Firmware target
     ADD_CUSTOM_TARGET(firmware ALL
-        DEPENDS ${POK3R_BIN}
-        #DEPENDS ${POK3R_RGB_BIN}
+        DEPENDS ${pok3r_custom_BIN}
+        #DEPENDS ${pok3r_custom_rgb_BIN}
+        #DEPENDS ${vortex_core_custom_BIN}
     )
 
 ENDIF()

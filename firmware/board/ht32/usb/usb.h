@@ -39,6 +39,17 @@
 #define FEATURE_DEVICE_REMOTE_WAKEUP    1
 #define FEATURE_TEST_MODE               2
 
+// Descriptor Types
+#define DESC_TYPE_DEVICE                    1
+#define DESC_TYPE_CONFIGURATION             2
+#define DESC_TYPE_STRING                    3
+#define DESC_TYPE_INTERFACE                 4
+#define DESC_TYPE_ENDPOINT                  5
+#define DESC_TYPE_DEVICE_QUALIFIER          6
+#define DESC_TYPE_OTHER_SPEED_CONFIGURATION 7
+#define DESC_TYPE_INTERFACE_POWER           8
+#define DESC_TYPE_HID                       0x21
+
 #define OPT_SELF_POWERED    0x01
 #define OPT_REMOTE_WAKEUP   0x02
 
@@ -123,6 +134,7 @@ typedef struct {
 } USB_Endpoint;
 
 typedef void (*usb_suspend_func)(void);
+typedef void (*usb_configuration_func)(u8);
 
 typedef struct {
     USB_Status currStatus;
@@ -137,12 +149,20 @@ typedef struct {
     USB_Descriptors descriptors;
 
     usb_suspend_func suspend_callback;
+    usb_configuration_func configuration_callback;
 } USB_Device;
 
 // API
 void usb_init();
 void usb_pull_up(char en);
 
+void usb_ep_init(u8 ep, u16 eplen, u32 ier);
+
+void usb_set_device_desc(const USB_Descriptor *desc);
+void usb_set_config_descs(const USB_Descriptor *descs, u8 num);
+void usb_set_string_descs(const USB_Descriptor *descs, u8 num);
+
 void usb_callback_suspend(usb_suspend_func call);
+void usb_callback_configuration(usb_configuration_func call);
 
 #endif // USB_H

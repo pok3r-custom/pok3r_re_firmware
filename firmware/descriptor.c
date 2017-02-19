@@ -1,7 +1,4 @@
-#include "descriptors.h"
-#include "usb.h"
-
-extern USB_Device usb_dev;
+#include "main.h"
 
 const u8 deviceDesc[] = {
     0x12,        // bLength
@@ -134,11 +131,7 @@ const USB_Descriptor strs[] = {
 };
 
 void usb_init_descriptors(){
-    usb_dev.descriptors.device = &device;
-
-    usb_dev.descriptors.config = configs;
-    usb_dev.descriptors.numConfig = 1;
-
-    usb_dev.descriptors.string = strs;
-    usb_dev.descriptors.numString = 2;
+    usb_set_device_desc(&device);
+    usb_set_config_descs(&configs, 1);
+    usb_set_string_descs(&strs, 2);
 }

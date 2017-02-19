@@ -14,4 +14,6 @@
     #error "Must specify a CPU!"
 #endif
 
+#include "usb/usb.h"
+
 #endif // HT32_H

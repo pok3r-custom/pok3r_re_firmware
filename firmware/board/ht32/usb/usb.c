@@ -1,8 +1,8 @@
 #include "usb.h"
-#include "descriptors.h"
 #include "../ht32.h"
 
 USB_Device usb_dev;
+u16 ep_next_addr;
 
 // Functions
 u32 usb_get_int_flags();
@@ -36,52 +36,39 @@ u16 endpoint_write(u8 ep, const u8 *src, u16 len);
 u16 endpoint_read(u8 ep, u8 *dest, u16 len);
 
 void usb_ep_init(u8 ep, u16 eplen, u32 ier){
-    static u32 ep_adr = 0x8;
-    u32 wcfgr;
-    u32 wier;
+    if(ep < EP_1 || ep > EP_7)
+        return;
 
-    if(ep == EP_0){
-        USBEP0CFGR_reg cfgr = {0};
-        cfgr.EPBUFA = ep_adr;
+    u32 wcfgr;
+    u16 epaddr = ep_next_addr;
+
+    if(ep < EP_4){
+        USBEPnCFGR_1_3_reg cfgr = {0};
+        cfgr.EPEN = 1;
+        cfgr.EPBUFA = epaddr;
         cfgr.EPLEN = eplen;
         wcfgr = cfgr.word;
-
-        wier = ier;
     } else {
-        if(ep < EP_4){
-            USBEPnCFGR_1_3_reg cfgr = {0};
-            cfgr.EPEN = 1;
-            cfgr.EPBUFA = ep_adr;
-            cfgr.EPLEN = eplen;
-            wcfgr = cfgr.word;
-        } else {
-            USBEPnCFGR_4_7_reg cfgr = {0};
-            cfgr.EPEN = 1;
-            cfgr.EPBUFA = ep_adr;
-            cfgr.EPLEN = eplen;
-            wcfgr = cfgr.word;
-        }
-
-        wier = ier;
+        USBEPnCFGR_4_7_reg cfgr = {0};
+        cfgr.EPEN = 1;
+        cfgr.EPBUFA = epaddr;
+        cfgr.EPLEN = eplen;
+        wcfgr = cfgr.word;
     }
+
+    ep_next_addr += eplen;
 
     usb_dev.ep[ep].enable = 1;
     usb_dev.ep[ep].length = eplen;
-    usb_dev.ep[ep].buffer = (volatile u8 *)(USB_SRAM_BASE + ep_adr);
-
-    if(ep == EP_0){
-        ep_adr += (eplen << 1); // ep 0 is bidirectional
-    } else {
-        ep_adr += eplen;
-    }
+    usb_dev.ep[ep].buffer = (volatile u8 *)(USB_SRAM_BASE + epaddr);
 
     // backup ep config
     usb_dev.ep[ep].cfgr = wcfgr;
-    usb_dev.ep[ep].ier = wier;
+    usb_dev.ep[ep].ier = ier;
 
     // set ep config
     REG(USB_USBEPnCFGR(ep)) = wcfgr;
-    REG(USB_USBEPnIER(ep)) = wier;
+    REG(USB_USBEPnIER(ep)) = ier;
     REG(USB_USBEPnISR(ep)) = 0xFFFFFFFF;
 }
 
@@ -93,15 +80,21 @@ void usb_init(){
     for(int i = 0; i < 8; ++i)
         usb_dev.ep[i].enable = 0;
 
+    usb_dev.suspend_callback = NULL;
+    usb_dev.configuration_callback = NULL;
+
     // enable USB clock
     REG_CKCU->AHBCCR.USBEN = 1;
     // set usb prescaler
     REG_CKCU->GCFGR.USBPRE = 2;
 
-    // init endpoints
-    usb_ep_init(EP_0, 64, EPnIER_ODRXIE | EPnIER_IDTXIE | EPnIER_SDRXIE);
-    usb_ep_init(EP_1, 64, EPnIER_ODRXIE);
-    usb_ep_init(EP_2, 64, EPnIER_ODRXIE);
+    // init endpoint 0
+    REG_USB->USBEP0CFGR.EPBUFA = 0x8;
+    REG_USB->USBEP0CFGR.EPLEN = 64;
+    REG_USB->USBEP0IER.word = EPnIER_ODRXIE | EPnIER_IDTXIE | EPnIER_SDRXIE;
+    REG_USB->USBEP0ISR.word = 0xFFFFFFFF;
+
+    ep_next_addr = 0x8 + 64 + 64;
 
     // enable usb interrupts
     usb_dev.ier.word = USBIER_UGIE |
@@ -524,7 +517,11 @@ void standard_set_configuration(USB_Request *request){
         u8 config = request->wValue & 0xFF;
         if(config){
             usb_dev.bConfigurationValue = config;
-            // TODO: config init
+
+            // User callback
+            if(usb_dev.configuration_callback)
+                usb_dev.configuration_callback(config);
+
             usb_dev.currStatus = CONFIGURED;
         } else {
             usb_dev.currStatus = ADDRESS;
@@ -629,6 +626,24 @@ u16 endpoint_read(u8 ep, u8 *dest, u16 len){
     return rlen;
 }
 
+void usb_set_device_desc(const USB_Descriptor *desc){
+    usb_dev.descriptors.device = desc;
+}
+
+void usb_set_config_descs(const USB_Descriptor *descs, u8 num){
+    usb_dev.descriptors.config = descs;
+    usb_dev.descriptors.numConfig = num;
+}
+
+void usb_set_string_descs(const USB_Descriptor *descs, u8 num){
+    usb_dev.descriptors.string = descs;
+    usb_dev.descriptors.numString = num;
+}
+
 void usb_callback_suspend(usb_suspend_func call){
     usb_dev.suspend_callback = call;
+}
+
+void usb_callback_configuration(usb_configuration_func call){
+    usb_dev.configuration_callback = call;
 }

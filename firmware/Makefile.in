@@ -9,21 +9,14 @@
 APP_NAME = @OUT_NAME@
 
 # Directories
-SRC_DIR = @FIRMWARE_SOURCE_DIR@
-BIN_DIR = @FIRMWARE_BINARY_DIR@
+SRC_DIR = @SOURCE_DIR@
+BIN_DIR = @BINARY_DIR@
 
 # Input Files
-LD_SCRIPT = $(SRC_DIR)/$(APP_NAME).ld
+LD_SCRIPT = $(SRC_DIR)/@LD_FILE@
 STARTUP_S = board/ht32/startup.s
 
-CC_SRCS = \
-	main.c \
-	board/cortex-m3.c \
-	board/ht32/ht32f165x.c \
-	board/ht32/ht32f1654.c \
-	board/ht32/ht32f1655.c \
-	board/ht32/usb/descriptors.c \
-	board/ht32/usb/usb.c
+CC_SRCS = @C_SRCS@
 
 # Output Files
 OUT_ELF = $(APP_NAME).elf

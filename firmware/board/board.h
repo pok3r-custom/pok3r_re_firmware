@@ -18,6 +18,8 @@
 #define MIN(A, B) ((A) < (B) ? (A) : (B))
 #define MAX(A, B) ((A) > (B) ? (A) : (B))
 
+#define NULL ((void*)0)
+
 typedef unsigned char u8;
 typedef unsigned short u16;
 typedef unsigned long u32;
