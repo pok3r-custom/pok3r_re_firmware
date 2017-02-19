@@ -16,20 +16,26 @@ void usb_resume();
 
 // SETUP methods
 void usb_setup();
+void standard_request(USB_Request *request);
 void standard_get_status(USB_Request *request);
-void standard_set_feature(USB_Request *request, u8 set_clear);
+void standard_clear_feature(USB_Request *request);
+void standard_set_feature(USB_Request *request);
 void standard_set_address(USB_Request *request);
 void standard_get_descriptor(USB_Request *request);
+void standard_set_descriptor(USB_Request *request);
 void standard_get_configuration(USB_Request *request);
 void standard_set_configuration(USB_Request *request);
 void standard_get_interface(USB_Request *request);
 void standard_set_interface(USB_Request *request);
 void standard_synch_frame(USB_Request *request);
 
+void control_in(const u8 *src, u16 len);
 void control_out();
-void control_in();
 
-void usb_ep_init(u8 ep, u8 eplen){
+u16 endpoint_write(u8 ep, const u8 *src, u16 len);
+u16 endpoint_read(u8 ep, u8 *dest, u16 len);
+
+void usb_ep_init(u8 ep, u16 eplen, u32 ier){
     static u32 ep_adr = 0x8;
     u32 wcfgr;
     u32 wier;
@@ -38,42 +44,36 @@ void usb_ep_init(u8 ep, u8 eplen){
         USBEP0CFGR_reg cfgr = {0};
         cfgr.EPBUFA = ep_adr;
         cfgr.EPLEN = eplen;
-
-        USBEP0IER_reg ier = {0};
-        ier.ODRXIE = 1; // OUT data received
-        ier.IDTXIE = 1; // IN data transmitted
-        ier.SDRXIE = 1; // SETUP data received
-
         wcfgr = cfgr.word;
-        wier = ier.word;
+
+        wier = ier;
     } else {
         if(ep < EP_4){
             USBEPnCFGR_1_3_reg cfgr = {0};
             cfgr.EPEN = 1;
             cfgr.EPBUFA = ep_adr;
             cfgr.EPLEN = eplen;
-
             wcfgr = cfgr.word;
         } else {
             USBEPnCFGR_4_7_reg cfgr = {0};
             cfgr.EPEN = 1;
             cfgr.EPBUFA = ep_adr;
             cfgr.EPLEN = eplen;
-
             wcfgr = cfgr.word;
         }
 
-        USBEPnIER_reg ier = {0};
-        ier.ODRXIE = 1; // OUT data received
-
-        wier = ier.word;
+        wier = ier;
     }
 
     usb_dev.ep[ep].enable = 1;
     usb_dev.ep[ep].length = eplen;
     usb_dev.ep[ep].buffer = (volatile u8 *)(USB_SRAM_BASE + ep_adr);
 
-    ep_adr += eplen;
+    if(ep == EP_0){
+        ep_adr += (eplen << 1); // ep 0 is bidirectional
+    } else {
+        ep_adr += eplen;
+    }
 
     // backup ep config
     usb_dev.ep[ep].cfgr = wcfgr;
@@ -87,9 +87,8 @@ void usb_ep_init(u8 ep, u8 eplen){
 
 void usb_init(){
     // init global struct
-    usb_dev.deviceFeature = FEAT_REMOTE_WAKEUP;
+    usb_dev.deviceFeature = OPT_REMOTE_WAKEUP;
     usb_dev.currStatus = POWERED;
-    usb_dev.prevStatus = POWERED;
 
     for(int i = 0; i < 8; ++i)
         usb_dev.ep[i].enable = 0;
@@ -100,9 +99,9 @@ void usb_init(){
     REG_CKCU->GCFGR.USBPRE = 2;
 
     // init endpoints
-    usb_ep_init(EP_0, 64);
-    usb_ep_init(EP_1, 64);
-    usb_ep_init(EP_2, 64);
+    usb_ep_init(EP_0, 64, EPnIER_ODRXIE | EPnIER_IDTXIE | EPnIER_SDRXIE);
+    usb_ep_init(EP_1, 64, EPnIER_ODRXIE);
+    usb_ep_init(EP_2, 64, EPnIER_ODRXIE);
 
     // enable usb interrupts
     usb_dev.ier.word = USBIER_UGIE |
@@ -154,12 +153,12 @@ void usb_isr(){
         if(episr & EPnISR_ODRXIF){
             // Clear ISR bit first
             usb_clear_ep_int_flags(EP_0, EPnISR_ODRXIF);
-            control_out();
+//            control_out();
         }
 
         // IN Data Sent
         if(episr & EPnISR_IDTXIF){
-            control_in();
+//            control_in();
             usb_clear_ep_int_flags(EP_0, EPnISR_IDTXIF);
         }
 
@@ -258,247 +257,378 @@ void usb_setup(){
     request.type = (Request_Type)((request.bmRequestType & REQUEST_TYPE_MASK) >> 5);
     request.recipient = (Request_Recipient)(request.bmRequestType & REQUEST_RECIPIENT_MASK);
 
+    // Default action is Request Error (STALL)
+    request.action = STALL;
+    request.controlLength = 0;
+
     // Request Type
     switch(request.type){
         case STANDARD:
-            // Standard Request
-            switch(request.recipient){
-                case DEVICE:
-                    // Device Request
-                    switch(request.bRequest){
-                        case GET_STATUS:
-                            standard_get_status(&request);
-                            break;
-                        case CLEAR_FEATURE:
-                            standard_set_feature(&request, 0);
-                            break;
-                        case SET_FEATURE:
-                            standard_set_feature(&request, 1);
-                            break;
-                        case SET_ADDRESS:
-                            standard_set_address(&request);
-                            break;
-                        case GET_DESCRIPTOR:
-                            standard_get_descriptor(&request);
-                            break;
-                        case SET_DESCRIPTOR:
-                            // do i have to support this?
-                            break;
-                        case GET_CONFIGURATION:
-                            standard_get_configuration(&request);
-                            break;
-                        case SET_CONFIGURATION:
-                            standard_set_configuration(&request);
-                            break;
-                        default:
-                            break;
-                    }
-                    break;
-
-                case INTERFACE:
-                    // Interface Request
-                    switch(request.bRequest){
-                        case GET_STATUS:
-                            standard_get_status(&request);
-                            break;
-                        case CLEAR_FEATURE:
-                            standard_set_feature(&request, 0);
-                            break;
-                        case SET_FEATURE:
-                            standard_set_feature(&request, 1);
-                            break;
-                        case GET_INTERFACE:
-                            standard_get_interface(&request);
-                            break;
-                        case SET_INTERFACE:
-                            standard_set_interface(&request);
-                            break;
-                        default:
-                            break;
-                    }
-                    break;
-
-                case ENDPOINT:
-                    // Endpoint Request
-                    switch(request.bRequest){
-                        case GET_STATUS:
-                            standard_get_status(&request);
-                            break;
-                        case CLEAR_FEATURE:
-                            standard_set_feature(&request, 0);
-                            break;
-                        case SET_FEATURE:
-                            standard_set_feature(&request, 1);
-                            break;
-                        case SYNCH_FRAME:
-                            standard_synch_frame(&request);
-                            break;
-                        default:
-                            break;
-                    }
-                    break;
-                default:
-                    // Reserved Recipient
-                    break;
-            }
-
+            standard_request(&request);
             break;
-
         case CLASS:
             // Class Request
             break;
-
         case VENDOR:
             // Vendor Request
             break;
-
         default:
-            // Reserved Device
             break;
     }
 
     // Request Action
     switch(request.action){
         case DATA_IN:
+            control_in(request.controlData, request.controlLength);
             break;
-
         case DATA_OUT:
             break;
-
         case STALL:
         default:
             // Send Control STALL
             REG_USB->USBEP0CSR.STLTX = 1;
-//            REG(USB_USBEPnCSR(EP_0)) = EPnCSR_STLTX;
+            break;
+    }
+}
+
+void standard_request(USB_Request *request){
+    // Standard Request
+    switch(request->bRequest){
+        case GET_STATUS:
+            standard_get_status(request);
+            break;
+
+        case CLEAR_FEATURE:
+            standard_clear_feature(request);
+            break;
+        case SET_FEATURE:
+            standard_set_feature(request);
+            break;
+
+        case SET_ADDRESS:
+            standard_set_address(request);
+            break;
+
+        case GET_DESCRIPTOR:
+            standard_get_descriptor(request);
+            break;
+        case SET_DESCRIPTOR:
+            standard_set_descriptor(request);
+            break;
+
+        case GET_CONFIGURATION:
+            standard_get_configuration(request);
+            break;
+        case SET_CONFIGURATION:
+            standard_set_configuration(request);
+            break;
+
+        case GET_INTERFACE:
+            standard_get_interface(request);
+            break;
+        case SET_INTERFACE:
+            standard_set_interface(request);
+            break;
+
+        case SYNCH_FRAME:
+            standard_synch_frame(request);
+            break;
+        default:
             break;
     }
 }
 
 void standard_get_status(USB_Request *request){
-    switch(request->recipient){
-        case DEVICE:
-            request->controlBuffer[0] = usb_dev.deviceFeature;
-            request->controlBuffer[1] = 0;
-            break;
-
-        case INTERFACE:
-            request->controlBuffer[0] = 0;
-            request->controlBuffer[1] = 0;
-            break;
-
-        case ENDPOINT: {
-            u8 ep = request->wIndex & 0xF;
-            u32 dir = REG(USB_USBEPnCFGR(ep)) & EPnCFGR_EPDIR;
-            u32 halt = REG(USB_USBEPnCSR(ep)) & (dir ? EPnCSR_STLTX : EPnCSR_STLRX);
-            request->controlBuffer[0] = halt ? 1 : 0;
-            request->controlBuffer[1] = 0;
-            break;
+    if(usb_dev.currStatus == ADDRESS || usb_dev.currStatus == CONFIGURED){
+        switch(request->recipient){
+            case DEVICE:
+                request->controlBuffer[0] = usb_dev.deviceFeature & 0x3;
+                request->controlBuffer[1] = 0;
+                break;
+            case INTERFACE: {
+//                u8 iface = request->wIndex & 0xFF;
+                request->controlBuffer[0] = 0;
+                request->controlBuffer[1] = 0;
+                break;
+            }
+            case ENDPOINT: {
+                u8 ep = request->wIndex & 0xF;
+                u32 dir = REG(USB_USBEPnCFGR(ep)) & EPnCFGR_EPDIR;  // endpoint direction
+                u32 halt = REG(USB_USBEPnCSR(ep)) & (dir ? EPnCSR_STLTX : EPnCSR_STLRX); // stall
+                request->controlBuffer[0] = halt ? 1 : 0;
+                request->controlBuffer[1] = 0;
+                break;
+            }
+            default:
+                return;
         }
 
-        default:
-            return;
+        request->controlData = request->controlBuffer;
+        request->controlLength = 2;
+        request->action = DATA_IN;
     }
-
-    request->controlData = request->controlBuffer;
-    request->controlLength = 2;
-    request->action = DATA_IN;
 }
 
-void standard_set_feature(USB_Request *request, u8 set_clear){
-    switch(request->recipient){
-        case DEVICE:
-            if(request->wValue == DEVICE_REMOTE_WAKEUP){
-                if(set_clear)
-                    usb_dev.deviceFeature |= FEAT_REMOTE_WAKEUP;
-                request->action = DATA_IN;
-            }
-            break;
-
-        case ENDPOINT: {
-            u8 ep = request->wIndex & 0xF;
-            if(ep){
-                if(set_clear){
-                    // Set Halt
-                    REG(USB_USBEPnISR(ep)) = EPnISR_STLIF;
-                    u32 epcsr = ~REG(USB_USBEPnCSR(ep));
-                    epcsr &= (EPnCSR_STLTX | EPnCSR_STLRX);
-                    REG(USB_USBEPnCSR(ep)) = epcsr;
-
-                } else {
-                    // Clear Halt
-                    REG(USB_USBEPnCSR(ep)) &= (EPnCSR_STLTX | EPnCSR_STLRX);
-                    // Clear Data Toggle
-                    REG(USB_USBEPnCSR(ep)) &= (EPnCSR_DTGTX | EPnCSR_DTGRX);
+void standard_clear_feature(USB_Request *request){
+    if(usb_dev.currStatus == ADDRESS || usb_dev.currStatus == CONFIGURED){
+        u16 feature = request->wValue;
+        switch(request->recipient){
+            case DEVICE:
+                switch(feature){
+                    case FEATURE_DEVICE_REMOTE_WAKEUP:
+                        usb_dev.deviceFeature &= ~OPT_REMOTE_WAKEUP;
+                        request->action = DATA_IN;
+                        break;
+                    default:
+                        break;
                 }
+                break;
+            case INTERFACE:
+                break;
+            case ENDPOINT: {
+                u8 ep = request->wIndex & 0xF;
+                switch(feature){
+                    case FEATURE_ENDPOINT_HALT:
+                        // Toggle off STALL status and Data toggle status
+                        REG(USB_USBEPnCSR(ep)) &= (EPnCSR_STLTX | EPnCSR_STLRX |
+                                                   EPnCSR_DTGTX | EPnCSR_DTGRX);
+                        request->action = DATA_IN;
+                        break;
+                    default:
+                        break;
+                }
+                break;
             }
-            break;
+            default:
+                break;
         }
+    }
+}
 
-        default:
-            return;
+void standard_set_feature(USB_Request *request){
+    if(usb_dev.currStatus == ADDRESS || usb_dev.currStatus == CONFIGURED){
+        u16 feature = request->wValue;
+        switch(request->recipient){
+            case DEVICE:
+                switch(feature){
+                    case FEATURE_DEVICE_REMOTE_WAKEUP:
+                        usb_dev.deviceFeature |= OPT_REMOTE_WAKEUP;
+                        request->action = DATA_IN;
+                        break;
+                    case FEATURE_TEST_MODE:
+                        // not supported
+                        break;
+                    default:
+                        break;
+                }
+                break;
+            case INTERFACE:
+                break;
+            case ENDPOINT: {
+                u8 ep = request->wIndex & 0xF;
+                switch(feature){
+                    case FEATURE_ENDPOINT_HALT:
+                        // Clear STALL TX flag
+                        REG(USB_USBEPnISR(ep)) = EPnISR_STLIF;
+                        // Set Halt (toggle STALL bits if they were unset)
+                        REG(USB_USBEPnCSR(ep)) = (~REG(USB_USBEPnCSR(ep))) & (EPnCSR_STLTX | EPnCSR_STLRX);
+                        request->action = DATA_IN;
+                        break;
+                    default:
+                        break;
+                }
+                break;
+            }
+            default:
+                break;
+        }
     }
 }
 
 void standard_set_address(USB_Request *request){
-    REG_USB->USBCSR.ADRSET = 1;
-    REG_USB->USBDEVAR.DEVA = request->wValue & 0x7F;
-//    REG(USB_USBCSR) |= USBCSR_ADRSET;
-//    REG(USB_USBDEVA) = request->wValue & 0x7F;
+    if(usb_dev.currStatus == DEFAULT || usb_dev.currStatus == ADDRESS){
+        u8 address = request->wValue & 0x7F;
+        if(address){
+            REG_USB->USBCSR.ADRSET = 1;
+            REG_USB->USBDEVAR.DEVA = address;
+            usb_dev.currStatus = ADDRESS;
+        } else {
+            REG_USB->USBCSR.ADRSET = 1;
+            REG_USB->USBDEVAR.DEVA = 0;
+            usb_dev.currStatus = DEFAULT;
+        }
+        request->action = DATA_IN;
+    }
 }
 
 void standard_get_descriptor(USB_Request *request){
-    switch(request->wValue >> 8){
+    u8 type = request->wValue >> 8;
+    u8 index = request->wValue & 0xFF;
+//    u16 lang = request->wIndex;
+    u16 length = request->wLength;
+
+    switch(type){
         case DESC_TYPE_DEVICE:
-            request->controlData = usb_dev.descriptors.deviceDesc;
-            request->controlLength = request->controlData[0];
+            request->controlData = usb_dev.descriptors.device->desc;
+            request->controlLength = MIN(usb_dev.descriptors.device->size, length);
             request->action = DATA_IN;
             break;
-
-        case DESC_TYPE_CONFIG:
-            request->controlData = usb_dev.descriptors.configDesc;
-            request->controlLength = request->controlData[0];
-            request->action = DATA_IN;
+        case DESC_TYPE_CONFIGURATION:
+            if(index < usb_dev.descriptors.numConfig){
+                request->controlData = usb_dev.descriptors.config[index].desc;
+                request->controlLength = MIN(usb_dev.descriptors.config[index].size, length);
+                request->action = DATA_IN;
+            }
             break;
-
         case DESC_TYPE_STRING: {
-            u8 index = request->wValue & 0xFF;
-            if(index < usb_dev.descriptors.numStringDescs){
-                request->controlData = usb_dev.descriptors.stringDescs[index];
-                request->controlLength = request->controlData[0];
+            if(index < usb_dev.descriptors.numString){
+                request->controlData = usb_dev.descriptors.string[index].desc;
+                request->controlLength = MIN(usb_dev.descriptors.string[index].size, length);
                 request->action = DATA_IN;
             }
             break;
         }
-
         default:
             return;
     }
 }
 
-void standard_get_configuration(USB_Request *request){
+void standard_set_descriptor(USB_Request *request){
+    // not supported
+}
 
+void standard_get_configuration(USB_Request *request){
+    if(usb_dev.currStatus == ADDRESS){
+        // Return 0
+        request->controlBuffer[0] = 0;
+        request->controlData = request->controlBuffer;
+        request->controlLength = 1;
+        request->action = DATA_IN;
+    } else if(usb_dev.currStatus == CONFIGURED){
+        switch (request->recipient) {
+            case DEVICE:
+                // Return bConfigurationValue
+                request->controlBuffer[0] = usb_dev.bConfigurationValue;
+                request->controlData = request->controlBuffer;
+                request->controlLength = 1;
+                request->action = DATA_IN;
+                break;
+            default:
+                break;
+        }
+    }
 }
 
 void standard_set_configuration(USB_Request *request){
-
+    if(usb_dev.currStatus == ADDRESS || usb_dev.currStatus == CONFIGURED){
+        u8 config = request->wValue & 0xFF;
+        if(config){
+            usb_dev.bConfigurationValue = config;
+            // TODO: config init
+            usb_dev.currStatus = CONFIGURED;
+        } else {
+            usb_dev.currStatus = ADDRESS;
+        }
+        request->action = DATA_IN;
+    }
 }
 
 void standard_get_interface(USB_Request *request){
-
+    if(usb_dev.currStatus == CONFIGURED){
+//        u16 iface = request->wIndex & 0xFF;
+        // TODO: get interface
+        request->controlBuffer[0] = 0;
+        request->controlData = request->controlBuffer;
+        request->controlLength = 1;
+        request->action = DATA_IN;
+    }
 }
 
 void standard_set_interface(USB_Request *request){
-
+    if(usb_dev.currStatus == CONFIGURED){
+//        u8 iface = request->wIndex & 0xFF;
+//        u16 alt = request->wValue;
+        // TODO: set interface
+//        request->action = DATA_IN;
+    }
 }
 
 void standard_synch_frame(USB_Request *request){
+    if(usb_dev.currStatus == CONFIGURED){
+//        u8 ep = request->wIndex & 0xF;
+        // not supported
+//        u16 frnum = 0;
+//        request->controlBuffer[0] = frnum & 0xFF;
+//        request->controlBuffer[1] = frnum >> 8;
+//        request->controlData = request->controlBuffer;
+//        request->controlLength = 2;
+//        request->action = DATA_IN;
+    }
+}
 
+void control_in(const u8 *src, u16 len){
+    endpoint_write(EP_0, src, len);
 }
 
 void control_out(){
 
 }
 
-void control_in(){
+/*! Write endpoint buffer, set TXCNT and toggle NAKTX.
+ * Will not write if write would overwrite existing data.
+ * \param ep    Endpoint.
+ * \param src   Src pointer.
+ * \param len   Bytes to write.
+ * \return Number of bytes written.
+ */
+u16 endpoint_write(u8 ep, const u8 *src, u16 len){
+    // get tx count
+    int eptx = REG(USB_USBEPnTCR(ep)) & 0x1FF;
 
+    if(eptx == 0 && len <= usb_dev.ep[ep].length){
+        // Copy to endpoint IN buffer
+        for(u8 i = 0; i < len; ++i){
+            usb_dev.ep[ep].buffer[i] = src[i];
+        }
+
+        // Set TX transfer count
+        REG(USB_USBEPnTCR(ep)) = len;
+        // Toggle NAKTX on
+        REG(USB_USBEPnCSR(ep)) = EPnCSR_NAKTX;
+
+        return len;
+    }
+    return 0;
+}
+
+/*! Read endpoint buffer and toggle NAKRX if data was read, or len was 0.
+ * \param ep    Endpoint.
+ * \param dest  Dest pointer.
+ * \param len   Bytes to read.
+ * \return Number of bytes read.
+ */
+u16 endpoint_read(u8 ep, u8 *dest, u16 len){
+    // get rx count
+    u16 eprx = (ep == EP_0) ? (REG(USB_USBEPnTCR(ep)) >> 16) : (REG(USB_USBEPnTCR(ep)) & 0x1FF);
+    u16 rlen = MIN(len, eprx);
+
+    // Copy from endpoint OUT buffer
+    for(u16 i = 0; i < rlen; ++i){
+        if(ep == EP_0){
+            dest[i] = (usb_dev.ep[ep].buffer + usb_dev.ep[ep].length)[i];
+        } else {
+            dest[i] = usb_dev.ep[ep].buffer[i];
+        }
+    }
+
+    if(eprx || len == 0){
+        // Toggle NAKRX off
+        REG(USB_USBEPnCSR(ep)) &= EPnCSR_NAKRX;
+    }
+
+    return rlen;
+}
+
+void usb_callback_suspend(usb_suspend_func call){
+    usb_dev.suspend_callback = call;
 }

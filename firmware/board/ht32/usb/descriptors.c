@@ -20,7 +20,8 @@ const u8 deviceDesc[] = {
     0x01,        // bNumConfigurations 1
 };
 
-const u8 configDesc[] = {
+const u8 config0Desc[] = {
+    // Configuration 0
     0x09,        //   bLength
     0x02,        //   bDescriptorType (Configuration)
     0x5B, 0x00,  //   wTotalLength 91
@@ -29,9 +30,8 @@ const u8 configDesc[] = {
     0x00,        //   iConfiguration (String Index)
     0xA0,        //   bmAttributes Remote Wakeup
     0x32,        //   bMaxPower 100mA
-};
 
-const u8 interface0Desc[] = {
+    // Interface 0
     0x09,        // bLength
     0x04,        // bDescriptorType (Interface)
     0x00,        // bInterfaceNumber 0
@@ -41,28 +41,16 @@ const u8 interface0Desc[] = {
     0x00,        // bInterfaceSubClass
     0x00,        // bInterfaceProtocol
     0x00,        // iInterface (String Index)
-};
 
-const u8 hid0Desc[] = {
-    0x09,        // bLength
-    0x21,        // bDescriptorType (HID)
-    0x11, 0x01,  // bcdHID 1.11
-    0x00,        // bCountryCode
-    0x01,        // bNumDescriptors
-    0x22,        // bDescriptorType[0] (HID)
-    0x22, 0x00,  // wDescriptorLength[0] 34
-};
-
-const u8 ep1Desc[] = {
+    // Endpoint 1
     0x07,        // bLength
     0x05,        // bDescriptorType (Endpoint)
     0x81,        // bEndpointAddress (IN/D2H)
     0x03,        // bmAttributes (Interrupt)
     0x40, 0x00,  // wMaxPacketSize 64
     0x01,        // bInterval 1 (unit depends on device speed)
-};
 
-const u8 ep2Desc[] = {
+    // Endpoint 2
     0x07,        // bLength
     0x05,        // bDescriptorType (Endpoint)
     0x02,        // bEndpointAddress (OUT/H2D)
@@ -73,18 +61,46 @@ const u8 ep2Desc[] = {
 
 // USB string descriptor 0 (LANGID 0x0409 - English US)
 const u8 str0Desc[] = {
-    0x04,        // bLength
+    2+2,         // bLength
     0x03,        // bDescriptorType (String)
     0x09, 0x04,
 };
 
-// USB string descriptor 1 "USB Keyboard"
+// USB string descriptor 1 "POK3R Custom Keyboard"
 const u8 str1Desc[] = {
-    0x1A,        // bLength
+    42+2,        // bLength
     0x03,        // bDescriptorType (String)
-    0x55, 0x00, 0x53, 0x00, 0x42, 0x00, 0x20, 0x00,
-    0x4B, 0x00, 0x65, 0x00, 0x79, 0x00, 0x62, 0x00,
-    0x6F, 0x00, 0x61, 0x00, 0x72, 0x00, 0x64, 0x00,
+    0x50, 0x00,
+    0x4F, 0x00,
+    0x4B, 0x00,
+    0x33, 0x00,
+    0x52, 0x00,
+    0x20, 0x00,
+    0x43, 0x00,
+    0x75, 0x00,
+    0x73, 0x00,
+    0x74, 0x00,
+    0x6F, 0x00,
+    0x6D, 0x00,
+    0x20, 0x00,
+    0x4B, 0x00,
+    0x65, 0x00,
+    0x79, 0x00,
+    0x62, 0x00,
+    0x6F, 0x00,
+    0x61, 0x00,
+    0x72, 0x00,
+    0x64, 0x00,
+};
+
+const u8 hid0Desc[] = {
+    0x09,        // bLength
+    0x21,        // bDescriptorType (HID)
+    0x11, 0x01,  // bcdHID 1.11
+    0x00,        // bCountryCode
+    0x01,        // bNumDescriptors
+    0x22,        // bDescriptorType[0] (HID)
+    0x22, 0x00,  // wDescriptorLength[0] 34
 };
 
 const u8 report0Desc[] = {
@@ -106,28 +122,23 @@ const u8 report0Desc[] = {
     0xC0,              // End Collection
 };
 
-const u8 *ifaceDescs[] = {
-    interface0Desc,
+const USB_Descriptor device = { deviceDesc, sizeof(deviceDesc) };
+
+const USB_Descriptor configs[] = {
+    { config0Desc, sizeof(config0Desc) },
 };
-const u8 *epDescs[] = {
-    ep1Desc,
-    ep2Desc,
-};
-const u8 *strDescs[] = {
-    str0Desc,
-    str1Desc,
+
+const USB_Descriptor strs[] = {
+    { str0Desc, sizeof(str0Desc) },
+    { str1Desc, sizeof(str1Desc) },
 };
 
 void usb_init_descriptors(){
-    usb_dev.descriptors.deviceDesc = deviceDesc;
-    usb_dev.descriptors.configDesc = configDesc;
+    usb_dev.descriptors.device = &device;
 
-    usb_dev.descriptors.interfaceDescs = ifaceDescs;
-    usb_dev.descriptors.numInterfaceDescs = sizeof(ifaceDescs) / sizeof(u8*);
+    usb_dev.descriptors.config = configs;
+    usb_dev.descriptors.numConfig = 1;
 
-    usb_dev.descriptors.endpointDescs = epDescs;
-    usb_dev.descriptors.numEndpointDescs = sizeof(epDescs) / sizeof(u8*);
-
-    usb_dev.descriptors.stringDescs = strDescs;
-    usb_dev.descriptors.numStringDescs = sizeof(strDescs) / sizeof(u8*);
+    usb_dev.descriptors.string = strs;
+    usb_dev.descriptors.numString = 2;
 }

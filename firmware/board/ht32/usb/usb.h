@@ -22,24 +22,25 @@
 #define REQUEST_RECIPIENT_OTHER     0x03
 
 // Standard Requests
-#define GET_STATUS          0x00
-#define CLEAR_FEATURE       0x01
-#define SET_FEATURE         0x03
-#define SET_ADDRESS         0x05
-#define GET_DESCRIPTOR      0x06
-#define SET_DESCRIPTOR      0x07
-#define GET_CONFIGURATION   0x08
-#define SET_CONFIGURATION   0x09
-#define GET_INTERFACE       0x0A
-#define SET_INTERFACE       0x11
-#define SYNCH_FRAME         0x12
+#define GET_STATUS          0
+#define CLEAR_FEATURE       1
+#define SET_FEATURE         3
+#define SET_ADDRESS         5
+#define GET_DESCRIPTOR      6
+#define SET_DESCRIPTOR      7
+#define GET_CONFIGURATION   8
+#define SET_CONFIGURATION   9
+#define GET_INTERFACE       10
+#define SET_INTERFACE       11
+#define SYNCH_FRAME         12
 
 // Device Features
-#define DEVICE_REMOTE_WAKEUP    1
+#define FEATURE_ENDPOINT_HALT           0
+#define FEATURE_DEVICE_REMOTE_WAKEUP    1
+#define FEATURE_TEST_MODE               2
 
-#define FEAT_SELF_POWERED       0x01
-#define FEAT_REMOTE_WAKEUP      0x02
-
+#define OPT_SELF_POWERED    0x01
+#define OPT_REMOTE_WAKEUP   0x02
 
 typedef enum {
     H2D = 0,
@@ -85,35 +86,35 @@ typedef struct {
 } USB_Request;
 
 typedef struct {
-    // Device descriptors
-    const u8 *deviceDesc;
+    const u8 *desc;
+    u8 size;
+} USB_Descriptor;
+
+typedef struct {
+    // Device descriptor
+    const USB_Descriptor *device;
 
     // Configuration descriptors
-    const u8 *configDesc;
-
-    // Interface descriptors
-    const u8 **interfaceDescs;
-    u8 numInterfaceDescs;
-
-    // Endpoint descriptors
-    const u8 **endpointDescs;
-    u8 numEndpointDescs;
+    const USB_Descriptor *config;
+    u8 numConfig;
 
     // String descriptors
-    const u8 **stringDescs;
-    u8 numStringDescs;
+    const USB_Descriptor *string;
+    u8 numString;
 } USB_Descriptors;
 
 typedef enum {
-    POWERED     = 0,    //!< Device is powered.
-    SUSPENDED   = 1,    //!< Device is suspended.
-    ADDRESS     = 2,    //!< Device has address.
-    CONFIGURED  = 3,    //!< Device is configured.
+    ATTACHED = 0,   //!< Attached.
+    POWERED,        //!< Attached, powered, not reset.
+    DEFAULT,        //!< Attached, powered, reset, no address.
+    ADDRESS,        //!< Attached, powered, reset, address, not configured.
+    CONFIGURED,     //!< Attached, powered, reset, address, configured. Ready for use.
+    SUSPENDED,      //!< Attached, powered, suspended.
 } USB_Status;
 
 typedef struct {
     u8 enable;
-    u8 length;
+    u16 length;
     volatile u8 *buffer;
 
     // endpoint config backup
@@ -121,20 +122,27 @@ typedef struct {
     u32 ier;
 } USB_Endpoint;
 
+typedef void (*usb_suspend_func)(void);
+
 typedef struct {
     USB_Status currStatus;
     USB_Status prevStatus;
 
     u8 deviceFeature;
+    u8 bConfigurationValue;
 
     USBIER_reg ier;
 
     USB_Endpoint ep[8];
     USB_Descriptors descriptors;
+
+    usb_suspend_func suspend_callback;
 } USB_Device;
 
 // API
 void usb_init();
 void usb_pull_up(char en);
+
+void usb_callback_suspend(usb_suspend_func call);
 
 #endif // USB_H

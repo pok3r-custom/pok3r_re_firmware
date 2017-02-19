@@ -2,12 +2,15 @@
 #define DESCRIPTORS_H
 
 // Descriptor Types
-#define DESC_TYPE_DEVICE    0x01
-#define DESC_TYPE_CONFIG    0x02
-#define DESC_TYPE_STRING    0x03
-#define DESC_TYPE_INTERFACE 0x04
-#define DESC_TYPE_ENDPOINT  0x05
-#define DESC_TYPE_HID       0x21
+#define DESC_TYPE_DEVICE                    1
+#define DESC_TYPE_CONFIGURATION             2
+#define DESC_TYPE_STRING                    3
+#define DESC_TYPE_INTERFACE                 4
+#define DESC_TYPE_ENDPOINT                  5
+#define DESC_TYPE_DEVICE_QUALIFIER          6
+#define DESC_TYPE_OTHER_SPEED_CONFIGURATION 7
+#define DESC_TYPE_INTERFACE_POWER           8
+#define DESC_TYPE_HID                       0x21
 
 void usb_init_descriptors();
 

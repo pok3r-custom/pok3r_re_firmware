@@ -289,13 +289,15 @@ int main(){
 //    afio_init();
     spi_init();
 
-    spi_read();
+//    spi_read();
 
     // USB
-//    usb_init_descriptors();
-//    usb_init();
+    usb_init_descriptors();
+    usb_init();
+    usb_callback_suspend(on_suspend);
+
     // Enable D+ pull-up
-//    usb_pull_up(1);
+    usb_pull_up(1);
 
     u32 count = 0;
     while(1){

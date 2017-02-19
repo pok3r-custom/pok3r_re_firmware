@@ -15,6 +15,9 @@
 #define SET_REG(A, M, O, D) REG(A) |= (D << O & M)
 #define GET_REG(A, M, O, D) REG(A) |= (D << O & M)
 
+#define MIN(A, B) ((A) < (B) ? (A) : (B))
+#define MAX(A, B) ((A) > (B) ? (A) : (B))
+
 typedef unsigned char u8;
 typedef unsigned short u16;
 typedef unsigned long u32;
