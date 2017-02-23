@@ -5,11 +5,12 @@ PROJECT(Pok3r_Custom C ASM)
 
 ### =================== SOURCES =================== ###
 
-SET(COMMON_HEADERS
+SET(HEADERS
     main.h
 
     board/board.h
     board/cortex-m3.h
+    board/gd25q_flash.h
 
     board/ht32/ht32.h
     board/ht32/ht32f165x.h
@@ -38,23 +39,26 @@ SET(COMMON_SOURCES
 
 SET(POK3R_SOURCES
     ${COMMON_SOURCES}
+    board/pok3r_board.c
     board/ht32/ht32f1655.c
 )
 
 SET(POK3R_RGB_SOURCES
     ${COMMON_SOURCES}
+    board/pok3r_rgb_board.c
     board/ht32/ht32f1654.c
 )
 
 SET(VORTEX_CORE_SOURCES
     ${COMMON_SOURCES}
+    board/vortex_core_board.c
     board/ht32/ht32f1654.c
 )
 
 FILE(GLOB_RECURSE DEMO_FILES demo/*.c demo/*.h demo/*.s demo/*.ld)
 
 SET(FILES
-    ${COMMON_HEADERS}
+    ${HEADERS}
     ${COMMON_SOURCES}
 
     ${POK3R_SOURCES}
@@ -91,7 +95,7 @@ FUNCTION(ConfigureBoard NAME SRCS LINK DEFS)
     # Custom make command
     SET(BOARD_BIN "${BOARD_DIR}/${NAME}.bin")
     ADD_CUSTOM_COMMAND(OUTPUT ${BOARD_BIN}
-        DEPENDS ${COMMON_HEADERS} ${STARTUP_SOURCE} ${SRCS}
+        DEPENDS ${HEADERS} ${STARTUP_SOURCE} ${SRCS}
         WORKING_DIRECTORY ${BOARD_DIR}
         COMMAND make -f ${BOARD_MAKE}
     )
@@ -102,17 +106,17 @@ ENDFUNCTION()
 ConfigureBoard("pok3r_custom"
     "${POK3R_SOURCES}"
     ht32f1655.ld
-    "-DBOARD=1 -DCPU=0x1655"
+    "-DBOARD=1 -DCPU=1"
 )
 ConfigureBoard("pok3r_rgb_custom"
     "${POK3R_RGB_SOURCES}"
     ht32f1654.ld
-    "-DBOARD=2 -DCPU=0x1654"
+    "-DBOARD=2 -DCPU=2"
 )
 ConfigureBoard("vortex_core_custom"
     "${VORTEX_CORE_SOURCES}"
     ht32f1654.ld
-    "-DBOARD=3 -DCPU=0x1654"
+    "-DBOARD=3 -DCPU=2"
 )
 
 ### =================== BUILD =================== ###

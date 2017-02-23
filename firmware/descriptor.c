@@ -132,6 +132,6 @@ const USB_Descriptor strs[] = {
 
 void usb_init_descriptors(){
     usb_set_device_desc(&device);
-    usb_set_config_descs(&configs, 1);
-    usb_set_string_descs(&strs, 2);
+    usb_set_config_descs(configs, 1);
+    usb_set_string_descs(strs, 2);
 }
