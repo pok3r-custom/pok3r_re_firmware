@@ -1,13 +1,17 @@
+#include "hiddevice.h"
 #include "pok3r.h"
 #include "pok3r_rgb.h"
 #include "vortex_core.h"
-#include "hiddevice.h"
+#include "vortex_tester.h"
 
 #include "zlog.h"
 #include "zfile.h"
 #include "zhash.h"
 #include "zpointer.h"
 using namespace LibChaos;
+
+#define UPDATE_USAGE_PAGE   0xff00
+#define UPDATE_USAGE        0x01
 
 #include <stdio.h>
 #include <iostream>
@@ -358,6 +362,25 @@ void warning(){
     }
 }
 
+enum DevType {
+    PROTO_VORTEX,
+    PROTO_CYKB,
+};
+
+struct USBDevice {
+    ZString name;
+    zu16 vid;
+    zu16 pid;
+    zu16 page;
+    zu16 usage;
+    DevType type;
+};
+
+const USBDevice devices[] = {
+    { "POK3R", HOLTEK_VID, POK3R_PID, UPDATE_USAGE_PAGE, UPDATE_USAGE, PROTO_VORTEX },
+    { "POK3R (builtin)", HOLTEK_VID, POK3R_BOOT_PID, UPDATE_USAGE_PAGE, UPDATE_USAGE, PROTO_VORTEX },
+};
+
 ZPointer<UpdateInterface> openDevice(int device){
     ZPointer<UpdateInterface> kb;
 
@@ -383,6 +406,14 @@ ZPointer<UpdateInterface> openDevice(int device){
     // Vortex CORE
     if(device & 4){
         kb = new VortexCORE();
+        if(kb->open()){
+            return kb;
+        }
+    }
+
+    // Vortex Switch Tester
+    if(device & 8){
+        kb = new VortexTester();
         if(kb->open()){
             return kb;
         }
@@ -430,6 +461,13 @@ int main(int _argc, char **_argv){
             }
             LOG("Selected Vortex CORE");
             device = 4;
+        } else if(arg == "--vortex-tester"){
+            if(device != 0){
+                LOG("Cannot specify multiple devices");
+                return 2;
+            }
+            LOG("Selected Vortex Tester");
+            device = 8;
         } else {
             args.push(arg);
         }

@@ -1,0 +1,9 @@
+
+0x1fd4 : gpio_map_3
+0x2024 : gpio_map_2
+0x2074 : gpio_map_1
+0x20bc : usb_report1_desc
+0x20ec : usb_report2_desc
+0x2148 : usb_report0_desc
+0x2188 : usb_descriptors
+

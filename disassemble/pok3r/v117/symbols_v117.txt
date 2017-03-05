@@ -183,7 +183,7 @@ spi_init                            @ 0x4d64
     spi_config
     spi_slave_select_output
     spi_enable
-spi_flash_read_wip                         @ 0x4dd8
+spi_flash_read_wip                  @ 0x4dd8
     spi_flash_read_status
 spi_gpio_init                       @ 0x4de4
     ckcu_ahb_clock_enable
@@ -227,7 +227,7 @@ function_27                         @ 0x50f0
 spi_flash_release_sleep             @ 0x50c8
 spi_flash_write_enable              @ 0x5168
     spi_write_read
-spi_flash_set_status_reg                         @ 0x518c
+spi_flash_set_status_reg            @ 0x518c
     function_9
     spi_flash_read_wip
 
@@ -541,7 +541,7 @@ function_e_14                       @ 0x83bc
     function_e_18
     function_e_83
     function_e_93
-function_e_6                        @ 0x8580
+function_e_1                        @ 0x8580
 function_e_96                       @ 0x864a
 function_e_12                       @ 0x8718
 function_e_13                       @ 0x878c

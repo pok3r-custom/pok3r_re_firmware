@@ -13,7 +13,7 @@ struct HIDDeviceData {
     hid_t *hid;
 };
 
-HIDDevice::HIDDevice(){
+HIDDevice::HIDDevice() : vid(0), pid(0), upage(0), usage(0){
     device = new HIDDeviceData;
     device->hid = NULL;
 }
@@ -24,6 +24,10 @@ HIDDevice::~HIDDevice(){
 }
 
 bool HIDDevice::open(zu16 vid, zu16 pid, zu16 usage_page, zu16 usage){
+    this->vid = vid;
+    this->pid = pid;
+    this->upage = upage;
+    this->usage = usage;
     device->hid = rawhid_open(vid, pid, usage_page, usage);
     return (device->hid != NULL);
 }

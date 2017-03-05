@@ -1,0 +1,182 @@
+
+* 3404
+* 3408
+* 340c
+* 3410
+* 3414
+* 3418
+* 342c
+* 3430
+* 3438
+* 343c
+* 3440
+* 3444
+* 3448
+* 344c
+* 3450
+* 3454
+* 3458
+* 345c
+* 3460
+* 3464
+* 3468
+* 346c
+* 3470
+* 3474
+* 3478
+* 347c
+* 3480
+* 3484
+* 3488
+* 348c
+* 3490
+* 3494
+* 3498
+* 349c
+* 34a0
+* 34a4
+* 34ac
+* 34b0
+* 34b4
+* 34b8
+* 34bc
+* 34c0
+* 34c4
+* 34c8
+* 34cc
+* 34d0
+* 34e4
+* 34e8
+* 34ec
+* 34f0
+* 34f4
+* 34f8
+* 34fc
+* 3500
+* 3504
+* 3508
+* 350c
+* 3510
+* 3514
+* 351c
+* 3520
+* 3524
+* 3528
+* 352c
+* 3530
+* 3534
+* 3538
+* 3550
+
+3554 : reset
+3560 : nmi
+3562 : hard_fault
+3564 : mcu_fault
+3566 : bus_fault
+3568 : usage_fault
+356a : svccall_intr
+356c : debug_intr
+356e : pendsv_intr
+3570 : systick_intr
+3572 : generic_intr
+3580 : entry
+3594 : rand
+35a8 : srand
+35b8 : memcpy
+35dc : mem_set
+35ea : mem_zero
+35ee : mem_set2
+3600 : memcmp
+361c : sram_init
+3640 : afio_exti_ssr_write
+375c : bftm_clear
+379c : afio_pin_config
+37c4 : spin_wait_maybe
+37d0 : setup_afio_gpio
+3888 : ckcu_clocks_enable
+38ac : ckcu_set_usb_prescaler
+3aa8 : function_130_6
+40ac : function_130_7
+40ec : function_11
+4114 : function_29
+418c : function_10
+4198 : function_82
+41ec : pinmux_b789_gpio
+4234 : pinmux_b789_spi
+4278 : function_e_38
+42c4 : function_e_39
+42fc : function_76
+4328 : function_78
+434c : function_42
+4374 : function_25
+43b4 : spi_write_read
+4424 : function_e_40
+4474 : function_27
+44ec : function_77
+4510 : function_28
+4538 : gpio_set_input_output
+4548 : gpio_set_output_current
+4558 : gpio_set_input_enable
+4569 : gpio_set_open_drain
+4578 : gpio_set_pin_pull_up_down
+45a0 : gpio_set_pin
+45a4 : gpio_set_reset_pin
+45ae : gptm_enable_disable
+5608 : function_130_10
+56d4 : setup_intr_priority
+575c : nvic_disable_intr
+5772 : calc_nvic_priority
+57f4 : jump_pinmux_b789_gpio
+57f8 : jump_pinmux_b789_spi
+5c30 : pinmux_c0_gpio
+5c3a : pinmux_c0_gptm
+5c88 : function_130_11
+5cd4 : function_130_12
+5cec : handle_frame
+5e54 : flash_read_packet
+5dd0 : reset_builtin
+5e88 : ckcu_voodoo1
+6370 : function_130_16
+6508 : function_e_54
+65a4 : clock_init
+6800 : usb_set_intr_flags
+680c : usb_init
+6878 : usb_dp_wake_up
+6894 : usb_dp_pull_up
+68b0 : usb_ckcu_voodoo
+68bc : usb_ep_data_toggle
+68cc : usb_ep_stall
+68dc : usb_set_ep_intr
+68e8 : usb_get_ep_buff
+6900 : usb_get_ep_buff_end
+6924 : usb_get_ep_len
+6932 : function_e_67
+694c : usb_get_ep_intr
+695a : usb_get_ep_tcnt
+696c : function_e_70
+6992 : usb_read_ep_buff
+69cc : usb_recv
+69fc : function_e_71
+6a0c : function_e_72
+6a18 : function_e_73
+6a2c : usb_copy_send
+6a74 : usb_enable_intr
+6a84 : function_e_75
+6aa4 : usb_get_intr_flags
+6ab8 : usb_set_lpmode_pdwn
+68c8 : usb_clear_csr
+6ad8 : function_28
+6b50 : ptr_write_data
+6b94 : function_130_2
+6c1c : usb_intr
+6c28 : watchdog_init
+6c58 : watchdog_reload_timer
+72c0 : function_130_1
+7774 : copy_words
+7784 : usb_get_ep_reg
+7794 : function_130_9
+784c : sram_init_func_1
+785c : sram_init_func_2
+786c : main
+7964 : function_130_15
+

@@ -1,5 +1,5 @@
-#include "usb.h"
-#include "../ht32.h"
+#include "ht32_usb.h"
+#include "ht32.h"
 
 USB_Device usb_dev;
 u16 ep_next_addr;
@@ -29,7 +29,7 @@ void standard_get_interface(USB_Request *request);
 void standard_set_interface(USB_Request *request);
 void standard_synch_frame(USB_Request *request);
 
-void control_in(const u8 *src, u16 len);
+void control_in();
 void control_out();
 
 u16 endpoint_write(u8 ep, const u8 *src, u16 len);
@@ -77,6 +77,7 @@ void usb_init(){
     usb_dev.deviceFeature = OPT_REMOTE_WAKEUP;
     usb_dev.currStatus = POWERED;
 
+    // endpoints default disabled
     for(int i = 0; i < 8; ++i)
         usb_dev.ep[i].enable = 0;
 
@@ -93,6 +94,11 @@ void usb_init(){
     REG_USB->USBEP0CFGR.EPLEN = 64;
     REG_USB->USBEP0IER.word = EPnIER_ODRXIE | EPnIER_IDTXIE | EPnIER_SDRXIE;
     REG_USB->USBEP0ISR.word = 0xFFFFFFFF;
+
+    // backup ep 0 reigsters
+    usb_dev.ep[0].enable = 1;
+    usb_dev.ep[0].cfgr = REG_USB->USBEP0CFGR.word;
+    usb_dev.ep[0].ier = REG_USB->USBEP0IER.word;
 
     ep_next_addr = 0x8 + 64 + 64;
 
@@ -146,12 +152,12 @@ void usb_isr(){
         if(episr & EPnISR_ODRXIF){
             // Clear ISR bit first
             usb_clear_ep_int_flags(EP_0, EPnISR_ODRXIF);
-//            control_out();
+            control_out();
         }
 
         // IN Data Sent
         if(episr & EPnISR_IDTXIF){
-//            control_in();
+            control_in();
             usb_clear_ep_int_flags(EP_0, EPnISR_IDTXIF);
         }
 
@@ -202,7 +208,7 @@ void usb_power_on(){
 }
 
 void usb_reset(){
-    usb_dev.currStatus = POWERED;
+    usb_dev.currStatus = DEFAULT;
 
     // Reset USB
     REG_RSTCU->AHBPRSTR.USBRST = 1;
@@ -212,6 +218,7 @@ void usb_reset(){
     REG_USB->USBEP0CFGR.word = usb_dev.ep[0].cfgr;
     REG_USB->USBEP0IER.word = usb_dev.ep[0].ier;
     REG_USB->USBEP0ISR.word = 0xFFFFFFFF;
+    // toggle flags
     REG_USB->USBEP0CSR.word &= EPnCSR_DTGTX | EPnCSR_DTGRX | EPnCSR_NAKRX;
 
     // Set IER
@@ -220,7 +227,7 @@ void usb_reset(){
 
 void usb_suspend(){
     // Will not suspend before configuration starts
-    if(usb_dev.currStatus != POWERED){
+    if(usb_dev.currStatus < DEFAULT){
         usb_power_off();
         usb_dev.prevStatus = usb_dev.currStatus;
         usb_dev.currStatus = SUSPENDED;
@@ -233,31 +240,32 @@ void usb_resume(){
 }
 
 void usb_setup(){
-    USB_Request request;
+    USB_Request *req = &usb_dev.request;
     u8 setup[8];
 
     // Read SETUP Data
     for(int i = 0; i < 8; ++i)
         setup[i] = ((u8 *)USB_SRAM_BASE)[i];
 
-    request.bmRequestType = setup[0];
-    request.bRequest = setup[1];
-    request.wValue = setup[2] | ((u16)setup[3]) << 8;
-    request.wIndex = setup[4] | ((u16)setup[5]) << 8;
-    request.wLength = setup[6] | ((u16)setup[7]) << 8;
+    req->bmRequestType = setup[0];
+    req->bRequest = setup[1];
+    req->wValue = setup[2] | ((u16)setup[3]) << 8;
+    req->wIndex = setup[4] | ((u16)setup[5]) << 8;
+    req->wLength = setup[6] | ((u16)setup[7]) << 8;
 
-    request.direction = (Request_Direction)((request.bmRequestType & REQUEST_DIR_MASK) >> 7);
-    request.type = (Request_Type)((request.bmRequestType & REQUEST_TYPE_MASK) >> 5);
-    request.recipient = (Request_Recipient)(request.bmRequestType & REQUEST_RECIPIENT_MASK);
+    req->direction = (Request_Direction)((req->bmRequestType & REQUEST_DIR_MASK) >> 7);
+    req->type = (Request_Type)((req->bmRequestType & REQUEST_TYPE_MASK) >> 5);
+    req->recipient = (Request_Recipient)(req->bmRequestType & REQUEST_RECIPIENT_MASK);
 
     // Default action is Request Error (STALL)
-    request.action = STALL;
-    request.controlLength = 0;
+    req->action = STALL;
+    req->controlLength = 0;
 
     // Request Type
-    switch(request.type){
+    switch(req->type){
         case STANDARD:
-            standard_request(&request);
+            // Standard Request
+            standard_request(req);
             break;
         case CLASS:
             // Class Request
@@ -270,11 +278,12 @@ void usb_setup(){
     }
 
     // Request Action
-    switch(request.action){
+    switch(req->action){
         case DATA_IN:
-            control_in(request.controlData, request.controlLength);
+            control_in();
             break;
         case DATA_OUT:
+            endpoint_write(0, NULL, 0);
             break;
         case STALL:
         default:
@@ -563,12 +572,44 @@ void standard_synch_frame(USB_Request *request){
     }
 }
 
-void control_in(const u8 *src, u16 len){
-    endpoint_write(EP_0, src, len);
+void control_in(){
+    USB_Request *req = &(usb_dev.request);
+    if(req->controlLength && req->action == DATA_IN){
+        u32 len;
+        if(req->controlLength >= usb_dev.ep[EP_0].length){
+            // More data to send
+            len = usb_dev.ep[EP_0].length;
+            req->controlLength -= len;
+        } else {
+            // Last data to send
+            len = req->controlLength;
+            req->controlLength = 0;
+            req->controlLength = DATA_OUT;
+        }
+        // Write IN data
+        endpoint_write(EP_0, req->controlData, len);
+        req->controlData += len;
+    }
 }
 
 void control_out(){
+    USB_Request *req = &(usb_dev.request);
+    if(req->controlLength && req->action == DATA_OUT){
+        // Read OUT data
+        u32 len = endpoint_read(EP_0, req->controlData, 64);
+        req->controlData += len;
+        req->controlLength -= len;
 
+        if(req->controlLength == 0){
+            // All data received
+            req->action = DATA_IN;
+            // OUT complete callback
+            if(usb_dev.control_out_callback){
+                usb_dev.control_out_callback(req);
+                usb_dev.control_out_callback = NULL;
+            }
+        }
+    }
 }
 
 /*! Write endpoint buffer, set TXCNT and toggle NAKTX.

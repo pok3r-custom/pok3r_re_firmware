@@ -16,7 +16,7 @@ SET(HEADERS
     board/ht32/ht32f165x.h
     board/ht32/ht32f1654.h
     board/ht32/ht32f1655.h
-    board/ht32/usb/usb.h
+    board/ht32/ht32_usb.h
 
     board/pok3r_board.h
     board/pok3r_rgb_board.h
@@ -34,7 +34,7 @@ SET(COMMON_SOURCES
     board/cortex-m3.c
 
     board/ht32/ht32f165x.c
-    board/ht32/usb/usb.c
+    board/ht32/ht32_usb.c
 )
 
 SET(POK3R_SOURCES
@@ -60,6 +60,7 @@ FILE(GLOB_RECURSE DEMO_FILES demo/*.c demo/*.h demo/*.s demo/*.ld)
 SET(FILES
     ${HEADERS}
     ${COMMON_SOURCES}
+    ${STARTUP_SOURCE}
 
     ${POK3R_SOURCES}
     ${POK3R_RGB_SOURCES}

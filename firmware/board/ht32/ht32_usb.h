@@ -1,7 +1,7 @@
-#ifndef USB_H
-#define USB_H
+#ifndef HT32_USB_H
+#define HT32_USB_H
 
-#include "../ht32f165x.h"
+#include "ht32f165x.h"
 
 // Request Data Direction
 #define REQUEST_DIR_MASK    0x80
@@ -92,7 +92,7 @@ typedef struct {
     // Control Buffer
     Control_Action action;
     u8 controlLength;
-    const u8 *controlData;
+    u8 *controlData;
     u8 controlBuffer[64];
 } USB_Request;
 
@@ -127,7 +127,6 @@ typedef struct {
     u8 enable;
     u16 length;
     volatile u8 *buffer;
-
     // endpoint config backup
     u32 cfgr;
     u32 ier;
@@ -135,21 +134,30 @@ typedef struct {
 
 typedef void (*usb_suspend_func)(void);
 typedef void (*usb_configuration_func)(u8);
+typedef void (*usb_control_out_func)(USB_Request *);
 
 typedef struct {
+    // Internal USB variables
     USB_Status currStatus;
     USB_Status prevStatus;
-
     u8 deviceFeature;
     u8 bConfigurationValue;
 
-    USBIER_reg ier;
+    USB_Request request;
 
+    // IER
+    USBIER_reg ier;
+    // Endpoints
     USB_Endpoint ep[8];
+
+    // Descriptors
     USB_Descriptors descriptors;
 
+    // User callbacks
     usb_suspend_func suspend_callback;
     usb_configuration_func configuration_callback;
+    // Internal callbacks
+    usb_control_out_func control_out_callback;
 } USB_Device;
 
 // API
@@ -165,4 +173,4 @@ void usb_set_string_descs(const USB_Descriptor *descs, u8 num);
 void usb_callback_suspend(usb_suspend_func call);
 void usb_callback_configuration(usb_configuration_func call);
 
-#endif // USB_H
+#endif // HT32_USB_H

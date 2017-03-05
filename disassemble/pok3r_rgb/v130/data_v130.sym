@@ -1,0 +1,27 @@
+
+7a3c : data_1
+7a48 : data_2
+7c18 : gpio_map_3
+7c68 : gpio_map_2
+7d24 : gpio_map_1
+7f74 : usb_report1_desc
+7f98 : usb_report2_desc
+8020 : usb_report0_desc
+8060 : usb_config_desc
+8069 : usb_interface0_desc
+8072 : usb_hid0_desc
+807b : usb_endpoint1_desc
+8082 : usb_interface1_desc
+808b : usb_hid1_desc
+8094 : usb_endpoint3_desc
+809b : usb_endpoint4_desc
+80a2 : usb_interface2_desc
+80ab : usb hid2_desc
+80b2 : usb_endpoint2_desc
+80bc : usb_device_desc
+80d0 : usb_str0_desc
+80d4 : usb_str1_desc
+811c : task_1
+812c : task_2
+813c : sram_init_data
+

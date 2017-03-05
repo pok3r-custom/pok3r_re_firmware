@@ -1708,9 +1708,8 @@ function_74:
     3930:   f000 ff78   bl 0x4824                   ; call function_e_24
     3934:   b006        add sp, #24
     3936:   bd70        pop {r4, r5, r6, pc}
-    3938:   8d44        ldrh r4, [r0, #42]   ; 0x2a
-    393a:   0000        movs r0, r0
 
+  0x3938:   0x8d44      ; data_3
   0x393c:   0x20000058  ; variable_sram_e_1
   0x3940:   0x20001cba
   0x3944:   0x8fa8      ; data_9
@@ -2593,7 +2592,7 @@ function_e_18:
     4232:   f880 4038   strb.w r4, [r0, #56]   ; 0x38
     4236:   f001 f869   bl 0x530c               ; call function_e_41
     423a:   e8bd 5ff0   ldmia.w sp!, {r4, r5, r6, r7, r8, r9, sl, fp, ip, lr}
-    423e:   f004 b99f   b.w 0x8580                  ; call function_e_6
+    423e:   f004 b99f   b.w 0x8580                  ; call function_e_1
     4242:   0000
 
   0x4244:   0x200000d8  ; pointer_15
@@ -2931,7 +2930,7 @@ function_e_19:
     45a8:   f8a9 1008   strh.w r1, [r9, #8]
     45ac:   e8bd 5ffc   ldmia.w sp!, {r2, r3, r4, r5, r6, r7, r8, r9, sl, fp, ip, lr}
 
-    45b0:   f003 bfe6   b.w 0x8580              ; call function_e_6
+    45b0:   f003 bfe6   b.w 0x8580              ; call function_e_1
     45b4:   f44f 72e1   mov.w r2, #450   ; 0x1c2
     45b8:   f8a9 2002   strh.w r2, [r9, #2]
     45bc:   e7e6        b.n 0x458c
@@ -2958,12 +2957,12 @@ function_e_20:
     45f8:   b128        cbz r0, 0x4606
     45fa:   2001        movs r0, #1
     45fc:   7148        strb r0, [r1, #5]
-    45fe:   f003 ffbf   bl 0x8580                   ; call function_e_6
+    45fe:   f003 ffbf   bl 0x8580                   ; call function_e_1
     4602:   2001        movs r0, #1
     4604:   bd10        pop {r4, pc}
     4606:   2000        movs r0, #0
     4608:   7148        strb r0, [r1, #5]
-    460a:   f003 ffb9   bl 0x8580                   ; call function_e_6
+    460a:   f003 ffb9   bl 0x8580                   ; call function_e_1
     460e:   2000        movs r0, #0
     4610:   bd10        pop {r4, pc}
     4612:   0000
@@ -3511,7 +3510,7 @@ function_e_26:
     4b22:   e753        b.n 0x49cc
     4b24:   200c        movs r0, #12
     4b26:   e004        b.n 0x4b32
-    4b28:   f1aa 001d   sub.w r0, sl, #29
+  0x4b28:   f1aa 001d   sub.w r0, sl, #29
     4b2c:   b2c0        uxtb r0, r0
     4b2e:   e000        b.n 0x4b32
     4b30:   200d        movs r0, #13
@@ -6344,7 +6343,7 @@ function_e_52:
     6560:   280e        cmp r0, #14
     6562:   d3e9        bcc.n 0x6538
     6564:   e8bd 41f0   ldmia.w sp!, {r4, r5, r6, r7, r8, lr}
-    6568:   f002 b80a   b.w 0x8580                  ; call function_e_6
+    6568:   f002 b80a   b.w 0x8580                  ; call function_e_1
 
   0x656c:   0x20000160
   0x6570:   0x8d34      ; data_15
@@ -9986,7 +9985,7 @@ function_e_14:
   0x8578:   0x20002e2c
   0x857c:   0x20002de4  ; pointer_34
 
-function_e_6:
+function_e_1:
   0x8580:   e92d 41f0   stmdb sp!, {r4, r5, r6, r7, r8, lr}
     8584:   4e5f        ldr r6, [pc, #380]   ; (0x8704)
     8586:   f896 0030   ldrb.w r0, [r6, #48]   ; 0x30

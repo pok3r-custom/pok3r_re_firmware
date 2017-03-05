@@ -10,3 +10,7 @@ SUBSYSTEMS=="usb", ATTRS{idVendor}=="04d9", ATTRS{idProduct}=="1167", GROUP="usb
 # Vortex CORE
 SUBSYSTEMS=="usb", ATTRS{idVendor}=="04d9", ATTRS{idProduct}=="0175", GROUP="usb"
 SUBSYSTEMS=="usb", ATTRS{idVendor}=="04d9", ATTRS{idProduct}=="1175", GROUP="usb"
+
+# Vortex Tester
+SUBSYSTEMS=="usb", ATTRS{idVendor}=="04d9", ATTRS{idProduct}=="0200", GROUP="usb"
+SUBSYSTEMS=="usb", ATTRS{idVendor}=="04d9", ATTRS{idProduct}=="1200", GROUP="usb"

@@ -21,6 +21,12 @@ public:
     bool send(const ZBinary &data);
     bool recv(ZBinary &data);
 
+public:
+    zu16 vid;
+    zu16 pid;
+    zu16 upage;
+    zu16 usage;
+
 private:
     HIDDeviceData *device;
 };

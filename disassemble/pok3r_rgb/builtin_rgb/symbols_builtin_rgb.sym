@@ -1,0 +1,29 @@
+
+0x1c   : entry
+0x30   : load_jump_fw
+0x40   : memcpy
+0x64   : mem_set
+0x72   : mem_zero
+0x76   : mem_set2
+0x88   : sram_init
+0xd8   : bftm_set_counter
+0xf4   : bftm_clear
+0x118  : reset
+0x124  : generic_fault
+0x1d8  : bftm_set_mien
+0x2cc  : ckcu_clocks_enable
+0x2f0  : ckcu_set_usb_prescaler
+0x304  : flash_page_erase
+0x314  : flash_commit
+0x668  : nvic_disable_intr
+0x7b0  : decrypt_packet
+0x7ec  : flash_write_buffer
+0x810  : handle_frame
+0x9e8  : reset_builtin
+0xa6c  : flash_read_packet
+0x1560 : get_event
+0x1628 : generate
+0x1668 : firmware_check
+0x1e48 : check_fw_sp_pc
+0x1ea4 : main
+
