@@ -15,10 +15,10 @@ SET(POK3RTOOL_SOURCES
     pok3r.cpp
     pok3r_rgb.h
     pok3r_rgb.cpp
-    vortex_core.h
-    vortex_core.cpp
-    vortex_tester.h
-    vortex_tester.cpp
+    #vortex_core.h
+    #vortex_core.cpp
+    #vortex_tester.h
+    #vortex_tester.cpp
 
     hiddevice.h
     hiddevice.cpp

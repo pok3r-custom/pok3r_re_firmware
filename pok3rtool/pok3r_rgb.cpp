@@ -1,8 +1,6 @@
 #include "pok3r_rgb.h"
 #include "zlog.h"
 
-#define UPDATE_USAGE_PAGE   0xff00
-#define UPDATE_USAGE        0x01
 #define UPDATE_PKT_LEN      64
 
 #define UPDATE_ERROR        0xaaff
@@ -14,31 +12,39 @@
 
 #define WAIT_SLEEP          2
 
-Pok3rRGB::Pok3rRGB() : debug(false), nop(false){
+ProtoCYKB::ProtoCYKB() : debug(false), nop(false){
 
 }
 
-Pok3rRGB::~Pok3rRGB(){
+ProtoCYKB::~ProtoCYKB(){
 
 }
 
-bool Pok3rRGB::open(){
+bool ProtoCYKB::open(zu16 avid, zu16 apid, zu16 aboot_pid){
+    vid = avid;
+    pid = apid;
+    boot_pid = aboot_pid;
+
     // Try firmware vid and pid
-    if(HIDDevice::open(HOLTEK_VID, POK3R_RGB_PID, UPDATE_USAGE_PAGE, UPDATE_USAGE)){
-        LOG("Opened POK3R RGB");
+    if(HIDDevice::open(vid, pid, UPDATE_USAGE_PAGE, UPDATE_USAGE)){
+//        LOG("Opened POK3R RGB");
         builtin = false;
         return true;
     }
     // Try builtin vid and pid
-    if(HIDDevice::open(HOLTEK_VID, POK3R_RGB_BOOT_PID, UPDATE_USAGE_PAGE, UPDATE_USAGE)){
-        LOG("Opened POK3R RGB (builtin)");
+    if(HIDDevice::open(vid, boot_pid, UPDATE_USAGE_PAGE, UPDATE_USAGE)){
+//        LOG("Opened POK3R RGB (builtin)");
         builtin = true;
         return true;
     }
     return false;
 }
 
-bool Pok3rRGB::enterFirmware(){
+bool ProtoCYKB::isBuiltin() const {
+    return builtin;
+}
+
+bool ProtoCYKB::enterFirmware(){
     if(!builtin){
 //        LOG("In Firmware");
         return true;
@@ -51,7 +57,7 @@ bool Pok3rRGB::enterFirmware(){
     close();
     ZThread::sleep(WAIT_SLEEP);
 
-    if(!open()){
+    if(!open(vid, pid, boot_pid)){
         ELOG("open error");
         return false;
     }
@@ -61,7 +67,7 @@ bool Pok3rRGB::enterFirmware(){
     return true;
 }
 
-bool Pok3rRGB::enterBootloader(){
+bool ProtoCYKB::enterBootloader(){
     if(builtin){
 //        LOG("In Bootloader");
         return true;
@@ -74,7 +80,7 @@ bool Pok3rRGB::enterBootloader(){
     close();
     ZThread::sleep(WAIT_SLEEP);
 
-    if(!open()){
+    if(!open(vid, pid, boot_pid)){
         ELOG("open error");
         return false;
     }
@@ -84,7 +90,7 @@ bool Pok3rRGB::enterBootloader(){
     return true;
 }
 
-bool Pok3rRGB::getInfo(){
+bool ProtoCYKB::getInfo(){
     ZBinary bin;
 
     for(zu8 i = 0x20; i < 0x31; ++i){
@@ -99,7 +105,7 @@ bool Pok3rRGB::getInfo(){
     return true;
 }
 
-ZString Pok3rRGB::getVersion(){
+ZString ProtoCYKB::getVersion(){
     ZBinary data;
 
     // version 1
@@ -127,7 +133,7 @@ ZString Pok3rRGB::getVersion(){
     return ver;
 }
 
-bool Pok3rRGB::clearVersion(){
+bool ProtoCYKB::clearVersion(){
     DLOG("clearVersion");
     if(!enterBootloader())
         return false;
@@ -156,7 +162,7 @@ const zu32 ver2[15] = {
     0xffffffff, 0xffffffff, 0x001c5aa5,
 };
 
-bool Pok3rRGB::setVersion(ZString version){
+bool ProtoCYKB::setVersion(ZString version){
     DLOG("setVersion " << version);
     if(!clearVersion())
         return false;
@@ -205,7 +211,7 @@ bool Pok3rRGB::setVersion(ZString version){
     return true;
 }
 
-ZBinary Pok3rRGB::dumpFlash(){
+ZBinary ProtoCYKB::dumpFlash(){
     ZBinary dump;
     for(zu16 i = 0; i < FLASH_LEN - 60; i += 60){
         if(!readFlash(i, dump))
@@ -223,7 +229,7 @@ ZBinary Pok3rRGB::dumpFlash(){
     return dump;
 }
 
-bool Pok3rRGB::writeFirmware(const ZBinary &fwbinin){
+bool ProtoCYKB::writeFirmware(const ZBinary &fwbinin){
     ZBinary fwbin = fwbinin;
     // Encode the firmware for the POK3R RGB
     encode_firmware(fwbin);
@@ -256,7 +262,7 @@ bool Pok3rRGB::writeFirmware(const ZBinary &fwbinin){
     return true;
 }
 
-bool Pok3rRGB::update(ZString version, const ZBinary &fwbin){
+bool ProtoCYKB::update(ZString version, const ZBinary &fwbin){
     // Reset to bootloader
     if(!enterBootloader())
         return false;
@@ -279,7 +285,7 @@ bool Pok3rRGB::update(ZString version, const ZBinary &fwbin){
 
 }
 
-void Pok3rRGB::test(){
+void ProtoCYKB::test(){
     ZBinary bin;
 
     LOG("READ_400");
@@ -333,7 +339,7 @@ void Pok3rRGB::test(){
     LOG("CRC " << ZString::ItoS((zu64)bin.readleu32(), 16));
 }
 
-bool Pok3rRGB::eraseFlash(zu32 start, zu32 length){
+bool ProtoCYKB::eraseFlash(zu32 start, zu32 length){
     DLOG("eraseFlash " << start << " " << length);
     if(start < VER_ADDR){
         ELOG("bad address");
@@ -350,7 +356,7 @@ bool Pok3rRGB::eraseFlash(zu32 start, zu32 length){
     return true;
 }
 
-bool Pok3rRGB::readFlash(zu32 addr, ZBinary &bin){
+bool ProtoCYKB::readFlash(zu32 addr, ZBinary &bin){
     DLOG("readFlash " << addr);
     ZBinary data;
     if(!sendRecvCmd(READ, READ_ADDR, data, addr))
@@ -360,7 +366,7 @@ bool Pok3rRGB::readFlash(zu32 addr, ZBinary &bin){
     return true;
 }
 
-bool Pok3rRGB::writeFlash(zu32 addr, ZBinary bin){
+bool ProtoCYKB::writeFlash(zu32 addr, ZBinary bin){
     DLOG("writeFlash " << addr << " " << bin.size());
     if(addr < VER_ADDR){
         ELOG("bad address");
@@ -397,7 +403,7 @@ bool Pok3rRGB::writeFlash(zu32 addr, ZBinary bin){
     return true;
 }
 
-zu32 Pok3rRGB::crcFlash(zu32 addr, zu32 len){
+zu32 ProtoCYKB::crcFlash(zu32 addr, zu32 len){
     if(addr < VER_ADDR){
         ELOG("bad address");
         return 0;
@@ -417,7 +423,7 @@ zu32 Pok3rRGB::crcFlash(zu32 addr, zu32 len){
     return data.readleu32();
 }
 
-bool Pok3rRGB::sendCmd(zu8 cmd, zu8 a1, zu16 a2, ZBinary data){
+bool ProtoCYKB::sendCmd(zu8 cmd, zu8 a1, zu16 a2, ZBinary data){
     if(data.size() > 52){
         ELOG("bad data size");
         return false;
@@ -441,7 +447,7 @@ bool Pok3rRGB::sendCmd(zu8 cmd, zu8 a1, zu16 a2, ZBinary data){
     return true;
 }
 
-bool Pok3rRGB::sendRecvCmd(zu8 cmd, zu8 a1, ZBinary &data, zu16 a2){
+bool ProtoCYKB::sendRecvCmd(zu8 cmd, zu8 a1, ZBinary &data, zu16 a2){
     if(!sendCmd(cmd, a1, a2, data))
         return false;
 
@@ -497,10 +503,10 @@ void xor_decode_encode(ZBinary &bin){
     }
 }
 
-void Pok3rRGB::decode_firmware(ZBinary &bin){
+void ProtoCYKB::decode_firmware(ZBinary &bin){
     xor_decode_encode(bin);
 }
 
-void Pok3rRGB::encode_firmware(ZBinary &bin){
+void ProtoCYKB::encode_firmware(ZBinary &bin){
     xor_decode_encode(bin);
 }

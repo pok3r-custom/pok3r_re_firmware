@@ -8,11 +8,16 @@
 #include "zbinary.h"
 using namespace LibChaos;
 
-#define HOLTEK_VID          0x04d9
-#define POK3R_RGB_PID       0x0167
-#define POK3R_RGB_BOOT_PID  0x1167
+#define POK3R_RGB_PID           0x0167
+#define POK3R_RGB_BOOT_PID      0x1167
 
-class Pok3rRGB : public HIDDevice, public UpdateInterface {
+#define VORTEX_CORE_PID         0x0175
+#define VORTEX_CORE_BOOT_PID    0x1175
+
+#define VORTEX_TESTER_PID       0x0200
+#define VORTEX_TESTER_BOOT_PID  0x1200
+
+class ProtoCYKB : public HIDDevice, public UpdateInterface {
 public:
     enum pok3r_rgb_cmd {
         CMD_16      = 0x10,
@@ -44,11 +49,13 @@ public:
     };
 
 public:
-    Pok3rRGB();
-    ~Pok3rRGB();
+    ProtoCYKB();
+    ~ProtoCYKB();
 
     //! Find and open POK3R RGB device.
-    bool open();
+    bool open(zu16 vid, zu16 pid, zu16 boot_pid);
+
+    bool isBuiltin() const;
 
     //! Reset and re-open device.
     bool enterFirmware();
@@ -97,6 +104,9 @@ private:
     bool builtin;
     bool debug;
     bool nop;
+    zu16 vid;
+    zu16 pid;
+    zu16 boot_pid;
 };
 
 #endif // POK3R_RGB_H

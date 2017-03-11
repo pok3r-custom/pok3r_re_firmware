@@ -8,70 +8,10 @@
 #include "zbinary.h"
 using namespace LibChaos;
 
-#define HOLTEK_VID          0x04d9
 #define POK3R_PID           0x0141
 #define POK3R_BOOT_PID      0x1141
 
-// Pok3r Update Protocol
-
-// Read:
-// Out: 64 bytes
-//    8  bits: FLASH_CMD
-//    8  bits: FLASH_READ_SUBCMD
-//   16  bits: CRC
-//   32  bits: Start Address
-//   32  bits: End Address
-//   52 bytes: 0
-// In: 64 bytes
-//   64 bytes: Data
-
-// Write:
-// Out: 64 bytes
-//    8  bits: FLASH_CMD
-//    8  bits: FLASH_WRITE_SUBCMD
-//   16  bits: CRC
-//   32  bits: Start Address
-//   32  bits: End Address
-//   52 bytes: Data
-// In: none
-
-// Erase:
-// Out: 64 bytes
-//    8  bits: ERASE_CMD
-//    8  bits: 0
-//   16  bits: CRC
-//   32  bits: Start Address (0x2800)
-//   32  bits: End Address (0x2808) (0xA108)
-//   52 bytes: 0
-// In: none
-
-// Update Start:
-// Out: 64 bytes
-//    8  bits: UPDATE_START_CMD
-//    8  bits: 0
-//   16  bits: CRC
-//   60 bytes: 0
-// In: 64 bytes
-//   0x55
-//   0x16
-//   0x00
-//   0x11
-//   0x00
-//   0x2c
-//   0x00
-//   0x04
-//   0x76
-//   0x00
-//   0x76
-//   0x00
-//   0x00
-//   0x28
-//   0x00
-//   0x00
-//   0x03
-//   Zero Padding
-
-class Pok3r : public HIDDevice, public UpdateInterface {
+class ProtoPOK3R : public HIDDevice, public UpdateInterface {
 public:
     enum pok3r_cmd {
         ERASE_CMD               = 0,    // Erase pages of flash
@@ -103,11 +43,13 @@ public:
     };
 
 public:
-    Pok3r();
-    ~Pok3r();
+    ProtoPOK3R();
+    ~ProtoPOK3R();
 
     //! Find and open POK3R device.
-    bool open();
+    bool open(zu16 vid, zu16 pid, zu16 boot_pid);
+
+    bool isBuiltin() const;
 
     //! Reset and re-open device.
     bool enterFirmware();
@@ -154,6 +96,9 @@ private:
     bool builtin;
     bool debug;
     bool nop;
+    zu16 vid;
+    zu16 pid;
+    zu16 boot_pid;
 };
 
 #endif // POK3R_H

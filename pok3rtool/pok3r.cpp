@@ -1,8 +1,6 @@
 #include "pok3r.h"
 #include "zlog.h"
 
-#define UPDATE_USAGE_PAGE   0xff00
-#define UPDATE_USAGE        0x01
 #define UPDATE_PKT_LEN      64
 
 #define VER_ADDR            0x2800
@@ -12,31 +10,39 @@
 
 #define WAIT_SLEEP          2
 
-Pok3r::Pok3r() : debug(false), nop(false){
+ProtoPOK3R::ProtoPOK3R() : debug(false), nop(false){
 
 }
 
-Pok3r::~Pok3r(){
+ProtoPOK3R::~ProtoPOK3R(){
 
 }
 
-bool Pok3r::open(){
+bool ProtoPOK3R::open(zu16 avid, zu16 apid, zu16 aboot_pid){
+    vid = avid;
+    pid = apid;
+    boot_pid = aboot_pid;
+
     // Try firmware vid and pid
-    if(HIDDevice::open(HOLTEK_VID, POK3R_PID, UPDATE_USAGE_PAGE, UPDATE_USAGE)){
-        LOG("Opened POK3R");
+    if(HIDDevice::open(vid, pid, UPDATE_USAGE_PAGE, UPDATE_USAGE)){
+//        LOG("Opened POK3R");
         builtin = false;
         return true;
     }
     // Try builtin vid and pid
-    if(HIDDevice::open(HOLTEK_VID, POK3R_BOOT_PID, UPDATE_USAGE_PAGE, UPDATE_USAGE)){
-        LOG("Opened POK3R (builtin)");
+    if(HIDDevice::open(vid, boot_pid, UPDATE_USAGE_PAGE, UPDATE_USAGE)){
+//        LOG("Opened POK3R (builtin)");
         builtin = true;
         return true;
     }
     return false;
 }
 
-bool Pok3r::enterFirmware(){
+bool ProtoPOK3R::isBuiltin() const {
+    return builtin;
+}
+
+bool ProtoPOK3R::enterFirmware(){
     if(!builtin){
 //        LOG("In Firmware");
         return true;
@@ -50,7 +56,7 @@ bool Pok3r::enterFirmware(){
     ZThread::sleep(WAIT_SLEEP);
 
     // Find device with new vid and pid
-    if(!open()){
+    if(!open(vid, pid, boot_pid)){
         ELOG("open error");
         return false;
     }
@@ -60,7 +66,7 @@ bool Pok3r::enterFirmware(){
     return true;
 }
 
-bool Pok3r::enterBootloader(){
+bool ProtoPOK3R::enterBootloader(){
     if(builtin){
 //        LOG("In Bootloader");
         return true;
@@ -74,7 +80,7 @@ bool Pok3r::enterBootloader(){
     ZThread::sleep(WAIT_SLEEP);
 
     // Find device with new vid and pid
-    if(!open()){
+    if(!open(vid, pid, boot_pid)){
         ELOG("open error");
         return false;
     }
@@ -84,7 +90,7 @@ bool Pok3r::enterBootloader(){
     return true;
 }
 
-bool Pok3r::getInfo(){
+bool ProtoPOK3R::getInfo(){
     if(!sendCmd(UPDATE_START_CMD, 0, 0, 0))
         return false;
 
@@ -115,7 +121,7 @@ bool Pok3r::getInfo(){
     return true;
 }
 
-ZString Pok3r::getVersion(){
+ZString ProtoPOK3R::getVersion(){
     ZBinary bin;
     if(!readFlash(VER_ADDR, bin))
         return "ERROR";
@@ -128,7 +134,7 @@ ZString Pok3r::getVersion(){
     return ZString(bin.raw() + 4);
 }
 
-bool Pok3r::clearVersion(){
+bool ProtoPOK3R::clearVersion(){
     DLOG("clearVersion");
     if(!enterBootloader())
         return false;
@@ -149,7 +155,7 @@ bool Pok3r::clearVersion(){
     return true;
 }
 
-bool Pok3r::setVersion(ZString version){
+bool ProtoPOK3R::setVersion(ZString version){
     DLOG("setVersion " << version);
     if(!clearVersion())
         return false;
@@ -180,7 +186,7 @@ bool Pok3r::setVersion(ZString version){
     return true;
 }
 
-ZBinary Pok3r::dumpFlash(){
+ZBinary ProtoPOK3R::dumpFlash(){
     ZBinary dump;
     for(zu32 i = 0; i < FLASH_LEN; i += 64){
         if(!readFlash(i, dump))
@@ -189,7 +195,7 @@ ZBinary Pok3r::dumpFlash(){
     return dump;
 }
 
-bool Pok3r::writeFirmware(const ZBinary &fwbinin){
+bool ProtoPOK3R::writeFirmware(const ZBinary &fwbinin){
     ZBinary fwbin = fwbinin;
     // Encode the firmware for the POK3R
     encode_firmware(fwbin);
@@ -251,7 +257,7 @@ bool Pok3r::writeFirmware(const ZBinary &fwbinin){
     return true;
 }
 
-bool Pok3r::update(ZString version, const ZBinary &fwbin){
+bool ProtoPOK3R::update(ZString version, const ZBinary &fwbin){
     // Reset to bootloader
     if(!enterBootloader())
         return false;
@@ -273,7 +279,7 @@ bool Pok3r::update(ZString version, const ZBinary &fwbin){
     return true;
 }
 
-bool Pok3r::eraseFlash(zu32 start, zu32 end){
+bool ProtoPOK3R::eraseFlash(zu32 start, zu32 end){
     DLOG("eraseFlash " << start << " " << end);
     // Send command
     if(!sendCmd(ERASE_CMD, 8, start, end))
@@ -281,7 +287,7 @@ bool Pok3r::eraseFlash(zu32 start, zu32 end){
     return true;
 }
 
-bool Pok3r::readFlash(zu32 addr, ZBinary &bin){
+bool ProtoPOK3R::readFlash(zu32 addr, ZBinary &bin){
     DLOG("readFlash " << addr);
     // Send command
     if(!sendCmd(FLASH_CMD, FLASH_READ_SUBCMD, addr, addr + 64))
@@ -300,7 +306,7 @@ bool Pok3r::readFlash(zu32 addr, ZBinary &bin){
     return true;
 }
 
-bool Pok3r::writeFlash(zu32 addr, ZBinary bin){
+bool ProtoPOK3R::writeFlash(zu32 addr, ZBinary bin){
     DLOG("writeFlash " << addr << " " << bin.size());
     if(!bin.size())
         return false;
@@ -310,7 +316,7 @@ bool Pok3r::writeFlash(zu32 addr, ZBinary bin){
     return true;
 }
 
-bool Pok3r::checkFlash(zu32 addr, ZBinary bin){
+bool ProtoPOK3R::checkFlash(zu32 addr, ZBinary bin){
     DLOG("checkFlash " << addr << " " << bin.size());
     if(!bin.size())
         return false;
@@ -320,7 +326,7 @@ bool Pok3r::checkFlash(zu32 addr, ZBinary bin){
     return true;
 }
 
-zu16 Pok3r::crcFlash(zu32 addr, zu32 len){
+zu16 ProtoPOK3R::crcFlash(zu32 addr, zu32 len){
     // Send command
     sendCmd(CRC_CMD, 0, addr, len);
     return 0;
@@ -342,7 +348,7 @@ zu16 crc16(unsigned char *addr, zu64 size) {
     return (zu16)crc;
 }
 
-bool Pok3r::sendCmd(zu8 cmd, zu8 subcmd, zu32 a1, zu32 a2, const zbyte *data, zu8 len){
+bool ProtoPOK3R::sendCmd(zu8 cmd, zu8 subcmd, zu32 a1, zu32 a2, const zbyte *data, zu8 len){
     if(len > 52){
         ELOG("bad data size");
         return false;
@@ -431,7 +437,7 @@ void decode_firmware_packet(zbyte *data, zu32 num){
 
 // Decode the encryption scheme used by the POK3R firmware
 // Ripped from the pok3r builtin firmware
-void Pok3r::decode_firmware(ZBinary &bin){
+void ProtoPOK3R::decode_firmware(ZBinary &bin){
     zu32 count = 0;
     for(zu32 offset = 0; offset < bin.size(); offset += 52){
         if(count >= 10 && count <= 100){
@@ -466,7 +472,7 @@ void encode_firmware_packet(zbyte *data, zu32 num){
 
 // Encode using the encryption scheme used by the POK3R firmware
 // Reverse engineered from the above
-void Pok3r::encode_firmware(ZBinary &bin){
+void ProtoPOK3R::encode_firmware(ZBinary &bin){
     zu32 count = 0;
     for(zu32 offset = 0; offset < bin.size(); offset += 52){
         if(count >= 10 && count <= 100){

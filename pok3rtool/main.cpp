@@ -1,13 +1,14 @@
 #include "hiddevice.h"
 #include "pok3r.h"
 #include "pok3r_rgb.h"
-#include "vortex_core.h"
-#include "vortex_tester.h"
+//#include "vortex_core.h"
+//#include "vortex_tester.h"
 
 #include "zlog.h"
 #include "zfile.h"
 #include "zhash.h"
 #include "zpointer.h"
+#include "zmap.h"
 using namespace LibChaos;
 
 #define UPDATE_USAGE_PAGE   0xff00
@@ -250,12 +251,12 @@ int decode_updater(ZPath exe, ZPath out){
         switch(type){
             case 1:
                 // Decrypt firmware
-                Pok3r::decode_firmware(sec);
+                ProtoPOK3R::decode_firmware(sec);
                 break;
             case 2:
                 // Decrypt RGB firmwares only
                 if(sec.size() > 180){
-                    Pok3rRGB::decode_firmware(sec);
+                    ProtoCYKB::decode_firmware(sec);
                 }
                 break;
             default:
@@ -289,7 +290,7 @@ int encode_image(ZPath fwin, ZPath fwout){
     }
 
 //    Pok3r::encode_firmware(fwbin);
-    Pok3rRGB::encode_firmware(fwbin);
+    ProtoCYKB::encode_firmware(fwbin);
     encode_package_data(fwbin);
 
     LOG("Output: " << fwout);
@@ -323,7 +324,7 @@ int encode_patch_updater(ZPath exein, ZPath fwin, ZPath exeout){
 
     // Encode firmware
 //    Pok3r::encode_firmware(fwbin);
-    Pok3rRGB::encode_firmware(fwbin);
+    ProtoCYKB::encode_firmware(fwbin);
     encode_package_data(fwbin);
 
     // Write encoded firmware onto exe
@@ -363,65 +364,180 @@ void warning(){
 }
 
 enum DevType {
-    PROTO_VORTEX,
-    PROTO_CYKB,
+    PROTO_POK3R,    //!< Used exclusively in the POK3R.
+    PROTO_CYKB,     //!< Used in new Vortex keyboards, marked with CYKB on the PCB.
+                    //!< POK3R RGB, Vortex CORE, Vortex Switch Tester.
 };
 
-struct USBDevice {
+struct VortexDevice {
+    int mask;
     ZString name;
     zu16 vid;
     zu16 pid;
-    zu16 page;
-    zu16 usage;
+    zu16 boot_pid;
     DevType type;
 };
 
-const USBDevice devices[] = {
-    { "POK3R", HOLTEK_VID, POK3R_PID, UPDATE_USAGE_PAGE, UPDATE_USAGE, PROTO_VORTEX },
-    { "POK3R (builtin)", HOLTEK_VID, POK3R_BOOT_PID, UPDATE_USAGE_PAGE, UPDATE_USAGE, PROTO_VORTEX },
+const ZArray<VortexDevice> devices = {
+    { 1, "POK3R",          HOLTEK_VID, POK3R_PID,          POK3R_BOOT_PID,         PROTO_POK3R },
+    { 2, "POK3R RGB",      HOLTEK_VID, POK3R_RGB_PID,      POK3R_RGB_BOOT_PID,     PROTO_CYKB },
+    { 4, "Vortex Core",    HOLTEK_VID, VORTEX_CORE_PID,    VORTEX_CORE_BOOT_PID,   PROTO_CYKB },
+    { 8, "Vortex Tester",  HOLTEK_VID, VORTEX_TESTER_PID,  VORTEX_TESTER_BOOT_PID, PROTO_CYKB },
 };
 
 ZPointer<UpdateInterface> openDevice(int device){
     ZPointer<UpdateInterface> kb;
 
-    if(device == 0)
-        device = 1 | 2 | 4;
+    for(zu64 i = 0; i < devices.size(); ++i){
+        VortexDevice dev = devices[i];
+        if(device & dev.mask){
+            // Select protocol
+            switch(dev.type){
+                case PROTO_POK3R:
+                    kb = new ProtoPOK3R();
+                    break;
+                case PROTO_CYKB:
+                    kb = new ProtoCYKB();
+                    break;
+                default:
+                    return nullptr;
+                    break;
+            }
 
-    // POK3R
-    if(device & 1){
-        kb = new Pok3r();
-        if(kb->open()){
-            return kb;
-        }
-    }
-
-    // POK3R RGB
-    if(device & 2){
-        kb = new Pok3rRGB();
-        if(kb->open()){
-            return kb;
-        }
-    }
-
-    // Vortex CORE
-    if(device & 4){
-        kb = new VortexCORE();
-        if(kb->open()){
-            return kb;
-        }
-    }
-
-    // Vortex Switch Tester
-    if(device & 8){
-        kb = new VortexTester();
-        if(kb->open()){
-            return kb;
+            // Try to open
+            if(kb->open(dev.vid, dev.pid, dev.boot_pid)){
+                if(kb->isBuiltin())
+                    LOG("Opened " << dev.name << " (builtin)");
+                else
+                    LOG("Opened " << dev.name);
+                return kb;
+            }
         }
     }
 
     ELOG("Failed to open device");
     return nullptr;
 }
+
+struct Param {
+    ZArray<ZString> args;
+    int device;
+};
+
+int cmd_version(Param *param){
+    // Read Version
+    ZPointer<UpdateInterface> kb = openDevice(param->device);
+    if(kb.get()){
+        LOG("Version: " << kb->getVersion());
+        return 0;
+    }
+    return -1;
+}
+
+int cmd_setversion(Param *param){
+    ZString version = param->args[1];
+    // Set Version
+    ZPointer<UpdateInterface> kb = openDevice(param->device);
+    if(kb.get()){
+        LOG("Old Version: " << kb->getVersion());
+        LOG(kb->setVersion(version));
+        LOG(kb->enterFirmware());
+        return 0;
+    }
+    return -1;
+}
+
+int cmd_info(Param *param){
+    // Get Info
+    ZPointer<UpdateInterface> kb = openDevice(param->device);
+    if(kb.get()){
+        LOG(kb->getInfo());
+        return 0;
+    }
+    return -1;
+}
+
+int cmd_reboot(Param *param){
+    // Reset to Firmware
+    ZPointer<UpdateInterface> kb = openDevice(param->device);
+    if(kb.get()){
+        LOG(kb->enterFirmware());
+        // Read version
+        LOG("Version: " << kb->getVersion());
+        return 0;
+    }
+    return -1;
+}
+
+int cmd_bootloader(Param *param){
+    // Reset to Bootloader
+    ZPointer<UpdateInterface> kb = openDevice(param->device);
+    if(kb.get()){
+        LOG(kb->enterBootloader());
+        // Read version
+        LOG("Version: " << kb->getVersion());
+        return 0;
+    }
+    return -1;
+}
+
+int cmd_dump(Param *param){
+    ZPath out = param->args[1];
+    // Dump Flash
+    ZPointer<UpdateInterface> kb = openDevice(param->device);
+    if(kb.get()){
+        LOG("Dump Flash");
+        ZBinary bin = kb->dumpFlash();
+        RLOG(bin.dumpBytes(4, 8));
+        LOG("Out: " << out);
+        ZFile::writeBinary(out, bin);
+        return 0;
+    }
+    return -1;
+}
+
+int cmd_flash(Param *param){
+    ZString version = param->args[1];
+    ZPath firmware = param->args[2];
+    // Update Firmware
+    if(param->device == 0){
+        LOG("Please specifiy a device");
+        return 2;
+    }
+    ZPointer<UpdateInterface> kb = openDevice(param->device);
+    if(kb.get()){
+        LOG("Update Firmware: " << firmware);
+        ZBinary fwbin;
+        if(!ZFile::readBinary(firmware, fwbin))
+            return -3;
+        LOG(kb->update(version, fwbin));
+        return 0;
+    }
+    return -1;
+}
+
+int cmd_decode(Param *param){
+    return decode_updater(param->args[1], param->args[2]);
+}
+
+typedef int (*cmd_func)(Param *);
+
+struct CmdEntry {
+    cmd_func func;
+    int argn;
+    ZString usage;
+};
+
+const ZMap<ZString, CmdEntry> cmds = {
+    { "version",    { cmd_version,      0, "pok3rtool version " } },
+    { "setversion", { cmd_setversion,   1, "pok3rtool setversion <version>" } },
+    { "info",       { cmd_info,         0, "pok3rtool info" } },
+    { "reboot",     { cmd_reboot,       0, "pok3rtool reboot" } },
+    { "bootloader", { cmd_bootloader,   0, "pok3rtool bootloader" } },
+    { "dump",       { cmd_dump,         1, "pok3rtool dump <output file>" } },
+    { "flash",      { cmd_flash,        2, "pok3rtool flash <version> <firmware>" } },
+    { "decode",     { cmd_decode,       2, "pok3rtool decode <path to updater> <output file>" } },
+};
 
 int main(int _argc, char **_argv){
     ZLog::logLevelStdOut(ZLog::INFO, "[%clock%] N %log%");
@@ -432,191 +548,59 @@ int main(int _argc, char **_argv){
     ZLog::logLevelFile(ZLog::DEBUG, lgf, "[%clock%] D [%function%|%file%:%line%] %log%");
     ZLog::logLevelFile(ZLog::ERRORS, lgf, "[%clock%] E [%function%|%file%:%line%] %log%");
 
-    bool ok = false;
-    int device = 0;
+    Param param;
+    param.device = 0;
 
-    ZArray<ZString> args;
+    bool ok = false;
+
     for(int i = 1; i < _argc; ++i){
         ZString arg = _argv[i];
         if(arg == "--ok" || arg == "-ok"){
             ok = true;
         } else if(arg == "--pok3r"){
-            if(device != 0){
+            if(param.device != 0){
                 LOG("Cannot specify multiple devices");
                 return 2;
             }
             LOG("Selected POK3R");
-            device = 1;
+            param.device = 1;
         } else if(arg == "--pok3r-rgb"){
-            if(device != 0){
+            if(param.device != 0){
                 LOG("Cannot specify multiple devices");
                 return 2;
             }
             LOG("Selected POK3R RGB");
-            device = 2;
+            param.device = 2;
         } else if(arg == "--vortex-core"){
-            if(device != 0){
+            if(param.device != 0){
                 LOG("Cannot specify multiple devices");
                 return 2;
             }
             LOG("Selected Vortex CORE");
-            device = 4;
+            param.device = 4;
         } else if(arg == "--vortex-tester"){
-            if(device != 0){
+            if(param.device != 0){
                 LOG("Cannot specify multiple devices");
                 return 2;
             }
             LOG("Selected Vortex Tester");
-            device = 8;
+            param.device = 8;
         } else {
-            args.push(arg);
+            param.args.push(arg);
         }
     }
 
-    if(args.size()){
-        ZString cmd = args[0];
-        if(cmd == "version"){
-            if(!ok) warning();
-            // Read Version
-            ZPointer<UpdateInterface> kb = openDevice(device);
-            if(kb.get()){
-                LOG("Version: " << kb->getVersion());
-                return 0;
-            }
-            return -1;
-
-        } else if(cmd == "setversion"){
-            if(args.size() > 1){
-                if(!ok) warning();
-                // Set Version
-                ZPointer<UpdateInterface> kb = openDevice(device);
-                if(kb.get()){
-                    LOG("Old Version: " << kb->getVersion());
-                    LOG(kb->setVersion(args[1]));
-                    LOG(kb->enterFirmware());
-                    return 0;
-                }
-                return -1;
+    if(param.args.size()){
+        ZString cmstr = param.args[0];
+        if(cmds.contains(cmstr)){
+            CmdEntry cmd = cmds[cmstr];
+            if(param.args.size() - 1 == cmd.argn){
+                cmd.func(&param);
             } else {
-                LOG("Usage: pok3rtool setversion <version>");
-                return 2;
+                LOG("Usage: " << cmd.usage);
             }
-
-        } else if(cmd == "info"){
-            if(!ok) warning();
-            // Get Info
-            ZPointer<UpdateInterface> kb = openDevice(device);
-            if(kb.get()){
-                LOG(kb->getInfo());
-                return 0;
-            }
-            return -1;
-
-        } else if(cmd == "reboot"){
-            if(!ok) warning();
-            // Reset to Firmware
-            ZPointer<UpdateInterface> kb = openDevice(device);
-            if(kb.get()){
-                LOG(kb->enterFirmware());
-                // Read version
-                LOG("Version: " << kb->getVersion());
-                return 0;
-            }
-            return -1;
-
-        } else if(cmd == "bootloader"){
-            if(!ok) warning();
-            // Reset to Bootloader
-            ZPointer<UpdateInterface> kb = openDevice(device);
-            if(kb.get()){
-                LOG(kb->enterBootloader());
-                // Read version
-                LOG("Version: " << kb->getVersion());
-                return 0;
-            }
-            return -1;
-
-        } else if(cmd == "dump"){
-            if(args.size() > 1){
-                if(!ok) warning();
-                // Dump Flash
-                ZPointer<UpdateInterface> kb = openDevice(device);
-                if(kb.get()){
-                    LOG("Dump Flash");
-                    ZBinary bin = kb->dumpFlash();
-                    RLOG(bin.dumpBytes(4, 8));
-                    LOG("Out: " << args[1]);
-                    ZFile::writeBinary(args[1], bin);
-                    return 0;
-                }
-                return -1;
-            } else {
-                LOG("Usage: pok3rtool dump <output file>");
-                return 2;
-            }
-
-        } else if(cmd == "flash"){
-            if(!ok) warning();
-            // Update Firmware
-            if(args.size() > 2){
-                if(device == 0){
-                    LOG("Please specifiy a device");
-                    return 2;
-                }
-                ZPointer<UpdateInterface> kb = openDevice(device);
-                if(kb.get()){
-                    LOG("Update Firmware: " << args[2]);
-                    ZBinary fwbin;
-                    if(!ZFile::readBinary(args[2], fwbin))
-                        return -3;
-                    LOG(kb->update(args[1], fwbin));
-                    return 0;
-                }
-                return -1;
-            } else {
-                LOG("Usage: pok3rtool flash <version> <firmware>");
-                return 2;
-            }
-
-        } else if(cmd == "test"){
-            if(!ok) warning();
-            // Test
-            Pok3rRGB kb;
-            if(kb.open()){
-                kb.test();
-                return 0;
-            }
-            return -1;
-
-        } else if(cmd == "decode"){
-            // Decode firmware from updater executable
-            if(args.size() > 2){
-                return decode_updater(ZString(args[1]), ZString(args[2]));
-            } else {
-                LOG("Usage: pok3rtool decode <path to updater> <output file>");
-                return 2;
-            }
-
-        } else if(cmd == "encode"){
-            // Encode firmware to format accepted by Pok3r
-            if(args.size() > 2){
-                return encode_image(ZString(args[1]), ZString(args[2]));
-            } else {
-                LOG("Usage: pok3rtool encode <path to firmware image> <output file>");
-                return 2;
-            }
-
-        } else if(cmd == "encodepatch"){
-            // Encode firmware abd patch into updater executable
-            if(args.size() > 3){
-                return encode_patch_updater(ZString(args[1]), ZString(args[2]), ZString(args[3]));
-            } else {
-                LOG("Usage: pok3rtool encodepatch <path to updater> <path to firmware> <output updater>");
-                return 2;
-            }
-
         } else {
-            LOG("Unknown Command \"" << cmd << "\"");
+            LOG("Unknown Command \"" << cmstr << "\"");
             return 1;
         }
     } else {
