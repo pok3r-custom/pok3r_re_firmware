@@ -2630,10 +2630,17 @@ function_e_19:
     429e:   2a0a        cmp r2, #10
     42a0:   d25e        bcs.n 0x4360
     42a2:   e8df f002   tbb [pc, r2]
-    42a6:   5ec6        ldrsh r6, [r0, r3]
-    42a8:   fe5d 5dfd   mrc2 13, 2, r5, cr13, cr13, {7}
-    42ac:   5d5d        ldrb r5, [r3, r5]
-    42ae:   fc05 465a   stc2 6, cr4, [r5], {90}   ; 0x5a
+            c6
+            5e
+            5d
+            fe
+            fd
+            5d
+            5d
+            5d
+            05
+            fc
+    42b0:   465a        mov r2, fp
     42b2:   b113        cbz r3, 0x42ba
     42b4:   2b01        cmp r3, #1
     42b6:   d009        beq.n 0x42cc
@@ -2711,9 +2718,12 @@ function_e_19:
     436c:   2806        cmp r0, #6
     436e:   d222        bcs.n 0x43b6
     4370:   e8df f000   tbb [pc, r0]
-    4374:   0903        lsrs r3, r0, #4
-    4376:   0f21        lsrs r1, r4, #28
-    4378:   1f18        subs r0, r3, #4
+            03
+            09
+            21
+            0f
+            18
+            1f
     437a:   71d1        strb r1, [r2, #7]
     437c:   f882 c008   strb.w ip, [r2, #8]
     4380:   f882 403a   strb.w r4, [r2, #58]   ; 0x3a

@@ -1,14 +1,16 @@
 
-* 2c04
-* 2c08
-* 2c0c
-* 2c10
-* 2c14
-* 2c18
-* 2c2c
-* 2c30
-* 2c38
-* 2c3c
+* 2c04: reset
+* 2c08: nmi
+* 2c0c: hard_fault
+* 2c10: mcu_fault
+* 2c14: bus_fault
+* 2c18: usage_fault
+
+* 2c2c: svccall_intr
+* 2c30: debug_intr
+
+* 2c38: pendsv_intr
+* 2c3c: systick_intr
 * 2c40
 * 2c44
 * 2c48
@@ -35,6 +37,7 @@
 * 2c9c
 * 2ca0
 * 2ca4
+
 * 2cac
 * 2cb0
 * 2cb4
@@ -45,10 +48,11 @@
 * 2cc8
 * 2ccc
 * 2cd0
-* 2ce4
-* 2ce8
+
+* 2ce4: bftm0_intr
+* 2ce8: bftm1_intr
 * 2cec
-* 2cf0
+* 2cf0: i2c1_intr
 * 2cf4
 * 2cf8
 * 2cfc
@@ -57,7 +61,8 @@
 * 2d08
 * 2d0c
 * 2d10
-* 2d14
+* 2d14: usb_intr
+
 * 2d1c
 * 2d20
 * 2d24
@@ -66,18 +71,20 @@
 * 2d30
 * 2d34
 * 2d38
+
 * 2d50
 
-2d54: reset
-2d60: nmi
-2d62: hard_fault
-2d64: mcu_fault
-2d66: bus_fault
-2d68: usage_fault
-2d6a: svccall_intr
-2d6c: debug_intr
-2d6e: pendsv_intr
-2d70: systick_intr
+#2d54: reset
+#2d60: nmi
+#2d62: hard_fault
+#2d64: mcu_fault
+#2d66: bus_fault
+#2d68: usage_fault
+#2d6a: svccall_intr
+#2d6c: debug_intr
+#2d6e: pendsv_intr
+#2d70: systick_intr
+
 2d72: generic_intr
 
 2d80: entry
@@ -91,8 +98,10 @@
 2f78: handle_update_packet
 3004: function_e_33
 3068: reset_cmd
-30c8: bftm0_intr
-3250: bftm1_intr
+
+#30c8: bftm0_intr
+#3250: bftm1_intr
+
 3264: function_44
 3272: function_45
 3286: function_46
@@ -126,7 +135,9 @@
 3592: gptm_enable_disable
 35a6: function_62
 35fc: function_e_36
-364c: i2c1_intr
+
+#364c: i2c1_intr
+
 377c: function_57
 3790: function_58
 379a: function_59
@@ -256,7 +267,9 @@
 70a8: usb_copy_ep_setup
 70b8: usb_set_genrsm
 70c8: usb_set_adrset
-70dc: usb_intr
+
+#70dc: usb_intr
+
 70e8: watchdog_init
 7144: watchdog_reload_timer
 7154: disconnect_cmd

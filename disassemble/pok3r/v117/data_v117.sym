@@ -1,4 +1,6 @@
 
+2c00: vectors
+
 8998: usb_report0_desc
 89d8: usb_report1_desc
 89fc: usb_report2_desc
