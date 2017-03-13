@@ -13,9 +13,15 @@ struct HIDDeviceData {
     hid_t *hid;
 };
 
-HIDDevice::HIDDevice() : vid(0), pid(0), upage(0), usage(0){
+HIDDevice::HIDDevice() : vid(0), pid(0), usage_page(0), usage(0){
     device = new HIDDeviceData;
     device->hid = NULL;
+}
+
+HIDDevice::HIDDevice(zu16 vid_, zu16 pid_, zu16 usage_page_, zu16 usage_, void *hidt) :
+        vid(vid_), pid(pid_), usage_page(usage_page_), usage(usage_){
+    device = new HIDDeviceData;
+    device->hid = (hid_t *)hidt;
 }
 
 HIDDevice::~HIDDevice(){
@@ -23,11 +29,12 @@ HIDDevice::~HIDDevice(){
     delete device;
 }
 
-bool HIDDevice::open(zu16 vid, zu16 pid, zu16 usage_page, zu16 usage){
-    this->vid = vid;
-    this->pid = pid;
-    this->upage = upage;
-    this->usage = usage;
+bool HIDDevice::open(zu16 vid_, zu16 pid_, zu16 usage_page_, zu16 usage_){
+    vid = vid_;
+    pid = pid_;
+    usage_page = usage_page_;
+    usage = usage_;
+
     device->hid = rawhid_open(vid, pid, usage_page, usage);
     return (device->hid != NULL);
 }
@@ -37,7 +44,7 @@ void HIDDevice::close(){
     device->hid = NULL;
 }
 
-bool HIDDevice::isOpen(){
+bool HIDDevice::isOpen() const {
     return !!(device->hid);
 }
 
@@ -74,4 +81,15 @@ bool HIDDevice::recv(ZBinary &data){
     }
     data.resize((zu64)ret);
     return true;
+}
+
+ZArray<ZPointer<HIDDevice> > HIDDevice::openAll(zu16 vid, zu16 pid, zu16 usage_page, zu16 usage){
+    hid_t *hid[128];
+    int count = rawhid_openall(hid, 128, vid, pid, usage_page, usage);
+
+    ZArray<ZPointer<HIDDevice>> devs;
+    for(zu64 i = 0; i < count; ++i){
+        devs.push(new HIDDevice(vid, pid, usage_page, usage, hid[i]));
+    }
+    return devs;
 }

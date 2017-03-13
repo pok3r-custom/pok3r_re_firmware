@@ -11,10 +11,10 @@ ADD_SUBDIRECTORY(rawhid)
 SET(POK3RTOOL_SOURCES
     main.cpp
 
-    pok3r.h
-    pok3r.cpp
-    pok3r_rgb.h
-    pok3r_rgb.cpp
+    proto_pok3r.h
+    proto_pok3r.cpp
+    proto_cykb.h
+    proto_cykb.cpp
     #vortex_core.h
     #vortex_core.cpp
     #vortex_tester.h

@@ -1,5 +1,5 @@
-#ifndef POK3R_RGB_H
-#define POK3R_RGB_H
+#ifndef PROTO_CYKB_H
+#define PROTO_CYKB_H
 
 #include "updateinterface.h"
 #include "hiddevice.h"
@@ -17,7 +17,7 @@ using namespace LibChaos;
 #define VORTEX_TESTER_PID       0x0200
 #define VORTEX_TESTER_BOOT_PID  0x1200
 
-class ProtoCYKB : public HIDDevice, public UpdateInterface {
+class ProtoCYKB : public UpdateInterface {
 public:
     enum pok3r_rgb_cmd {
         CMD_16      = 0x10,
@@ -50,10 +50,13 @@ public:
 
 public:
     ProtoCYKB();
+    ProtoCYKB(HIDDevice *dev, zu16 vid, zu16 pid, bool builtin);
     ~ProtoCYKB();
 
     //! Find and open POK3R RGB device.
     bool open(zu16 vid, zu16 pid, zu16 boot_pid);
+    void close();
+    bool isOpen() const;
 
     bool isBuiltin() const;
 
@@ -107,6 +110,8 @@ private:
     zu16 vid;
     zu16 pid;
     zu16 boot_pid;
+
+    ZPointer<HIDDevice> dev;
 };
 
-#endif // POK3R_RGB_H
+#endif // PROTO_CYKB_H

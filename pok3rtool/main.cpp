@@ -1,8 +1,10 @@
 #include "hiddevice.h"
-#include "pok3r.h"
-#include "pok3r_rgb.h"
+#include "proto_pok3r.h"
+#include "proto_cykb.h"
 //#include "vortex_core.h"
 //#include "vortex_tester.h"
+
+#include "rawhid/hid.h"
 
 #include "zlog.h"
 #include "zfile.h"
@@ -424,6 +426,38 @@ struct Param {
     int device;
 };
 
+void list_openAll(ZString name, zu16 vid, zu16 pid, DevType type, bool builtin){
+    ZArray<ZPointer<HIDDevice>> devs = HIDDevice::openAll(vid, pid, UPDATE_USAGE_PAGE, UPDATE_USAGE);
+    for(zu64 j = 0; j < devs.size(); ++j){
+        ZPointer<UpdateInterface> iface;
+        if(type == PROTO_POK3R){
+            iface = new ProtoPOK3R(devs[j].get(), vid, pid, builtin);
+        } else if(type == PROTO_CYKB){
+            iface = new ProtoCYKB(devs[j].get(), vid, pid, builtin);
+        }
+
+        if(iface.get()){
+            devs[j].divorce();
+            if(iface->isOpen()){
+                LOG(name << ": " << iface->getVersion());
+            } else {
+                LOG(name << "not open");
+            }
+        }
+    }
+}
+
+int cmd_list(Param *param){
+    LOG("List Devices...");
+    for(zu64 i = 0; i < devices.size(); ++i){
+        VortexDevice devinfo = devices[i];
+        list_openAll(devinfo.name, devinfo.vid, devinfo.pid, devinfo.type, false);
+        list_openAll(devinfo.name + " (builtin)", devinfo.vid, devinfo.boot_pid, devinfo.type, true);
+    }
+
+    return 0;
+}
+
 int cmd_version(Param *param){
     // Read Version
     ZPointer<UpdateInterface> kb = openDevice(param->device);
@@ -529,7 +563,8 @@ struct CmdEntry {
 };
 
 const ZMap<ZString, CmdEntry> cmds = {
-    { "version",    { cmd_version,      0, "pok3rtool version " } },
+    { "list",       { cmd_list,         0, "pok3rtool list" } },
+    { "version",    { cmd_version,      0, "pok3rtool version" } },
     { "setversion", { cmd_setversion,   1, "pok3rtool setversion <version>" } },
     { "info",       { cmd_info,         0, "pok3rtool info" } },
     { "reboot",     { cmd_reboot,       0, "pok3rtool reboot" } },

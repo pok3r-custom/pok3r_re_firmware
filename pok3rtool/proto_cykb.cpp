@@ -1,4 +1,4 @@
-#include "pok3r_rgb.h"
+#include "proto_cykb.h"
 #include "zlog.h"
 
 #define UPDATE_PKT_LEN      64
@@ -12,7 +12,11 @@
 
 #define WAIT_SLEEP          2
 
-ProtoCYKB::ProtoCYKB() : debug(false), nop(false){
+ProtoCYKB::ProtoCYKB() : builtin(false), debug(false), nop(false), vid(0), pid(0), dev(new HIDDevice){
+
+}
+
+ProtoCYKB::ProtoCYKB(HIDDevice *dev_, zu16 vid_, zu16 pid_, bool builtin_) : builtin(builtin_), debug(false), nop(false), vid(vid_), pid(pid_), dev(dev_){
 
 }
 
@@ -26,18 +30,26 @@ bool ProtoCYKB::open(zu16 avid, zu16 apid, zu16 aboot_pid){
     boot_pid = aboot_pid;
 
     // Try firmware vid and pid
-    if(HIDDevice::open(vid, pid, UPDATE_USAGE_PAGE, UPDATE_USAGE)){
+    if(dev->open(vid, pid, UPDATE_USAGE_PAGE, UPDATE_USAGE)){
 //        LOG("Opened POK3R RGB");
         builtin = false;
         return true;
     }
     // Try builtin vid and pid
-    if(HIDDevice::open(vid, boot_pid, UPDATE_USAGE_PAGE, UPDATE_USAGE)){
+    if(dev->open(vid, boot_pid, UPDATE_USAGE_PAGE, UPDATE_USAGE)){
 //        LOG("Opened POK3R RGB (builtin)");
         builtin = true;
         return true;
     }
     return false;
+}
+
+void ProtoCYKB::close(){
+    dev->close();
+}
+
+bool ProtoCYKB::isOpen() const {
+    return dev->isOpen();
 }
 
 bool ProtoCYKB::isBuiltin() const {
@@ -322,7 +334,7 @@ void ProtoCYKB::test(){
     LOG("SUM");
     if(!sendCmd(FW, FW_SUM, 0, data))
         return;
-    if(!recv(bin))
+    if(!dev->recv(bin))
         return;
     bin.rewind();
     bin.seek(4);
@@ -332,7 +344,7 @@ void ProtoCYKB::test(){
     LOG("CRC");
     if(!sendCmd(FW, FW_CRC, 0, data))
         return;
-    if(!recv(bin))
+    if(!dev->recv(bin))
         return;
     bin.rewind();
     bin.seek(4);
@@ -440,7 +452,7 @@ bool ProtoCYKB::sendCmd(zu8 cmd, zu8 a1, zu16 a2, ZBinary data){
     DLOG(ZLog::RAW << packet.dumpBytes(4, 8));
 
     // Send packet
-    if(!send(packet)){
+    if(!dev->send(packet)){
         ELOG("send error");
         return false;
     }
@@ -453,7 +465,7 @@ bool ProtoCYKB::sendRecvCmd(zu8 cmd, zu8 a1, ZBinary &data, zu16 a2){
 
     // Recv packet
     data.resize(UPDATE_PKT_LEN);
-    if(!recv(data)){
+    if(!dev->recv(data)){
         ELOG("recv error");
         return false;
     }

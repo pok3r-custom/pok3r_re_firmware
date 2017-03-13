@@ -1,5 +1,5 @@
-#ifndef POK3R_H
-#define POK3R_H
+#ifndef PROTO_POK3R_H
+#define PROTO_POK3R_H
 
 #include "updateinterface.h"
 #include "hiddevice.h"
@@ -11,29 +11,29 @@ using namespace LibChaos;
 #define POK3R_PID           0x0141
 #define POK3R_BOOT_PID      0x1141
 
-class ProtoPOK3R : public HIDDevice, public UpdateInterface {
+class ProtoPOK3R : public UpdateInterface {
 public:
     enum pok3r_cmd {
-        ERASE_CMD               = 0,    // Erase pages of flash
-        ERASE_NOP               = 10,   // Cancel erase
+        ERASE_CMD               = 0,    //! Erase pages of flash
+        ERASE_NOP               = 10,   //! Cancel erase
 
-        FLASH_CMD               = 1,    // Read/write flash
-        FLASH_CHECK_SUBCMD      = 0,    // Compare bytes in flash with sent bytes
-        FLASH_WRITE_SUBCMD      = 1,    // Write 52 bytes to flash
-        FLASH_READ_SUBCMD       = 2,    // Read 64 bytes from flash
+        FLASH_CMD               = 1,    //! Read/write flash
+        FLASH_CHECK_SUBCMD      = 0,    //! Compare bytes in flash with sent bytes
+        FLASH_WRITE_SUBCMD      = 1,    //! Write 52 bytes to flash
+        FLASH_READ_SUBCMD       = 2,    //! Read 64 bytes from flash
         FLASH_3_SUBCMD          = 3,    // ?
 
-        CRC_CMD                 = 2,    // CRC part of flash
+        CRC_CMD                 = 2,    //! CRC part of flash
 
-        UPDATE_START_CMD        = 3,    // Start update
+        UPDATE_START_CMD        = 3,    //! Start update
 
-        RESET_CMD               = 4,    // Reset processor
-        RESET_BOOT_SUBCMD       = 0,    // Reset to opposite firmware (main -> builtin, builtin -> main)
-        RESET_BUILTIN_SUBCMD    = 1,    // Reset to builtin firmware
+        RESET_CMD               = 4,    //! Reset processor
+        RESET_BOOT_SUBCMD       = 0,    //! Reset to opposite firmware (main -> builtin, builtin -> main)
+        RESET_BUILTIN_SUBCMD    = 1,    //! Reset to builtin firmware
 
-        DISCONNECT_CMD          = 5,    // Only in builtin firmware, disconnect USB and force reset
+        DISCONNECT_CMD          = 5,    //! Only in builtin firmware, disconnect USB and force reset
 
-        DEBUG_CMD               = 6,    // Collection of debug commands
+        DEBUG_CMD               = 6,    //! Collection of debug commands
         DEBUG_0_SUBCMD          = 0,    // ?
         DEBUG_1_SUBCMD          = 1,    // ?
         DEBUG_2_SUBCMD          = 2,    // ?
@@ -44,10 +44,13 @@ public:
 
 public:
     ProtoPOK3R();
+    ProtoPOK3R(HIDDevice *dev, zu16 vid, zu16 pid, bool builtin);
     ~ProtoPOK3R();
 
     //! Find and open POK3R device.
     bool open(zu16 vid, zu16 pid, zu16 boot_pid);
+    void close();
+    bool isOpen() const;
 
     bool isBuiltin() const;
 
@@ -99,6 +102,8 @@ private:
     zu16 vid;
     zu16 pid;
     zu16 boot_pid;
+
+    ZPointer<HIDDevice> dev;
 };
 
-#endif // POK3R_H
+#endif // PROTO_POK3R_H

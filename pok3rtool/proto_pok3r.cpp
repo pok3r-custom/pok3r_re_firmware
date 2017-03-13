@@ -1,4 +1,4 @@
-#include "pok3r.h"
+#include "proto_pok3r.h"
 #include "zlog.h"
 
 #define UPDATE_PKT_LEN      64
@@ -10,7 +10,11 @@
 
 #define WAIT_SLEEP          2
 
-ProtoPOK3R::ProtoPOK3R() : debug(false), nop(false){
+ProtoPOK3R::ProtoPOK3R() : builtin(false), debug(false), nop(false), vid(0), pid(0), dev(new HIDDevice){
+
+}
+
+ProtoPOK3R::ProtoPOK3R(HIDDevice *dev_, zu16 vid_, zu16 pid_, bool builtin_) : builtin(builtin_), debug(false), nop(false), vid(vid_), pid(pid_), dev(dev_){
 
 }
 
@@ -24,18 +28,26 @@ bool ProtoPOK3R::open(zu16 avid, zu16 apid, zu16 aboot_pid){
     boot_pid = aboot_pid;
 
     // Try firmware vid and pid
-    if(HIDDevice::open(vid, pid, UPDATE_USAGE_PAGE, UPDATE_USAGE)){
+    if(dev->open(vid, pid, UPDATE_USAGE_PAGE, UPDATE_USAGE)){
 //        LOG("Opened POK3R");
         builtin = false;
         return true;
     }
     // Try builtin vid and pid
-    if(HIDDevice::open(vid, boot_pid, UPDATE_USAGE_PAGE, UPDATE_USAGE)){
+    if(dev->open(vid, boot_pid, UPDATE_USAGE_PAGE, UPDATE_USAGE)){
 //        LOG("Opened POK3R (builtin)");
         builtin = true;
         return true;
     }
     return false;
+}
+
+void ProtoPOK3R::close(){
+    dev->close();
+}
+
+bool ProtoPOK3R::isOpen() const {
+    return dev->isOpen();
 }
 
 bool ProtoPOK3R::isBuiltin() const {
@@ -95,7 +107,7 @@ bool ProtoPOK3R::getInfo(){
         return false;
 
     ZBinary data(64);
-    if(!recv(data)){
+    if(!dev->recv(data)){
         ELOG("recv error");
         return false;
     }
@@ -204,7 +216,7 @@ bool ProtoPOK3R::writeFirmware(const ZBinary &fwbinin){
     if(!sendCmd(UPDATE_START_CMD, 0, 0, 0))
         return false;
     ZBinary data(UPDATE_PKT_LEN);
-    if(!recv(data)){
+    if(!dev->recv(data)){
         ELOG("recv error");
         return false;
     }
@@ -247,7 +259,7 @@ bool ProtoPOK3R::writeFirmware(const ZBinary &fwbinin){
     if(!sendCmd(UPDATE_START_CMD, 0, 0, 0)){
         return false;
     }
-    if(!recv(data)){
+    if(!dev->recv(data)){
         ELOG("recv error");
         return false;
     }
@@ -295,7 +307,7 @@ bool ProtoPOK3R::readFlash(zu32 addr, ZBinary &bin){
 
     // Get response
     ZBinary pkt(UPDATE_PKT_LEN);
-    if(!recv(pkt)){
+    if(!dev->recv(pkt)){
         ELOG("recv error");
         return false;
     }
@@ -373,7 +385,7 @@ bool ProtoPOK3R::sendCmd(zu8 cmd, zu8 subcmd, zu32 a1, zu32 a2, const zbyte *dat
     DLOG(ZLog::RAW << packet.dumpBytes(4, 8));
 
     // Send command (interrupt write)
-    if(!send(packet)){
+    if(!dev->send(packet)){
         ELOG("send error");
         return false;
     }
