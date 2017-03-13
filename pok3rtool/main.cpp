@@ -11,6 +11,7 @@
 #include "zhash.h"
 #include "zpointer.h"
 #include "zmap.h"
+#include "zoptions.h"
 using namespace LibChaos;
 
 #define UPDATE_USAGE_PAGE   0xff00
@@ -422,6 +423,7 @@ ZPointer<UpdateInterface> openDevice(int device){
 }
 
 struct Param {
+    bool ok;
     ZArray<ZString> args;
     int device;
 };
@@ -554,8 +556,15 @@ int cmd_decode(Param *param){
     return decode_updater(param->args[1], param->args[2]);
 }
 
-typedef int (*cmd_func)(Param *);
+#define OPT_OK      "ok"
+#define OPT_TYPE    "device"
 
+const ZArray<ZOptions::OptDef> optdef = {
+    { OPT_OK,       0, ZOptions::NONE },
+    { OPT_TYPE,     't', ZOptions::STRING },
+};
+
+typedef int (*cmd_func)(Param *);
 struct CmdEntry {
     cmd_func func;
     int argn;
@@ -574,7 +583,14 @@ const ZMap<ZString, CmdEntry> cmds = {
     { "decode",     { cmd_decode,       2, "pok3rtool decode <path to updater> <output file>" } },
 };
 
-int main(int _argc, char **_argv){
+const ZMap<ZString, int> devnames = {
+    { "pok3r",          1 },
+    { "pok3r-rgb",      2 },
+    { "vortex-core",    4 },
+    { "vortex-tester",  8 },
+};
+
+int main(int argc, char **argv){
     ZLog::logLevelStdOut(ZLog::INFO, "[%clock%] N %log%");
 //    ZLog::logLevelStdOut(ZLog::DEBUG, "\x1b[35m[%clock%] %thread% N %log%\x1b[m");
     ZLog::logLevelStdErr(ZLog::ERRORS, "\x1b[31m[%clock%] E %log%\x1b[m");
@@ -583,46 +599,19 @@ int main(int _argc, char **_argv){
     ZLog::logLevelFile(ZLog::DEBUG, lgf, "[%clock%] D [%function%|%file%:%line%] %log%");
     ZLog::logLevelFile(ZLog::ERRORS, lgf, "[%clock%] E [%function%|%file%:%line%] %log%");
 
+    ZOptions options(optdef);
+    if(!options.parse(argc, argv))
+        return 1;
+
     Param param;
     param.device = 0;
+    param.ok = options.getOpts().contains(OPT_OK);
+    param.args = options.getArgs();
 
-    bool ok = false;
-
-    for(int i = 1; i < _argc; ++i){
-        ZString arg = _argv[i];
-        if(arg == "--ok" || arg == "-ok"){
-            ok = true;
-        } else if(arg == "--pok3r"){
-            if(param.device != 0){
-                LOG("Cannot specify multiple devices");
-                return 2;
-            }
-            LOG("Selected POK3R");
-            param.device = 1;
-        } else if(arg == "--pok3r-rgb"){
-            if(param.device != 0){
-                LOG("Cannot specify multiple devices");
-                return 2;
-            }
-            LOG("Selected POK3R RGB");
-            param.device = 2;
-        } else if(arg == "--vortex-core"){
-            if(param.device != 0){
-                LOG("Cannot specify multiple devices");
-                return 2;
-            }
-            LOG("Selected Vortex CORE");
-            param.device = 4;
-        } else if(arg == "--vortex-tester"){
-            if(param.device != 0){
-                LOG("Cannot specify multiple devices");
-                return 2;
-            }
-            LOG("Selected Vortex Tester");
-            param.device = 8;
-        } else {
-            param.args.push(arg);
-        }
+    if(options.getOpts().contains(OPT_TYPE)){
+        ZString type = options.getOpts()[OPT_TYPE];
+        if(devnames.contains(type))
+            param.device = devnames[type];
     }
 
     if(param.args.size()){
