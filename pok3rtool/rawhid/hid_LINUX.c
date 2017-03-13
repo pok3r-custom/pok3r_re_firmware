@@ -292,7 +292,7 @@ int rawhid_openall(hid_t **hids, int max, int vid, int pid, int usage_page, int 
     uint32_t val=0, parsed_usage, parsed_usage_page;
     int opencount = 0;
 
-    printf("rawhid_open\n");
+    printf("rawhid_open all\n");
     usb_init();
     usb_find_busses();
     usb_find_devices();

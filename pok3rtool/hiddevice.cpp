@@ -88,7 +88,7 @@ ZArray<ZPointer<HIDDevice> > HIDDevice::openAll(zu16 vid, zu16 pid, zu16 usage_p
     int count = rawhid_openall(hid, 128, vid, pid, usage_page, usage);
 
     ZArray<ZPointer<HIDDevice>> devs;
-    for(zu64 i = 0; i < count; ++i){
+    for(int i = 0; i < count; ++i){
         devs.push(new HIDDevice(vid, pid, usage_page, usage, hid[i]));
     }
     return devs;

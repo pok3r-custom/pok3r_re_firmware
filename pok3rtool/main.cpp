@@ -426,7 +426,7 @@ struct Param {
     int device;
 };
 
-void list_openAll(ZString name, zu16 vid, zu16 pid, DevType type, bool builtin){
+void list_open_all(ZString name, zu16 vid, zu16 pid, DevType type, bool builtin){
     ZArray<ZPointer<HIDDevice>> devs = HIDDevice::openAll(vid, pid, UPDATE_USAGE_PAGE, UPDATE_USAGE);
     for(zu64 j = 0; j < devs.size(); ++j){
         ZPointer<UpdateInterface> iface;
@@ -451,8 +451,8 @@ int cmd_list(Param *param){
     LOG("List Devices...");
     for(zu64 i = 0; i < devices.size(); ++i){
         VortexDevice devinfo = devices[i];
-        list_openAll(devinfo.name, devinfo.vid, devinfo.pid, devinfo.type, false);
-        list_openAll(devinfo.name + " (builtin)", devinfo.vid, devinfo.boot_pid, devinfo.type, true);
+        list_open_all(devinfo.name, devinfo.vid, devinfo.pid, devinfo.type, false);
+        list_open_all(devinfo.name + " (builtin)", devinfo.vid, devinfo.boot_pid, devinfo.type, true);
     }
 
     return 0;
