@@ -395,16 +395,12 @@ ZPointer<UpdateInterface> openDevice(int device){
         VortexDevice dev = devices[i];
         if(device & dev.mask){
             // Select protocol
-            switch(dev.type){
-                case PROTO_POK3R:
-                    kb = new ProtoPOK3R();
-                    break;
-                case PROTO_CYKB:
-                    kb = new ProtoCYKB();
-                    break;
-                default:
-                    return nullptr;
-                    break;
+            if(dev.type == PROTO_POK3R){
+                kb = new ProtoPOK3R(dev.vid, dev.pid, dev.boot_pid);
+            } else if(dev.type == PROTO_CYKB){
+                kb = new ProtoCYKB(dev.vid, dev.pid, dev.boot_pid);
+            } else {
+                return nullptr;
             }
 
             // Try to open
@@ -428,33 +424,45 @@ struct Param {
     int device;
 };
 
-void list_open_all(ZString name, zu16 vid, zu16 pid, DevType type, bool builtin){
-    ZArray<ZPointer<HIDDevice>> devs = HIDDevice::openAll(vid, pid, UPDATE_USAGE_PAGE, UPDATE_USAGE);
-    for(zu64 j = 0; j < devs.size(); ++j){
-        ZPointer<UpdateInterface> iface;
-        if(type == PROTO_POK3R){
-            iface = new ProtoPOK3R(devs[j].get(), vid, pid, builtin);
-        } else if(type == PROTO_CYKB){
-            iface = new ProtoCYKB(devs[j].get(), vid, pid, builtin);
-        }
-
-        if(iface.get()){
-            devs[j].divorce();
-            if(iface->isOpen()){
-                LOG(name << ": " << iface->getVersion());
-            } else {
-                LOG(name << "not open");
-            }
-        }
-    }
-}
+struct ListDevice {
+    VortexDevice dev;
+    ZPointer<HIDDevice> hid;
+    bool boot;
+};
 
 int cmd_list(Param *param){
     LOG("List Devices...");
+    ZArray<ListDevice> devs;
+
     for(zu64 i = 0; i < devices.size(); ++i){
-        VortexDevice devinfo = devices[i];
-        list_open_all(devinfo.name, devinfo.vid, devinfo.pid, devinfo.type, false);
-        list_open_all(devinfo.name + " (builtin)", devinfo.vid, devinfo.boot_pid, devinfo.type, true);
+        VortexDevice devi = devices[i];
+
+        auto hdev = HIDDevice::openAll(devi.vid, devi.pid, UPDATE_USAGE_PAGE, UPDATE_USAGE);
+        for(zu64 j = 0; j < hdev.size(); ++j)
+            devs.push({ devi, hdev[j], false });
+
+        auto hbdev = HIDDevice::openAll(devi.vid, devi.boot_pid, UPDATE_USAGE_PAGE, UPDATE_USAGE);
+        for(zu64 j = 0; j < hbdev.size(); ++j)
+            devs.push({ devi, hbdev[j], true });
+    }
+
+    for(zu64 i = 0; i < devs.size(); ++i){
+        ListDevice ldev = devs[i];
+        // Check device
+        if(ldev.hid.get() && ldev.hid->isOpen()){
+            ZPointer<UpdateInterface> iface;
+            // Select protocol
+            if(ldev.dev.type == PROTO_POK3R){
+                iface = new ProtoPOK3R(ldev.dev.vid, ldev.dev.pid, ldev.dev.boot_pid, ldev.boot, ldev.hid.get());
+            } else if(ldev.dev.type == PROTO_CYKB){
+                iface = new ProtoCYKB(ldev.dev.vid, ldev.dev.pid, ldev.dev.boot_pid, ldev.boot, ldev.hid.get());
+            }
+
+            ldev.hid.divorce();
+            LOG(ldev.dev.name << ": " << iface->getVersion());
+        } else {
+            LOG(ldev.dev.name << " not open");
+        }
     }
 
     return 0;
@@ -585,9 +593,17 @@ const ZMap<ZString, CmdEntry> cmds = {
 
 const ZMap<ZString, int> devnames = {
     { "pok3r",          1 },
+
     { "pok3r-rgb",      2 },
+    { "pok3r_rgb",      2 },
+
+    { "core",           4 },
     { "vortex-core",    4 },
+    { "vortex_core",    4 },
+
+    { "tester",         8 },
     { "vortex-tester",  8 },
+    { "vortex_tester",  8 },
 };
 
 int main(int argc, char **argv){

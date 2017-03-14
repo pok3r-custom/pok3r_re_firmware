@@ -12,23 +12,25 @@
 
 #define WAIT_SLEEP          2
 
-ProtoCYKB::ProtoCYKB() : builtin(false), debug(false), nop(false), vid(0), pid(0), dev(new HIDDevice){
+ProtoCYKB::ProtoCYKB(zu16 vid_, zu16 pid_, zu16 boot_pid_) :
+    builtin(false), debug(false), nop(false),
+    vid(vid_), pid(pid_), boot_pid(boot_pid_),
+    dev(new HIDDevice){
 
 }
 
-ProtoCYKB::ProtoCYKB(HIDDevice *dev_, zu16 vid_, zu16 pid_, bool builtin_) : builtin(builtin_), debug(false), nop(false), vid(vid_), pid(pid_), dev(dev_){
+ProtoCYKB::ProtoCYKB(zu16 vid_, zu16 pid_, zu16 boot_pid_, bool builtin_, HIDDevice *dev_) :
+    builtin(builtin_), debug(false), nop(false),
+    vid(vid_), pid(pid_), boot_pid(boot_pid_),
+    dev(dev_){
 
 }
 
 ProtoCYKB::~ProtoCYKB(){
-
+    delete dev;
 }
 
 bool ProtoCYKB::open(zu16 avid, zu16 apid, zu16 aboot_pid){
-    vid = avid;
-    pid = apid;
-    boot_pid = aboot_pid;
-
     // Try firmware vid and pid
     if(dev->open(vid, pid, UPDATE_USAGE_PAGE, UPDATE_USAGE)){
 //        LOG("Opened POK3R RGB");

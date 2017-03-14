@@ -49,8 +49,12 @@ public:
     };
 
 public:
-    ProtoCYKB();
-    ProtoCYKB(HIDDevice *dev, zu16 vid, zu16 pid, bool builtin);
+    //! Construct unopened device.
+    ProtoCYKB(zu16 vid, zu16 pid, zu16 boot_pid);
+    //! Construct open device from open HIDDevice.
+    ProtoCYKB(zu16 vid, zu16 pid, zu16 boot_pid, bool builtin, HIDDevice *dev);
+
+    ProtoCYKB(const ProtoCYKB &) = delete;
     ~ProtoCYKB();
 
     //! Find and open POK3R RGB device.
@@ -111,7 +115,7 @@ private:
     zu16 pid;
     zu16 boot_pid;
 
-    ZPointer<HIDDevice> dev;
+    HIDDevice *dev;
 };
 
 #endif // PROTO_CYKB_H
