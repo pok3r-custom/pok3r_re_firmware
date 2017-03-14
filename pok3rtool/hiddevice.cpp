@@ -84,12 +84,14 @@ bool HIDDevice::recv(ZBinary &data){
 }
 
 ZArray<ZPointer<HIDDevice> > HIDDevice::openAll(zu16 vid, zu16 pid, zu16 usage_page, zu16 usage){
+    ZArray<ZPointer<HIDDevice>> devs;
+#if PLATFORM == LINUX
     hid_t *hid[128];
     int count = rawhid_openall(hid, 128, vid, pid, usage_page, usage);
 
-    ZArray<ZPointer<HIDDevice>> devs;
     for(int i = 0; i < count; ++i){
         devs.push(new HIDDevice(vid, pid, usage_page, usage, hid[i]));
     }
+#endif
     return devs;
 }
