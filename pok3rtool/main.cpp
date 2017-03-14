@@ -404,7 +404,7 @@ ZPointer<UpdateInterface> openDevice(int device){
             }
 
             // Try to open
-            if(kb->open(dev.vid, dev.pid, dev.boot_pid)){
+            if(kb->open()){
                 if(kb->isBuiltin())
                     LOG("Opened " << dev.name << " (builtin)");
                 else

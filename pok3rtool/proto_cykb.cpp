@@ -30,16 +30,14 @@ ProtoCYKB::~ProtoCYKB(){
     delete dev;
 }
 
-bool ProtoCYKB::open(zu16 avid, zu16 apid, zu16 aboot_pid){
+bool ProtoCYKB::open(){
     // Try firmware vid and pid
     if(dev->open(vid, pid, UPDATE_USAGE_PAGE, UPDATE_USAGE)){
-//        LOG("Opened POK3R RGB");
         builtin = false;
         return true;
     }
     // Try builtin vid and pid
     if(dev->open(vid, boot_pid, UPDATE_USAGE_PAGE, UPDATE_USAGE)){
-//        LOG("Opened POK3R RGB (builtin)");
         builtin = true;
         return true;
     }
@@ -71,7 +69,7 @@ bool ProtoCYKB::enterFirmware(){
     close();
     ZThread::sleep(WAIT_SLEEP);
 
-    if(!open(vid, pid, boot_pid)){
+    if(!open()){
         ELOG("open error");
         return false;
     }
@@ -94,7 +92,7 @@ bool ProtoCYKB::enterBootloader(){
     close();
     ZThread::sleep(WAIT_SLEEP);
 
-    if(!open(vid, pid, boot_pid)){
+    if(!open()){
         ELOG("open error");
         return false;
     }

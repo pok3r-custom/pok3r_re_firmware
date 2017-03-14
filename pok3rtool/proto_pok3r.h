@@ -52,7 +52,7 @@ public:
     ~ProtoPOK3R();
 
     //! Find and open POK3R device.
-    bool open(zu16 vid, zu16 pid, zu16 boot_pid);
+    bool open();
     void close();
     bool isOpen() const;
 

@@ -28,16 +28,14 @@ ProtoPOK3R::~ProtoPOK3R(){
     delete dev;
 }
 
-bool ProtoPOK3R::open(zu16 avid, zu16 apid, zu16 aboot_pid){
+bool ProtoPOK3R::open(){
     // Try firmware vid and pid
     if(dev->open(vid, pid, UPDATE_USAGE_PAGE, UPDATE_USAGE)){
-//        LOG("Opened POK3R");
         builtin = false;
         return true;
     }
     // Try builtin vid and pid
     if(dev->open(vid, boot_pid, UPDATE_USAGE_PAGE, UPDATE_USAGE)){
-//        LOG("Opened POK3R (builtin)");
         builtin = true;
         return true;
     }
@@ -70,7 +68,7 @@ bool ProtoPOK3R::enterFirmware(){
     ZThread::sleep(WAIT_SLEEP);
 
     // Find device with new vid and pid
-    if(!open(vid, pid, boot_pid)){
+    if(!open()){
         ELOG("open error");
         return false;
     }
@@ -94,7 +92,7 @@ bool ProtoPOK3R::enterBootloader(){
     ZThread::sleep(WAIT_SLEEP);
 
     // Find device with new vid and pid
-    if(!open(vid, pid, boot_pid)){
+    if(!open()){
         ELOG("open error");
         return false;
     }

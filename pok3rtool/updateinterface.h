@@ -13,8 +13,8 @@ class UpdateInterface {
 public:
     virtual ~UpdateInterface(){}
 
-    //! Find and open device.
-    virtual bool open(zu16 vid, zu16 pid, zu16 boot_pid) = 0;
+    //! Open device.
+    virtual bool open() = 0;
     virtual void close() = 0;
     virtual bool isOpen() const = 0;
 
