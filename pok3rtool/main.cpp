@@ -434,6 +434,7 @@ int cmd_list(Param *param){
     LOG("List Devices...");
     ZArray<ListDevice> devs;
 
+    // Get all connected devices from list
     for(zu64 i = 0; i < devices.size(); ++i){
         VortexDevice devi = devices[i];
 
@@ -446,6 +447,7 @@ int cmd_list(Param *param){
             devs.push({ devi, hbdev[j], true });
     }
 
+    // Read version from each device
     for(zu64 i = 0; i < devs.size(); ++i){
         ListDevice ldev = devs[i];
         // Check device
@@ -479,6 +481,9 @@ int cmd_version(Param *param){
 }
 
 int cmd_setversion(Param *param){
+    if(!param->ok)
+        warning();
+
     ZString version = param->args[1];
     // Set Version
     ZPointer<UpdateInterface> kb = openDevice(param->device);
@@ -492,6 +497,9 @@ int cmd_setversion(Param *param){
 }
 
 int cmd_info(Param *param){
+    if(!param->ok)
+        warning();
+
     // Get Info
     ZPointer<UpdateInterface> kb = openDevice(param->device);
     if(kb.get()){
@@ -526,6 +534,9 @@ int cmd_bootloader(Param *param){
 }
 
 int cmd_dump(Param *param){
+    if(!param->ok)
+        warning();
+
     ZPath out = param->args[1];
     // Dump Flash
     ZPointer<UpdateInterface> kb = openDevice(param->device);
@@ -541,6 +552,9 @@ int cmd_dump(Param *param){
 }
 
 int cmd_flash(Param *param){
+    if(!param->ok)
+        warning();
+
     ZString version = param->args[1];
     ZPath firmware = param->args[2];
     // Update Firmware
