@@ -332,7 +332,7 @@ void ProtoCYKB::test(){
     data.writeleu32(0x4da4);
 
     LOG("SUM");
-    if(!sendCmd(FW, FW_SUM, 0, data))
+    if(!sendCmd(FW, FW_SUM, data))
         return;
     if(!dev->recv(bin))
         return;
@@ -342,7 +342,7 @@ void ProtoCYKB::test(){
     LOG("SUM " << ZString::ItoS((zu64)sum, 16));
 
     LOG("CRC");
-    if(!sendCmd(FW, FW_CRC, 0, data))
+    if(!sendCmd(FW, FW_CRC, data))
         return;
     if(!dev->recv(bin))
         return;
@@ -371,7 +371,8 @@ bool ProtoCYKB::eraseFlash(zu32 start, zu32 length){
 bool ProtoCYKB::readFlash(zu32 addr, ZBinary &bin){
     DLOG("readFlash " << addr);
     ZBinary data;
-    if(!sendRecvCmd(READ, READ_ADDR, data, addr))
+    data.writeleu32(addr);
+    if(!sendRecvCmd(READ, READ_ADDR, data))
         return false;
 
     bin.write(data.raw() + 4, 60);
@@ -435,7 +436,7 @@ zu32 ProtoCYKB::crcFlash(zu32 addr, zu32 len){
     return data.readleu32();
 }
 
-bool ProtoCYKB::sendCmd(zu8 cmd, zu8 a1, zu16 a2, ZBinary data){
+bool ProtoCYKB::sendCmd(zu8 cmd, zu8 a1, ZBinary data){
     if(data.size() > 52){
         ELOG("bad data size");
         return false;
@@ -445,7 +446,7 @@ bool ProtoCYKB::sendCmd(zu8 cmd, zu8 a1, zu16 a2, ZBinary data){
     packet.fill(0);
     packet.writeu8(cmd);    // command
     packet.writeu8(a1);     // argument
-    packet.writeleu16(a2);  // patch argument
+    packet.seek(4);
     packet.write(data);     // data
 
     DLOG("send:");
@@ -459,8 +460,8 @@ bool ProtoCYKB::sendCmd(zu8 cmd, zu8 a1, zu16 a2, ZBinary data){
     return true;
 }
 
-bool ProtoCYKB::sendRecvCmd(zu8 cmd, zu8 a1, ZBinary &data, zu16 a2){
-    if(!sendCmd(cmd, a1, a2, data))
+bool ProtoCYKB::sendRecvCmd(zu8 cmd, zu8 a1, ZBinary &data){
+    if(!sendCmd(cmd, a1, data))
         return false;
 
     // Recv packet

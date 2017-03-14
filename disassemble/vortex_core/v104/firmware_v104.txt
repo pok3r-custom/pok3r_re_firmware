@@ -4752,18 +4752,21 @@ handle_frame:
     5fd8:   2820        cmp r0, #32
     5fda:   d30e        bcc.n 0x5ffa
 
+; This code is useless, the exploit patch will replace this
+; -----------------------------------------------------
     5fdc:   f1a0 021f   sub.w r2, r0, #31
     5fe0:   ebc2 1202   rsb r2, r2, r2, lsl #4
     5fe4:   ebb3 0f82   cmp.w r3, r2, lsl #2
     5fe8:   db07        blt.n 0x5ffa
+; -----------------------------------------------------
 
-    5fea:   ebc0 1000   rsb r0, r0, r0, lsl #4
+  0x5fea:   ebc0 1000   rsb r0, r0, r0, lsl #4
     5fee:   f44f 5122   mov.w r1, #10368    ; 0x2880
     5ff2:   eb01 0080   add.w r0, r1, r0, lsl #2
     5ff6:   213c        movs r1, #60    ; 0x3c
     5ff8:   e027        b.n 0x604a
 
-    5ffa:   b120        cbz r0, 0x6006
+  0x5ffa:   b120        cbz r0, 0x6006
     5ffc:   2801        cmp r0, #1
     5ffe:   d01d        beq.n 0x603c
     6000:   2802        cmp r0, #2

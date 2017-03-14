@@ -272,11 +272,13 @@
 
 70e8: watchdog_init
 7144: watchdog_reload_timer
+
 7154: disconnect_cmd
 7158: flash_crc_cmd
 7178: flash_erase_cmd
 71b8: flash_read_write_cmd
 729c: update_start_cmd
+
 72b0: function_e_78
 7328: function_e_79
 7444: function_e_80
@@ -328,6 +330,14 @@
 * 6914
 * 6a0c
 * 6d8c
+
+* 8b54
+* 8b58
+* 8b5c
+* 8b60
+* 8b64
+* 8b68
+* 8b6c
 
 #* 8ffc
 #* 900c

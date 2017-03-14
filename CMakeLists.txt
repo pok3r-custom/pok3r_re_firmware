@@ -54,12 +54,12 @@ SET(FILES
     disassemble/pok3r_rgb/v130/symbols_v130.sym
     disassemble/pok3r_rgb/v130/data_v130.sym
 
-    disassemble/core/builtin_core/firmware_builtin_core.bin
-    disassemble/core/builtin_core/firmware_builtin_core.txt
+    disassemble/vortex_core/builtin_core/firmware_builtin_core.bin
+    disassemble/vortex_core/builtin_core/firmware_builtin_core.txt
 
-    disassemble/core/v104/firmware_v104.bin
-    disassemble/core/v104/firmware_v104.txt
-    disassemble/core/v104/patch_v104.txt
+    disassemble/vortex_core/v104/firmware_v104.bin
+    disassemble/vortex_core/v104/firmware_v104.txt
+    disassemble/vortex_core/v104/patch_v104.txt
 )
 
 ### =================== BUILD =================== ###

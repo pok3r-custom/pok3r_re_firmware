@@ -4706,10 +4706,14 @@ handle_frame:
     5d26:   d30e        bcc.n 0x5d46            ; if r0 < 0x20
 
     ; else r0 >= 0x20
+
+; This code is useless, the exploit patch will replace this
+; -----------------------------------------------------
     5d28:   f1a0 021f   sub.w r2, r0, #31           ; r2 = r0 - 31
     5d2c:   ebc2 1202   rsb r2, r2, r2, lsl #4      ; r2 *= 15
     5d30:   ebb3 0f82   cmp.w r3, r2, lsl #2
     5d34:   db07        blt.n 0x5d46                ; if 0x400 < (r2 * 4)
+; -----------------------------------------------------
 
   0x5d36:   ebc0 1000   rsb r0, r0, r0, lsl #4      ; r0 *= 15
     5d3a:   f44f 5122   mov.w r1, #10368

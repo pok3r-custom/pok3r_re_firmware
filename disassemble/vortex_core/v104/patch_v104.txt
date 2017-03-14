@@ -3,9 +3,9 @@ Firmware v104 Exploit Patch:
 This patch will allow the contents of flash to be read out of a CORE keyboard.
 
     5fdc:   28ff        cmp r0, #255
-    5fde:   d104        bne.n 0x5d36
+    5fde:   d104        bne.n 0x5fea
     5fe0:   6868        ldr r0, [r5, #4]
     5fe2:   213c        movs r1, #60
-    5fe4:   e031        b.n 0x5d96
+    5fe4:   e031        b.n 0x5ffa
     5fe6:   46c0        nop
     5fe8:   46c0        nop

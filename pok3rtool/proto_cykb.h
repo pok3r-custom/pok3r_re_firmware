@@ -95,9 +95,9 @@ public:
 
 private:
     //! Send command
-    bool sendCmd(zu8 cmd, zu8 a1, zu16 a2 = 0, ZBinary data = ZBinary());
+    bool sendCmd(zu8 cmd, zu8 a1, ZBinary data = ZBinary());
     //! Send command and recv response.
-    bool sendRecvCmd(zu8 cmd, zu8 a1, ZBinary &data, zu16 a2 = 0);
+    bool sendRecvCmd(zu8 cmd, zu8 a1, ZBinary &data);
 
 public:
     static void decode_firmware(ZBinary &bin);
