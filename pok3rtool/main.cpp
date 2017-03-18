@@ -589,7 +589,7 @@ const ZArray<ZOptions::OptDef> optdef = {
 typedef int (*cmd_func)(Param *);
 struct CmdEntry {
     cmd_func func;
-    int argn;
+    unsigned argn;
     ZString usage;
 };
 
@@ -648,7 +648,7 @@ int main(int argc, char **argv){
         ZString cmstr = param.args[0];
         if(cmds.contains(cmstr)){
             CmdEntry cmd = cmds[cmstr];
-            if(param.args.size() - 1 == cmd.argn){
+            if(param.args.size() == cmd.argn + 1){
                 cmd.func(&param);
             } else {
                 LOG("Usage: " << cmd.usage);
