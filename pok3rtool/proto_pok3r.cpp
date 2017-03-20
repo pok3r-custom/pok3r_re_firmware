@@ -143,7 +143,9 @@ ZString ProtoPOK3R::getVersion(){
     if(bin == tst)
         return "CLEARED";
 
-    return ZString(bin.raw() + 4);
+    bin.rewind();
+    zu32 len = MIN(bin.readleu32(), 64U);
+    return ZString(bin.raw() + 4, len);
 }
 
 bool ProtoPOK3R::clearVersion(){
