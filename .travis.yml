@@ -19,13 +19,13 @@ addons:
     - cmake-data
     - libssl-dev
     - libusb-dev
-    - gcc-4.8
-    - g++-4.8
+    - gcc-4.9
+    - g++-4.9
     - clang
 
 before_install:
 - uname -a
-- if [ "$CXX" = "g++" -a "$TRAVIS_OS_NAME" == "linux" ]; then export CXX="g++-4.8" CC="gcc-4.8"; fi
+- if [ "$CXX" = "g++" -a "$TRAVIS_OS_NAME" == "linux" ]; then export CXX="g++-4.9" CC="gcc-4.9"; fi
 - $CC --version
 - $CXX --version
 - git submodule init
