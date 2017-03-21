@@ -38,7 +38,7 @@ before_install:
 script:
 - if [ "$TRAVIS_OS_NAME" == "osx" ]; then export CMAKE_INCLUDE_PATH='/usr/local/opt/openssl/include'; fi
 - if [ "$TRAVIS_OS_NAME" == "osx" ]; then export CMAKE_LIBRARY_PATH='/usr/local/opt/openssl/lib'; fi
-- cmake .
+- cmake -D DISABLE_ZPNG=1 -D DISABLE_ZJPEG=1 -D DISABLE_ZWEBP=1 .
 - make pok3rtool
 - ./pok3rtool/pok3rtool list | tee -a output
 - test "$(head -n1 output)" == '[00:00:00:000] N List Devices...'
