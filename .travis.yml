@@ -31,7 +31,8 @@ before_install:
 - git submodule init
 - git submodule update
 # Disable doxygen and latex. TODO: Add a cmake flag to make documentation optional.
-- sed -i 's/INCLUDE(cmake\/Doxygen.cmake)//g' pok3rtool/libchaos/CMakeLists.txt
+- if [ "$TRAVIS_OS_NAME" == "osx" ]; then sed -i '' 's/INCLUDE(cmake\/Doxygen.cmake)//g' pok3rtool/libchaos/CMakeLists.txt; fi
+- if [ "$TRAVIS_OS_NAME" == "linux" ]; then sed -i 's/INCLUDE(cmake\/Doxygen.cmake)//g' pok3rtool/libchaos/CMakeLists.txt; fi
 - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew install openssl; fi
 
 script:
