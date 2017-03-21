@@ -134,7 +134,7 @@ ZString ProtoCYKB::getVersion(){
         ver = "CLEARED";
     } else {
         data.rewind();
-        zu32 len = MIN(data.readleu32(), 60);
+        zu32 len = MIN(data.readleu32(), 60U);
         ver.parseUTF16((zu16 *)(data.raw() + 8), len);
     }
 
