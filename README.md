@@ -33,8 +33,7 @@ build it. After it is compiled, it should have no runtime dependencies, and can 
 UNUSABLE WITHOUT EXPENSIVE DEVELOPMENT TOOLS. READ THE DOCUMENTATION, POSSIBLY READ THE
 CODE, AND PROCEED AT YOUR OWN RISK.**
 
-[See the wiki for pok3rtool usage, warnings, etc.]
-(https://github.com/ChaoticConundrum/pok3r_re_firmware/wiki/pok3rtool-Usage)
+[See the wiki for pok3rtool usage, warnings, etc.](https://github.com/ChaoticConundrum/pok3r_re_firmware/wiki/pok3rtool-Usage)
 
 ### POK3R Firmware Patch
 A very small firmware patch will allow the contents of the flash storage to be read out over USB,
