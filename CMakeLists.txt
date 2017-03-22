@@ -10,6 +10,7 @@ ADD_SUBDIRECTORY(firmware)
 
 SET(FILES
     README.md
+    .travis.yml
 
     disassemble/build.sh
     disassemble/unas.sh
