@@ -32,8 +32,6 @@ addons:
 before_install:
 - uname -a
 - cmake --version
-- if [ "$TRAVIS_OS_NAME" == "osx" -a "$CC" == "gcc" ]; then brew update; fi
-- if [ "$TRAVIS_OS_NAME" == "osx" -a "$CC" == "gcc" ]; then brew install gcc49; fi
 - if [ "$CC" = "gcc" ]; then export CC="gcc-4.9" CXX="g++-4.9"; fi
 - mkdir pok3r-build
 
