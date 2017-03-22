@@ -1,26 +1,22 @@
-# Vortex POK3R (RGB) Custom Firmware Project
+# Vortex Keyboard Custom Firmware Project [![Travis-CI Badge](https://travis-ci.org/ChaoticConundrum/pok3r_re_firmware.svg?branch=master "Travis-CI Badge")](https://travis-ci.org/ChaoticConundrum/pok3r_re_firmware)
 
 *Disclaimer: This project comes with no warranty, and may be used for free at your own risk. I do
 this in my free time for fun, as such there are no guarantees of progress or success.*
 
-### Goals / Progress
+### Progress
 - POK3R
     - Extract unencrypted POK3R firmware and flash contents. **DONE**
     - Reverse engineer the POK3R firmware and update procedure. **DONE**
-    - Application to write new firmware to POK3R over USB. **DONE**
 - POK3R RGB
     - Extract unencrypted POK3R RGB firmware and flash contents. **DONE**
     - Reverse engineer the POK3R RGB firmware and update procedure. **DONE**
-    - Application to write new firmware to POK3R RGB over USB. **DONE**
 - Vortex CORE
-    - Extract unencrypted CORE firmware and flash contents. *decrypted firmware*
-    - Reverse engineer the CORE firmware and update procedure. *same as pok3r rgb*
-    - Application to write new firmware to CORE over USB. *untested*
-- New Firmware
-    - Open-source firmware compatible with POK3R and POK3R RGB. *WIP*
-        - Patch OpenOCD to allow JTAG flashing of HT32. **DONE**
-        - Firmware can be installed from Vortex firmware over USB (no hardware required). **DONE**
-        - Firmware can be rolled back with Votex firmware update application. *TDB*
+    - Extract unencrypted CORE firmware and flash contents. **DONE**
+    - Reverse engineer the CORE firmware and update procedure. **DONE**
+
+- Patch OpenOCD to allow JTAG flashing of HT32. **DONE**
+- Desktop tool to flash keyboards over USB. **DONE**
+- Open-source firmware compatible with POK3R and POK3R RGB. *WIP*
 
 ## pok3rtool
 The `pok3rtool` CLI application runs on Linux, Windows, and Mac OS X. Along with some development
