@@ -1,0 +1,44 @@
+language: cpp
+
+os:
+- linux
+- osx
+
+compiler:
+- clang
+- gcc
+
+addons:
+  apt:
+    sources:
+    # For CMake 3.x
+    - george-edison55-precise-backports
+    - ubuntu-toolchain-r-test
+    packages:
+    - cmake
+    - cmake-data
+    - libssl-dev
+    - libusb-dev
+    - gcc-4.9
+    - g++-4.9
+    - clang
+
+before_install:
+- uname -a
+- if [ "$CXX" = "g++" -a "$TRAVIS_OS_NAME" == "linux" ]; then export CXX="g++-4.9" CC="gcc-4.9"; fi
+- $CC --version
+- $CXX --version
+- git submodule init
+- git submodule update
+# Disable doxygen and latex. TODO: Add a cmake flag to make documentation optional.
+- if [ "$TRAVIS_OS_NAME" == "osx" ]; then sed -i '' 's/INCLUDE(cmake\/Doxygen.cmake)//g' pok3rtool/libchaos/CMakeLists.txt; fi
+- if [ "$TRAVIS_OS_NAME" == "linux" ]; then sed -i 's/INCLUDE(cmake\/Doxygen.cmake)//g' pok3rtool/libchaos/CMakeLists.txt; fi
+- if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew install openssl; fi
+
+script:
+- if [ "$TRAVIS_OS_NAME" == "osx" ]; then export CMAKE_INCLUDE_PATH='/usr/local/opt/openssl/include'; fi
+- if [ "$TRAVIS_OS_NAME" == "osx" ]; then export CMAKE_LIBRARY_PATH='/usr/local/opt/openssl/lib'; fi
+- cmake -D DISABLE_ZPNG=1 -D DISABLE_ZJPEG=1 -D DISABLE_ZWEBP=1 -D DISABLE_ZDATABASE=1 .
+- make pok3rtool
+- ./pok3rtool/pok3rtool list | tee -a output
+- test "$(head -n1 output)" == '[00:00:00:000] N List Devices...'
