@@ -422,7 +422,8 @@ handle_update_packet:
     2f86:   4c1b        ldr r4, [pc, #108]   ; (0x2ff4)
     2f88:   4d1b        ldr r5, [pc, #108]   ; (0x2ff8)
     2f8a:   6026        str r6, [r4, #0]
-    2f8c:   6820        ldr r0, [r4, #0]
+
+  0x2f8c:   6820        ldr r0, [r4, #0]
     2f8e:   1829        adds r1, r5, r0
     2f90:   1c40        adds r0, r0, #1
     2f92:   6020        str r0, [r4, #0]
@@ -431,6 +432,7 @@ handle_update_packet:
     2f9a:   6820        ldr r0, [r4, #0]
     2f9c:   2840        cmp r0, #64   ; 0x40
     2f9e:   d3f5        bcc.n 0x2f8c
+
     2fa0:   886c        ldrh r4, [r5, #2]
     2fa2:   70ee        strb r6, [r5, #3]
     2fa4:   70ae        strb r6, [r5, #2]
@@ -447,7 +449,7 @@ handle_update_packet:
     2fbc:   480f        ldr r0, [pc, #60]   ; (0x2ffc)
     2fbe:   f000 f9f1   bl 0x33a4               ; call clear_two_words
     2fc2:   e00c        b.n 0x2fde
-    2fc4:   f06f 0001   mvn.w r0, #1
+  0x2fc4:   f06f 0001   mvn.w r0, #1
     2fc8:   f003 fb1c   bl 0x6604               ; call function_e_4
 
     ; call an update handler function from the update cmd
@@ -466,7 +468,7 @@ handle_update_packet:
     2fd8:   7868        ldrb r0, [r5, #1]           ; r0 = [r5 + 1]
     2fda:   4798        blx r3                      ; call r3
     2fdc:   4604        mov r4, r0
-    2fde:   4621        mov r1, r4
+  0x2fde:   4621        mov r1, r4
     2fe0:   e8bd 4070   ldmia.w sp!, {r4, r5, r6, lr}
     2fe4:   4805        ldr r0, [pc, #20]   ; (0x2ffc)
     2fe6:   3810        subs r0, #16
@@ -974,6 +976,8 @@ clear_two_words_and_write_two_bytes:
     33b6:   4770        bx lr
 
 function_e_2:
+    ; r0 =
+    ; r1 = data byte
   0x33b8:   b510        push {r4, lr}
     33ba:   6844        ldr r4, [r0, #4]
     33bc:   2200        movs r2, #0
@@ -990,7 +994,7 @@ function_e_2:
     33d4:   fb02 1113   mls r1, r2, r3, r1
     33d8:   2201        movs r2, #1
     33da:   6001        str r1, [r0, #0]
-    33dc:   4610        mov r0, r2
+  0x33dc:   4610        mov r0, r2
     33de:   bd10        pop {r4, pc}
 
 function_14:
@@ -6438,7 +6442,8 @@ spi_slave_select_output:
     6602:   4770        bx lr
 
 function_e_4:
-  0x6604:   f04f 21e0   mov.w r1, #3758153728   ; 0xe000e000    ; this is in the private periphial bus, specifically the base of the system control space registers
+    ; this is in the private periphial bus, the base of the system control space registers
+  0x6604:   f04f 21e0   mov.w r1, #3758153728   ; 0xe000e000
     6608:   b130        cbz r0, 0x6618
     660a:   2801        cmp r0, #1
     660c:   6908        ldr r0, [r1, #16]
@@ -7545,6 +7550,9 @@ usb_read_ep_buff:
     6ee2:   e7f2        b.n 0x6eca
 
 usb_recv:
+    r0 = ep
+    r1 = dest
+    r2 = size
   0x6ee4:   e92d 41f0   stmdb sp!, {r4, r5, r6, r7, r8, lr}
     6ee8:   460f        mov r7, r1
     6eea:   4615        mov r5, r2
@@ -7919,7 +7927,7 @@ flash_erase_cmd:
     71b6:   e7e8        b.n 0x718a
 
 flash_read_write_cmd:
-    ; r0 =
+    ; r0 = subcmd
     ; r1 = start address
     ; r2 = end address
     ; This function is called for each write packet
