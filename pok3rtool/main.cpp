@@ -84,9 +84,11 @@ void encode_package_data(ZBinary &bin){
 // POK3R RGB
 #define V124_HASH   0x882CB0E4ECE25454
 #define V130_HASH   0x6CFF0BB4F4086C2F
+#define V140_HASH   0xA6EE37F856CD24C1
 
 // CORE
-#define V104_HASH   0x51BFA86A7FAF4EEA
+#define V10401_HASH 0x51BFA86A7FAF4EEA
+#define V10403_HASH 0x0582733413943655
 
 int decode_updater(ZPath exe, ZPath out){
     LOG("Extract from " << exe);
@@ -110,7 +112,6 @@ int decode_updater(ZPath exe, ZPath out){
     zu64 offset_version;
     zu64 offset_sig;
 
-
     switch(exehash){
         case V113_HASH:
         case V114_HASH:
@@ -128,7 +129,9 @@ int decode_updater(ZPath exe, ZPath out){
 
         case V124_HASH:
         case V130_HASH:
-        case V104_HASH:
+        case V140_HASH:
+        case V10401_HASH:
+        case V10403_HASH:
             type = 2;
             strings_len = 0xB24; // from IDA disassembly in sub_403830 of v130 updater
                                  // same size in v104
@@ -576,6 +579,12 @@ int cmd_flash(Param *param){
 
 int cmd_decode(Param *param){
     return decode_updater(param->args[1], param->args[2]);
+
+//    ZBinary fw;
+//    ZFile::readBinary(param->args[1], fw);
+//    ProtoPOK3R::decode_firmware(fw);
+//    ZFile::writeBinary(param->args[2], fw);
+//    return 0;
 }
 
 #define OPT_OK      "ok"
