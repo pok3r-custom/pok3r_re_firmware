@@ -385,10 +385,31 @@ struct VortexDevice {
 };
 
 const ZArray<VortexDevice> devices = {
-    { 1, "POK3R",          HOLTEK_VID, POK3R_PID,          POK3R_BOOT_PID,         PROTO_POK3R },
-    { 2, "POK3R RGB",      HOLTEK_VID, POK3R_RGB_PID,      POK3R_RGB_BOOT_PID,     PROTO_CYKB },
-    { 4, "Vortex Core",    HOLTEK_VID, VORTEX_CORE_PID,    VORTEX_CORE_BOOT_PID,   PROTO_CYKB },
-    { 8, "Vortex Tester",  HOLTEK_VID, VORTEX_TESTER_PID,  VORTEX_TESTER_BOOT_PID, PROTO_CYKB },
+    { 1,  "POK3R",          HOLTEK_VID, POK3R_PID,          POK3R_BOOT_PID,         PROTO_POK3R },
+    { 2,  "POK3R RGB",      HOLTEK_VID, POK3R_RGB_PID,      POK3R_RGB_BOOT_PID,     PROTO_CYKB },
+    { 4,  "Vortex Core",    HOLTEK_VID, VORTEX_CORE_PID,    VORTEX_CORE_BOOT_PID,   PROTO_CYKB },
+    { 8,  "Vortex Tester",  HOLTEK_VID, VORTEX_TESTER_PID,  VORTEX_TESTER_BOOT_PID, PROTO_CYKB },
+    { 16, "KBP V60",        HOLTEK_VID, KBP_V60_PID,        KBP_V60_BOOT_PID,       PROTO_POK3R },
+};
+
+const ZMap<ZString, int> devnames = {
+    { "pok3r",          1 },
+
+    { "pok3r-rgb",      2 },
+    { "pok3r_rgb",      2 },
+
+    { "core",           4 },
+    { "vortex-core",    4 },
+    { "vortex_core",    4 },
+
+    { "tester",         8 },
+    { "vortex-tester",  8 },
+    { "vortex_tester",  8 },
+
+    { "kbp60",          16 },
+    { "kbpv60",         16 },
+    { "v60mini",        16 },
+    { "kbpv60mini",     16 },
 };
 
 ZPointer<UpdateInterface> openDevice(int device){
@@ -591,8 +612,8 @@ int cmd_decode(Param *param){
 #define OPT_TYPE    "device"
 
 const ZArray<ZOptions::OptDef> optdef = {
-    { OPT_OK,       0, ZOptions::NONE },
-    { OPT_TYPE,     't', ZOptions::STRING },
+    { OPT_OK,   0,   ZOptions::NONE },
+    { OPT_TYPE, 't', ZOptions::STRING },
 };
 
 typedef int (*cmd_func)(Param *);
@@ -612,21 +633,6 @@ const ZMap<ZString, CmdEntry> cmds = {
     { "dump",       { cmd_dump,         1, "pok3rtool dump <output file>" } },
     { "flash",      { cmd_flash,        2, "pok3rtool flash <version> <firmware>" } },
     { "decode",     { cmd_decode,       2, "pok3rtool decode <path to updater> <output file>" } },
-};
-
-const ZMap<ZString, int> devnames = {
-    { "pok3r",          1 },
-
-    { "pok3r-rgb",      2 },
-    { "pok3r_rgb",      2 },
-
-    { "core",           4 },
-    { "vortex-core",    4 },
-    { "vortex_core",    4 },
-
-    { "tester",         8 },
-    { "vortex-tester",  8 },
-    { "vortex_tester",  8 },
 };
 
 int main(int argc, char **argv){
