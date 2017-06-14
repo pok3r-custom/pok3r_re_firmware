@@ -74,88 +74,25 @@ void encode_package_data(ZBinary &bin){
     }
 }
 
-// POK3R
-#define V113_HASH   0x62FCF913A689C9AE
-#define V114_HASH   0xFE37430DB1FFCF5F
-#define V115_HASH   0x8986F7893143E9F7
-#define V116_HASH   0xA28E5EFB3F796181
-#define V117_HASH   0xEA55CB190C35505F
+int decode_maajonsn(ZFile *file, ZPath out){
+    zu64 exelen = file->fileSize();
 
-// POK3R RGB
-#define V124_HASH   0x882CB0E4ECE25454
-#define V130_HASH   0x6CFF0BB4F4086C2F
-#define V140_HASH   0xA6EE37F856CD24C1
+    zu64 strings_len = 0x4B8;
 
-// CORE
-#define V10401_HASH 0x51BFA86A7FAF4EEA
-#define V10403_HASH 0x0582733413943655
+    zu64 offset_company = 0x10;
+    zu64 offset_product = offset_company + 0x208; // 0x218
+    zu64 offset_version = 0x460;
+    zu64 offset_sig = 0x4AE;
 
-int decode_updater(ZPath exe, ZPath out){
-    LOG("Extract from " << exe);
-    ZFile file;
-    if(!file.open(exe, ZFile::READ)){
-        ELOG("Failed to open file");
-        return -1;
-    }
-
-    zu64 exelen = file.fileSize();
-    zu64 exehash = ZFile::fileHash(exe);
-
-    char type = 0;
-
-    zu64 strings_len;
-    zu64 strings_start;
-    zu64 fw_len;
-
-    zu64 offset_company;
-    zu64 offset_product;
-    zu64 offset_version;
-    zu64 offset_sig;
-
-    switch(exehash){
-        case V113_HASH:
-        case V114_HASH:
-        case V115_HASH:
-        case V116_HASH:
-        case V117_HASH:
-            type = 1;
-            strings_len = 0x4B8;
-
-            offset_company = 0x10;
-            offset_product = 0x218;
-            offset_version = 0x460;
-            offset_sig     = 0x4AE;
-            break;
-
-        case V124_HASH:
-        case V130_HASH:
-        case V140_HASH:
-        case V10401_HASH:
-        case V10403_HASH:
-            type = 2;
-            strings_len = 0xB24; // from IDA disassembly in sub_403830 of v130 updater
-                                 // same size in v104
-
-            offset_company = 0x22E;
-            offset_product = 0x436;
-            offset_version = 0;
-            offset_sig     = 0xB19;
-            break;
-
-        default:
-            ELOG("Unknown updater executable: " << ZString::ItoS(exehash, 16));
-            return -2;
-    }
-
-    strings_start = exelen - strings_len;
+    zu64 strings_start = exelen - strings_len;
 
     // Read strings
     ZBinary strs;
-    if(file.seek(strings_start) != strings_start){
+    if(file->seek(strings_start) != strings_start){
         LOG("File too short - seek");
         return -4;
     }
-    if(file.read(strs, strings_len) != strings_len){
+    if(file->read(strs, strings_len) != strings_len){
         LOG("File too short - read");
         return -5;
     }
@@ -180,50 +117,128 @@ int decode_updater(ZPath exe, ZPath out){
     LOG("Signature:   " << ZString(strs.raw() + offset_sig, strings_len - offset_sig));
 
 //    LOG("String Dump:");
-    RLOG(strs.dumpBytes(4, 8));
+//    RLOG(strs.dumpBytes(4, 8));
 
     // Decode other encrypted sections
 
     zu64 total = strings_len;
     ZArray<zu64> sections;
 
-    switch(type){
-        case 1: {
-            fw_len = ZBinary::decle32(strs.raw() + 0x420); // Firmware length
+    zu64 sec_len = ZBinary::decle32(strs.raw() + 0x420); // Firmware length
 
+    ZString layout;
+    layout.parseUTF16((const zu16 *)(strs.raw() + 0x424), 0x20);
+    LOG("Layout: " << layout);
+
+    total += sec_len;
+    sections.push(sec_len);
+
+    zu64 sec_start = exelen - total;
+
+    LOG("Offset: 0x" << ZString::ItoS(sec_start, 16));
+    LOG("Length: 0x" << ZString::ItoS(sec_len, 16));
+
+    // Read section
+    ZBinary sec;
+    if(file->seek(sec_start) != sec_start){
+        LOG("File too short - seek");
+        return -2;
+    }
+    if(file->read(sec, sec_len) != sec_len){
+        LOG("File too short - read");
+        return -3;
+    }
+
+    // Decode section
+    decode_package_data(sec);
+
+    // Decrypt firmware
+    ProtoPOK3R::decode_firmware(sec);
+
+//    LOG("Section Dump:");
+//    RLOG(sec.dumpBytes(4, 8, 0));
+
+    LOG("Output: " << out);
+
+    // Write firmware
+    ZFile fwout(out, ZFile::WRITE);
+    fwout.write(sec);
+
+    return 0;
+
+}
+
+int decode_maav102(ZFile *file, ZPath out){
+    zu64 exelen = file->fileSize();
+
+    zu64 strings_len = 0xB24;   // from IDA disassembly in sub_403830 of v130 updater
+                                // same size in v104
+    zu64 strings_start = exelen - strings_len;
+
+    zu64 offset_desc = 0x26;
+    zu64 offset_company = offset_desc + 0x208;      // 0x22e
+    zu64 offset_product = offset_company + 0x208;   // 0x436
+    zu64 offset_version = offset_product + 0x208;   // 0x63e
+    zu64 offset_sig = 0xb19;
+
+    // Read strings
+    ZBinary strs;
+    if(file->seek(strings_start) != strings_start){
+        LOG("File too short - seek");
+        return -4;
+    }
+    if(file->read(strs, strings_len) != strings_len){
+        LOG("File too short - read");
+        return -5;
+    }
+    // Decrypt strings
+    decode_package_data(strs);
+
+    ZString desc;
+    ZString company;
+    ZString product;
+    ZString version;
+
+    // Description
+    desc.parseUTF16((const zu16 *)(strs.raw() + offset_desc), 0x200);
+    // Company name
+    company.parseUTF16((const zu16 *)(strs.raw() + offset_company), 0x200);
+    // Product name
+    product.parseUTF16((const zu16 *)(strs.raw() + offset_product), 0x200);
+    // Version
+    version.parseUTF16((const zu16 *)(strs.raw() + offset_version), 0x200);
+
+    LOG("Description: " << desc);
+    LOG("Company:     " << company);
+    LOG("Product:     " << product);
+    LOG("Version:     " << version);
+
+    LOG("Signature:   " << ZString(strs.raw() + offset_sig, strings_len - offset_sig));
+
+//    LOG("String Dump:");
+//    RLOG(strs.dumpBytes(4, 8));
+
+    // Decode other encrypted sections
+
+    zu64 total = strings_len;
+    ZArray<zu64> sections;
+
+    zu64 start = 0xAC8 - (0x50 * 8);
+    for(zu8 i = 0; i < 8; ++i){
+        zu32 fwl = ZBinary::decle32(strs.raw() + start); // Firmware length
+        zu32 strl = ZBinary::decle32(strs.raw() + start + 4); // Info length
+
+        if(fwl){
             ZString layout;
-            layout.parseUTF16((const zu16 *)(strs.raw() + 0x424), 0x20);
-            LOG("Layout: " << layout);
+            layout.parseUTF16((const zu16 *)(strs.raw() + start + 8), 0x20);
+            LOG("Layout " << i << ": " << layout);
 
-            total += fw_len;
-            sections.push(fw_len);
-            break;
+            total += fwl;
+            total += strl;
+            sections.push(fwl);
+            sections.push(strl);
         }
-
-        case 2: {
-            zu64 start = 0xAC8 - (0x50 * 8);
-            for(zu8 i = 0; i < 8; ++i){
-                zu32 fwl = ZBinary::decle32(strs.raw() + start); // Firmware length
-                zu32 strl = ZBinary::decle32(strs.raw() + start + 4); // Info length
-
-                if(fwl){
-                    ZString layout;
-                    layout.parseUTF16((const zu16 *)(strs.raw() + start + 8), 0x20);
-                    LOG("Layout " << i << ": " << layout);
-
-                    total += fwl;
-                    total += strl;
-                    sections.push(fwl);
-                    sections.push(strl);
-                }
-                start += 0x50;
-            }
-            break;
-        }
-
-        default:
-            return -4;
-            break;
+        start += 0x50;
     }
 
     zu64 sec_start = exelen - total;
@@ -240,11 +255,11 @@ int decode_updater(ZPath exe, ZPath out){
 
         // Read section
         ZBinary sec;
-        if(file.seek(sec_start) != sec_start){
+        if(file->seek(sec_start) != sec_start){
             LOG("File too short - seek");
             return -2;
         }
-        if(file.read(sec, sec_len) != sec_len){
+        if(file->read(sec, sec_len) != sec_len){
             LOG("File too short - read");
             return -3;
         }
@@ -254,27 +269,16 @@ int decode_updater(ZPath exe, ZPath out){
         // Decode section
         decode_package_data(sec);
 
-        switch(type){
-            case 1:
-                // Decrypt firmware
-                ProtoPOK3R::decode_firmware(sec);
-                break;
-            case 2:
                 // Decrypt RGB firmwares only
                 if(sec.size() > 180){
                     ProtoCYKB::decode_firmware(sec);
                 }
-                break;
-            default:
-                break;
-        }
 
 //        LOG("Section Dump:");
 //        RLOG(sec.dumpBytes(4, 8, 0));
 
         ZPath secout = out;
-        if(type == 2)
-            secout.last() = out.getName() + "-" + i + out.getExtension();
+        secout.last() = out.getName() + "-" + i + out.getExtension();
         LOG("  Output: " << secout);
 
         // Write firmware
@@ -283,6 +287,57 @@ int decode_updater(ZPath exe, ZPath out){
     }
 
     return 0;
+
+}
+
+enum PackType {
+    PACKAGE_NONE = 0,
+    MAAJONSN,
+    MAAV102,
+};
+
+const ZMap<zu64, PackType> packages = {
+    // POK3R
+    { 0x62FCF913A689C9AE,   MAAJONSN }, // V113
+    { 0xFE37430DB1FFCF5F,   MAAJONSN }, // V114
+    { 0x8986F7893143E9F7,   MAAJONSN }, // V115
+    { 0xA28E5EFB3F796181,   MAAJONSN }, // V116
+    { 0xEA55CB190C35505F,   MAAJONSN }, // V117
+
+    // POK3R RGB
+    { 0x882CB0E4ECE25454,   MAAV102 },  // V124
+    { 0x6CFF0BB4F4086C2F,   MAAV102 },  // V130
+    { 0xA6EE37F856CD24C1,   MAAV102 },  //140
+    { 0x8AA1AEA217DA685B,   MAAV102 },  // 2-in-1
+
+    // CORE
+    { 0x51BFA86A7FAF4EEA,   MAAV102 },  // V10401
+    { 0x0582733413943655,   MAAV102 },  // V10403
+
+    // NEW 75?
+    { 0xb542d0d86b9a85c3,   MAAV102 },
+};
+
+const ZMap<PackType, int (*)(ZFile *, ZPath)> types = {
+    { MAAJONSN, decode_maajonsn },
+    { MAAV102,  decode_maav102 },
+};
+
+int decode_updater(ZPath exe, ZPath out){
+    LOG("Extract from " << exe);
+    ZFile file;
+    if(!file.open(exe, ZFile::READ)){
+        ELOG("Failed to open file");
+        return -1;
+    }
+
+    zu64 exehash = ZFile::fileHash(exe);
+    if(packages.contains(exehash)){
+        return types[packages[exehash]](&file, out);
+    } else {
+        ELOG("Unknown updater executable: " << ZString::ItoS(exehash, 16));
+        return -2;
+    }
 }
 
 int encode_image(ZPath fwin, ZPath fwout){
@@ -369,6 +424,15 @@ void warning(){
     }
 }
 
+enum Device {
+    DEV_NONE = 0,
+    POK3R,          //!< Vortex POK3R
+    POK3R_RGB,      //!< Vortex POK3R RGB
+    VORTEX_CORE,    //!< Vortex Core
+    VORTEX_TESTER,  //!< Vortex 22-Key Switch Tester
+    KBP_V60,        //!< KBParadise v60 Mini
+};
+
 enum DevType {
     PROTO_POK3R,    //!< Used exclusively in the POK3R.
     PROTO_CYKB,     //!< Used in new Vortex keyboards, marked with CYKB on the PCB.
@@ -376,7 +440,6 @@ enum DevType {
 };
 
 struct VortexDevice {
-    int mask;
     ZString name;
     zu16 vid;
     zu16 pid;
@@ -384,68 +447,68 @@ struct VortexDevice {
     DevType type;
 };
 
-const ZArray<VortexDevice> devices = {
-    { 1,  "POK3R",          HOLTEK_VID, POK3R_PID,          POK3R_BOOT_PID,         PROTO_POK3R },
-    { 2,  "POK3R RGB",      HOLTEK_VID, POK3R_RGB_PID,      POK3R_RGB_BOOT_PID,     PROTO_CYKB },
-    { 4,  "Vortex Core",    HOLTEK_VID, VORTEX_CORE_PID,    VORTEX_CORE_BOOT_PID,   PROTO_CYKB },
-    { 8,  "Vortex Tester",  HOLTEK_VID, VORTEX_TESTER_PID,  VORTEX_TESTER_BOOT_PID, PROTO_CYKB },
-    { 16, "KBP V60",        HOLTEK_VID, KBP_V60_PID,        KBP_V60_BOOT_PID,       PROTO_POK3R },
+const ZMap<ZString, Device> devnames = {
+    { "pok3r",          POK3R },
+
+    { "pok3r-rgb",      POK3R_RGB },
+    { "pok3r_rgb",      POK3R_RGB },
+
+    { "core",           VORTEX_CORE },
+    { "vortex-core",    VORTEX_CORE },
+    { "vortex_core",    VORTEX_CORE },
+
+    { "tester",         VORTEX_TESTER },
+    { "vortex-tester",  VORTEX_TESTER },
+    { "vortex_tester",  VORTEX_TESTER },
+
+    { "kbp60",          KBP_V60 },
+    { "kbpv60",         KBP_V60 },
+    { "v60mini",        KBP_V60 },
+    { "kbpv60mini",     KBP_V60 },
 };
 
-const ZMap<ZString, int> devnames = {
-    { "pok3r",          1 },
-
-    { "pok3r-rgb",      2 },
-    { "pok3r_rgb",      2 },
-
-    { "core",           4 },
-    { "vortex-core",    4 },
-    { "vortex_core",    4 },
-
-    { "tester",         8 },
-    { "vortex-tester",  8 },
-    { "vortex_tester",  8 },
-
-    { "kbp60",          16 },
-    { "kbpv60",         16 },
-    { "v60mini",        16 },
-    { "kbpv60mini",     16 },
+const ZMap<Device, VortexDevice> devices = {
+    { POK3R,            { "POK3R",          HOLTEK_VID, POK3R_PID,          POK3R_BOOT_PID,         PROTO_POK3R } },
+    { POK3R_RGB,        { "POK3R RGB",      HOLTEK_VID, POK3R_RGB_PID,      POK3R_RGB_BOOT_PID,     PROTO_CYKB } },
+    { VORTEX_CORE,      { "Vortex Core",    HOLTEK_VID, VORTEX_CORE_PID,    VORTEX_CORE_BOOT_PID,   PROTO_CYKB } },
+    { VORTEX_TESTER,    { "Vortex Tester",  HOLTEK_VID, VORTEX_TESTER_PID,  VORTEX_TESTER_BOOT_PID, PROTO_CYKB } },
+    { KBP_V60,          { "KBP V60",        HOLTEK_VID, KBP_V60_PID,        KBP_V60_BOOT_PID,       PROTO_POK3R } },
 };
 
-ZPointer<UpdateInterface> openDevice(int device){
+ZPointer<UpdateInterface> openDevice(Device dev){
     ZPointer<UpdateInterface> kb;
-
-    for(zu64 i = 0; i < devices.size(); ++i){
-        VortexDevice dev = devices[i];
-        if(device & dev.mask){
-            // Select protocol
-            if(dev.type == PROTO_POK3R){
-                kb = new ProtoPOK3R(dev.vid, dev.pid, dev.boot_pid);
-            } else if(dev.type == PROTO_CYKB){
-                kb = new ProtoCYKB(dev.vid, dev.pid, dev.boot_pid);
-            } else {
-                return nullptr;
-            }
-
-            // Try to open
-            if(kb->open()){
-                if(kb->isBuiltin())
-                    LOG("Opened " << dev.name << " (builtin)");
-                else
-                    LOG("Opened " << dev.name);
-                return kb;
-            }
+    if(devices.contains(dev)){
+        VortexDevice device = devices[dev];
+        // Select protocol
+        if(device.type == PROTO_POK3R){
+            kb = new ProtoPOK3R(device.vid, device.pid, device.boot_pid);
+        } else if(device.type == PROTO_CYKB){
+            kb = new ProtoCYKB(device.vid, device.pid, device.boot_pid);
+        } else {
+            return nullptr;
         }
-    }
 
-    ELOG("Failed to open device");
+        // Try to open
+        if(kb->open()){
+            if(kb->isBuiltin())
+                LOG("Opened " << device.name << " (builtin)");
+            else
+                LOG("Opened " << device.name);
+            return kb;
+        }
+
+        ELOG("Failed to Open Device: " << device.name);
+
+    } else {
+        ELOG("Unknown Device");
+    }
     return nullptr;
 }
 
 struct Param {
     bool ok;
     ZArray<ZString> args;
-    int device;
+    Device device;
 };
 
 struct ListDevice {
@@ -459,16 +522,16 @@ int cmd_list(Param *param){
     ZArray<ListDevice> devs;
 
     // Get all connected devices from list
-    for(zu64 i = 0; i < devices.size(); ++i){
-        VortexDevice devi = devices[i];
+    for(auto it = devices.begin(); it.more(); ++it){
+        VortexDevice dev = devices[it.get()];
 
-        auto hdev = HIDDevice::openAll(devi.vid, devi.pid, UPDATE_USAGE_PAGE, UPDATE_USAGE);
+        auto hdev = HIDDevice::openAll(dev.vid, dev.pid, UPDATE_USAGE_PAGE, UPDATE_USAGE);
         for(zu64 j = 0; j < hdev.size(); ++j)
-            devs.push({ devi, hdev[j], false });
+            devs.push({ dev, hdev[j], false });
 
-        auto hbdev = HIDDevice::openAll(devi.vid, devi.boot_pid, UPDATE_USAGE_PAGE, UPDATE_USAGE);
+        auto hbdev = HIDDevice::openAll(dev.vid, dev.boot_pid, UPDATE_USAGE_PAGE, UPDATE_USAGE);
         for(zu64 j = 0; j < hbdev.size(); ++j)
-            devs.push({ devi, hbdev[j], true });
+            devs.push({ dev, hbdev[j], true });
     }
 
     // Read version from each device
@@ -649,7 +712,7 @@ int main(int argc, char **argv){
         return 1;
 
     Param param;
-    param.device = 0;
+    param.device = DEV_NONE;
     param.ok = options.getOpts().contains(OPT_OK);
     param.args = options.getArgs();
 
