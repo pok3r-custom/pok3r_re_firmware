@@ -297,25 +297,27 @@ enum PackType {
 };
 
 const ZMap<zu64, PackType> packages = {
-    // POK3R
+    // POK3R (141)
     { 0x62FCF913A689C9AE,   MAAJONSN }, // V113
     { 0xFE37430DB1FFCF5F,   MAAJONSN }, // V114
     { 0x8986F7893143E9F7,   MAAJONSN }, // V115
     { 0xA28E5EFB3F796181,   MAAJONSN }, // V116
     { 0xEA55CB190C35505F,   MAAJONSN }, // V117
 
-    // POK3R RGB
-    { 0x882CB0E4ECE25454,   MAAV102 },  // V124
-    { 0x6CFF0BB4F4086C2F,   MAAV102 },  // V130
-    { 0xA6EE37F856CD24C1,   MAAV102 },  //140
-    { 0x8AA1AEA217DA685B,   MAAV102 },  // 2-in-1
+    // POK3R RGB (167)
+    { 0x882CB0E4ECE25454,   MAAV102 },  // V10204   V124
+    { 0x6CFF0BB4F4086C2F,   MAAV102 },  // V10300   V130
+    { 0xA6EE37F856CD24C1,   MAAV102 },  // V10400   V140
 
-    // CORE
-    { 0x51BFA86A7FAF4EEA,   MAAV102 },  // V10401
-    { 0x0582733413943655,   MAAV102 },  // V10403
+    // CORE (175)
+    { 0x51BFA86A7FAF4EEA,   MAAV102 },  // V10401   V141
+    { 0x0582733413943655,   MAAV102 },  // V10403   V143
 
-    // NEW 75?
-    { 0xb542d0d86b9a85c3,   MAAV102 },
+    // NEW 75? (192)
+    { 0xb542d0d86b9a85c3,   MAAV102 },  // V10201   V121
+
+    // (207)
+    { 0x8AA1AEA217DA685B,   MAAV102 },  // V10005   V105
 };
 
 const ZMap<PackType, int (*)(ZFile *, ZPath)> types = {
