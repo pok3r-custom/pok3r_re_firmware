@@ -24,6 +24,9 @@ SET(POK3RTOOL_SOURCES
     hiddevice.cpp
 
     updateinterface.h
+
+    updatepackage.h
+    updatepackage.cpp
 )
 
 SET(FILES
