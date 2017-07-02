@@ -14,6 +14,9 @@ using namespace LibChaos;
 #define KBP_V60_PID         0x0112
 #define KBP_V60_BOOT_PID    0x1112
 
+#define KBP_V80_PID         0x0129
+#define KBP_V80_BOOT_PID    0x1129
+
 class ProtoPOK3R : public UpdateInterface {
 public:
     enum pok3r_cmd {

@@ -28,6 +28,7 @@ enum Device {
     VORTEX_CORE,    //!< Vortex Core
     VORTEX_TESTER,  //!< Vortex 22-Key Switch Tester
     KBP_V60,        //!< KBParadise v60 Mini
+    KBP_V80,        //!< KBParadise v80
 };
 
 enum DevType {
@@ -76,10 +77,8 @@ const ZMap<ZString, Device> devnames = {
     { "vortex-tester",  VORTEX_TESTER },
     { "vortex_tester",  VORTEX_TESTER },
 
-    { "kbp60",          KBP_V60 },
     { "kbpv60",         KBP_V60 },
-    { "v60mini",        KBP_V60 },
-    { "kbpv60mini",     KBP_V60 },
+    { "kbpv80",         KBP_V80 },
 };
 
 const ZMap<Device, VortexDevice> devices = {
@@ -88,6 +87,7 @@ const ZMap<Device, VortexDevice> devices = {
     { VORTEX_CORE,      { "Vortex Core",    HOLTEK_VID, VORTEX_CORE_PID,    VORTEX_CORE_BOOT_PID,   PROTO_CYKB } },
     { VORTEX_TESTER,    { "Vortex Tester",  HOLTEK_VID, VORTEX_TESTER_PID,  VORTEX_TESTER_BOOT_PID, PROTO_CYKB } },
     { KBP_V60,          { "KBP V60",        HOLTEK_VID, KBP_V60_PID,        KBP_V60_BOOT_PID,       PROTO_POK3R } },
+    { KBP_V80,          { "KBP V80",        HOLTEK_VID, KBP_V80_PID,        KBP_V80_BOOT_PID,       PROTO_POK3R } },
 };
 
 // Functions
@@ -287,9 +287,11 @@ int cmd_flash(Param *param){
 
 int cmd_decode(Param *param){
     UpdatePackage package;
-    bool status = package.loadFromExe(param->args[1], 0);
-    if(!status)
+    if(!package.loadFromExe(param->args[1], 0))
         return 1;
+    ZBinary fw = package.getFirmware();
+    if(!ZFile::writeBinary(param->args[2], fw))
+        return 2;
     return 0;
 }
 

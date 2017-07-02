@@ -13,7 +13,7 @@ public:
 
     bool loadFromExe(ZPath exe, int index);
 
-    ZBinary getFirmware() const;
+    const ZBinary &getFirmware() const;
 
 private:
     ZBinary firmware;

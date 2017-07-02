@@ -7,14 +7,16 @@
 #include "zmap.h"
 #include "zlog.h"
 
-typedef int (*decodeFunc)(ZFile *);
-int decode_maajonsn(ZFile *file);
-int decode_maav102(ZFile *file);
+typedef int (*decodeFunc)(ZFile *, ZBinary &);
+int decode_maajonsn(ZFile *file, ZBinary &fw_out);
+int decode_maav102(ZFile *file, ZBinary &fw_out);
+int decode_kbp_cykb(ZFile *file, ZBinary &fw_out);
 
 enum PackType {
     PACKAGE_NONE = 0,
     MAAJONSN,   // .maajonsn
     MAAV102,    // .maaV102
+    KBPCYKB,
 };
 
 const ZMap<zu64, PackType> packages = {
@@ -39,11 +41,18 @@ const ZMap<zu64, PackType> packages = {
 
     // (207)
     { 0x8AA1AEA217DA685B,   MAAV102 },  // V1.00.05   v1.0.5
+
+    // KBP V60 (112)
+    { 0x6064D8C4EE74BE18,   KBPCYKB },  //
+
+    // KBP V80 (129)
+    { 0xBCF4C9830D800D8C,   KBPCYKB },  //
 };
 
 const ZMap<PackType, decodeFunc> types = {
     { MAAJONSN, decode_maajonsn },
     { MAAV102,  decode_maav102 },
+    { KBPCYKB,  decode_kbp_cykb },
 };
 
 UpdatePackage::UpdatePackage(){
@@ -60,7 +69,7 @@ bool UpdatePackage::loadFromExe(ZPath exe, int index){
 
     zu64 exehash = ZFile::fileHash(exe);
     if(packages.contains(exehash)){
-        int ret = types[packages[exehash]](&file);
+        int ret = types[packages[exehash]](&file, firmware);
         return !!ret;
     } else {
         ELOG("Unknown updater executable: " << ZString::ItoS(exehash, 16));
@@ -70,7 +79,7 @@ bool UpdatePackage::loadFromExe(ZPath exe, int index){
     return true;
 }
 
-ZBinary UpdatePackage::getFirmware() const {
+const ZBinary &UpdatePackage::getFirmware() const {
     return firmware;
 }
 
@@ -129,9 +138,9 @@ void encode_package_data(ZBinary &bin){
     }
 }
 
-/*  Decode the updater for the POK3R / KVP v60.
+/*  Decode the updater for the POK3R.
  */
-int decode_maajonsn(ZFile *file){
+int decode_maajonsn(ZFile *file, ZBinary &fw_out){
     zu64 exelen = file->fileSize();
 
     zu64 strings_len = 0x4B8;
@@ -216,6 +225,7 @@ int decode_maajonsn(ZFile *file){
 //    RLOG(sec.dumpBytes(4, 8, 0));
 
     // Write firmware
+    fw_out = sec;
 
     return 0;
 
@@ -223,7 +233,7 @@ int decode_maajonsn(ZFile *file){
 
 /*  Decode the updater for the POK3R RGB / Vortex Core.
  */
-int decode_maav102(ZFile *file){
+int decode_maav102(ZFile *file, ZBinary &fw_out){
     zu64 exelen = file->fileSize();
 
     zu64 strings_len = 0xB24;   // from IDA disassembly in sub_403830 of v130 updater
@@ -339,11 +349,72 @@ int decode_maav102(ZFile *file){
         // Write firmware
 //        ZFile fwout(secout, ZFile::WRITE);
 //        fwout.write(sec);
+        fw_out = sec;
     }
 
     return 0;
 }
 
+void kbp_decrypt(zbyte *data, zu64 size, zu32 key)
+{
+    zbyte xor_key[4];
+    ZBinary::encbe32(xor_key, key);
+    for(zu64 i = 0; i < size; ++i){
+        data[i] = data[i] ^ xor_key[i % 4] ^ (i & 0xFF);
+    }
+}
+
+/*  Decode the updater for the KBP V60 / V80.
+ */
+int decode_kbp_cykb(ZFile *file, ZBinary &fw_out){
+//    zu32 key = 0xDA6282CD;  // v60
+    zu32 key = 0xF6F3111F;  // v80
+
+    zu64 exelen = file->fileSize();
+    zu64 strings_len = 588;
+    zu64 strings_start = exelen - strings_len;
+
+    // Read strings
+    ZBinary strs;
+    if(file->seek(strings_start) != strings_start){
+        LOG("File too short - seek");
+        return -4;
+    }
+    if(file->read(strs, strings_len) != strings_len){
+        LOG("File too short - read");
+        return -5;
+    }
+
+    // Decrypt strings
+    kbp_decrypt(strs.raw(), strs.size(), key);
+
+    LOG("String Dump:");
+    RLOG(strs.dumpBytes(4, 8));
+
+    zu64 fw_start = 0x54000;
+    zu64 fw_len = ZBinary::decle32(strs.raw() + 4);
+
+    LOG("Firmware Size 0x" << ZString::ItoS(fw_len, 16));
+
+    // Read firmware
+    ZBinary fw;
+    if(file->seek(fw_start) != fw_start){
+        LOG("File too short - seek");
+        return -2;
+    }
+    if(file->read(fw, fw_len) != fw_len){
+        LOG("File too short - read");
+        return -3;
+    }
+
+    // Decrypt firmware
+    kbp_decrypt(fw.raw(), fw.size(), key);
+    fw_out = fw;
+
+    RLOG(fw_out.dumpBytes(4, 8));
+
+    return 0;
+}
 
 int encode_image(ZPath fwin, ZPath fwout){
     LOG("Input: " << fwin);
