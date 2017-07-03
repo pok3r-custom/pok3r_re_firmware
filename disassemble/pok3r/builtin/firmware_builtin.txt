@@ -1489,9 +1489,7 @@ function_b_2:
 ckcu_set_wtf:
     ; r0 = bits to set/unset
     ; r1 = 0/1 unset/set
-    ; Sets or unsets specified bits in 0x10c in the CKCU
-    ; But this register is not documented, the manual jumps from 0x34 to 0x300
-    ; I don't know what the fuck this is
+    ; Sets or unsets specified bits in the APB 1 peripheral reset register
    0xbb0:   4a05        ldr r2, [pc, #20]       ; r2 = (0xbc8) CKCU
      bb2:   2901        cmp r1, #1
      bb4:   f8d2 110c   ldr.w r1, [r2, #268]    ; r1 = [r2 + 0x10c]
@@ -3756,7 +3754,7 @@ main:
     1ef6:   2801        cmp r0, #1
     1ef8:   d107        bne.n 0x1f0a            ; branch if r0 != 1
 
-    ; Set some undocumented register
+    ; Reset GPTM0?
     1efa:   2101        movs r1, #1
     1efc:   2010        movs r0, #16
     1efe:   f7fe fe57   bl 0xbb0                ; call ckcu_set_wtf(0x10, 1)

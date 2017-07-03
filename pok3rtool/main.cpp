@@ -287,11 +287,18 @@ int cmd_flash(Param *param){
 
 int cmd_decode(Param *param){
     UpdatePackage package;
-    if(!package.loadFromExe(param->args[1], 0))
+    if(!package.loadFromExe(param->args[1], 0)){
+        ELOG("Load Error");
         return 1;
+    }
+    ZPath out = param->args[2];
+    LOG("Write " << out);
     ZBinary fw = package.getFirmware();
-    if(!ZFile::writeBinary(param->args[2], fw))
+    if(!ZFile::writeBinary(out, fw)){
+        ELOG("Write Error");
         return 2;
+    }
+    LOG("Done");
     return 0;
 }
 
@@ -336,7 +343,7 @@ int main(int argc, char **argv){
 
     ZOptions options(optdef);
     if(!options.parse(argc, argv))
-        return 1;
+        return -2;
 
     Param param;
     param.device = DEV_NONE;
@@ -354,16 +361,17 @@ int main(int argc, char **argv){
         if(cmds.contains(cmstr)){
             CmdEntry cmd = cmds[cmstr];
             if(param.args.size() == cmd.argn + 1){
-                cmd.func(&param);
+                return cmd.func(&param);
             } else {
                 LOG("Usage: " << cmd.usage);
+                return -1;
             }
         } else {
             LOG("Unknown Command \"" << cmstr << "\"");
-            return 1;
+            return -1;
         }
     } else {
         LOG("No Command");
-        return 1;
+        return -1;
     }
 }

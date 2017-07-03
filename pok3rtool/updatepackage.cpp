@@ -10,13 +10,15 @@
 typedef int (*decodeFunc)(ZFile *, ZBinary &);
 int decode_maajonsn(ZFile *file, ZBinary &fw_out);
 int decode_maav102(ZFile *file, ZBinary &fw_out);
-int decode_kbp_cykb(ZFile *file, ZBinary &fw_out);
+int decode_kbp_v60(ZFile *file, ZBinary &fw_out);
+int decode_kbp_v80(ZFile *file, ZBinary &fw_out);
 
 enum PackType {
     PACKAGE_NONE = 0,
     MAAJONSN,   // .maajonsn
     MAAV102,    // .maaV102
-    KBPCYKB,
+    KBPV60,
+    KBPV80,
 };
 
 const ZMap<zu64, PackType> packages = {
@@ -43,16 +45,17 @@ const ZMap<zu64, PackType> packages = {
     { 0x8AA1AEA217DA685B,   MAAV102 },  // V1.00.05   v1.0.5
 
     // KBP V60 (112)
-    { 0x6064D8C4EE74BE18,   KBPCYKB },  //
+    { 0x6064D8C4EE74BE18,   KBPV60 },   // V1.0.7
 
     // KBP V80 (129)
-    { 0xBCF4C9830D800D8C,   KBPCYKB },  //
+    { 0xBCF4C9830D800D8C,   KBPV80 },   // V1.0.7
 };
 
 const ZMap<PackType, decodeFunc> types = {
     { MAAJONSN, decode_maajonsn },
     { MAAV102,  decode_maav102 },
-    { KBPCYKB,  decode_kbp_cykb },
+    { KBPV60,   decode_kbp_v60 },
+    { KBPV80,   decode_kbp_v80 },
 };
 
 UpdatePackage::UpdatePackage(){
@@ -70,7 +73,7 @@ bool UpdatePackage::loadFromExe(ZPath exe, int index){
     zu64 exehash = ZFile::fileHash(exe);
     if(packages.contains(exehash)){
         int ret = types[packages[exehash]](&file, firmware);
-        return !!ret;
+        return !ret;
     } else {
         ELOG("Unknown updater executable: " << ZString::ItoS(exehash, 16));
         return false;
@@ -366,10 +369,7 @@ void kbp_decrypt(zbyte *data, zu64 size, zu32 key)
 
 /*  Decode the updater for the KBP V60 / V80.
  */
-int decode_kbp_cykb(ZFile *file, ZBinary &fw_out){
-//    zu32 key = 0xDA6282CD;  // v60
-    zu32 key = 0xF6F3111F;  // v80
-
+int decode_kbp_cykb(ZFile *file, ZBinary &fw_out, zu32 key){
     zu64 exelen = file->fileSize();
     zu64 strings_len = 588;
     zu64 strings_start = exelen - strings_len;
@@ -409,11 +409,22 @@ int decode_kbp_cykb(ZFile *file, ZBinary &fw_out){
 
     // Decrypt firmware
     kbp_decrypt(fw.raw(), fw.size(), key);
+    ProtoPOK3R::decode_firmware(fw);
     fw_out = fw;
 
     RLOG(fw_out.dumpBytes(4, 8));
 
     return 0;
+}
+
+int decode_kbp_v60(ZFile *file, ZBinary &fw_out){
+    zu32 key = 0xDA6282CD;  // v60
+    return decode_kbp_cykb(file, fw_out, key);
+}
+
+int decode_kbp_v80(ZFile *file, ZBinary &fw_out){
+    zu32 key = 0xF6F3111F;  // v80
+    return decode_kbp_cykb(file, fw_out, key);
 }
 
 int encode_image(ZPath fwin, ZPath fwout){
