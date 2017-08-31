@@ -34,14 +34,17 @@ const ZMap<zu64, PackType> packages = {
     { 0x6CFF0BB4F4086C2F,   MAAV102 },  // V1.03.00   v1.3.0
     { 0xA6EE37F856CD24C1,   MAAV102 },  // V1.04.00   v1.4.0
 
-    // CORE (175)
+    // Vortex CORE (175)
     { 0x51BFA86A7FAF4EEA,   MAAV102 },  // V1.04.01   v1.4.1
     { 0x0582733413943655,   MAAV102 },  // V1.04.03   v1.4.3
 
-    // NEW 75? (192)
-    { 0xb542d0d86b9a85c3,   MAAV102 },  // V1.02.01   v1.2.1
+    // Vortex Tester (200)
+    // none :(
 
-    // (207)
+    // NEW 75? (192)
+    { 0xB542D0D86B9A85C3,   MAAV102 },  // V1.02.01   v1.2.1
+
+    // POK3R RGB 2? (207)
     { 0x8AA1AEA217DA685B,   MAAV102 },  // V1.00.05   v1.0.5
 
     // KBP V60 (112)

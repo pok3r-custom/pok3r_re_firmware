@@ -3,20 +3,29 @@
 *Disclaimer: This project comes with no warranty, and may be used for free at your own risk. I do
 this in my free time for fun, as such there are no guarantees of progress or success.*
 
-### Progress
-- POK3R
-    - Extract unencrypted POK3R firmware and flash contents. **DONE**
-    - Reverse engineer the POK3R firmware and update procedure. **DONE**
-- POK3R RGB
-    - Extract unencrypted POK3R RGB firmware and flash contents. **DONE**
-    - Reverse engineer the POK3R RGB firmware and update procedure. **DONE**
-- Vortex CORE
-    - Extract unencrypted CORE firmware and flash contents. **DONE**
-    - Reverse engineer the CORE firmware and update procedure. **DONE**
+For the reverse engineering effort on the original Vortex firmware and a tool to communicate
+with Vortex keyboards, see [pok3r_re_firmware](https://github.com/ChaoticConundrum/pok3r_re_firmware).
 
-- Patch OpenOCD to allow JTAG flashing of HT32. **DONE**
-- Desktop tool to flash keyboards over USB. **DONE**
-- Open-source firmware compatible with POK3R and POK3R RGB. *WIP*
+### Scope
+This project includes the reverse engineering effort for the original keyboard firmwares on several
+keyboards, including:
+
+- Vortex
+    - POK3R
+    - POK3R RGB
+    - Vortex CORE
+    - Vortex Tester
+    - Vortex RACE 3
+- KBParadise
+    - V60 Mini
+    - V80 TKL
+
+This project also includes a tool for communicating with and updating the firmware on Vortex
+(and similar) keyboards.
+
+For the effort at developing new firmware for these keyboards based on TMK, see
+[tmk_pok3r](https://github.com/ChaoticConundrum/tmk_pok3r).
+
 
 ## pok3rtool
 The `pok3rtool` CLI application runs on Linux, Windows, and Mac OS X. Along with some development

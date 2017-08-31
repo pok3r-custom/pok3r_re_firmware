@@ -78,7 +78,12 @@ const ZMap<ZString, Device> devnames = {
     { "vortex_tester",  VORTEX_TESTER },
 
     { "kbpv60",         KBP_V60 },
+    { "kbp-v60",        KBP_V60 },
+    { "kbp_v60",        KBP_V60 },
+
     { "kbpv80",         KBP_V80 },
+    { "kbp-v80",        KBP_V80 },
+    { "kbp_v80",        KBP_V80 },
 };
 
 const ZMap<Device, VortexDevice> devices = {
@@ -87,7 +92,8 @@ const ZMap<Device, VortexDevice> devices = {
     { VORTEX_CORE,      { "Vortex Core",    HOLTEK_VID, VORTEX_CORE_PID,    VORTEX_CORE_BOOT_PID,   PROTO_CYKB } },
     { VORTEX_TESTER,    { "Vortex Tester",  HOLTEK_VID, VORTEX_TESTER_PID,  VORTEX_TESTER_BOOT_PID, PROTO_CYKB } },
     { KBP_V60,          { "KBP V60",        HOLTEK_VID, KBP_V60_PID,        KBP_V60_BOOT_PID,       PROTO_POK3R } },
-    { KBP_V80,          { "KBP V80",        HOLTEK_VID, KBP_V80_PID,        KBP_V80_BOOT_PID,       PROTO_POK3R } },
+//    { KBP_V80,          { "KBP V80",        HOLTEK_VID, KBP_V80_PID,        KBP_V80_BOOT_PID,       PROTO_POK3R } },
+    { KBP_V80,          { "KBP V80",        HOLTEK_VID, KBP_V80_PID,        KBP_V60_BOOT_PID,       PROTO_POK3R } },
 };
 
 // Functions
