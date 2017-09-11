@@ -31,6 +31,16 @@ tools, `pok3rtool` implements the firmware update protocol over USB for the POK3
 The `pok3rtool` executable is built with CMake. You will need the LibChaos submodule cloned to
 build it. After it is compiled, it should have no runtime dependencies, and can be run portably.
 
+```shell
+git clone --recursive -j8 git@github.com:ChaoticConundrum/pok3r_re_firmware.git
+```
+
+You also need libusb-dev
+
+```shell
+apt-get install libusb-dev
+```
+
 **WARNING: THIS TOOL CAN VERY EASILY BRICK YOUR KEYBOARD IF USED INCORRECTLY, MAKING IT
 UNUSABLE WITHOUT EXPENSIVE DEVELOPMENT TOOLS. READ THE DOCUMENTATION, POSSIBLY READ THE
 CODE, AND PROCEED AT YOUR OWN RISK.**
