@@ -115,7 +115,7 @@ ZPointer<UpdateInterface> openDevice(Device dev){
         // Try to open
         if(kb->open()){
             if(kb->isBuiltin())
-                LOG("Opened " << device.name << " (builtin)");
+                LOG("Opened " << device.name << " (bootloader)");
             else
                 LOG("Opened " << device.name);
             return kb;

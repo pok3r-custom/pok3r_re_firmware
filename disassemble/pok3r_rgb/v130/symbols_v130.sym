@@ -89,6 +89,8 @@
 3600 : memcmp
 361c : sram_init
 3640 : afio_exti_ssr_write
+366c : bftm0_intr
+36fc : bftm1_intr
 375c : bftm_clear
 379c : afio_pin_config
 37c4 : spin_wait_maybe
@@ -117,7 +119,7 @@
 4538 : gpio_set_input_output
 4548 : gpio_set_output_current
 4558 : gpio_set_input_enable
-4569 : gpio_set_open_drain
+4568 : gpio_set_open_drain
 4578 : gpio_set_pin_pull_up_down
 45a0 : gpio_set_pin
 45a4 : gpio_set_reset_pin
@@ -172,6 +174,9 @@
 6c28 : watchdog_init
 6c58 : watchdog_reload_timer
 72c0 : function_130_1
+73b8 : function_unused_1
+74ac : function_unused_2
+74b8 : function_unused_2
 7774 : copy_words
 7784 : usb_get_ep_reg
 7794 : function_130_9

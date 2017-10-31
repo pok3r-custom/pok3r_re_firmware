@@ -1,5 +1,11 @@
 #include "main.h"
 
+
+void nvic_init(){
+    // Set vector table address
+    nvic_set_vtor(FIRMWARE_ADDR);
+}
+
 void ckcu_init(){
     REG_CKCU->LPCR.BKISO = 1;       // Backup domain
     REG_CKCU->APBCCR1.BKPREN = 1;   // Backup domain register access
@@ -26,11 +32,6 @@ void ckcu_init(){
 
 //    REG_CKCU->AHBCCR.FMCEN = 1;
 //    REG_FMC->CFCR.WAIT = 3;         // Flash wait status 2 (48MHz <= HCLK <= 72MHz)
-}
-
-void nvic_init(){
-    // Set vector table address
-    nvic_set_vtor(FIRMWARE_ADDR);
 }
 
 void wdt_init(){
@@ -120,18 +121,23 @@ int main(){
 
     // I/O init
 //    afio_init();
-    spi_init();
 
+//    spi_init();
 //    spi_read();
 
+    // CKOUT
+    afio_pin_config(GPIO_A, 8, AFIO_OTHER);
+    // CK_AHB / 16
+    REG_CKCU->GCFGR.CKOUTSRC = 1;
+
     // USB
-    usb_init();
-    usb_init_descriptors();
-    usb_callback_suspend(on_suspend);
-    usb_callback_configuration(on_configuration);
+//    usb_init();
+//    usb_init_descriptors();
+//    usb_callback_suspend(on_suspend);
+//    usb_callback_configuration(on_configuration);
 
     // Enable D+ pull-up
-    usb_pull_up(1);
+//    usb_pull_up(1);
 
     u32 count = 0;
     while(1){

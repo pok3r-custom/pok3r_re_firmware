@@ -61,7 +61,7 @@ vector_table:
     34e4:   0x366d      ; 41 BFTM0          (bftm0_intr)
     34e8:   0x36fd      ; 42 BFTM1          (bftm1_intr)
     34ec:   0x3573      ; 43 I2C0           (generic_intr)
-    34f0:   0x3573      ; 44 I2C1           (i2c1_intr)
+    34f0:   0x3573      ; 44 I2C1           (generic_intr)
     34f4:   0x3573      ; 45 SPI0           (generic_intr)
     34f8:   0x3573      ; 46 SPI1           (generic_intr)
     34fc:   0x3573      ; 47 USART0         (generic_intr)
@@ -7338,7 +7338,7 @@ function_130_1:
   0x73b0:   0x20000608  ; update_packet
   0x73b4:   0x200006bc
 
-    73b8:   b5f0        push {r4, r5, r6, r7, lr}
+  0x73b8:   b5f0        push {r4, r5, r6, r7, lr}
     73ba:   8801        ldrh r1, [r0, #0]
     73bc:   f44f 7680   mov.w r6, #256   ; 0x100
     73c0:   f640 1521   movw r5, #2337   ; 0x921
@@ -7448,13 +7448,15 @@ function_130_1:
     74a6:   2000        movs r0, #0
     74a8:   74ad        strb r5, [r5, #18]
     74aa:   0000        movs r0, r0
-    74ac:   4a01        ldr r2, [pc, #4]   ; (0x74b4)
+    
+  0x74ac:   4a01        ldr r2, [pc, #4]   ; (0x74b4)
     74ae:   2101        movs r1, #1
     74b0:   5411        strb r1, [r2, r0]
     74b2:   4770        bx lr
     74b4:   003e        movs r6, r7
     74b6:   2000        movs r0, #0
-    74b8:   78c2        ldrb r2, [r0, #3]
+    
+  0x74b8:   78c2        ldrb r2, [r0, #3]
     74ba:   8881        ldrh r1, [r0, #4]
     74bc:   2301        movs r3, #1
     74be:   2a21        cmp r2, #33   ; 0x21

@@ -1,4 +1,8 @@
 *.user
+*.user.*
+
+*.swp
+*.vim
 
 *.id0
 *.id1

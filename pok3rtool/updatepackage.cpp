@@ -37,12 +37,14 @@ const ZMap<zu64, PackType> packages = {
     // Vortex CORE (175)
     { 0x51BFA86A7FAF4EEA,   MAAV102 },  // V1.04.01   v1.4.1
     { 0x0582733413943655,   MAAV102 },  // V1.04.03   v1.4.3
+    { 0x61F73244FA73079F,   MAAV102 },  // V1.04.05   v1.4.5
 
     // Vortex Tester (200)
     // none :(
 
-    // NEW 75? (192)
+    // NEW 75 / RACE3 (192)
     { 0xB542D0D86B9A85C3,   MAAV102 },  // V1.02.01   v1.2.1
+    { 0xFBF40BEE5D0A3C70,   MAAV102 },  // V1.02.04   v1.2.4
 
     // POK3R RGB 2? (207)
     { 0x8AA1AEA217DA685B,   MAAV102 },  // V1.00.05   v1.0.5
@@ -279,6 +281,8 @@ int decode_maav102(ZFile *file, ZBinary &fw_out){
     // Version
     version.parseUTF16((const zu16 *)(strs.raw() + offset_version), 0x200);
 
+    LOG("==============================");
+
     LOG("Description: " << desc);
     LOG("Company:     " << company);
     LOG("Product:     " << product);
@@ -288,6 +292,8 @@ int decode_maav102(ZFile *file, ZBinary &fw_out){
 
 //    LOG("String Dump:");
 //    RLOG(strs.dumpBytes(4, 8));
+
+    LOG("==============================");
 
     // Decode other encrypted sections
 
@@ -312,6 +318,8 @@ int decode_maav102(ZFile *file, ZBinary &fw_out){
         start += 0x50;
     }
 
+    LOG("==============================");
+
     zu64 sec_start = exelen - total;
     LOG("Section Count: " << sections.size());
 
@@ -321,8 +329,8 @@ int decode_maav102(ZFile *file, ZBinary &fw_out){
             continue;
 
         LOG("Section " << i << ":");
-        LOG("  Offset: 0x" << ZString::ItoS(sec_start, 16));
-        LOG("  Length: 0x" << ZString::ItoS(sec_len, 16));
+//        LOG("  Offset: 0x" << ZString::ItoS(sec_start, 16));
+        LOG("  Length: " << sec_len);
 
         // Read section
         ZBinary sec;
@@ -341,21 +349,19 @@ int decode_maav102(ZFile *file, ZBinary &fw_out){
         decode_package_data(sec);
 
         // Decrypt RGB firmwares only
-        if(sec.size() > 180){
+        if(sec.size() == 180){
+            LOG("  Data");
+            RLOG(sec.dumpBytes(4, 8, 0));
+            continue;
+        } else {
+            LOG("  Firmware" << ZLog::NOLN);
             ProtoCYKB::decode_firmware(sec);
+            if(i == 0){
+                fw_out = sec;
+                RLOG(" (output)");
+            }
+            RLOG(ZLog::NEWLN);
         }
-
-//        LOG("Section Dump:");
-//        RLOG(sec.dumpBytes(4, 8, 0));
-
-//        ZPath secout = out;
-//        secout.last() = out.getName() + "-" + i + out.getExtension();
-//        LOG("  Output: " << secout);
-
-        // Write firmware
-//        ZFile fwout(secout, ZFile::WRITE);
-//        fwout.write(sec);
-        fw_out = sec;
     }
 
     return 0;

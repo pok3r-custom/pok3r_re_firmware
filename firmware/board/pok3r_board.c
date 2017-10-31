@@ -144,3 +144,14 @@ void spi_flash_command(const u8 *cmd, int writelen, u8 *out, int readlen){
     // chip select high
     gpio_pin_set_reset(GPIO_B, 10, 1);
 }
+
+void usart_init(){
+    // USART0 clock
+    ckcu_clock_enable(CLOCK_USR0, 1);
+
+    // pinmux PA8 for AF6
+    afio_pin_config(GPIO_A, 8, 6);
+
+    REG_USART0->MDR.MODE = 0;
+    REG_USART0->DLR.BRD = 625; // 115200 baud
+}

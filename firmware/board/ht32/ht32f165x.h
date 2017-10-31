@@ -166,6 +166,21 @@
 #define CLOCK_OPA1      TYPE_APB1 | (1 << 23)
 #define CLOCK_ADC       TYPE_APB1 | (1 << 24)
 
+// Constants
+// ////////////////////////////////////////////////////////////////////////////////////////////////
+#define AFIO_DEFAULT    0
+#define AFIO_GPIO       1
+#define AFIO_ADC        2
+#define AFIO_CMP        3
+#define AFIO_TM         4
+#define AFIO_SPI        5
+#define AFIO_USART      6
+#define AFIO_I2C        7
+#define AFIO_SMC        8
+#define AFIO_EBI        9
+#define AFIO_I2S        10
+#define AFIO_OTHER      15
+
 // Power Control Unit
 // ////////////////////////////////////////////////////////////////////////////////////////////////
 #define PWRCU_BAKSR     PWRCU_BASE + 0x100  // Backup Domain Status
@@ -496,6 +511,260 @@ STRUCT_REG_CHECK(FMC, SBVT3);
 
 // USART
 // ////////////////////////////////////////////////////////////////////////////////////////////////
+#define USART0_RBR      USART0_BASE + 0x0   // USART 0 Receiver Buffer
+#define USART0_TBR      USART0_BASE + 0x0   // USART 0 Transmitter Buffer
+#define USART0_IER      USART0_BASE + 0x4   // USART 0 Interrupt Enable
+#define USART0_IIR      USART0_BASE + 0x8   // USART 0 Interrupt Identification
+#define USART0_FCR      USART0_BASE + 0xC   // USART 0 FIFO Control
+#define USART0_LCR      USART0_BASE + 0x10  // USART 0 Line Control
+#define USART0_MODCR    USART0_BASE + 0x14  // USART 0 Modem Control
+#define USART0_LSR      USART0_BASE + 0x18  // USART 0 Line Status
+#define USART0_MODSR    USART0_BASE + 0x1C  // USART 0 Modem Status
+#define USART0_TPR      USART0_BASE + 0x20  // USART 0 Timing Parameter
+#define USART0_MDR      USART0_BASE + 0x24  // USART 0 Mode
+#define USART0_IRDACR   USART0_BASE + 0x28  // USART 0 IrDA Control
+#define USART0_RS485CR  USART0_BASE + 0x2C  // USART 0 RS485 Control
+#define USART0_SYNCR    USART0_BASE + 0x30  // USART 0 Synchronous Control
+#define USART0_FSR      USART0_BASE + 0x34  // USART 0 FIFO Status
+#define USART0_DLR      USART0_BASE + 0x38  // USART 0 Divider Latch
+#define USART0_DEGTSTR  USART0_BASE + 0x40  // USART 0 Debug/Test
+
+#define USART1_RBR      USART1_BASE + 0x0   // USART 1 Receiver Buffer
+#define USART1_TBR      USART1_BASE + 0x0   // USART 1 Transmitter Buffer
+#define USART1_IER      USART1_BASE + 0x4   // USART 1 Interrupt Enable
+#define USART1_IIR      USART1_BASE + 0x8   // USART 1 Interrupt Identification
+#define USART1_FCR      USART1_BASE + 0xC   // USART 1 FIFO Control
+#define USART1_LCR      USART1_BASE + 0x10  // USART 1 Line Control
+#define USART1_MODCR    USART1_BASE + 0x14  // USART 1 Modem Control
+#define USART1_LSR      USART1_BASE + 0x18  // USART 1 Line Status
+#define USART1_MODSR    USART1_BASE + 0x1C  // USART 1 Modem Status
+#define USART1_TPR      USART1_BASE + 0x20  // USART 1 Timing Parameter
+#define USART1_MDR      USART1_BASE + 0x24  // USART 1 Mode
+#define USART1_IRDACR   USART1_BASE + 0x28  // USART 1 IrDA Control
+#define USART1_RS485CR  USART1_BASE + 0x2C  // USART 1 RS485 Control
+#define USART1_SYNCR    USART1_BASE + 0x30  // USART 1 Synchronous Control
+#define USART1_FSR      USART1_BASE + 0x34  // USART 1 FIFO Status
+#define USART1_DLR      USART1_BASE + 0x38  // USART 1 Divider Latch
+#define USART1_DEGTSTR  USART1_BASE + 0x40  // USART 1 Debug/Test
+
+// USART RBR
+STRUCT_REGISTER_START {
+    u32 RD          : 9;    //!< Receiver Data
+    u32             : 23;
+} STRUCT_REGISTER_END USARTRBR_reg;
+STRUCT_SIZE_ASSERT(USARTRBR_reg, 4);
+
+// USART TBR
+STRUCT_REGISTER_START {
+    u32 TD          : 9;    //!< Transmitter Data
+    u32             : 23;
+} STRUCT_REGISTER_END USARTTBR_reg;
+STRUCT_SIZE_ASSERT(USARTTBR_reg, 4);
+
+// USART IER
+STRUCT_REGISTER_START {
+    u32 RFTLI_RTOIE : 1;    //!< Receiver FIFO Threshold Level Interrupt Enable or Receiver FIFO Time-Out Interrupt Enable
+    u32 TFTLIE      : 1;    //!< Transmitter FIFO Threshold Level Interrupt Enable
+    u32 RLSIE       : 1;    //!< Receive Line Status Interrupt Enable
+    u32 MODSIE      : 1;    //!< MODEM Status Interrupt Enable
+    u32             : 28;
+} STRUCT_REGISTER_END USARTIER_reg;
+STRUCT_SIZE_ASSERT(USARTIER_reg, 4);
+
+// USART IIR
+STRUCT_REGISTER_START {
+    u32 NIP         : 1;    //!< No Interrupt Pending
+    u32 IID         : 3;    //!< Interript Identification
+    u32             : 28;
+} STRUCT_REGISTER_END USARTIIR_reg;
+STRUCT_SIZE_ASSERT(USARTIIR_reg, 4);
+
+// USART FCR
+STRUCT_REGISTER_START {
+    u32 FME         : 1;    //!< FIFO Mode Enable
+    u32 RFR         : 1;    //!< RX FIFO Reset
+    u32 TFR         : 1;    //!< TX FIFO Reset
+    u32             : 1;
+    u32 TFTL        : 2;    //!< TX FIFO Threshold Setting
+    u32 RFTL        : 2;    //!< RX FIFO Threshold Setting
+    u32 URTXEN      : 1;    //!< USART TX Enable
+    u32 URRXEN      : 1;    //!< USART RX Enable
+    u32             : 22;
+} STRUCT_REGISTER_END USARTFCR_reg;
+STRUCT_SIZE_ASSERT(USARTFCR_reg, 4);
+
+// USART LCR
+STRUCT_REGISTER_START {
+    u32 WLS         : 2;    //!< Word Length Select
+    u32 NSB         : 1;    //!< Number of STOP bit
+    u32 PBE         : 1;    //!< Parity Bit Enable
+    u32 EPE         : 1;    //!< Even Parity Enable
+    u32 SPE         : 1;    //!< Stick Parity Enable
+    u32 BCB         : 1;    //!< Break Control Bit
+    u32             : 25;
+} STRUCT_REGISTER_END USARTLCR_reg;
+STRUCT_SIZE_ASSERT(USARTLCR_reg, 4);
+
+// USART MODCR
+STRUCT_REGISTER_START {
+    u32 DTR         : 1;    //!< Data Terminal Ready Signal
+    u32 RTS         : 1;    //!< Request To Send Signal
+    u32 HFCEN       : 1;    //!< Hardware Flow Control Function Enable
+    u32             : 29;
+} STRUCT_REGISTER_END USARTMODCR_reg;
+STRUCT_SIZE_ASSERT(USARTMODCR_reg, 4);
+
+// USART LSR
+STRUCT_REGISTER_START {
+    u32 RFDR        : 1;    //!< RX FIFO Data Ready
+    u32 OEI         : 1;    //!< Overrun Error Indicator
+    u32 PEI         : 1;    //!< Parity Error Indicator
+    u32 FEI         : 1;    //!< Framing Error Indicator
+    u32 BII         : 1;    //!< Break Interrupt Indicator
+    u32 TXFEMPT     : 1;    //!< Transmitter FIFO Empty
+    u32 TXEMPT      : 1;    //!< Transmitter Empty
+    u32 ERRRX       : 1;    //!< RX FIFO Error
+    u32 RSADDEF     : 1;    //!< RS485 Address Detection Flag
+    u32             : 23;
+} STRUCT_REGISTER_END USARTLSR_reg;
+STRUCT_SIZE_ASSERT(USARTLSR_reg, 4);
+
+// USART MODSR
+STRUCT_REGISTER_START {
+    u32 DCTS        : 1;    //!< Detect UR_CTS Status Change
+    u32 DDSR        : 1;    //!< Detect UR_DSR Status Change
+    u32 DRI         : 1;    //!< Detect DR_RI Status Change
+    u32 DDCD        : 1;    //!< Detect UR_DCD Status Change
+    u32 CTSS        : 1;    //!< UR_CTS Clear To Send Status
+    u32 DSRS        : 1;    //!< UR_DSR Data Set Ready Status
+    u32 RIS         : 1;    //!< UR_RI Ring Indicator Status
+    u32 DCDS        : 1;    //!< Data Carrier Detect Status
+    u32             : 24;
+} STRUCT_REGISTER_END USARTMODSR_reg;
+STRUCT_SIZE_ASSERT(USARTMODSR_reg, 4);
+
+// USART TPR
+STRUCT_REGISTER_START {
+    u32 RTOIC       : 7;    //!< Receiver FIFO Time Out Interrupt Compare Value
+    u32 RTOIE       : 1;    //!< Receiver FIFO Time Out Interrupt Enable
+    u32 TG          : 8;    //!< Transmitter Time Guard
+    u32             : 16;
+} STRUCT_REGISTER_END USARTTPR_reg;
+STRUCT_SIZE_ASSERT(USARTTPR_reg, 4);
+
+// USART MDR
+STRUCT_REGISTER_START {
+    u32 MODE        : 2;    //!< USART Mode Selection
+    u32 TRSM        : 1;    //!< Transfer Mode Selection
+    u32             : 1;
+    u32 TXDMAEN     : 1;    //!< USART TX DMA Enable
+    u32 RXDMAEN     : 1;    //!< USART RX DMA Enable
+    u32             : 26;
+} STRUCT_REGISTER_END USARTMDR_reg;
+STRUCT_SIZE_ASSERT(USARTMDR_reg, 4);
+
+// USART IRDACR
+STRUCT_REGISTER_START {
+    u32 IRDAEN      : 1;    //!< IrDA Enable
+    u32 IRDALP      : 1;    //!< IrDA Low Power Mode
+    u32 TXSEL       : 1;    //!< Transmit Select
+    u32 LB          : 1;    //!< IrDA Loop Back Mode
+    u32 TXINV       : 1;    //!< RX Signal Inverse Control
+    u32 RXINV       : 1;    //!< RX Signal Inverse Control
+    u32             : 2;
+    u32 IRDAPSC     : 8;    //!< IrDA Prescaler Value
+    u32             : 16;
+} STRUCT_REGISTER_END USARTIRDACR_reg;
+STRUCT_SIZE_ASSERT(USARTIRDACR_reg, 4);
+
+// USART RS485CR
+STRUCT_REGISTER_START {
+    u32 TXENP       : 1;    //!< UR_RTS/TXE Pin Polarity
+    u32 RSNMM       : 1;    //!< RS485 Normal Multi-Drop Operation Mode Control
+    u32 RSAAD       : 1;    //!< RS485 Auto Address Detection Operation Mode Control
+    u32             : 5;
+    u32 ADDMATCH    : 8;    //!< RS485 Auto Address Match Value
+    u32             : 16;
+} STRUCT_REGISTER_END USARTRS485_reg;
+STRUCT_SIZE_ASSERT(USARTRS485_reg, 4);
+
+// USART SYNCR
+STRUCT_REGISTER_START {
+    u32 CLKEN       : 1;    //!< Clock Enable
+    u32             : 1;
+    u32 CPS         : 1;    //!< Clock Phase
+    u32 CPO         : 1;    //!< Clock Polarity
+    u32             : 28;
+} STRUCT_REGISTER_END USARTSYNCR_reg;
+STRUCT_SIZE_ASSERT(USARTSYNCR_reg, 4);
+
+// USART FSR
+STRUCT_REGISTER_START {
+    u32 TXFS        : 1;    //!< TX FIFO Status
+    u32             : 3;
+    u32 RXFS        : 1;    //!< RX FIFO Status
+    u32             : 19;
+} STRUCT_REGISTER_END USARTFSR_reg;
+STRUCT_SIZE_ASSERT(USARTFSR_reg, 4);
+
+// USART DLR
+STRUCT_REGISTER_START {
+    u32 BRD         : 16;   //!< Baud Rate Divider
+    u32             : 16;
+} STRUCT_REGISTER_END USARTDLR_reg;
+STRUCT_SIZE_ASSERT(USARTDLR_reg, 4);
+
+// USART DEGTSTR
+STRUCT_REGISTER_START {
+    u32 LBM         : 2;
+    u32             : 30;
+} STRUCT_REGISTER_END USARTDEGTSTR_reg;
+STRUCT_SIZE_ASSERT(USARTDEGTSTR_reg, 4);
+
+typedef struct {
+    union {
+        USARTRBR_reg RBR;
+        USARTTBR_reg TBR;
+    };
+    USARTIER_reg IER;
+    USARTIIR_reg IIR;
+    USARTFCR_reg FCR;
+    USARTLCR_reg LCR;
+    USARTMODCR_reg MODCR;
+    USARTLSR_reg LSR;
+    USARTMODSR_reg MODSR;
+    USARTTPR_reg TPR;
+    USARTMDR_reg MDR;
+    USARTIRDACR_reg IRDACR;
+    USARTRS485_reg RS485CR;
+    USARTSYNCR_reg SYNCR;
+    USARTFSR_reg FSR;
+    USARTDLR_reg DLR;
+    u32 _pad;
+    USARTDEGTSTR_reg DEGTSTR;
+} USART_map;
+STRUCT_SIZE_ASSERT(USART_map, 0x44);
+
+#define REG_USART0 ((volatile USART_map *)USART0_BASE)
+#define REG_USART1 ((volatile USART_map *)USART1_BASE)
+
+STRUCT_ADDR_ASSERT(REG_USART0->RBR, USART0_RBR);
+STRUCT_ADDR_ASSERT(REG_USART0->TBR, USART0_TBR);
+STRUCT_ADDR_ASSERT(REG_USART0->IER, USART0_IER);
+STRUCT_ADDR_ASSERT(REG_USART0->IIR, USART0_IIR);
+STRUCT_ADDR_ASSERT(REG_USART0->FCR, USART0_FCR);
+STRUCT_ADDR_ASSERT(REG_USART0->LCR, USART0_LCR);
+STRUCT_ADDR_ASSERT(REG_USART0->MODCR, USART0_MODCR);
+STRUCT_ADDR_ASSERT(REG_USART0->LSR, USART0_LSR);
+STRUCT_ADDR_ASSERT(REG_USART0->MODSR, USART0_MODSR);
+STRUCT_ADDR_ASSERT(REG_USART0->TPR, USART0_TPR);
+STRUCT_ADDR_ASSERT(REG_USART0->MDR, USART0_MDR);
+STRUCT_ADDR_ASSERT(REG_USART0->IRDACR, USART0_IRDACR);
+STRUCT_ADDR_ASSERT(REG_USART0->RS485CR, USART0_RS485CR);
+STRUCT_ADDR_ASSERT(REG_USART0->SYNCR, USART0_SYNCR);
+STRUCT_ADDR_ASSERT(REG_USART0->FSR, USART0_FSR);
+STRUCT_ADDR_ASSERT(REG_USART0->DLR, USART0_DLR);
+STRUCT_ADDR_ASSERT(REG_USART0->DEGTSTR, USART0_DEGTSTR);
 
 // UART
 // ////////////////////////////////////////////////////////////////////////////////////////////////
