@@ -17,4 +17,7 @@ void spi_init();
 u8 spi_txrx(u8 byte);
 void spi_flash_command(const u8 *cmd, int writelen, u8 *out, int readlen);
 
+void usart_init();
+void usart_write(const u8 *data, u32 size);
+
 #endif // POK3R_BOARD_H

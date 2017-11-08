@@ -13,16 +13,22 @@ void ckcu_init(){
     REG_CKCU->AHBCFGR.AHBPRE = 1;   // Set AHB prescaler (CK_AHB = CK_SYS / 2)
 
     // PLL
-//    REG_CKCU->GCCR.HSEEN = 1;       // HSE enable
-//    REG_CKCU->GCFGR.PLLSRC = 0;     // PLL source HSE
-//    REG_CKCU->PLLCFGR.PFBD = 18;    // PLL VCO output clock feedback divider to 18
-//    REG_CKCU->GCCR.PLLEN = 1;       // PLL enable
+    REG_CKCU->GCCR.HSEEN = 1;       // HSE enable
+    REG_CKCU->GCFGR.PLLSRC = 0;     // PLL source HSE
+//    REG_CKCU->GCFGR.PLLSRC = 1;     // PLL source HSI
 
-//    while(REG_CKCU->GCSR.PLLRDY == 0);  // wait for PLL
+//    REG_CKCU->PLLCFGR.PFBD = 36;    // PLL feedback divider = 36
+//    REG_CKCU->PLLCFGR.POTD = 1;     // PLL output divider = 2
+    REG_CKCU->PLLCFGR.PFBD = 18;    // PLL feedback divider = 18
+    REG_CKCU->PLLCFGR.POTD = 0;     // PLL output divider = 1
+
+    REG_CKCU->GCCR.PLLEN = 1;       // PLL enable
+
+    while(REG_CKCU->GCSR.PLLRDY == 0);  // wait for PLL
 
     // system clock
-//    REG_CKCU->GCCR.SW = 1;              // set clock source to PLL
-//    while(REG_CKCU->CKST.CKSWST != 1);  // wait for clock switch
+    REG_CKCU->GCCR.SW = 1;              // set clock source to PLL
+    while(REG_CKCU->CKST.CKSWST != 1);  // wait for clock switch
 
 //    while((REG_CKCU->CKST.HSEST & 2) == 0); // check HSE in use
 //    while((REG_CKCU->CKST.PLLST & 1) == 0); // check PLL in use
@@ -31,7 +37,7 @@ void ckcu_init(){
 //    REG_CKCU->GCCR.HSIEN = 0;           // HSI disable
 
 //    REG_CKCU->AHBCCR.FMCEN = 1;
-//    REG_FMC->CFCR.WAIT = 3;         // Flash wait status 2 (48MHz <= HCLK <= 72MHz)
+    REG_FMC->CFCR.WAIT = 3;         // Flash wait status 2 (48MHz <= HCLK <= 72MHz)
 }
 
 void wdt_init(){
@@ -108,6 +114,18 @@ void on_configuration(u8 config){
     }
 }
 
+u32 strlen(const char *str){
+    u32 i = 0;
+    while(*str++)
+        ++i;
+    return i;
+}
+
+void usart_log(const char *str){
+    usart_write((const u8 *)str, strlen(str));
+    usart_write((const u8 *)"\r\n", 2);
+}
+
 int main(){
     // Basic init
     nvic_init();
@@ -120,15 +138,12 @@ int main(){
 //    flash_version_clear();
 
     // I/O init
-//    afio_init();
+    afio_init();
 
 //    spi_init();
 //    spi_read();
 
-    // CKOUT
-    afio_pin_config(GPIO_A, 8, AFIO_OTHER);
-    // CK_AHB / 16
-    REG_CKCU->GCFGR.CKOUTSRC = 1;
+    usart_init();
 
     // USB
 //    usb_init();
@@ -141,6 +156,7 @@ int main(){
 
     u32 count = 0;
     while(1){
+        usart_log("test output");
         count = count + 1;
 //        wdt_reload();
     }

@@ -40,11 +40,12 @@ SECTIONS {
 
     /* stack */
     .stack : {
+        . = ALIGN(4);
         __stack_start = .;
 
         . += C_STACK_SIZE;
-        . = ALIGN (4);
 
+        . = ALIGN (4);
         __stack_end = .;
     } > sram
 

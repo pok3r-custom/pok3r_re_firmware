@@ -16,20 +16,28 @@ void afio_init(){
     gpio_pin_input_enable(GPIO_A, 11, 0);
     gpio_pin_pull(GPIO_A, 11, PULL_DISABLE);
 
-    afio_pin_config(GPIO_A, 11, 1);
-    afio_pin_config(GPIO_C, 13, 1);
+    afio_pin_config(GPIO_A, 11, AFIO_GPIO);
+    afio_pin_config(GPIO_C, 13, AFIO_GPIO);
 
-    afio_pin_config(GPIO_C, 14, 1);
-    afio_pin_config(GPIO_C, 15, 1);
+    afio_pin_config(GPIO_C, 14, AFIO_GPIO);
+    afio_pin_config(GPIO_C, 15, AFIO_GPIO);
 
     // check HSEEN
     if(REG_CKCU->GCCR.HSEEN == 0){
-        afio_pin_config(GPIO_B, 14, 1);
-        afio_pin_config(GPIO_B, 15, 1);
+        afio_pin_config(GPIO_B, 14, AFIO_GPIO);
+        afio_pin_config(GPIO_B, 15, AFIO_GPIO);
     }
 
     // disable GPIO A clock
 //    ckcu_clock_enable(CLOCK_PA, 0);
+
+    // CKOUT on PA8
+//    afio_pin_config(GPIO_A, 8, AFIO_OTHER);
+//    REG_CKCU->GCFGR.CKOUTSRC = 1;   // CKOUTSR = CCK_AHB / 16
+//    REG_CKCU->GCFGR.CKOUTSRC = 2;   // CKOUTSR = CCK_SYS / 16
+
+    // USART on PA8
+    afio_pin_config(GPIO_A, 8, AFIO_USART);
 }
 
 void pinmux_spi(){
@@ -149,9 +157,20 @@ void usart_init(){
     // USART0 clock
     ckcu_clock_enable(CLOCK_USR0, 1);
 
-    // pinmux PA8 for AF6
-    afio_pin_config(GPIO_A, 8, 6);
+    REG_USART0->MDR.MODE = 0;   // normal operation
+    REG_USART0->DLR.BRD = 625;  // 115200 baud
+    REG_USART0->LCR.WLS = 1;    // 8 bits
+    REG_USART0->LCR.PBE = 0;    // no parity
+    REG_USART0->LCR.NSB = 0;    // 1 stop bit
+    REG_USART0->FCR.URRXEN = 0; // RX disable
+    REG_USART0->FCR.URTXEN = 1; // TX enable
+}
 
-    REG_USART0->MDR.MODE = 0;
-    REG_USART0->DLR.BRD = 625; // 115200 baud
+void usart_write(const u8 *data, u32 size){
+    while(size > 0){
+        REG_USART0->TBR.TD = *data;         // write fifo
+        while(!(REG_USART0->LSR.TXEMPT));   // wait while tx not empty
+        data++;
+        size--;
+    }
 }

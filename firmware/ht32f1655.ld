@@ -10,7 +10,7 @@ MEMORY {
   sram  (rwx) : ORIGIN = 0x20000000, LENGTH = 32K
 }
 
-IMAGE_BASE = 0x2c00;
+IMAGE_BASE = 0x0;
 
 /* Various stack sizes */
 C_STACK_SIZE   = 1024;
