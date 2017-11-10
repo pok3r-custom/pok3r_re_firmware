@@ -144,6 +144,20 @@ int main(){
 //    spi_read();
 
     usart_init();
+    
+    const u8 data[] = {
+        0x01, 0x02, 0x03, 0x04,
+        0x11, 0x12, 0x13, 0x14,
+        0x21, 0x22, 0x23, 0x24,
+        0x31, 0x32, 0x33, 0x34,
+    };
+    
+    usart_log("Write flash at 0x4000");
+    
+    // Flash
+    ht32_flash_write(0x4000, data, data + sizeof(data));
+    
+    usart_log("Done");
 
     // USB
 //    usb_init();
@@ -156,7 +170,6 @@ int main(){
 
     u32 count = 0;
     while(1){
-        usart_log("test output");
         count = count + 1;
 //        wdt_reload();
     }

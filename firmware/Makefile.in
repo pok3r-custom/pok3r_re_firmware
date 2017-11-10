@@ -13,9 +13,8 @@ BIN_DIR = @BINARY_DIR@
 
 # Input Files
 LD_SCRIPT = $(SRC_DIR)/@LD_FILE@
-STARTUP_S = board/ht32/startup.s
 
-CC_SRCS = @C_SRCS@
+ALL_SRCS = @C_SRCS@
 
 # Output Files
 OUT_ELF = $(APP_NAME).elf
@@ -23,10 +22,17 @@ OUT_BIN = $(APP_NAME).bin
 OUT_MAP = $(APP_NAME).map
 
 # Intermediary files
-STARTUP_OBJ = startup.o
-#CC_OBJS = $(CC_SRCS:.c=.o)
-CC_OBJS = $(addprefix $(BIN_DIR)/,$(CC_SRCS:.c=.o))
-CC_DEPS = $(CC_SRCS:.c=.d)
+CC_SRCS = $(filter %.c, $(ALL_SRCS))
+CC_DEPS = $(patsubst %.d, %.d, $(CC_SRCS))
+
+AS_SRCS += $(filter %.s %.S, $(ALL_SRCS))
+
+CC_OBJS = $(addprefix $(BIN_DIR)/, $(patsubst %.c, %.o, $(CC_SRCS)))
+AS_OBJS += $(addprefix $(BIN_DIR)/, $(patsubst %.s, %.o, $(filter %.s, $(AS_SRCS))))
+AS_OBJS += $(addprefix $(BIN_DIR)/, $(patsubst %.S, %.o, $(filter %.S, $(AS_SRCS))))
+
+ALL_OBJS += $(CC_OBJS)
+ALL_OBJS += $(AS_OBJS)
 
 # Config
 ARM_CPU = cortex-m3
@@ -41,59 +47,62 @@ OC = arm-none-eabi-objcopy
 RM = rm -f
 MKDIR = mkdir -p
 
-# Flags
-CC_FLAGS += -c -std=c11 -Wall -g
-CC_FLAGS += -mcpu=$(ARM_CPU) -mthumb -nostdlib -nostartfiles
-CC_FLAGS += -ffreestanding -fstrict-volatile-bitfields
-CC_FLAGS += -MT $@ -MMD -MP -MF $*.d
-CC_FLAGS += -DFW_BUILDING @C_DEFS@
+# Options
 
-CPP_FLAGS += -c -std=c++11 -Wall -g
-CPP_FLAGS += -mcpu=$(ARM_CPU) -mthumb -nostdlib -nostartfiles
-CPP_FLAGS += -ffreestanding -fstrict-volatile-bitfields
-CPP_FLAGS += -MT $@ -MMD -MP -MF $*.d
-CPP_FLAGS += -DFW_BUILDING @C_DEFS@
+C_OPTS += -Wall -g -Os
+C_OPTS += -mcpu=$(ARM_CPU) -mthumb -nostdlib -nostartfiles
+C_OPTS += -ffreestanding -fstrict-volatile-bitfields
+C_OPTS += -MMD -MP -MF $(BIN_DIR)/$*.d
+C_OPTS += -DFW_BUILDING @C_DEFS@
 
-AS_FLAGS += -mcpu=$(ARM_CPU) -mthumb
+CC_FLAGS += -std=c11 $(C_OPTS)
+CPP_FLAGS += -std=c++11 $(C_OPTS)
 
-LD_FLAGS += -nostdlib -nostartfiles -T $(LD_SCRIPT) -Map $(OUT_MAP)
+AS_FLAGS += -mcpu=$(ARM_CPU) -mthumb -g 
+
+LD_FLAGS += -nostdlib -nostartfiles -nodefaultlibs -T $(LD_SCRIPT) -Map $(OUT_MAP)
 
 # Targets
+
 all: | dirs $(OUT_BIN)
 
-$(OUT_BIN): $(OUT_ELF)
-	echo "BIN  $(notdir $@)"
-	$(OC) $(OUT_ELF) -O binary $(OUT_BIN)
-
-$(OUT_ELF): $(LD_SCRIPT) $(STARTUP_OBJ) $(CC_OBJS)
-	echo "LINK $(notdir $@)"
-	$(LD) $(LD_FLAGS) -o $@ $(STARTUP_OBJ) $(CC_OBJS)
-
-$(STARTUP_OBJ): $(SRC_DIR)/$(STARTUP_S)
-	echo "AS   $(notdir $<)"
-	$(AS) $(AS_FLAGS) -o $@ $<
-
 $(BIN_DIR)/%.o: $(SRC_DIR)/%.s
-	echo "AS   $(notdir $<)"
+	$(info AS   $(notdir $<))
 	$(AS) $(AS_FLAGS) -o $@ $<
+
+$(BIN_DIR)/%.o: $(SRC_DIR)/%.S
+	$(info GAS  $(notdir $<))
+	$(CC) -c $(AS_FLAGS) -o $@ $<
 
 $(BIN_DIR)/%.o: $(SRC_DIR)/%.c
-	echo "CC   $(notdir $<)"
-	$(CC) $(CC_FLAGS) -o $@ $<
+	$(info CC   $(notdir $<))
+	$(CC) -c $(CC_FLAGS) -o $@ $<
 
 $(BIN_DIR)/%.o: $(SRC_DIR)/%.cpp
-	echo "CPP  $(notdir $<)"
-	$(CPP) $(CPP_FLAGS) -o $@ $<
+	$(info CPP  $(notdir $<))
+	$(CPP) -c $(CPP_FLAGS) -o $@ $<
+
+$(OUT_ELF): $(LD_SCRIPT) $(ALL_OBJS)
+	$(info LINK $(notdir $@))
+	$(LD) $(LD_FLAGS) -o $@ $(ALL_OBJS)
+	@size -B $@
+
+$(OUT_BIN): $(OUT_ELF)
+	$(info BIN  $(notdir $@))
+	$(OC) $(OUT_ELF) -O binary $(OUT_BIN)
 
 dirs:
-	$(foreach dir,$(CC_SRCS),$(MKDIR) $(dir $(dir));)
+	$(foreach dir, $(CC_SRCS), $(MKDIR) $(dir $(dir));)
 
 clean:
+	$(RM) $(ALL_OBJS)
+	$(RM) $(CC_DEPS)
 	$(RM) $(OUT_ELF)
-	$(RM) $(OUT_BIN)
 	$(RM) $(OUT_MAP)
-	$(RM) *.o
-	$(RM) usb/*.o
+	$(RM) $(OUT_BIN)
+
+print-%:
+	@echo $* = $($*)
 
 -include $(CC_DEPS)
 

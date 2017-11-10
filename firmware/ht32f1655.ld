@@ -25,7 +25,8 @@ SECTIONS {
 
     /* vector table and reset code */
     .reset IMAGE_BASE : {
-        startup.o(.text)
+        *(.vectors)
+        *(.reset)
         . = ALIGN(4);
     } > flash
 

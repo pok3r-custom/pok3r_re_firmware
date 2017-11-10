@@ -6,7 +6,7 @@
 .equ _stack_fill,   0xACACACAC
 
 /* interrupt vector table */
-/*.section ".vectors"*/
+.section ".vectors"
 /*.global _vector_table*/
 
 _vector_table:
@@ -113,7 +113,7 @@ _vector_table:
 .align 4
 
 /* reset and interrupt code */
-/*.section ".reset"*/
+.section ".reset"
 
 /* entry point */
 .global _start

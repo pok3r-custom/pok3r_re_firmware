@@ -33,8 +33,11 @@ SET(COMMON_SOURCES
 
     board/cortex-m3.c
 
+    board/ht32/startup.s
     board/ht32/ht32f165x.c
     board/ht32/ht32_usb.c
+
+    ht32f165x_flash.S
 )
 
 SET(POK3R_SOURCES
