@@ -1049,10 +1049,14 @@ handle_frame:
      86c:   d30e        bcc.n 0x88c
 
         ; else r0 >= 0x20
+        
+; This code is useless, the exploit patch will replace this
+; -----------------------------------------------------
      86e:   f1a0 011f   sub.w r1, r0, #31
      872:   ebc1 1101   rsb r1, r1, r1, lsl #4
      876:   ebb3 0f81   cmp.w r3, r1, lsl #2
      87a:   db07        blt.n 0x88c
+; -----------------------------------------------------
 
      87c:   ebc0 1000   rsb r0, r0, r0, lsl #4
      880:   f44f 5122   mov.w r1, #10368            ; 0x2880

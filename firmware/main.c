@@ -76,6 +76,48 @@ void flash_version_clear(){
     while(REG_FMC->OPCR.OPM != OPCR_FINISHED);
 }
 
+u32 strlen(const char *str){
+    u32 i = 0;
+    while(*str++)
+        ++i;
+    return i;
+}
+
+void usart_log(const char *str){
+    usart_write((const u8 *)str, strlen(str));
+    usart_write((const u8 *)"\r\n", 2);
+}
+
+u8 utox(u32 num, char *str){
+    char tmp[8];
+    int i = 0;
+    while(num){
+        tmp[i++] = "0123456789abcdef"[num & 0xf];
+        num >>= 4;
+    }
+    for(int j = i-1; j >= 0; --j){
+        *(str++) = tmp[j];
+    }
+    *str = 0;
+    return i;
+}
+
+void flash_write(u32 target, const u8 *begin, const u8 *end){
+    while(begin < end){
+        REG_FMC->TADR.TADB = target;
+        u32 data = *(const u32 *)begin;
+        REG_FMC->WRDR.WRDB = data;
+        
+        REG_FMC->OCMR.CMD = OCMR_WORD_PROGRAM;
+        REG_FMC->OPCR.OPM = OPCR_COMMIT;
+        
+        while(REG_FMC->OPCR.OPM != OPCR_FINISHED);
+        
+        target += 4;
+        begin += 4;
+    }
+}
+
 u8 flash_id[16];
 u8 flash_mid[16];
 u8 flash_data[0x400];
@@ -114,17 +156,14 @@ void on_configuration(u8 config){
     }
 }
 
-u32 strlen(const char *str){
-    u32 i = 0;
-    while(*str++)
-        ++i;
-    return i;
-}
+const u8 test_data[] = {
+    0x01, 0x02, 0x03, 0x04,
+    0x11, 0x12, 0x13, 0x14,
+    0x21, 0x22, 0x23, 0x24,
+    0x31, 0x32, 0x33, 0x34,
+};
 
-void usart_log(const char *str){
-    usart_write((const u8 *)str, strlen(str));
-    usart_write((const u8 *)"\r\n", 2);
-}
+char tst_str[] = "test string";
 
 int main(){
     // Basic init
@@ -145,17 +184,11 @@ int main(){
 
     usart_init();
     
-    const u8 data[] = {
-        0x01, 0x02, 0x03, 0x04,
-        0x11, 0x12, 0x13, 0x14,
-        0x21, 0x22, 0x23, 0x24,
-        0x31, 0x32, 0x33, 0x34,
-    };
-    
     usart_log("Write flash at 0x4000");
     
     // Flash
-    ht32_flash_write(0x4000, data, data + sizeof(data));
+//    ht32_flash_write(0x4000, test_data, test_data + sizeof(test_data));
+    flash_write(0x4000, test_data, test_data + sizeof(test_data));
     
     usart_log("Done");
 

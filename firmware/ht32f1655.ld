@@ -23,19 +23,13 @@ UND_STACK_SIZE = 0;
 /* Sections */
 SECTIONS {
 
-    /* vector table and reset code */
-    .reset IMAGE_BASE : {
-        *(.vectors)
-        *(.reset)
+    /* vector table and code */
+    .text IMAGE_BASE : {
+        *(.vector_table)
         . = ALIGN(4);
-    } > flash
-
-    /* main code */
-    .text : {
-        *(.text .text.*)
+        *(.text*)
         *(.glue_7t) *(.glue_7)
-
-        . = ALIGN (4);
+        . = ALIGN(4);
         *(.rodata .rodata.*)
     } > flash
 
@@ -46,7 +40,7 @@ SECTIONS {
 
         . += C_STACK_SIZE;
 
-        . = ALIGN (4);
+        . = ALIGN(4);
         __stack_end = .;
     } > sram
 
@@ -55,9 +49,9 @@ SECTIONS {
         . = ALIGN(4);
         __bss_start = .;
 
-        *(.bss .bss.*)
+        *(.bss*)
 
-        . = ALIGN (4);
+        . = ALIGN(4);
         __bss_end = .;
     } > sram
 
@@ -67,9 +61,9 @@ SECTIONS {
         __data_load = (LOADADDR(.data) + 4 - 1) & ~(4 - 1);
         __data_start = .;
 
-        *(.data .data.*)
+        *(.data*)
 
-        . = ALIGN (4);
+        . = ALIGN(4);
         __data_end = .;
     } > sram AT > flash
 
