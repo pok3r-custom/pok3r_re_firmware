@@ -40,6 +40,8 @@ public:
 
     //! Complete update wrapper.
     virtual bool update(ZString version, const ZBinary &fwbin) = 0;
+
+    virtual bool eraseAndCheck(){ return false; }
 };
 
 #endif // UPDATEINTERFACE_H

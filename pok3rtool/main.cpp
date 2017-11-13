@@ -164,6 +164,8 @@ int cmd_list(Param *param){
             devs.push({ dev, hbdev[j], true });
     }
 
+    DLOG("Devices: " << devs.size());
+
     // Read version from each device
     for(zu64 i = 0; i < devs.size(); ++i){
         ListDevice ldev = devs[i];
@@ -291,6 +293,25 @@ int cmd_flash(Param *param){
     return -1;
 }
 
+int cmd_wipe(Param *param){
+    if(!param->ok)
+        warning();
+
+    // Erase Firmware
+    if(param->device == 0){
+        LOG("Please specifiy a device");
+        return 2;
+    }
+    ZPointer<UpdateInterface> kb = openDevice(param->device);
+    if(kb.get()){
+        LOG("Erase Firmware");
+        bool ret = kb->eraseAndCheck();
+        LOG(ret);
+        return 0;
+    }
+    return -1;
+}
+
 int cmd_decode(Param *param){
     UpdatePackage package;
     if(!package.loadFromExe(param->args[1], 0)){
@@ -327,25 +348,40 @@ struct CmdEntry {
 };
 
 const ZMap<ZString, CmdEntry> cmds = {
-    { "list",       { cmd_list,         0, "pok3rtool list" } },
-    { "version",    { cmd_version,      0, "pok3rtool version" } },
-    { "setversion", { cmd_setversion,   1, "pok3rtool setversion <version>" } },
-    { "info",       { cmd_info,         0, "pok3rtool info" } },
-    { "reboot",     { cmd_reboot,       0, "pok3rtool reboot" } },
-    { "bootloader", { cmd_bootloader,   0, "pok3rtool bootloader" } },
-    { "dump",       { cmd_dump,         1, "pok3rtool dump <output file>" } },
-    { "flash",      { cmd_flash,        2, "pok3rtool flash <version> <firmware>" } },
-    { "decode",     { cmd_decode,       2, "pok3rtool decode <path to updater> <output file>" } },
+    { "list",       { cmd_list,         0, "list" } },
+    { "version",    { cmd_version,      0, "version" } },
+    { "setversion", { cmd_setversion,   1, "setversion <version>" } },
+    { "info",       { cmd_info,         0, "info" } },
+    { "reboot",     { cmd_reboot,       0, "reboot" } },
+    { "bootloader", { cmd_bootloader,   0, "bootloader" } },
+    { "dump",       { cmd_dump,         1, "dump <output file>" } },
+    { "flash",      { cmd_flash,        2, "flash <version> <firmware>" } },
+    { "wipe",       { cmd_wipe,        	0, "wipe" } },
+    { "decode",     { cmd_decode,       2, "decode <path to updater> <output file>" } },
 };
+
+void printUsage(){
+    LOG("Pok3rTool Usage:");
+    for(auto it = cmds.begin(); it.more(); ++it){
+        LOG("    pok3rtool " << cmds[it.get()].usage);
+    }
+}
 
 int main(int argc, char **argv){
     ZLog::logLevelStdOut(ZLog::INFO, "[%clock%] N %log%");
-//    ZLog::logLevelStdOut(ZLog::DEBUG, "\x1b[35m[%clock%] %thread% N %log%\x1b[m");
+    ZLog::logLevelStdOut(ZLog::DEBUG, "\x1b[35m[%clock%] D %log%\x1b[m");
     ZLog::logLevelStdErr(ZLog::ERRORS, "\x1b[31m[%clock%] E %log%\x1b[m");
     ZPath lgf = ZPath("logs") + ZLog::genLogFileName("pok3rtool_");
     ZLog::logLevelFile(ZLog::INFO, lgf, "[%clock%] N %log%");
-    ZLog::logLevelFile(ZLog::DEBUG, lgf, "[%clock%] D [%function%|%file%:%line%] %log%");
+    ZLog::logLevelFile(ZLog::DEBUG, lgf, "[%clock%] %thread% D [%function%|%file%:%line%] %log%");
     ZLog::logLevelFile(ZLog::ERRORS, lgf, "[%clock%] E [%function%|%file%:%line%] %log%");
+
+    ZString optbuf;
+    for(int i = 0; i < argc; ++i){
+        optbuf += argv[i];
+        optbuf += " ";
+    }
+    DLOG("Command Line: " << optbuf);
 
     ZOptions options(optdef);
     if(!options.parse(argc, argv))
@@ -369,15 +405,17 @@ int main(int argc, char **argv){
             if(param.args.size() == cmd.argn + 1){
                 return cmd.func(&param);
             } else {
-                LOG("Usage: " << cmd.usage);
+                LOG("Usage: pok3rtool " << cmd.usage);
                 return -1;
             }
         } else {
             LOG("Unknown Command \"" << cmstr << "\"");
+            printUsage();
             return -1;
         }
     } else {
         LOG("No Command");
+        printUsage();
         return -1;
     }
 }

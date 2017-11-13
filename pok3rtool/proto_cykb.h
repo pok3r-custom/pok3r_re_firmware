@@ -85,6 +85,8 @@ public:
 
     bool update(ZString version, const ZBinary &fwbin);
 
+    bool eraseAndCheck();
+
     void test();
 
     //! Erase flash pages starting at \a start, ending on the page of \a end.

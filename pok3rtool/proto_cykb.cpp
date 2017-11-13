@@ -12,6 +12,8 @@
 
 #define WAIT_SLEEP          2
 
+#define HEX(A) (ZString::ItoS((zu64)(A), 16))
+
 ProtoCYKB::ProtoCYKB(zu16 vid_, zu16 pid_, zu16 boot_pid_) :
     builtin(false), debug(false), nop(false),
     vid(vid_), pid(pid_), boot_pid(boot_pid_),
@@ -277,16 +279,16 @@ bool ProtoCYKB::writeFirmware(const ZBinary &fwbinin){
     ZBinary fwbin = fwbinin;
     // Encode the firmware for the POK3R RGB
     encode_firmware(fwbin);
+    zu32 crc1 = ZHash<ZBinary, ZHashBase::CRC32>(fwbin).hash();
+    LOG("Firmware CRC: " << ZString::ItoS((zu64)crc1, 16, 8));
 
 //    zu32 ccrc = crcFlash(FW_ADDR, 0xc000);
     zu32 ccrc = crcFlash(FW_ADDR, fwbin.size());
     LOG("Current CRC: " << ZString::ItoS((zu64)ccrc, 16, 8));
 
-    zu32 crc1 = ZHash<ZBinary, ZHashBase::CRC32>(fwbin).hash();
-    LOG("New CRC: " << ZString::ItoS((zu64)crc1, 16, 8));
-
     LOG("Erase...");
     if(!eraseFlash(FW_ADDR, fwbin.size()))
+//    if(!eraseFlash(FW_ADDR, FLASH_LEN - FW_ADDR))
         return false;
 
     ZThread::sleep(WAIT_SLEEP);
@@ -296,10 +298,10 @@ bool ProtoCYKB::writeFirmware(const ZBinary &fwbinin){
         return false;
 
     zu32 crc2 = crcFlash(FW_ADDR, fwbin.size());
-    LOG("Firmware CRC: " << ZString::ItoS((zu64)crc2, 16, 8));
+    LOG("New CRC: " << ZString::ItoS((zu64)crc2, 16, 8));
 
     if(crc2 != crc1){
-        ELOG("crc mismatch");
+        ELOG("CRCs no not match, firmware write failed");
         return false;
     }
 
@@ -327,6 +329,23 @@ bool ProtoCYKB::update(ZString version, const ZBinary &fwbin){
         return false;
     return true;
 
+}
+
+bool ProtoCYKB::eraseAndCheck(){
+    // Reset to bootloader
+    if(!enterBootloader())
+        return false;
+
+    zu32 crc_before = crcFlash(VER_ADDR, FLASH_LEN - VER_ADDR);
+    LOG("Current CRC: " << ZString::ItoS((zu64)crc_before, 16, 8));
+
+    if(!eraseFlash(VER_ADDR, FW_ADDR - VER_ADDR))
+        return false;
+
+    zu32 crc_after = crcFlash(VER_ADDR, FLASH_LEN - VER_ADDR);
+    LOG("New CRC: " << ZString::ItoS((zu64)crc_after, 16, 8));
+
+    return true;
 }
 
 void ProtoCYKB::test(){
@@ -384,7 +403,7 @@ void ProtoCYKB::test(){
 }
 
 bool ProtoCYKB::eraseFlash(zu32 start, zu32 length){
-    DLOG("eraseFlash " << start << " " << length);
+    DLOG("eraseFlash 0x" << HEX(start) << " 0x" << HEX(length));
     if(start < VER_ADDR){
         ELOG("bad address");
         return false;
@@ -401,7 +420,7 @@ bool ProtoCYKB::eraseFlash(zu32 start, zu32 length){
 }
 
 bool ProtoCYKB::readFlash(zu32 addr, ZBinary &bin){
-    DLOG("readFlash " << addr);
+    DLOG("readFlash 0x" << HEX(addr));
     ZBinary data;
     data.writeleu32(addr);
     if(!sendRecvCmd(READ, READ_ADDR, data))
@@ -412,7 +431,7 @@ bool ProtoCYKB::readFlash(zu32 addr, ZBinary &bin){
 }
 
 bool ProtoCYKB::writeFlash(zu32 addr, ZBinary bin){
-    DLOG("writeFlash " << addr << " " << bin.size());
+    DLOG("writeFlash 0x" << HEX(addr) << " " << bin.size());
     if(addr < VER_ADDR){
         ELOG("bad address");
         return false;
@@ -454,7 +473,7 @@ zu32 ProtoCYKB::crcFlash(zu32 addr, zu32 len){
         return 0;
     }
 
-    DLOG("crcFlash " << addr << " " << len);
+    DLOG("crcFlash 0x" << HEX(addr) << " 0x" << HEX(len));
 
     ZBinary data;
     data.writeleu32(addr - VER_ADDR);

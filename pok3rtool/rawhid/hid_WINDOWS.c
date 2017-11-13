@@ -120,21 +120,30 @@ int rawhid_send(hid_t *hid, const void *buf, int len, int timeout)
     ov.hEvent = tx_event;
     tmpbuf[0] = 0;
     memcpy(tmpbuf + 1, buf, len);
-    if (!WriteFile(hid->handle, tmpbuf, len + 1, NULL, &ov)) {
-        if (GetLastError() != ERROR_IO_PENDING) goto return_error;
+    if(!WriteFile(hid->handle, tmpbuf, len + 1, NULL, &ov)){
+        if (GetLastError() != ERROR_IO_PENDING)
+            goto return_error;
         r = WaitForSingleObject(tx_event, timeout);
-        if (r == WAIT_TIMEOUT) goto return_timeout;
-        if (r != WAIT_OBJECT_0) goto return_error;
+        if (r == WAIT_TIMEOUT)
+            goto return_timeout;
+        if (r != WAIT_OBJECT_0)
+            goto return_error;
     }
-    if (!GetOverlappedResult(hid->handle, &ov, &n, FALSE)) goto return_error;
+    if (!GetOverlappedResult(hid->handle, &ov, &n, FALSE))
+        goto return_error;
     LeaveCriticalSection(&tx_mutex);
-    if (n <= 0) return -1;
+    if (n <= 0){
+        printf("rawhid_send no data\n");
+        return -1;
+    }
     return n - 1;
 return_timeout:
+    printf("rawhid_send timeout\n");
     CancelIo(hid->handle);
     LeaveCriticalSection(&tx_mutex);
     return 0;
 return_error:
+    printf("rawhid_send error\n");
     print_win32_err();
     LeaveCriticalSection(&tx_mutex);
     return -1;
@@ -231,6 +240,88 @@ hid_t *rawhid_open(int vid, int pid, int usage_page, int usage)
 //        add_hid(hid);
         return hid;
     }
+}
+
+int rawhid_openall(hid_t **hids, int max, int vid, int pid, int usage_page, int usage)
+{
+    GUID guid;
+    HDEVINFO info;
+    DWORD index=0, reqd_size;
+    SP_DEVICE_INTERFACE_DATA iface;
+    SP_DEVICE_INTERFACE_DETAIL_DATA *details;
+    HIDD_ATTRIBUTES attrib;
+    PHIDP_PREPARSED_DATA hid_data;
+    HIDP_CAPS capabilities;
+    HANDLE h;
+    BOOL ret;
+    int opencount = 0;
+
+    if (!rx_event) {
+        rx_event = CreateEvent(NULL, TRUE, TRUE, NULL);
+        tx_event = CreateEvent(NULL, TRUE, TRUE, NULL);
+        InitializeCriticalSection(&rx_mutex);
+        InitializeCriticalSection(&tx_mutex);
+    }
+    HidD_GetHidGuid(&guid);
+    info = SetupDiGetClassDevs(&guid, NULL, NULL, DIGCF_PRESENT | DIGCF_DEVICEINTERFACE);
+    if(info == INVALID_HANDLE_VALUE)
+        return 0;
+    for(index = 0; 1; index++) {
+        iface.cbSize = sizeof(SP_DEVICE_INTERFACE_DATA);
+        ret = SetupDiEnumDeviceInterfaces(info, NULL, &guid, index, &iface);
+        if (!ret)
+            return opencount;
+        SetupDiGetInterfaceDeviceDetail(info, &iface, NULL, 0, &reqd_size, NULL);
+        details = (SP_DEVICE_INTERFACE_DETAIL_DATA *)malloc(reqd_size);
+        if (details == NULL)
+            continue;
+
+        memset(details, 0, reqd_size);
+        details->cbSize = sizeof(SP_DEVICE_INTERFACE_DETAIL_DATA);
+        ret = SetupDiGetDeviceInterfaceDetail(info, &iface, details,
+            reqd_size, NULL, NULL);
+        if (!ret) {
+            free(details);
+            continue;
+        }
+        h = CreateFile(details->DevicePath, GENERIC_READ|GENERIC_WRITE,
+            FILE_SHARE_READ|FILE_SHARE_WRITE, NULL,
+            OPEN_EXISTING, FILE_FLAG_OVERLAPPED, NULL);
+        free(details);
+        if (h == INVALID_HANDLE_VALUE)
+            continue;
+        attrib.Size = sizeof(HIDD_ATTRIBUTES);
+        ret = HidD_GetAttributes(h, &attrib);
+        //printf("vid: %4x\n", attrib.VendorID);
+        if (!ret || (vid > 0 && attrib.VendorID != vid) ||
+          (pid > 0 && attrib.ProductID != pid) ||
+          !HidD_GetPreparsedData(h, &hid_data)) {
+            CloseHandle(h);
+            continue;
+        }
+        if (!HidP_GetCaps(hid_data, &capabilities) ||
+          (usage_page > 0 && capabilities.UsagePage != usage_page) ||
+          (usage > 0 && capabilities.Usage != usage)) {
+            HidD_FreePreparsedData(hid_data);
+            CloseHandle(h);
+            continue;
+        }
+        HidD_FreePreparsedData(hid_data);
+
+        hids[opencount] = (struct hid_struct *)malloc(sizeof(struct hid_struct));
+        hid_t *hid = hids[opencount];
+        if (!hid) {
+            CloseHandle(h);
+            continue;
+        }
+        opencount++;
+
+        hid->handle = h;
+        hid->open = 1;
+
+        if(opencount == max) return opencount;
+    }
+    return opencount;
 }
 
 //  rawhid_close - close a device
