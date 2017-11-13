@@ -285,8 +285,15 @@ int cmd_flash(Param *param){
     if(kb.get()){
         LOG("Update Firmware: " << firmware);
         ZBinary fwbin;
-        if(!ZFile::readBinary(firmware, fwbin))
+        ZFile file;
+        if(!file.open(firmware)){
+            ELOG("Failed to open file");
             return -3;
+        }
+        if(file.read(fwbin, file.fileSize()) != file.fileSize()){
+            ELOG("Failed to read file");
+            return -4;
+        }
         LOG(kb->update(version, fwbin));
         return 0;
     }
