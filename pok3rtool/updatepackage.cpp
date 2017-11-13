@@ -198,7 +198,7 @@ int decode_maajonsn(ZFile *file, ZBinary &fw_out){
     zu64 total = strings_len;
     ZArray<zu64> sections;
 
-    zu64 sec_len = ZBinary::decle32(strs.raw() + 0x420); // Firmware length
+    zu64 sec_len = ZBinary::decleu32(strs.raw() + 0x420); // Firmware length
 
     ZString layout;
     layout.parseUTF16((const zu16 *)(strs.raw() + 0x424), 0x20);
@@ -302,8 +302,8 @@ int decode_maav102(ZFile *file, ZBinary &fw_out){
 
     zu64 start = 0xAC8 - (0x50 * 8);
     for(zu8 i = 0; i < 8; ++i){
-        zu32 fwl = ZBinary::decle32(strs.raw() + start); // Firmware length
-        zu32 strl = ZBinary::decle32(strs.raw() + start + 4); // Info length
+        zu32 fwl = ZBinary::decleu32(strs.raw() + start); // Firmware length
+        zu32 strl = ZBinary::decleu32(strs.raw() + start + 4); // Info length
 
         if(fwl){
             ZString layout;
@@ -370,7 +370,7 @@ int decode_maav102(ZFile *file, ZBinary &fw_out){
 void kbp_decrypt(zbyte *data, zu64 size, zu32 key)
 {
     zbyte xor_key[4];
-    ZBinary::encbe32(xor_key, key);
+    ZBinary::encbeu32(xor_key, key);
     for(zu64 i = 0; i < size; ++i){
         data[i] = data[i] ^ xor_key[i % 4] ^ (i & 0xFF);
     }
@@ -401,7 +401,7 @@ int decode_kbp_cykb(ZFile *file, ZBinary &fw_out, zu32 key){
     RLOG(strs.dumpBytes(4, 8));
 
     zu64 fw_start = 0x54000;
-    zu64 fw_len = ZBinary::decle32(strs.raw() + 4);
+    zu64 fw_len = ZBinary::decleu32(strs.raw() + 4);
 
     LOG("Firmware Size 0x" << ZString::ItoS(fw_len, 16));
 
