@@ -213,7 +213,7 @@ bool ProtoCYKB::setVersion(ZString version){
     if(!clearVersion())
         return false;
 
-    LOG("Write Version: " << version);
+    LOG("Write Version...");
 
     zu16 str[256];
     zu64 len = version.readUTF16(str, 255);
@@ -301,7 +301,7 @@ bool ProtoCYKB::writeFirmware(const ZBinary &fwbinin){
     LOG("New CRC: " << ZString::ItoS((zu64)crc2, 16, 8));
 
     if(crc2 != crc1){
-        ELOG("CRCs no not match, firmware write failed");
+        ELOG("CRCs do not match, firmware write failed");
         return false;
     }
 

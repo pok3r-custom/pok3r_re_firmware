@@ -5,10 +5,12 @@
 
 #include "hid.h"
 
+
 #if PLATFORM == WINDOWS
     #include <windows.h>
 #elif PLATFORM == LINUX
     #include <usb.h>
+    #include <errno.h>
 #endif
 
 struct HIDDeviceData {
@@ -66,6 +68,10 @@ bool HIDDevice::send(const ZBinary &data, bool tolerate_dc){
         }
         ELOG("hid send win32 error: " << err);
 #elif PLATFORM == LINUX
+        if(tolerate_dc && (ret == -EPIPE || ret == -ENXIO)){
+            // ignore some errors when devices may disconnect
+            return true;
+        }
         ELOG("hid send error: " << ret << ": " << usb_strerror());
 #else
         ELOG("hid send error: " << ret);
