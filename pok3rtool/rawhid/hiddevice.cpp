@@ -5,7 +5,9 @@
 
 #include "hid.h"
 
-#if PLATFORM == LINUX
+#if PLATFORM == WINDOWS
+    #include <windows.h>
+#elif PLATFORM == LINUX
     #include <usb.h>
 #endif
 
@@ -48,12 +50,22 @@ bool HIDDevice::isOpen() const {
     return !!(device->hid);
 }
 
-bool HIDDevice::send(const ZBinary &data){
+bool HIDDevice::send(const ZBinary &data, bool tolerate_dc){
     if(!isOpen())
         return false;
     int ret = rawhid_send(device->hid, data.raw(), data.size(), SEND_TIMEOUT);
     if(ret < 0){
-#if PLATFORM == LINUX
+#if PLATFORM == WINDOWS
+        zu32 err = ZError::getSystemErrorCode();
+        if(tolerate_dc && (
+            err == ERROR_GEN_FAILURE ||
+            err == ERROR_DEVICE_NOT_CONNECTED
+        )){
+            // ignore some errors when devices may disconnect
+            return true;
+        }
+        ELOG("hid send win32 error: " << err);
+#elif PLATFORM == LINUX
         ELOG("hid send error: " << ret << ": " << usb_strerror());
 #else
         ELOG("hid send error: " << ret);

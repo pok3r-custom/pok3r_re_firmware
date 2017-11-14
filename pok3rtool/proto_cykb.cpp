@@ -504,7 +504,7 @@ bool ProtoCYKB::sendCmd(zu8 cmd, zu8 a1, ZBinary data){
     DLOG(ZLog::RAW << packet.dumpBytes(4, 8));
 
     // Send packet
-    if(!dev->send(packet)){
+    if(!dev->send(packet, (cmd == RESET ? true : false))){
         ELOG("send error");
         return false;
     }

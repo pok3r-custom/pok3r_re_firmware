@@ -387,7 +387,7 @@ bool ProtoPOK3R::sendCmd(zu8 cmd, zu8 subcmd, zu32 a1, zu32 a2, const zbyte *dat
     DLOG(ZLog::RAW << packet.dumpBytes(4, 8));
 
     // Send command (interrupt write)
-    if(!dev->send(packet)){
+    if(!dev->send(packet, (cmd == RESET_CMD ? true : false))){
         ELOG("send error");
         return false;
     }

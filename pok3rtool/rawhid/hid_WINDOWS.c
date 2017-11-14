@@ -51,7 +51,7 @@ static CRITICAL_SECTION tx_mutex;
 
 void print_win32_err(void)
 {
-    char str[256];
+    char str[1024];
     DWORD err = GetLastError();
     FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
                    NULL,
@@ -59,7 +59,7 @@ void print_win32_err(void)
                    MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
                    str, sizeof(str),
                    NULL);
-    printf("err %ld: %s\n", err, str);
+    printf("err %lx: %s\n", err, str);
 }
 
 // private functions, not intended to be used from outside this file
@@ -145,18 +145,14 @@ int rawhid_send(hid_t *hid, const void *buf, int len, int timeout)
         goto return_error;
     LeaveCriticalSection(&tx_mutex);
     if (n <= 0){
-        printf("rawhid_send no data\n");
         return -1;
     }
     return n - 1;
 return_timeout:
-    printf("rawhid_send timeout\n");
     CancelIo(hid->handle);
     LeaveCriticalSection(&tx_mutex);
     return 0;
 return_error:
-    printf("rawhid_send error\n");
-    print_win32_err();
     LeaveCriticalSection(&tx_mutex);
     return -1;
 }
