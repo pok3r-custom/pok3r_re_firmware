@@ -19,10 +19,10 @@ addons:
   apt:
     sources:
     - ubuntu-toolchain-r-test
+    - sourceline: 'ppa:adrozdoff/cmake'
 
     packages:
     - cmake
-    - cmake-data
     - gcc-4.9
     - g++-4.9
     - clang
@@ -31,6 +31,7 @@ addons:
 
 before_install:
 - uname -a
+- if [ "$TRAVIS_OS_NAME" == "linux" ]; then apt-cache policy cmake; fi
 - cmake --version
 - if [ "$CC" = "gcc" ]; then export CC="gcc-4.9" CXX="g++-4.9"; fi
 - mkdir pok3r-build
