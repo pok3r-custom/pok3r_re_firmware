@@ -5,6 +5,8 @@ PROJECT(rawhid)
 
 SET(SOURCES
     hid.h
+    hiddevice.h
+    hiddevice.cpp
 )
 
 SET(FILES
@@ -17,7 +19,7 @@ IF(CMAKE_SYSTEM_NAME MATCHES "Windows")
     SET(SOURCES ${SOURCES}
         hid_WINDOWS.c
     )
-ELSEIF(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+ELSEIF(CMAKE_SYSTEM_NAME MATCHES "Darwin")
     SET(SOURCES ${SOURCES}
         hid_MACOSX.c
     )
@@ -27,15 +29,12 @@ ELSE()
     )
 ENDIF()
 
-#SET(CMAKE_VERBOSE_MAKEFILE ON)
-
 ### =================== CONFIG =================== ###
 
-IF(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+IF(CMAKE_SYSTEM_NAME MATCHES "Darwin")
     # Find IOKit on Mac OS
     FIND_LIBRARY(IOKIT_LIBRARY IOKit REQUIRED)
     FIND_LIBRARY(COREFOUNDATION_LIBRARY CoreFoundation REQUIRED)
-    MESSAGE(STATUS "${IOKIT_LIBRARY} ${COREFOUNDATION_LIBRARY}")
 ENDIF()
 
 ### =================== BUILD =================== ###
@@ -43,11 +42,13 @@ ENDIF()
 ADD_CUSTOM_TARGET(rawhid-dummy SOURCES ${FILES})
 
 ADD_LIBRARY(rawhid ${SOURCES})
+SET_PROPERTY(TARGET rawhid PROPERTY CXX_STANDARD 11)
+TARGET_LINK_LIBRARIES(rawhid chaos)
 
 IF(CMAKE_SYSTEM_NAME MATCHES "Windows")
     # Windows
     TARGET_LINK_LIBRARIES(rawhid hid setupapi)
-ELSEIF(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+ELSEIF(CMAKE_SYSTEM_NAME MATCHES "Darwin")
     # Mac OS
     TARGET_LINK_LIBRARIES(rawhid ${IOKIT_LIBRARY} ${COREFOUNDATION_LIBRARY})
 ELSE()

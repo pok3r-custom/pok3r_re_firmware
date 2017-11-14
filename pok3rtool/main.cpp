@@ -1,4 +1,4 @@
-#include "hiddevice.h"
+#include "rawhid/hiddevice.h"
 #include "proto_pok3r.h"
 #include "proto_cykb.h"
 #include "updatepackage.h"
@@ -376,7 +376,7 @@ void printUsage(){
 
 int main(int argc, char **argv){
     ZLog::logLevelStdOut(ZLog::INFO, "[%clock%] N %log%");
-    ZLog::logLevelStdOut(ZLog::DEBUG, "\x1b[35m[%clock%] D %log%\x1b[m");
+    //ZLog::logLevelStdOut(ZLog::DEBUG, "\x1b[35m[%clock%] D %log%\x1b[m");
     ZLog::logLevelStdErr(ZLog::ERRORS, "\x1b[31m[%clock%] E %log%\x1b[m");
     ZPath lgf = ZPath("logs") + ZLog::genLogFileName("pok3rtool_");
     ZLog::logLevelFile(ZLog::INFO, lgf, "[%clock%] N %log%");

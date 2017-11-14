@@ -2,7 +2,7 @@
 #define PROTO_CYKB_H
 
 #include "updateinterface.h"
-#include "hiddevice.h"
+#include "rawhid/hiddevice.h"
 
 #include "zstring.h"
 #include "zbinary.h"

@@ -13,10 +13,9 @@ FILE(GLOB_RECURSE DISASSEMBLE_FILES disassemble/*)
 SET(FILES
     README.md
     .travis.yml
-    
+
     ${DISASSEMBLE_FILES}
 )
-
 
 ### =================== BUILD =================== ###
 

@@ -3,7 +3,7 @@
 #include "zmutex.h"
 #include "zlock.h"
 
-#include "rawhid/hid.h"
+#include "hid.h"
 
 #if PLATFORM == LINUX
     #include <usb.h>

@@ -44,14 +44,26 @@ struct hid_struct {
     int open;
 };
 
-static HANDLE rx_event=NULL;
-static HANDLE tx_event=NULL;
+static HANDLE rx_event = NULL;
+static HANDLE tx_event = NULL;
 static CRITICAL_SECTION rx_mutex;
 static CRITICAL_SECTION tx_mutex;
 
+void print_win32_err(void)
+{
+    char str[256];
+    DWORD err = GetLastError();
+    FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+                   NULL,
+                   err,
+                   MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+                   str, sizeof(str),
+                   NULL);
+    printf("err %ld: %s\n", err, str);
+}
+
 // private functions, not intended to be used from outside this file
 static void hid_close(hid_t *hid);
-void print_win32_err(void);
 
 //  rawhid_recv - receive a packet
 //    Inputs:
@@ -129,7 +141,7 @@ int rawhid_send(hid_t *hid, const void *buf, int len, int timeout)
         if (r != WAIT_OBJECT_0)
             goto return_error;
     }
-    if (!GetOverlappedResult(hid->handle, &ov, &n, FALSE))
+    if(!GetOverlappedResult(hid->handle, &ov, &n, FALSE))
         goto return_error;
     LeaveCriticalSection(&tx_mutex);
     if (n <= 0){
@@ -342,15 +354,4 @@ static void hid_close(hid_t *hid)
 {
     CloseHandle(hid->handle);
     hid->handle = NULL;
-}
-
-void print_win32_err(void)
-{
-    char buf[256];
-    DWORD err;
-
-    err = GetLastError();
-    FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, err,
-        0, buf, sizeof(buf), NULL);
-    printf("err %ld: %s\n", err, buf);
 }
