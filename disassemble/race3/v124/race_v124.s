@@ -6132,7 +6132,7 @@
 
 
             .thumb_func
-            call_5fc8:
+            handle_frame:
 /*0x5fc8*/      push {r4, r5, r6, lr}
 /*0x5fca*/      ldr r6, [pc, #0xd8] /* data_60a4 */
 /*0x5fcc*/      ldrb r0, [r6]
@@ -6164,10 +6164,19 @@
 /*0x5ffe*/      mov.w r3, #0x400
 /*0x6002*/      cmp r0, #0x20
 /*0x6004*/      blo jump_6024
-/*0x6006*/      sub.w r2, r0, #0x1f
-/*0x600a*/      rsb r2, r2, r2, lsl #4
-/*0x600e*/      cmp.w r3, r2, lsl #2
-/*0x6012*/      blt jump_6024
+
+/* PATCH */
+/* --------------------------------------- */
+                cmp r0, #255
+                bne.n jump_6014
+                ldr r0, [r5, #4]
+                movs r1, #60
+                b.n jump_6074
+                nop
+                nop
+/* --------------------------------------- */
+
+            jump_6014:
 /*0x6014*/      rsb r0, r0, r0, lsl #4
 /*0x6018*/      mov.w r1, #0x2880
 /*0x601c*/      add.w r0, r1, r0, lsl #2
@@ -6216,7 +6225,7 @@
             jump_6072:
 /*0x6072*/      adds r0, r5, #4
             jump_6074:
-/*0x6074*/      bl call_6118
+/*0x6074*/      bl flash_read_packet
 /*0x6078*/      movs r4, #1
             jump_607a:
 /*0x607a*/      ldrb r0, [r6]
@@ -6306,7 +6315,7 @@
 
 
             .thumb_func
-            call_6118:
+            flash_read_packet:
 /*0x6118*/      push {r4, r5, r6, lr}
 /*0x611a*/      mov r4, r1
 /*0x611c*/      ldr r2, [pc, #0x28] /* data_6148 */
@@ -9612,7 +9621,7 @@
 /*0x7988*/      .short 0x1e40 /* subs r0, r0, #1 */ 
 /*0x798a*/      str r0, [r5]
             jump_798c:
-/*0x798c*/      bl call_5fc8
+/*0x798c*/      bl handle_frame
 /*0x7990*/      bl call_79b4
 /*0x7994*/      ldrb r0, [r4]
 /*0x7996*/      cbnz r0, jump_799e

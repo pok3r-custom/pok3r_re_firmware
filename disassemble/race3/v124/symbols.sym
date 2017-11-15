@@ -69,3 +69,7 @@
 * 3550
 
 356e : generic_intr
+
+5fc8 : handle_frame
+6118 : flash_read_packet
+

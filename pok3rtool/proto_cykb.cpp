@@ -339,8 +339,15 @@ bool ProtoCYKB::eraseAndCheck(){
     zu32 crc_before = crcFlash(VER_ADDR, FLASH_LEN - VER_ADDR);
     LOG("Current CRC: " << ZString::ItoS((zu64)crc_before, 16, 8));
 
-    if(!eraseFlash(VER_ADDR, FW_ADDR - VER_ADDR))
-        return false;
+    zu32 addr = VER_ADDR;
+    for(zu32 i = 0; i < 16-3; ++i){
+        LOG("Erase 0x" << HEX(addr));
+        if(!eraseFlash(addr, 0x1000)){
+            ELOG("erase failed");
+            return false;
+        }
+        addr += 0x1000;
+    }
 
     zu32 crc_after = crcFlash(VER_ADDR, FLASH_LEN - VER_ADDR);
     LOG("New CRC: " << ZString::ItoS((zu64)crc_after, 16, 8));
@@ -528,7 +535,7 @@ bool ProtoCYKB::sendRecvCmd(zu8 cmd, zu8 a1, ZBinary &data){
     // Check error
     data.rewind();
     if(data.readleu16() == UPDATE_ERROR){
-        ELOG("error response");
+        ELOG("error response: " << HEX(data[4]) << " " << HEX(data[5]));
         ELOG(ZLog::RAW << data.dumpBytes(4, 8));
         return false;
     }

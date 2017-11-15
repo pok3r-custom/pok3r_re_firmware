@@ -5539,10 +5539,14 @@ jump_5d20:
     mov.w r3, #0x400
     cmp r0, #0x20
     blo jump_5d46
+    
+    
     sub.w r2, r0, #0x1f
     rsb r2, r2, r2, lsl #4
     cmp.w r3, r2, lsl #2
     blt jump_5d46
+    
+    
     rsb r0, r0, r0, lsl #4
     mov.w r1, #0x2880
     add.w r0, r1, r0, lsl #2

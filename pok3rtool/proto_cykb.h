@@ -14,6 +14,9 @@ using namespace LibChaos;
 #define VORTEX_CORE_PID         0x0175
 #define VORTEX_CORE_BOOT_PID    0x1175
 
+#define VORTEX_RACE3_PID        0x0192
+#define VORTEX_RACE3_BOOT_PID   0x1192
+
 #define VORTEX_TESTER_PID       0x0200
 #define VORTEX_TESTER_BOOT_PID  0x1200
 
