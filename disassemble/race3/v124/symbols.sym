@@ -70,6 +70,14 @@
 
 356e : generic_intr
 
+35a0
+35e6
+3bf6
+7870
+7872
+787e
+7882
+
 5fc8 : handle_frame
 6118 : flash_read_packet
 
