@@ -49,6 +49,9 @@ const ZMap<zu64, PackType> packages = {
     // POK3R RGB 2? (207)
     { 0x8AA1AEA217DA685B,   MAAV102 },  // V1.00.05   v1.0.5
 
+    // Vortex ViBE (216)
+    { 0xCE7C8EAA3D28B10D,   MAAV102 },  // V1.01.03
+
     // KBP V60 (112)
     { 0x6064D8C4EE74BE18,   KBPV60 },   // V1.0.7
 
