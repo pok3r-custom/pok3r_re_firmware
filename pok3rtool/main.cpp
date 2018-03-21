@@ -394,10 +394,13 @@ void printUsage(){
     }
 }
 
+#define TERM_RESET  "\x1b[m"
+#define TERM_RED    "\x1b[31m"
+
 int main(int argc, char **argv){
     ZLog::logLevelStdOut(ZLog::INFO, "[%clock%] N %log%");
     //ZLog::logLevelStdOut(ZLog::DEBUG, "\x1b[35m[%clock%] D %log%\x1b[m");
-    ZLog::logLevelStdErr(ZLog::ERRORS, "\x1b[31m[%clock%] E %log%\x1b[m");
+    ZLog::logLevelStdErr(ZLog::ERRORS, TERM_RED "[%clock%] E %log%" TERM_RESET);
     ZPath lgf = ZPath("logs") + ZLog::genLogFileName("pok3rtool_");
     ZLog::logLevelFile(ZLog::INFO, lgf, "[%clock%] N %log%");
     ZLog::logLevelFile(ZLog::DEBUG, lgf, "[%clock%] %thread% D [%function%|%file%:%line%] %log%");

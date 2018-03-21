@@ -5,45 +5,40 @@ branches:
   - master
 
 matrix:
-    include:
-    - os: linux
-      compiler: gcc
-      dist: trusty
-      sudo: true
+  include:
+  - os: linux
+    dist: trusty
+    sudo: false
+    compiler: gcc
+    addons:
+      apt:
+        sources:
+        - ubuntu-toolchain-r-test
+        - sourceline: 'ppa:adrozdoff/cmake'
+        packages:
+        - cmake
+        - gcc-5
+        - g++-5
+        - libssl-dev
+        - libusb-dev
+    before_install:
+    - export CC=gcc-5 CXX=g++-5
+    - apt-cache policy cmake
+    - cmake --version
 
-    - os: osx
-      compiler: clang
-      osx_image: xcode8
-
-addons:
-  apt:
-    sources:
-    - ubuntu-toolchain-r-test
-    - sourceline: 'ppa:adrozdoff/cmake'
-
-    packages:
-    - cmake
-    - gcc-4.9
-    - g++-4.9
-    - clang
-    - libssl-dev
-    - libusb-dev
-
-before_install:
-- uname -a
-- if [ "$TRAVIS_OS_NAME" == "linux" ]; then apt-cache policy cmake; fi
-- cmake --version
-- if [ "$CC" = "gcc" ]; then export CC="gcc-4.9" CXX="g++-4.9"; fi
-- mkdir pok3r-build
+  - os: osx
+    compiler: clang
+    env:
+    - CMAKE_INCLUDE_PATH=/usr/local/opt/openssl/include
+    - CMAKE_LIBRARY_PATH=/usr/local/opt/openssl/lib
 
 install:
-- cd pok3r-build
-- if [ "$TRAVIS_OS_NAME" == "osx" ]; then export CMAKE_INCLUDE_PATH='/usr/local/opt/openssl/include'; fi
-- if [ "$TRAVIS_OS_NAME" == "osx" ]; then export CMAKE_LIBRARY_PATH='/usr/local/opt/openssl/lib'; fi
-- cmake -D DEBUG=1 -D DISABLE_ZPNG=1 -D DISABLE_ZJPEG=1 -D DISABLE_ZWEBP=1 -D DISABLE_ZDATABASE=1 ..
+- mkdir -p $TRAVIS_BUILD_DIR/build
+- cd $TRAVIS_BUILD_DIR/build
+- cmake -D DEBUG=1 -D DISABLE_ZPNG=1 -D DISABLE_ZJPEG=1 -D DISABLE_ZWEBP=1 -D DISABLE_ZDATABASE=1 $TRAVIS_BUILD_DIR
 - make pok3rtool
 
 script:
-- cd pok3rtool
-- ./pok3rtool list | tee -a output
+- cd $TRAVIS_BUILD_DIR/build/pok3rtool
+- ./pok3rtool list
 - ../../pok3rtool/test.sh ../..
