@@ -28,6 +28,7 @@ enum Device {
     VORTEX_CORE,    //!< Vortex Core
     VORTEX_RACE3,   //!< Vortex Race 3
     VORTEX_TESTER,  //!< Vortex 22-Key Switch Tester
+    VORTEX_VIBE,    //!< Vortex ViBE
     KBP_V60,        //!< KBParadise v60 Mini
     KBP_V80,        //!< KBParadise v80
 };
@@ -82,6 +83,10 @@ const ZMap<ZString, Device> devnames = {
     { "vortex-tester",  VORTEX_TESTER },
     { "vortex_tester",  VORTEX_TESTER },
 
+    { "vibe",           VORTEX_VIBE },
+    { "vortex-vibe",    VORTEX_VIBE },
+    { "vortex_vibe",    VORTEX_VIBE },
+
     { "kbpv60",         KBP_V60 },
     { "kbp-v60",        KBP_V60 },
     { "kbp_v60",        KBP_V60 },
@@ -97,6 +102,7 @@ const ZMap<Device, VortexDevice> devices = {
     { VORTEX_CORE,      { "Vortex Core",    HOLTEK_VID, VORTEX_CORE_PID,    VORTEX_CORE_BOOT_PID,   PROTO_CYKB } },
     { VORTEX_TESTER,    { "Vortex Tester",  HOLTEK_VID, VORTEX_TESTER_PID,  VORTEX_TESTER_BOOT_PID, PROTO_CYKB } },
     { VORTEX_RACE3,     { "Vortex Race 3",  HOLTEK_VID, VORTEX_RACE3_PID,   VORTEX_RACE3_BOOT_PID,  PROTO_CYKB } },
+    { VORTEX_VIBE,      { "Vortex ViBE",    HOLTEK_VID, VORTEX_VIBE_PID,    VORTEX_VIBE_BOOT_PID,   PROTO_CYKB } },
     { KBP_V60,          { "KBP V60",        HOLTEK_VID, KBP_V60_PID,        KBP_V60_BOOT_PID,       PROTO_POK3R } },
     { KBP_V80,          { "KBP V80",        HOLTEK_VID, KBP_V80_PID,        KBP_V80_BOOT_PID,       PROTO_POK3R } },
 };

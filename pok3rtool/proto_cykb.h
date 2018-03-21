@@ -20,6 +20,9 @@ using namespace LibChaos;
 #define VORTEX_TESTER_PID       0x0200
 #define VORTEX_TESTER_BOOT_PID  0x1200
 
+#define VORTEX_VIBE_PID         0x0216
+#define VORTEX_VIBE_BOOT_PID    0x1216
+
 class ProtoCYKB : public UpdateInterface {
 public:
     enum pok3r_rgb_cmd {
