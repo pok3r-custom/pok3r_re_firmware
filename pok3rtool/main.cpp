@@ -31,6 +31,7 @@ enum Device {
     VORTEX_VIBE,    //!< Vortex ViBE
     KBP_V60,        //!< KBParadise v60 Mini
     KBP_V80,        //!< KBParadise v80
+    TEX_YODA_II,    //!< Tex Yoda II
 };
 
 enum DevType {
@@ -94,6 +95,13 @@ const ZMap<ZString, Device> devnames = {
     { "kbpv80",         KBP_V80 },
     { "kbp-v80",        KBP_V80 },
     { "kbp_v80",        KBP_V80 },
+
+    { "yoda2",          TEX_YODA_II },
+    { "tex-yoda-2",     TEX_YODA_II },
+    { "tex_yoda_2",     TEX_YODA_II },
+    { "tex-yoda-ii",    TEX_YODA_II },
+    { "tex_yoda_ii",    TEX_YODA_II },
+
 };
 
 const ZMap<Device, VortexDevice> devices = {
@@ -105,6 +113,7 @@ const ZMap<Device, VortexDevice> devices = {
     { VORTEX_VIBE,      { "Vortex ViBE",    HOLTEK_VID, VORTEX_VIBE_PID,    VORTEX_VIBE_BOOT_PID,   PROTO_CYKB } },
     { KBP_V60,          { "KBP V60",        HOLTEK_VID, KBP_V60_PID,        KBP_V60_BOOT_PID,       PROTO_POK3R } },
     { KBP_V80,          { "KBP V80",        HOLTEK_VID, KBP_V80_PID,        KBP_V80_BOOT_PID,       PROTO_POK3R } },
+    { TEX_YODA_II,      { "Tex Yoda II",    HOLTEK_VID, TEX_YODA_II_PID,    TEX_YODA_II_BOOT_PID,   PROTO_CYKB } },
 };
 
 // Functions
