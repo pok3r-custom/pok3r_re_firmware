@@ -24,6 +24,7 @@ SET(POK3RTOOL_SOURCES
 
 SET(FILES
     99-pok3r.rules
+    test.sh
 )
 
 ### =================== BUILD =================== ###
