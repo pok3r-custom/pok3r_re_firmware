@@ -29,6 +29,9 @@ const ZMap<zu64, PackType> packages = {
     { 0xA28E5EFB3F796181,   MAAJONSN }, // V1.1.6
     { 0xEA55CB190C35505F,   MAAJONSN }, // V1.1.7
 
+    // Yoda II (163)
+    { 0xf5a3714fa9a3ca40,   MAAV102 },  // V1.01.01   v1.1.1
+
     // POK3R RGB (167)
     { 0x882CB0E4ECE25454,   MAAV102 },  // V1.02.04   v1.2.4
     { 0x6CFF0BB4F4086C2F,   MAAV102 },  // V1.03.00   v1.3.0
