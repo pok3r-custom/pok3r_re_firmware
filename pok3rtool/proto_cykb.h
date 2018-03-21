@@ -114,6 +114,8 @@ private:
 public:
     static void decode_firmware(ZBinary &bin);
     static void encode_firmware(ZBinary &bin);
+    
+    static void info_section(ZBinary data);
 
 private:
     bool builtin;

@@ -355,6 +355,7 @@ int decode_maav102(ZFile *file, ZBinary &fw_out){
         if(sec.size() == 180){
             LOG("  Data");
             RLOG(sec.dumpBytes(4, 8, 0));
+            ProtoCYKB::info_section(sec);
             continue;
         } else {
             LOG("  Firmware" << ZLog::NOLN);

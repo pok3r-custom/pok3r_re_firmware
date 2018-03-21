@@ -1,4 +1,6 @@
-# Vortex Keyboard Custom Firmware Project [![Travis-CI Badge](https://travis-ci.org/ChaoticConundrum/pok3r_re_firmware.svg?branch=master "Travis-CI Badge")](https://travis-ci.org/ChaoticConundrum/pok3r_re_firmware)
+# Vortex Keyboard Custom Firmware Project
+
+[![Travis-CI Badge](https://travis-ci.org/ChaoticConundrum/pok3r_re_firmware.svg?branch=master "Travis-CI Badge")](https://travis-ci.org/ChaoticConundrum/pok3r_re_firmware)
 
 *Disclaimer: This project comes with no warranty, and may be used for free at your own risk. I do
 this in my free time for fun, as such there are no guarantees of progress or success.*

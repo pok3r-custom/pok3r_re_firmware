@@ -48,3 +48,4 @@ install:
 script:
 - cd pok3rtool
 - ./pok3rtool list | tee -a output
+- ./test.sh ..

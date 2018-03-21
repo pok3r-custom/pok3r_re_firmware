@@ -333,7 +333,7 @@ int cmd_wipe(Param *param){
 int cmd_decode(Param *param){
     UpdatePackage package;
     if(!package.loadFromExe(param->args[1], 0)){
-        ELOG("Load Error");
+        ELOG("Load Error: " << param->args[1]);
         return 1;
     }
     ZPath out = param->args[2];

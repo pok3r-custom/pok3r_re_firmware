@@ -115,37 +115,7 @@ bool ProtoCYKB::getInfo(){
     }
     RLOG(data.dumpBytes(4, 8, VER_ADDR));
 
-    ZString ver;
-    if(data.readleu32() == 0xFFFFFFFF){
-        ver = "CLEARED";
-    } else {
-        data.rewind();
-        zu32 len = MIN(data.readleu32(), 60U);
-        ver.parseUTF16((zu16 *)(data.raw() + 4), len);
-    }
-    LOG("Version String: " << ver);
-
-    data.seek(120);
-    zu32 a = data.readleu32();
-    zu32 b = data.readleu32();
-    zu32 c = data.readleu32();
-    zu32 d = data.readleu32();
-    zu32 e = data.readleu32();
-    zu32 f = data.readleu32();
-    zu32 ivid = data.readleu16();
-    zu32 ipid = data.readleu16();
-    data.seek(176);
-    zu32 h = data.readleu32();
-
-    LOG("a: " << ZString::ItoS((zu64)a, 16, 8));
-    LOG("Version: " << ZString::ItoS((zu64)b, 16, 8));
-    LOG("c: " << ZString::ItoS((zu64)c, 16, 8));
-    LOG("d: " << ZString::ItoS((zu64)d, 16, 8));
-    LOG("e: " << ZString::ItoS((zu64)e, 16, 8));
-    LOG("f: " << ZString::ItoS((zu64)f, 16, 8));
-    LOG("VID/PID: " << ZString::ItoS((zu64)ivid, 16, 4) << " " << ZString::ItoS((zu64)ipid, 16, 4));
-    LOG("h: " << ZString::ItoS((zu64)h, 16, 8));
-
+    info_section(data);
     return true;
 }
 
@@ -580,4 +550,37 @@ void ProtoCYKB::decode_firmware(ZBinary &bin){
 
 void ProtoCYKB::encode_firmware(ZBinary &bin){
     xor_decode_encode(bin);
+}
+
+void ProtoCYKB::info_section(ZBinary data){
+    ZString ver;
+    if(data.readleu32() == 0xFFFFFFFF){
+        ver = "CLEARED";
+    } else {
+        data.rewind();
+        zu32 len = MIN(data.readleu32(), 60U);
+        ver.parseUTF16((zu16 *)(data.raw() + 4), len);
+    }
+    LOG("Version String: " << ver);
+    
+    data.seek(120);
+    zu32 a = data.readleu32();
+    zu32 b = data.readleu32();
+    zu32 c = data.readleu32();
+    zu32 d = data.readleu32();
+    zu32 e = data.readleu32();
+    zu32 f = data.readleu32();
+    zu32 ivid = data.readleu16();
+    zu32 ipid = data.readleu16();
+    data.seek(176);
+    zu32 h = data.readleu32();
+
+    LOG("a: " << ZString::ItoS((zu64)a, 16, 8));
+    LOG("Version: " << ZString::ItoS((zu64)b, 16, 8));
+    LOG("c: " << ZString::ItoS((zu64)c, 16, 8));
+    LOG("d: " << ZString::ItoS((zu64)d, 16, 8));
+    LOG("e: " << ZString::ItoS((zu64)e, 16, 8));
+    LOG("f: " << ZString::ItoS((zu64)f, 16, 8));
+    LOG("VID/PID: " << ZString::ItoS((zu64)ivid, 16, 4) << " " << ZString::ItoS((zu64)ipid, 16, 4));
+    LOG("h: " << ZString::ItoS((zu64)h, 16, 8));
 }
