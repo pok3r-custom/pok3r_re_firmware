@@ -8,6 +8,9 @@
 #include "zbinary.h"
 using namespace LibChaos;
 
+#define TEX_YODA_II_PID         0x0163
+#define TEX_YODA_II_BOOT_PID    0x1163
+
 #define POK3R_RGB_PID           0x0167
 #define POK3R_RGB_BOOT_PID      0x1167
 
