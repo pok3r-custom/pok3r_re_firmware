@@ -4,18 +4,16 @@ branches:
   only:
   - master
 
-os:
-- linux
-- osx
+matrix:
+    include:
+    - os: linux
+      compiler: gcc
+      dist: trusty
+      sudo: true
 
-osx_image: xcode8
-
-dist: trusty
-sudo: false
-
-compiler:
-- gcc
-- clang
+    - os: osx
+      compiler: clang
+      osx_image: xcode8
 
 addons:
   apt:
@@ -42,7 +40,7 @@ install:
 - cd pok3r-build
 - if [ "$TRAVIS_OS_NAME" == "osx" ]; then export CMAKE_INCLUDE_PATH='/usr/local/opt/openssl/include'; fi
 - if [ "$TRAVIS_OS_NAME" == "osx" ]; then export CMAKE_LIBRARY_PATH='/usr/local/opt/openssl/lib'; fi
-- cmake -D DISABLE_ZPNG=1 -D DISABLE_ZJPEG=1 -D DISABLE_ZWEBP=1 -D DISABLE_ZDATABASE=1 ..
+- cmake -D DEBUG=1 -D DISABLE_ZPNG=1 -D DISABLE_ZJPEG=1 -D DISABLE_ZWEBP=1 -D DISABLE_ZDATABASE=1 ..
 - make pok3rtool
 
 script:

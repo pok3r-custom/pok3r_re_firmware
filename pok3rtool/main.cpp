@@ -430,7 +430,12 @@ int main(int argc, char **argv){
         if(cmds.contains(cmstr)){
             CmdEntry cmd = cmds[cmstr];
             if(param.args.size() == cmd.argn + 1){
-                return cmd.func(&param);
+                try {
+                    return cmd.func(&param);
+                } catch(ZException e){
+                    ELOG("ERROR: " << e.what());
+                    ELOG("Trace: " << e.traceStr());
+                }
             } else {
                 LOG("Usage: pok3rtool " << cmd.usage);
                 return -1;
