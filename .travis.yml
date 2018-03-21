@@ -4,18 +4,16 @@ branches:
   only:
   - master
 
-os:
-- linux
-- osx
+matrix:
+    include:
+    - os: linux
+      compiler: gcc
+      dist: trusty
+      sudo: true
 
-osx_image: xcode8
-
-dist: trusty
-sudo: false
-
-compiler:
-- gcc
-- clang
+    - os: osx
+      compiler: clang
+      osx_image: xcode8
 
 addons:
   apt:

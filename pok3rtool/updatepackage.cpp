@@ -428,7 +428,7 @@ int decode_kbp_cykb(ZFile *file, ZBinary &fw_out, zu32 key){
     ProtoPOK3R::decode_firmware(fw);
     fw_out = fw;
 
-    RLOG(fw_out.dumpBytes(4, 8));
+    //RLOG(fw_out.dumpBytes(4, 8));
 
     return 0;
 }
