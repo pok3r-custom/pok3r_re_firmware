@@ -8,6 +8,8 @@ os:
 - linux
 - osx
 
+osx_image: xcode8
+
 dist: trusty
 sudo: false
 
