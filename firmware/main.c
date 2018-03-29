@@ -184,11 +184,12 @@ int main(){
 
     usart_init();
     
-    usart_log("Write flash at 0x4000");
-    
+    usart_log("POK3R Custom App");
+
     // Flash
+//    usart_log("Write flash at 0x4000");
 //    ht32_flash_write(0x4000, test_data, test_data + sizeof(test_data));
-    flash_write(0x4000, test_data, test_data + sizeof(test_data));
+//    flash_write(0x4000, test_data, test_data + sizeof(test_data));
     
     usart_log("Done");
 

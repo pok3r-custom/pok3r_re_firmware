@@ -31,6 +31,7 @@ SECTIONS {
         *(.glue_7t) *(.glue_7)
         . = ALIGN(4);
         *(.rodata .rodata.*)
+        . = ALIGN(4);
     } > flash
 
     /* stack */
@@ -104,5 +105,4 @@ SECTIONS {
     .note.gnu.arm.ident 0 : { KEEP (*(.note.gnu.arm.ident)) }
     .ARM.attributes 0 : { KEEP (*(.ARM.attributes)) }
     /DISCARD/ : { *(.note.GNU-stack)  }
-
 }
