@@ -107,6 +107,7 @@ bool ProtoCYKB::enterBootloader(){
 bool ProtoCYKB::getInfo(){
     ZBinary data;
 
+    LOG("** READ_VER");
     for(zu8 i = 0x20; i < 0x23; ++i){
         ZBinary bin;
         if(!sendRecvCmd(READ, i, bin))
@@ -116,6 +117,25 @@ bool ProtoCYKB::getInfo(){
     RLOG(data.dumpBytes(4, 8, VER_ADDR));
 
     info_section(data);
+
+    LOG("** READ_400");
+    data.clear();
+    if(!sendRecvCmd(READ, READ_400, data))
+        return false;
+    data = data.getSub(4, 52);
+    RLOG(data.dumpBytes(4, 8));
+
+    data.seek(8);
+    zu32 bvid = data.readleu16();
+    zu32 bpid = data.readleu16();
+    LOG("VID/PID: " << ZString::ItoS((zu64)bvid, 16, 4) << " " << ZString::ItoS((zu64)bpid, 16, 4));
+
+    LOG("** READ_3c00");
+    data.clear();
+    if(!sendRecvCmd(READ, READ_3C00, data))
+        return false;
+    data = data.getSub(4, 4);
+    RLOG(data.dumpBytes(4, 8));
     return true;
 }
 

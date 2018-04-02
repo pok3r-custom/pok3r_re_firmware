@@ -15,6 +15,8 @@ SET(POK3RTOOL_SOURCES
     proto_pok3r.cpp
     proto_cykb.h
     proto_cykb.cpp
+    proto_qmkp.h
+    proto_qmkp.cpp
 
     updateinterface.h
 

@@ -35,6 +35,10 @@
 
 #include "hid.h"
 
+#define INTERFACE_CLASS_HID     3
+#define INTERFACE_SUBCLASS_NONE 0
+#define INTERFACE_PROTOCOL_NONE 0
+
 // On Linux there are several options to access HID devices.
 //
 // libusb 0.1 - the only way that works well on all distributions
@@ -122,6 +126,7 @@ int rawhid_recv(hid_t *hid, void *buf, int len, int timeout)
 int rawhid_send(hid_t *hid, const void *buf, int len, int timeout)
 {
     if (!hid || !hid->open) return -1;
+    printf("ep_out: %d\n", hid->ep_out);
     if (hid->ep_out) {
         return usb_interrupt_write(hid->usb, hid->ep_out, buf, len, timeout);
     } else {
@@ -147,7 +152,7 @@ hid_t *rawhid_open(int vid, int pid, int usage_page, int usage)
     struct usb_interface *iface;
     struct usb_interface_descriptor *desc;
     struct usb_endpoint_descriptor *ep;
-    usb_dev_handle *u;
+    usb_dev_handle *handle;
     uint8_t buf[1024], *p;
     int i, n, len, tag, ep_in, ep_out, claimed;
     uint32_t val=0, parsed_usage, parsed_usage_page;
@@ -157,29 +162,36 @@ hid_t *rawhid_open(int vid, int pid, int usage_page, int usage)
     usb_init();
     usb_find_busses();
     usb_find_devices();
+    // loop over buses
     for (bus = usb_get_busses(); bus; bus = bus->next) {
+        // loop over devices
         for (dev = bus->devices; dev; dev = dev->next) {
             if (vid > 0 && dev->descriptor.idVendor != vid) continue;
             if (pid > 0 && dev->descriptor.idProduct != pid) continue;
             if (!dev->config) continue;
             if (dev->config->bNumInterfaces < 1) continue;
             printf("device: vid=%04X, pic=%04X, with %d iface\n",
-                dev->descriptor.idVendor,
-                dev->descriptor.idProduct,
-                dev->config->bNumInterfaces);
+                   dev->descriptor.idVendor,
+                   dev->descriptor.idProduct,
+                   dev->config->bNumInterfaces);
             iface = dev->config->interface;
-            u = NULL;
+            handle = NULL;
             claimed = 0;
+            // loop over interfaces
             for (i=0; i<dev->config->bNumInterfaces && iface; i++, iface++) {
                 desc = iface->altsetting;
                 if (!desc) continue;
-                printf("  type %d, %d, %d\n", desc->bInterfaceClass,
-                    desc->bInterfaceSubClass, desc->bInterfaceProtocol);
-                if (desc->bInterfaceClass != 3) continue;
-                if (desc->bInterfaceSubClass != 0) continue;
-                if (desc->bInterfaceProtocol != 0) continue;
+                printf("  iface: type %d, %d, %d\n", desc->bInterfaceClass,
+                       desc->bInterfaceSubClass, desc->bInterfaceProtocol);
+                // check for hid interface
+                if (desc->bInterfaceClass != INTERFACE_CLASS_HID ||
+                        desc->bInterfaceSubClass != INTERFACE_SUBCLASS_NONE ||
+                        desc->bInterfaceProtocol != INTERFACE_PROTOCOL_NONE)
+                    continue;
+
                 ep = desc->endpoint;
                 ep_in = ep_out = 0;
+                // loop over endpoints
                 for (n = 0; n < desc->bNumEndpoints; n++, ep++) {
                     if (ep->bEndpointAddress & 0x80) {
                         if (!ep_in) ep_in = ep->bEndpointAddress & 0x7F;
@@ -189,44 +201,48 @@ hid_t *rawhid_open(int vid, int pid, int usage_page, int usage)
                         printf("    OUT endpoint %d\n", ep_out);
                     }
                 }
-                if (!ep_in) continue;
-                if (!u) {
-                    u = usb_open(dev);
-                    if (!u) {
+//                if (!ep_in) continue;
+//                printf("    hid interface (generic)\n");
+
+                // open device
+                if (!handle) {
+                    handle = usb_open(dev);
+                    if (!handle) {
                         printf("  unable to open device\n");
                         break;
                     }
                 }
-                printf("  hid interface (generic)\n");
-                if (usb_get_driver_np(u, i, (char *)buf, sizeof(buf)) >= 0) {
+
+                if (usb_get_driver_np(handle, i, (char *)buf, sizeof(buf)) >= 0) {
                     printf("  in use by driver \"%s\"\n", buf);
-                    if (usb_detach_kernel_driver_np(u, i) < 0) {
+                    if (usb_detach_kernel_driver_np(handle, i) < 0) {
                         printf("  unable to detach from kernel\n");
                         continue;
                     }
                 }
-                if (usb_claim_interface(u, i) < 0) {
-                    printf("  unable claim interface %d\n", i);
+                if (usb_claim_interface(handle, i) < 0) {
+                    printf("  unable to claim interface %d\n", i);
                     continue;
                 }
-                len = usb_control_msg(u, 0x81, 6, 0x2200, i, (char *)buf, sizeof(buf), 250);
-                    printf("  descriptor, len=%d\n", len);
+                len = usb_control_msg(handle, 0x81, 6, 0x2200, i, (char *)buf, sizeof(buf), 250);
+                printf("    descriptor, len=%d\n", len);
                 if (len < 2) {
-                    usb_release_interface(u, i);
+                    usb_release_interface(handle, i);
                     continue;
                 }
                 p = buf;
                 parsed_usage_page = parsed_usage = 0;
+                // parse report descriptors
                 while ((tag = hid_parse_item(&val, &p, buf + len)) >= 0) {
-                    printf("  tag: %X, val %X\n", tag, val);
+                    printf("    tag: %X, val %X\n", tag, val);
                     if (tag == 4) parsed_usage_page = val;
                     if (tag == 8) parsed_usage = val;
                     if (parsed_usage_page && parsed_usage) break;
                 }
                 if ((!parsed_usage_page) || (!parsed_usage) ||
-                  (usage_page > 0 && parsed_usage_page != usage_page) ||
-                  (usage > 0 && parsed_usage != usage)) {
-                    usb_release_interface(u, i);
+                        (usage_page > 0 && parsed_usage_page != usage_page) ||
+                        (usage > 0 && parsed_usage != usage)) {
+                    usb_release_interface(handle, i);
                     continue;
                 }
 
@@ -237,21 +253,23 @@ hid_t *rawhid_open(int vid, int pid, int usage_page, int usage)
 
                 hid = (struct hid_struct *)malloc(sizeof(struct hid_struct));
                 if (!hid) {
-                    usb_release_interface(u, i);
+                    usb_release_interface(handle, i);
                     continue;
                 }
-                hid->usb = u;
+                hid->usb = handle;
                 hid->iface = i;
                 hid->ep_in = ep_in;
                 hid->ep_out = ep_out;
+                printf("ep_in: %d, ep_out: %d\n", hid->ep_in, hid->ep_out);
                 hid->open = 1;
                 claimed++;
                 count++;
                 return hid;
-            }
-            if (u && !claimed) usb_close(u);
-        }
-    }
+            } // end interface
+            if (handle && !claimed)
+                usb_close(handle);
+        } // end device
+    } // end bus
     return hid;
 }
 
@@ -305,9 +323,9 @@ int rawhid_openall(hid_t **hids, int max, int vid, int pid, int usage_page, int 
             if (!dev->config) continue;
             if (dev->config->bNumInterfaces < 1) continue;
             printf("device: vid=%04X, pic=%04X, with %d iface\n",
-                dev->descriptor.idVendor,
-                dev->descriptor.idProduct,
-                dev->config->bNumInterfaces);
+                   dev->descriptor.idVendor,
+                   dev->descriptor.idProduct,
+                   dev->config->bNumInterfaces);
             iface = dev->config->interface;
             u = NULL;
             claimed = 0;
@@ -315,7 +333,7 @@ int rawhid_openall(hid_t **hids, int max, int vid, int pid, int usage_page, int 
                 desc = iface->altsetting;
                 if (!desc) continue;
                 printf("  type %d, %d, %d\n", desc->bInterfaceClass,
-                    desc->bInterfaceSubClass, desc->bInterfaceProtocol);
+                       desc->bInterfaceSubClass, desc->bInterfaceProtocol);
                 if (desc->bInterfaceClass != 3) continue;
                 if (desc->bInterfaceSubClass != 0) continue;
                 if (desc->bInterfaceProtocol != 0) continue;
@@ -351,7 +369,7 @@ int rawhid_openall(hid_t **hids, int max, int vid, int pid, int usage_page, int 
                     continue;
                 }
                 len = usb_control_msg(u, 0x81, 6, 0x2200, i, (char *)buf, sizeof(buf), 250);
-                    printf("  descriptor, len=%d\n", len);
+                printf("  descriptor, len=%d\n", len);
                 if (len < 2) {
                     usb_release_interface(u, i);
                     continue;
@@ -365,8 +383,8 @@ int rawhid_openall(hid_t **hids, int max, int vid, int pid, int usage_page, int 
                     if (parsed_usage_page && parsed_usage) break;
                 }
                 if ((!parsed_usage_page) || (!parsed_usage) ||
-                  (usage_page > 0 && parsed_usage_page != usage_page) ||
-                  (usage > 0 && parsed_usage != usage)) {
+                        (usage_page > 0 && parsed_usage_page != usage_page) ||
+                        (usage > 0 && parsed_usage != usage)) {
                     usb_release_interface(u, i);
                     continue;
                 }
@@ -421,10 +439,10 @@ static int hid_parse_item(uint32_t *val, uint8_t **data, const uint8_t *end)
         len = table[p[0] & 0x03];
         if (p + len + 1 >= end) return -1;
         switch (p[0] & 0x03) {
-          case 3: *val = p[1] | (p[2] << 8) | (p[3] << 16) | (p[4] << 24); break;
-          case 2: *val = p[1] | (p[2] << 8); break;
-          case 1: *val = p[1]; break;
-          case 0: *val = 0; break;
+        case 3: *val = p[1] | (p[2] << 8) | (p[3] << 16) | (p[4] << 24); break;
+        case 2: *val = p[1] | (p[2] << 8); break;
+        case 1: *val = p[1]; break;
+        case 0: *val = 0; break;
         }
     }
     *data += len + 1;

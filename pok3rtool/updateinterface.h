@@ -9,6 +9,10 @@ using namespace LibChaos;
 #define UPDATE_USAGE_PAGE   0xff00
 #define UPDATE_USAGE        0x01
 
+#define QMK_VID             0xFEED
+#define QMK_USAGE_PAGE      0xff60
+#define QMK_USAGE           0x61
+
 class UpdateInterface {
 public:
     virtual ~UpdateInterface(){}

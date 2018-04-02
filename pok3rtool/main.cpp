@@ -1,6 +1,7 @@
 #include "rawhid/hiddevice.h"
 #include "proto_pok3r.h"
 #include "proto_cykb.h"
+#include "proto_qmkp.h"
 #include "updatepackage.h"
 
 #include "rawhid/hid.h"
@@ -13,9 +14,6 @@
 #include "zoptions.h"
 using namespace LibChaos;
 
-#define UPDATE_USAGE_PAGE   0xff00
-#define UPDATE_USAGE        0x01
-
 #include <iostream>
 
 // Enums
@@ -24,6 +22,7 @@ using namespace LibChaos;
 enum Device {
     DEV_NONE = 0,
     POK3R,          //!< Vortex POK3R
+    POK3R_QMK,
     POK3R_RGB,      //!< Vortex POK3R RGB
     VORTEX_CORE,    //!< Vortex Core
     VORTEX_RACE3,   //!< Vortex Race 3
@@ -38,6 +37,7 @@ enum DevType {
     PROTO_POK3R,    //!< Used exclusively in the POK3R.
     PROTO_CYKB,     //!< Used in new Vortex keyboards, marked with CYKB on the PCB.
                     //!< POK3R RGB, Vortex CORE, Vortex 22-Key Switch Tester.
+    PROTO_QMKP,     //!< Used on Vortex Keybords running QMK_POK3R
 };
 
 // Types
@@ -45,10 +45,12 @@ enum DevType {
 
 struct VortexDevice {
     ZString name;
+    DevType type;
     zu16 vid;
     zu16 pid;
     zu16 boot_pid;
-    DevType type;
+    zu16 usage_page;
+    zu16 usage;
 };
 
 struct Param {
@@ -68,6 +70,7 @@ struct ListDevice {
 
 const ZMap<ZString, Device> devnames = {
     { "pok3r",          POK3R },
+    { "pok3r_qmk",      POK3R_QMK },
 
     { "pok3r-rgb",      POK3R_RGB },
     { "pok3r_rgb",      POK3R_RGB },
@@ -101,19 +104,20 @@ const ZMap<ZString, Device> devnames = {
     { "tex_yoda_2",     TEX_YODA_II },
     { "tex-yoda-ii",    TEX_YODA_II },
     { "tex_yoda_ii",    TEX_YODA_II },
-
 };
 
 const ZMap<Device, VortexDevice> devices = {
-    { POK3R,            { "POK3R",          HOLTEK_VID, POK3R_PID,          POK3R_BOOT_PID,         PROTO_POK3R } },
-    { POK3R_RGB,        { "POK3R RGB",      HOLTEK_VID, POK3R_RGB_PID,      POK3R_RGB_BOOT_PID,     PROTO_CYKB } },
-    { VORTEX_CORE,      { "Vortex Core",    HOLTEK_VID, VORTEX_CORE_PID,    VORTEX_CORE_BOOT_PID,   PROTO_CYKB } },
-    { VORTEX_TESTER,    { "Vortex Tester",  HOLTEK_VID, VORTEX_TESTER_PID,  VORTEX_TESTER_BOOT_PID, PROTO_CYKB } },
-    { VORTEX_RACE3,     { "Vortex Race 3",  HOLTEK_VID, VORTEX_RACE3_PID,   VORTEX_RACE3_BOOT_PID,  PROTO_CYKB } },
-    { VORTEX_VIBE,      { "Vortex ViBE",    HOLTEK_VID, VORTEX_VIBE_PID,    VORTEX_VIBE_BOOT_PID,   PROTO_CYKB } },
-    { KBP_V60,          { "KBP V60",        HOLTEK_VID, KBP_V60_PID,        KBP_V60_BOOT_PID,       PROTO_POK3R } },
-    { KBP_V80,          { "KBP V80",        HOLTEK_VID, KBP_V80_PID,        KBP_V80_BOOT_PID,       PROTO_POK3R } },
-    { TEX_YODA_II,      { "Tex Yoda II",    HOLTEK_VID, TEX_YODA_II_PID,    TEX_YODA_II_BOOT_PID,   PROTO_CYKB } },
+    { POK3R,            { "POK3R",          PROTO_POK3R,    HOLTEK_VID, POK3R_PID,          POK3R_BOOT_PID,         UPDATE_USAGE_PAGE,  UPDATE_USAGE, } },
+    { POK3R_QMK,        { "POK3R (QMK)",    PROTO_POK3R,    QMK_VID,    POK3R_PID,          POK3R_BOOT_PID,         UPDATE_USAGE_PAGE,  UPDATE_USAGE, } },
+//    { POK3R_QMK,        { "POK3R (qmk)",    PROTO_QMKP,     QMK_VID,    POK3R_PID,          POK3R_BOOT_PID,         QMK_USAGE_PAGE,     QMK_USAGE, } },
+    { POK3R_RGB,        { "POK3R RGB",      PROTO_CYKB,     HOLTEK_VID, POK3R_RGB_PID,      POK3R_RGB_BOOT_PID,     UPDATE_USAGE_PAGE,  UPDATE_USAGE, } },
+    { VORTEX_CORE,      { "Vortex Core",    PROTO_CYKB,     HOLTEK_VID, VORTEX_CORE_PID,    VORTEX_CORE_BOOT_PID,   UPDATE_USAGE_PAGE,  UPDATE_USAGE, } },
+    { VORTEX_TESTER,    { "Vortex Tester",  PROTO_CYKB,     HOLTEK_VID, VORTEX_TESTER_PID,  VORTEX_TESTER_BOOT_PID, UPDATE_USAGE_PAGE,  UPDATE_USAGE, } },
+    { VORTEX_RACE3,     { "Vortex Race 3",  PROTO_CYKB,     HOLTEK_VID, VORTEX_RACE3_PID,   VORTEX_RACE3_BOOT_PID,  UPDATE_USAGE_PAGE,  UPDATE_USAGE, } },
+    { VORTEX_VIBE,      { "Vortex ViBE",    PROTO_CYKB,     HOLTEK_VID, VORTEX_VIBE_PID,    VORTEX_VIBE_BOOT_PID,   UPDATE_USAGE_PAGE,  UPDATE_USAGE, } },
+    { KBP_V60,          { "KBP V60",        PROTO_POK3R,    HOLTEK_VID, KBP_V60_PID,        KBP_V60_BOOT_PID,       UPDATE_USAGE_PAGE,  UPDATE_USAGE, } },
+    { KBP_V80,          { "KBP V80",        PROTO_POK3R,    HOLTEK_VID, KBP_V80_PID,        KBP_V80_BOOT_PID,       UPDATE_USAGE_PAGE,  UPDATE_USAGE, } },
+    { TEX_YODA_II,      { "Tex Yoda II",    PROTO_CYKB,     HOLTEK_VID, TEX_YODA_II_PID,    TEX_YODA_II_BOOT_PID,   UPDATE_USAGE_PAGE,  UPDATE_USAGE, } },
 };
 
 // Functions
@@ -128,6 +132,8 @@ ZPointer<UpdateInterface> openDevice(Device dev){
             kb = new ProtoPOK3R(device.vid, device.pid, device.boot_pid);
         } else if(device.type == PROTO_CYKB){
             kb = new ProtoCYKB(device.vid, device.pid, device.boot_pid);
+        } else if(device.type == PROTO_QMKP){
+            kb = new ProtoQMKP(device.vid, device.pid, device.boot_pid);
         } else {
             return nullptr;
         }
@@ -175,11 +181,11 @@ int cmd_list(Param *param){
     for(auto it = devices.begin(); it.more(); ++it){
         VortexDevice dev = devices[it.get()];
 
-        auto hdev = HIDDevice::openAll(dev.vid, dev.pid, UPDATE_USAGE_PAGE, UPDATE_USAGE);
+        auto hdev = HIDDevice::openAll(dev.vid, dev.pid, dev.usage_page, dev.usage);
         for(zu64 j = 0; j < hdev.size(); ++j)
             devs.push({ dev, hdev[j], false });
 
-        auto hbdev = HIDDevice::openAll(dev.vid, dev.boot_pid, UPDATE_USAGE_PAGE, UPDATE_USAGE);
+        auto hbdev = HIDDevice::openAll(dev.vid, dev.boot_pid, dev.usage_page, dev.usage);
         for(zu64 j = 0; j < hbdev.size(); ++j)
             devs.push({ dev, hbdev[j], true });
     }
@@ -200,7 +206,7 @@ int cmd_list(Param *param){
             }
 
             ldev.hid.divorce();
-            LOG(ldev.dev.name << ": " << iface->getVersion());
+            LOG(ldev.dev.name << (ldev.boot ? " (bootloader)" : "") << ": " << iface->getVersion());
         } else {
             LOG(ldev.dev.name << " not open");
         }
@@ -215,6 +221,8 @@ int cmd_version(Param *param){
     if(kb.get()){
         LOG("Version: " << kb->getVersion());
         return 0;
+    } else {
+        LOG("No Device");
     }
     return -1;
 }
@@ -231,6 +239,8 @@ int cmd_setversion(Param *param){
         LOG(kb->setVersion(version));
         LOG(kb->enterFirmware());
         return 0;
+    } else {
+        LOG("No Device");
     }
     return -1;
 }
@@ -244,6 +254,8 @@ int cmd_info(Param *param){
     if(kb.get()){
         LOG(kb->getInfo());
         return 0;
+    } else {
+        LOG("No Device");
     }
     return -1;
 }
@@ -256,6 +268,8 @@ int cmd_reboot(Param *param){
         // Read version
         LOG("Version: " << kb->getVersion());
         return 0;
+    } else {
+        LOG("No Device");
     }
     return -1;
 }
@@ -268,6 +282,8 @@ int cmd_bootloader(Param *param){
         // Read version
         LOG("Version: " << kb->getVersion());
         return 0;
+    } else {
+        LOG("No Device");
     }
     return -1;
 }
@@ -286,6 +302,8 @@ int cmd_dump(Param *param){
         LOG("Out: " << out);
         ZFile::writeBinary(out, bin);
         return 0;
+    } else {
+        LOG("No Device");
     }
     return -1;
 }
@@ -316,6 +334,8 @@ int cmd_flash(Param *param){
         }
         LOG(kb->update(version, fwbin));
         return 0;
+    } else {
+        LOG("No Device");
     }
     return -1;
 }
@@ -335,6 +355,8 @@ int cmd_wipe(Param *param){
         bool ret = kb->eraseAndCheck();
         LOG(ret);
         return 0;
+    } else {
+        LOG("No Device");
     }
     return -1;
 }
@@ -423,7 +445,7 @@ int main(int argc, char **argv){
     param.args = options.getArgs();
 
     if(options.getOpts().contains(OPT_TYPE)){
-        ZString type = options.getOpts()[OPT_TYPE];
+        ZString type = options.getOpts()[OPT_TYPE].toLower();
         if(devnames.contains(type))
             param.device = devnames[type];
     }
