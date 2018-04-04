@@ -1,0 +1,76 @@
+
+[code]
+
+* 0004: reset
+* 0008
+* 000c
+* 0010
+* 0014
+* 0018
+
+* 003c: systick_intr
+* 00e4: bftm0_intr
+* 00e8: bftm1_intr
+* 00ec
+* 00f0
+* 0114: usb_intr
+
+
+001c: entry
+0030: load_jump_fw
+0040: memcpy
+0064: mem_set
+0072: mem_zero
+0076: mem_set2
+0088: sram_init
+
+00d8: bftm_set_counter
+00f4: bftm_clear
+
+0124: generic_fault
+0126: generic_intr
+02f0: ckcu_clocks_enable
+
+0444: function_444
+
+0850: handle_frame
+0a28: reset_builtin
+0a6c: flash_read_packet
+
+#0x1d8  : bftm_set_mien
+#0x2f0  : ckcu_set_usb_prescaler
+#0x304  : flash_page_erase
+#0x314  : flash_commit
+#0x668  : nvic_disable_intr
+#0x7b0  : decrypt_packet
+#0x7ec  : flash_write_buffer
+#0xa6c  : flash_read_packet
+#0x1560 : get_event
+
+167c: generate
+16bc: firmware_check
+
+18fc: function_18fc
+19f8: function_19f8
+1ae0: function_1ae0
+1aec: function_1aec
+1e80: function_1e80
+1e8e: function_1e8e
+
+#0x1e48 : check_fw_sp_pc
+
+1efe: main
+
+[data]
+
+0400: read_400_data
+
+1fdc: data_1fdc
+
+#1fd4 : gpio_map_3
+#2024 : gpio_map_2
+#2074 : gpio_map_1
+#20bc : usb_report1_desc
+#20ec : usb_report2_desc
+#2148 : usb_report0_desc
+#2188 : usb_descriptors

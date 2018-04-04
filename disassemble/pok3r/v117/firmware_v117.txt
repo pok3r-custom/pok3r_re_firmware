@@ -5695,10 +5695,10 @@ function_3:
   0x5ef4:   0x42d4208c
   0x5ef8:   0xe000ed10
 
-ckcu_voodoo1:
+reset_peripheral:
     ; r0 = ??
     ; r1 = 0/1
-    ; Some undocumented CKCU register voodoo
+    ; Reset a peripheral in AHBPRSTR
   0x5efc:   4a05        ldr r2, [pc, #20]   ; (0x5f14)
     5efe:   2901        cmp r1, #1
     5f00:   f8d2 1104   ldr.w r1, [r2, #260]   ; 0x104
@@ -7410,7 +7410,7 @@ usb_dp_pull_up:
 usb_ckcu_voodoo:
   0x6dcc:   2101        movs r1, #1
     6dce:   2020        movs r0, #32
-    6dd0:   f7ff b894   b.w 0x5efc              ; call ckcu_voodoo1(0x20, 1)
+    6dd0:   f7ff b894   b.w 0x5efc              ; call reset_peripheral(USBRST, 1)
 
 usb_ep_data_toggle:
     ; r0 = ep #
