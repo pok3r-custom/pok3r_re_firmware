@@ -1,6 +1,6 @@
 # Vortex Keyboard Custom Firmware Project
 
-[![Travis-CI Badge](https://travis-ci.org/ChaoticConundrum/pok3r_re_firmware.svg?branch=master "Travis-CI Badge")](https://travis-ci.org/ChaoticConundrum/pok3r_re_firmware)
+[![Travis-CI Badge](https://travis-ci.org/pok3r-custom/pok3r_re_firmware.svg?branch=master "Travis-CI Badge")](https://travis-ci.org/pok3r-custom/pok3r_re_firmware)
 
 *Disclaimer: This project comes with no warranty, and may be used for free at your own risk. I do
 this in my free time for fun, as such there are no guarantees of progress or success.*
@@ -19,25 +19,12 @@ keyboards, including:
     - V60 Mini
     - V80 TKL
 
-This project also includes a tool for communicating with and updating the firmware on Vortex
-(and similar) keyboards.
+For the tool developed for communicating with and updating the firmware on Vortex
+(and similar) keyboards, see 
+[pok3rtool](https://github.com/pok3r-custom/pok3rtool).
 
 For the effort at developing new firmware for these keyboards based on TMK, see
-[tmk_pok3r](https://github.com/ChaoticConundrum/tmk_pok3r).
-
-
-## pok3rtool
-The `pok3rtool` CLI application runs on Linux, Windows, and Mac OS X. Along with some development
-tools, `pok3rtool` implements the firmware update protocol over USB for the POK3R and POK3R RGB.
-
-The `pok3rtool` executable is built with CMake. You will need the LibChaos submodule cloned to
-build it. After it is compiled, it should have no runtime dependencies, and can be run portably.
-
-**WARNING: THIS TOOL CAN VERY EASILY BRICK YOUR KEYBOARD IF USED INCORRECTLY, MAKING IT
-UNUSABLE WITHOUT EXPENSIVE DEVELOPMENT TOOLS. READ THE DOCUMENTATION, POSSIBLY READ THE
-CODE, AND PROCEED AT YOUR OWN RISK.**
-
-[See the wiki for pok3rtool usage, warnings, etc.](https://github.com/ChaoticConundrum/pok3r_re_firmware/wiki/pok3rtool-Usage)
+[tmk_pok3r](https://github.com/pok3r-custom/tmk_pok3r).
 
 ### POK3R Firmware Patch
 A very small firmware patch will allow the contents of the flash storage to be read out over USB,
