@@ -1,8 +1,20 @@
+# Build Files
+.dep
+build
+util/jlink_flashloader/FlashLoader_HT32/Output
+.tmp.bin
+
+# Editor Files
+*.swp
+*.kate-swp
+*.vim
+
+# IDE Files
 *.user
 *.user.*
-
-*.swp
-*.vim
+util/jlink_flashloader/FlashLoader_HT32/*.emSession
+util/jlink_flashloader/FlashLoader_HT32/*.jlink
+*.jdebug
 
 *.id0
 *.id1

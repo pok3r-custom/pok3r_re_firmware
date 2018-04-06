@@ -1,0 +1,8 @@
+<!DOCTYPE Linker_Placement_File>
+<Root name="RAM Section Placement">
+  <MemorySegment name="RAM">
+    <ProgramSection alignment="4" load="Yes" name="PrgCode" keep="Yes"/>
+    <ProgramSection alignment="4" load="Yes" name="PrgData" keep="Yes"/>
+    <ProgramSection alignment="4" load="Yes" name="DevDscr" keep="Yes"/>
+  </MemorySegment>
+</Root>

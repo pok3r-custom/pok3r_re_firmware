@@ -1,0 +1,11 @@
+
+si SWD
+speed 4000
+connect
+rsettype 2
+
+w4 0x4008000C 0xA
+w4 0x40080010 0x14
+rx 100
+
+q
