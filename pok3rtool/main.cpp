@@ -108,7 +108,7 @@ const ZMap<ZString, Device> devnames = {
 
 const ZMap<Device, DeviceInfo> known_devices = {
     { POK3R,            { "POK3R",          PROTO_POK3R,    HOLTEK_VID, POK3R_PID,          POK3R_BOOT_PID,         UPDATE_USAGE_PAGE,  UPDATE_USAGE, } },
-    { POK3R_QMK,        { "POK3R (QMK)",    PROTO_POK3R,    QMK_VID,    POK3R_PID,          POK3R_BOOT_PID,         UPDATE_USAGE_PAGE,  UPDATE_USAGE, } },
+//    { POK3R_QMK,        { "POK3R (QMK)",    PROTO_POK3R,    QMK_VID,    POK3R_PID,          POK3R_BOOT_PID,         UPDATE_USAGE_PAGE,  UPDATE_USAGE, } },
 //    { POK3R_QMK,        { "POK3R (qmk)",    PROTO_QMKP,     QMK_VID,    POK3R_PID,          POK3R_BOOT_PID,         QMK_USAGE_PAGE,     QMK_USAGE, } },
     { POK3R_RGB,        { "POK3R RGB",      PROTO_CYKB,     HOLTEK_VID, POK3R_RGB_PID,      POK3R_RGB_BOOT_PID,     UPDATE_USAGE_PAGE,  UPDATE_USAGE, } },
     { VORTEX_CORE,      { "Vortex Core",    PROTO_CYKB,     HOLTEK_VID, VORTEX_CORE_PID,    VORTEX_CORE_BOOT_PID,   UPDATE_USAGE_PAGE,  UPDATE_USAGE, } },

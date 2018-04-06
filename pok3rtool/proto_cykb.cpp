@@ -287,8 +287,11 @@ bool ProtoCYKB::writeFirmware(const ZBinary &fwbinin){
     if(!writeFlash(FW_ADDR, fwbin))
         return false;
 
-    zu32 crc2 = crcFlash(FW_ADDR, fwbin.size());
-    LOG("New CRC: " << ZString::ItoS((zu64)crc2, 16, 8));
+    zu32 crc2;
+    for(int i = 0; i < 3; ++i){
+        crc2 = crcFlash(FW_ADDR, fwbin.size());
+        LOG("New CRC: " << ZString::ItoS((zu64)crc2, 16, 8));
+    }
 
     if(crc2 != crc1){
         ELOG("CRCs do not match, firmware write failed");
