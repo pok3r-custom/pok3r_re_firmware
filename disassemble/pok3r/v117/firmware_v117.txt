@@ -7600,6 +7600,9 @@ function_e_73:
     6f42:   bd10        pop {r4, pc}
 
 usb_copy_send:
+    ; a0 = ep
+    ; a1 = data ptr
+    ; a2 = size
   0x6f44:   e92d 41f0   stmdb sp!, {r4, r5, r6, r7, r8, lr}
     6f48:   4688        mov r8, r1
     6f4a:   4614        mov r4, r2
@@ -7624,11 +7627,11 @@ usb_copy_send:
     6f78:   1ce0        adds r0, r4, #3
     6f7a:   0882        lsrs r2, r0, #2
     6f7c:   4640        mov r0, r8
-    6f7e:   f000 fa87   bl 0x7490
-    6f82:   60ec        str r4, [r5, #12]
+    6f7e:   f000 fa87   bl 0x7490               ; copy data into ep buffer
+    6f82:   60ec        str r4, [r5, #12]       ; write length into ep TCR reg
     6f84:   2002        movs r0, #2
-    6f86:   6028        str r0, [r5, #0]
-    6f88:   4620        mov r0, r4
+    6f86:   6028        str r0, [r5, #0]        ; toggle ep NAKTX
+    6f88:   4620        mov r0, r4              ; return size
   0x6f8a:   e7ef        b.n 0x6f6c
 
 usb_enable_intr:

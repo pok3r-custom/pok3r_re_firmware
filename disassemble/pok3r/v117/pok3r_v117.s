@@ -8191,6 +8191,7 @@
             jump_6c66:
 /*0x6c66*/      mov r0, r6
 /*0x6c68*/      bl usb_set_intr_flags
+
 /*0x6c6c*/      b jump_6c96
             jump_6c6e:
 /*0x6c6e*/      mov r0, r5

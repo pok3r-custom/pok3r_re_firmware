@@ -1,3 +1,8 @@
+# Vortex CORE v145
+
+[data]
+
+3400 : vectors .word
 
 [code]
 
@@ -113,7 +118,7 @@
 #4568 : gpio_set_open_drain
 #4578 : gpio_set_pin_pull_up_down
 #45a0 : gpio_set_pin
-#45a4 : gpio_set_reset_pin
+45d4 : gpio_set_reset_pin
 #45ae : gptm_enable_disable
 #5608 : function_130_10
 591c : setup_intr_priority
@@ -170,6 +175,9 @@
 #73b8 : function_unused_1
 #74ac : function_unused_2
 #74b8 : function_unused_2
+7630
+* 7720
+7730
 #7774 : copy_words
 #7784 : usb_get_ep_reg
 #7794 : function_130_9
@@ -178,16 +186,57 @@
 7b2c : main
 #7964 : function_130_15
 
+* 83e4
+* 83f4
+
 [data]
+
+* 3638! : sram_defs .word 8
+* 363c! : sram_init_data
 
 3bf8: bootloader_crc_magic
 3c00: flash_3c00_data
 
-* 7464 : data_7f54
-* 725c : data_7db7
-* 70f4 : data_7e48
+* 39b8
+* 3a3c
+* 3a84
+* 3aec
+* 3af0
+* 3bd8
+* 3d8c
+* 3f8c
+* 3f90
+* 3fe8
+* 4c7c
+* 4ed0
+* 4f28
+* 4f68
+* 5290
+* 530c
+* 5534
+* 56b0
+* 57a4
+* 5e44
+* 62e8
+* 6364
+* 636c
+* 63ac
+* 6478
+* 6564
+* 6a44
+* 6ae4
+* 6f44
+* 70f4
 * 7120
-* 6f44 : data_7e91
+* 725c
+* 7464
+* 783c
+* 7998
+* 7afc
+
+7ed4 : gpio_map_1 .word 16
+7f24 : gpio_map_2 .word 14
+7fc8 : gpio_map_3 .word 8
 
 #7a3c : data_1
 #7a48 : data_2
@@ -215,3 +264,32 @@
 #812c : task_2
 #813c : sram_init_data
 
+* 83d8
+* 83e8!
+
+[annote]
+
+6388 : gpio pin mask
+638c : gpio reg address
+
+7ed4 : GPIO C, pin 9
+7edc : GPIO A, pin 5
+7ee4 : GPIO A, pin 6
+7eec : GPIO A, pin 7
+7ef4 : GPIO C, pin 11
+7efc : GPIO C, pin 13
+7f04 : GPIO C, pin 14
+7f0c : GPIO C, pin 15
+
+7f24 : GPIO A, pin 4
+7f2c : GPIO B, pin 10
+7f34 : GPIO D, pin 0
+7f3c : GPIO B, pin 11
+7f44 : GPIO A, pin 11
+7f4c : GPIO A, pin 0
+7f54 : GPIO A, pin 1
+
+7fc8 : GPIO C, pin 4
+7fd0 : GPIO C, pin 5
+7fd8 : GPIO C, pin 6
+7fe0 : GPIO B, pin 1

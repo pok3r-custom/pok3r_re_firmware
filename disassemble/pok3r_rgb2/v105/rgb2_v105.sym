@@ -1,0 +1,303 @@
+# Vortex POK3R RGB 2 v105
+
+[data]
+
+3400 : vectors .word
+
+[code]
+
+* 3404 : reset
+* 3408 : nmi
+* 340c : hard_fault
+* 3410 : mcu_fault
+* 3414 : bus_fault
+* 3418 : usage_fault
+* 342c : svccall_intr
+* 3430 : debug_intr
+* 3438 : pendsv_intr
+* 343c : systick_intr
+* 3440
+* 3444
+* 3448
+* 344c
+* 3450
+* 3454
+* 3458
+* 345c
+* 3460
+* 3464
+* 3468
+* 346c
+* 3470
+* 3474
+* 3478
+* 347c
+* 3480
+* 3484
+* 3488
+* 348c
+* 3490
+* 3494
+* 3498
+* 349c
+* 34a0
+* 34a4
+* 34ac
+* 34b0
+* 34b4
+* 34b8
+* 34bc
+* 34c0
+* 34c4
+* 34c8
+* 34cc
+* 34d0
+* 34e4 : bftm0_intr
+* 34e8 : bftm1_intr
+* 34ec
+* 34f0 : i2c1_intr
+* 34f4
+* 34f8
+* 34fc
+* 3500
+* 3504
+* 3508
+* 350c
+* 3510
+* 3514 : usb_intr
+* 351c
+* 3520
+* 3524
+* 3528
+* 352c
+* 3530
+* 3534
+* 3538
+* 3550
+
+3572 : generic_intr
+
+3580 : entry
+3594 : rand
+35a8 : srand
+35b8 : memcpy
+35dc : mem_set
+35ea : mem_zero
+35ee : mem_set2
+3600 : memcmp
+#361c : sram_init
+#3640 : afio_exti_ssr_write
+#3780 : bftm_clear
+#37c0 : afio_pin_config
+#37e8 : spin_wait
+#37f4 : setup_afio_gpio
+#38ac : ckcu_clocks_enable
+#38d0 : ckcu_set_usb_prescaler
+#3aa8 : function_130_6
+#40ac : function_130_7
+#40ec : function_11
+#4114 : function_29
+#418c : function_10
+#4198 : function_82
+#41ec : pinmux_b789_gpio
+#4234 : pinmux_b789_spi
+#4278 : function_e_38
+#42c4 : function_e_39
+#42fc : function_76
+#4328 : function_78
+#434c : function_42
+#4374 : function_25
+#43b4 : spi_write_read
+#4424 : function_e_40
+#4474 : function_27
+#44ec : function_77
+#4510 : function_28
+#4538 : gpio_set_input_output
+#4548 : gpio_set_output_current
+#4558 : gpio_set_input_enable
+#4568 : gpio_set_open_drain
+#4578 : gpio_set_pin_pull_up_down
+#45a0 : gpio_set_pin
+#45a4 : gpio_set_reset_pin
+#45ae : gptm_enable_disable
+#5608 : function_130_10
+#591c : setup_intr_priority
+#59a4 : nvic_disable_intr
+#59ba : calc_nvic_priority
+#59ec : ppb_set_nvic_priority
+#5a0c : nvic_set_vtor
+#57f4 : jump_pinmux_b789_gpio
+#57f8 : jump_pinmux_b789_spi
+#5c30 : pinmux_c0_gpio
+#5c3a : pinmux_c0_gptm
+#5c88 : function_130_11
+#5cd4 : function_130_12
+#5f4c : handle_frame
+#5e54 : flash_read_packet
+#6030 : reset_builtin
+#5e88 : ckcu_voodoo1
+#6370 : function_130_16
+#6508 : function_e_54
+#6820 : clock_init
+#6800 : usb_set_intr_flags
+#680c : usb_init
+#6878 : usb_dp_wake_up
+#6894 : usb_dp_pull_up
+#68b0 : usb_ckcu_voodoo
+#68bc : usb_ep_data_toggle
+#68cc : usb_ep_stall
+#68dc : usb_set_ep_intr
+#68e8 : usb_get_ep_buff
+#6900 : usb_get_ep_buff_end
+#6924 : usb_get_ep_len
+#6932 : function_e_67
+#694c : usb_get_ep_intr
+#695a : usb_get_ep_tcnt
+#696c : function_e_70
+#6992 : usb_read_ep_buff
+#69cc : usb_recv
+#69fc : function_e_71
+#6a0c : function_e_72
+#6a18 : function_e_73
+#6a2c : usb_copy_send
+#6a74 : usb_enable_intr
+#6a84 : function_e_75
+#6aa4 : usb_get_intr_flags
+#6ab8 : usb_set_lpmode_pdwn
+#68c8 : usb_clear_csr
+#6ad8 : function_28
+#6b50 : ptr_write_data
+#6b94 : function_130_2
+#6c1c : usb_intr
+#6ea4 : watchdog_init
+#6c58 : watchdog_reload_timer
+#72c0 : function_130_1
+7344
+#73b8 : function_unused_1
+#74ac : function_unused_2
+#74b8 : function_unused_2
+7450
+* 7540
+7550
+#7774 : copy_words
+#7784 : usb_get_ep_reg
+#7794 : function_130_9
+#784c : sram_init_func_1
+#785c : sram_init_func_2
+78e4
+78f2
+78f4
+7904 : main
+#7964 : function_130_15
+
+* 81bc : sram_task1
+* 81cc : sram_task2
+
+[data]
+
+* 3638! : sram_defs .word 8
+* 363c! : sram_init_data
+
+3bf8: bootloader_crc_magic
+3c00: flash_3c00_data
+
+* 3758
+* 39d8
+* 3a5c
+* 3aa4
+* 3b0c
+* 3b14
+* 3b20
+* 3d04
+* 3d64
+* 3f78
+* 3f7c
+* 4b14
+* 4b30
+* 4e28
+* 4e44
+* 4e8c
+* 513c
+* 51b4
+* 53c0
+* 550c
+* 55ac
+* 5c10
+* 61a8
+* 6860
+* 60bc
+* 6138
+* 6140
+* 6264
+* 63bc
+* 6498
+* 6900
+* 6d60
+* 6f10
+* 6f3c
+* 7078
+* 7280
+* 75b0
+* 765c
+* 77b8
+
+7cb0 : gpio_map_1 .word 16
+7d00 : gpio_map_2 .word 18
+7dbc : gpio_map_3 .word 12
+
+#7a3c : data_1
+#7a48 : data_2
+#7c18 : gpio_map_3
+#7c68 : gpio_map_2
+#7d24 : gpio_map_1
+#7f74 : usb_report1_desc
+#7f98 : usb_report2_desc
+#8020 : usb_report0_desc
+#8060 : usb_config_desc
+#8069 : usb_interface0_desc
+#8072 : usb_hid0_desc
+#807b : usb_endpoint1_desc
+#8082 : usb_interface1_desc
+#808b : usb_hid1_desc
+#8094 : usb_endpoint3_desc
+#809b : usb_endpoint4_desc
+#80a2 : usb_interface2_desc
+#80ab : usb hid2_desc
+#80b2 : usb_endpoint2_desc
+#80bc : usb_device_desc
+#80d0 : usb_str0_desc
+#80d4 : usb_str1_desc
+#811c : task_1
+#812c : task_2
+#813c : sram_init_data
+
+* 81b0
+* 81c0!
+
+[annote]
+
+7cb0 : GPIO C, pin 9
+7cb8 : GPIO A, pin 5
+7cc0 : GPIO A, pin 6
+7cc8 : GPIO A, pin 7
+7cd0 : GPIO C, pin 9
+7cd8 : GPIO C, pin 13
+7ce0 : GPIO C, pin 14
+7ce8 : GPIO C, pin 15
+
+7d00 : GPIO C, pin 4
+7d08 : GPIO B, pin 6
+7d10 : GPIO D, pin 0
+7d18 : GPIO B, pin 11
+7d20 : GPIO A, pin 11
+7d28 : GPIO A, pin 0
+7d30 : GPIO A, pin 1
+7d38 : GPIO A, pin 2
+7d40 : GPIO A, pin 3
+
+7dbc : GPIO C, pin 8
+7dc4 : GPIO C, pin 7
+7dcc : GPIO B, pin 5
+7dd4 : GPIO B, pin 4
+7ddc : GPIO B, pin 3
+7de4 : GPIO B, pin 2
