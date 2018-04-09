@@ -245,31 +245,23 @@
 7d00 : gpio_map_2 .word 18
 7dbc : gpio_map_3 .word 12
 
-#7a3c : data_1
-#7a48 : data_2
-#7c18 : gpio_map_3
-#7c68 : gpio_map_2
-#7d24 : gpio_map_1
-#7f74 : usb_report1_desc
-#7f98 : usb_report2_desc
-#8020 : usb_report0_desc
-#8060 : usb_config_desc
-#8069 : usb_interface0_desc
-#8072 : usb_hid0_desc
-#807b : usb_endpoint1_desc
-#8082 : usb_interface1_desc
-#808b : usb_hid1_desc
-#8094 : usb_endpoint3_desc
-#809b : usb_endpoint4_desc
-#80a2 : usb_interface2_desc
-#80ab : usb hid2_desc
-#80b2 : usb_endpoint2_desc
-#80bc : usb_device_desc
-#80d0 : usb_str0_desc
-#80d4 : usb_str1_desc
-#811c : task_1
-#812c : task_2
-#813c : sram_init_data
+8004 : usb_report1_desc
+8028 : usb_report2_desc
+80b0 : usb_report0_desc
+80f0 : usb_config_desc
+  +9 : usb_interface0_desc
+  +9 : usb_hid0_desc
+  +9 : usb_endpoint1_desc
+  +7 : usb_interface1_desc
+  +9 : usb_hid1_desc
+  +9 : usb_endpoint3_desc
+  +7 : usb_endpoint4_desc
+  +7 : usb_interface2_desc
+  +9 : usb_hid2_desc
+  +9 : usb_endpoint2_desc
+814c : usb_device_desc
+8160 : usb_str0_desc
+  +4 : usb_str1_desc
 
 * 81b0
 * 81c0!
@@ -301,3 +293,117 @@
 7dd4 : GPIO B, pin 4
 7ddc : GPIO B, pin 3
 7de4 : GPIO B, pin 2
+
+8004 : Usage Page (Vendor Defined 0xFF00)
+  +3 : Usage (0x01)
+  +2 : Collection (Application)
+  +2 : - Usage (0x02)
+  +2 : - Logical Minimum (0)
+  +2 : - Logical Maximum (255)
+  +3 : - Report Size (8)
+  +2 : - Report Count (64)
+  +2 : - Input (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
+  +2 : - Usage (0x03)
+  +2 : - Logical Minimum (0)
+  +2 : - Logical Maximum (255)
+  +3 : - Report Size (8)
+  +2 : - Report Count (64)
+  +2 : - Output (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position,Non-volatile)
+  +2 : End Collection
+
+8028 : Usage Page (Generic Desktop Ctrls)
+  +2 : Usage (Sys Control)
+  +2 : Collection (Application)
+  +2 : - Report ID (1)
+  +2 : - Usage Minimum (Sys Power Down)
+  +2 : - Usage Maximum (Sys Wake Up)
+  +2 : - Logical Minimum (0)
+  +2 : - Logical Maximum (1)
+  +2 : - Report Count (3)
+  +2 : - Report Size (1)
+  +2 : - Input (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
+  +2 : - Report Count (1)
+  +2 : - Report Size (5)
+  +2 : - Input (Const,Array,Abs,No Wrap,Linear,Preferred State,No Null Position)
+  +2 : End Collection
+  +1 : Usage Page (Consumer)
+  +2 : Usage (Consumer Control)
+  +2 : Collection (Application)
+  +2 : - Report ID (2)
+  +2 : - Logical Minimum (0)
+  +2 : - Logical Maximum (1)
+  +2 : - Report Count (18)
+  +2 : - Report Size (1)
+  +3 : - Usage (AL Consumer Control Configuration)
+  +3 : - Usage (AL Email Reader)
+  +3 : - Usage (AL Calculator)
+  +3 : - Usage (AL Local Machine Browser)
+  +2 : - Usage (Play/Pause)
+  +2 : - Usage (Stop)
+  +2 : - Usage (Scan Previous Track)
+  +2 : - Usage (Scan Next Track)
+  +2 : - Usage (Mute)
+  +2 : - Usage (Volume Decrement)
+  +2 : - Usage (Volume Increment)
+  +3 : - Usage (AC Search)
+  +3 : - Usage (AC Home)
+  +3 : - Usage (AC Back)
+  +3 : - Usage (AC Forward)
+  +3 : - Usage (AC Stop)
+  +3 : - Usage (AC Refresh)
+  +3 : - Usage (AC Bookmarks)
+  +2 : - Input (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
+  +2 : - Report Count (1)
+  +2 : - Report Size (14)
+  +2 : - Input (Const,Array,Abs,No Wrap,Linear,Preferred State,No Null Position)
+  +2 : End Collection
+  +1 : Usage Page (Generic Desktop Ctrls)
+  +2 : Usage (Keyboard)
+  +2 : Collection (Application)
+  +2 : - Report ID (4)
+  +2 : - Usage Page (Kbrd/Keypad)
+  +2 : - Report Count (1)
+  +2 : - Report Size (8)
+  +2 : - Input (Const,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
+  +2 : - Report Count (232)
+  +2 : - Report Size (1)
+  +2 : - Logical Minimum (0)
+  +2 : - Logical Maximum (1)
+  +2 : - Usage Page (Kbrd/Keypad)
+  +2 : - Usage Minimum (0x00)
+  +2 : - Usage Maximum (0xE7)
+  +2 : - Input (Data,Array,Abs,No Wrap,Linear,Preferred State,No Null Position)
+  +2 : End Collection
+
+80b0 : Usage Page (Generic Desktop Ctrls)
+  +2 : Usage (Keyboard)
+  +2 : Collection (Application)
+  +2 : - Usage Page (Kbrd/Keypad)
+  +2 : - Usage Minimum (0xE0)
+  +2 : - Usage Maximum (0xE7)
+  +2 : - Logical Minimum (0)
+  +2 : - Logical Maximum (1)
+  +2 : - Report Size (1)
+  +2 : - Report Count (8)
+  +2 : - Input (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
+  +2 : - Report Count (1)
+  +2 : - Report Size (8)
+  +2 : - Input (Const,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
+  +2 : - Report Count (3)
+  +2 : - Report Size (1)
+  +2 : - Usage Page (LEDs)
+  +2 : - Usage Minimum (Num Lock)
+  +2 : - Usage Maximum (Scroll Lock)
+  +2 : - Output (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position,Non-volatile)
+  +2 : - Report Count (1)
+  +2 : - Report Size (5)
+  +2 : - Output (Const,Var,Abs,No Wrap,Linear,Preferred State,No Null Position,Non-volatile)
+  +2 : - Report Count (6)
+  +2 : - Report Size (8)
+  +2 : - Logical Minimum (0)
+  +2 : - Logical Maximum (164)
+  +3 : - Usage Page (Kbrd/Keypad)
+  +2 : - Usage Minimum (0x00)
+  +2 : - Usage Maximum (0xA4)
+  +2 : - Input (Data,Array,Abs,No Wrap,Linear,Preferred State,No Null Position)
+  +2 : End Collection
