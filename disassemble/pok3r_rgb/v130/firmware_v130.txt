@@ -8355,7 +8355,7 @@ gpio_map_2:
     7ca8:   00 00 0b 40     0x400b0000  ; GPIO A
     7cac:   08 00 00 00     0x8         ; pin 3
 
-    7cb0:   00 00 0b 40     0x400b0000  ; GPIO A
+  0x7cb0:   00 00 0b 40     0x400b0000  ; GPIO A
     7cb4:   10 00 00 00     0x10        ; pin 4
 
     7cb8:   2f2d

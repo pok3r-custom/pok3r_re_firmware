@@ -1074,9 +1074,9 @@
 /*0x3b60*/      ldr r0, [pc, #0x68] /* data_3bcc */
 /*0x3b62*/      ldrh r0, [r0]
 /*0x3b64*/      lsls r0, r0, #0x15
-/*0x3b66*/      asrs r0, r0, #8 /* case switch_6f6c */
-/*0x3b68*/      lsrs r1, r0, #0x18 /* case switch_6fa0 */
-/*0x3b6a*/      movs r0, #0x31 /* case switch_6fec */
+/*0x3b66*/      asrs r0, r0, #8
+/*0x3b68*/      lsrs r1, r0, #0x18
+/*0x3b6a*/      movs r0, #0x31
 /*0x3b6c*/      bl call_4114
 /*0x3b70*/      b jump_3b8c
             jump_3b72:
@@ -5137,13 +5137,13 @@
 /*0x5872*/      bl call_5e64
 /*0x5876*/      bl call_5a3c
 /*0x587a*/      movs r0, #1
-/*0x587c*/      bl call_6370
+/*0x587c*/      bl matrix_init_outputs
 /*0x5880*/      pop.w {r4, lr}
 /*0x5884*/      b.w jump_6568
             jump_5888:
 /*0x5888*/      bl call_5a40
 /*0x588c*/      movs r0, #0
-/*0x588e*/      bl call_6370
+/*0x588e*/      bl matrix_init_outputs
 /*0x5892*/      movs r1, #0
 /*0x5894*/      mov r0, r4
 /*0x5896*/      bl call_37ba
@@ -6612,7 +6612,7 @@
 
 
             .thumb_func
-            call_6370:
+            matrix_init_outputs:
 /*0x6370*/      push.w {r4, r5, r6, r7, r8, lr}
 /*0x6374*/      movs r4, #7
 /*0x6376*/      cbz r0, jump_637e

@@ -1,4 +1,4 @@
-# Vortex POK3R RGB 2 v105
+# Vortex POK3R RGB v140
 
 [data]
 
@@ -79,20 +79,20 @@
 
 3580 : entry
 3594 : rand
-35a8 : srand
-35b8 : memcpy
-35dc : mem_set
-35ea : mem_zero
-35ee : mem_set2
-3600 : memcmp
+35a8 : srand                        seed
+35b8 : memcpy                       dest src size
+35dc : mem_set                      dest size val
+35ea : mem_zero                     dest size
+35ee : mem_set2                     dest val size
+3600 : memcmp                       ptr1 ptr2 size
 361c : sram_init
-#3640 : afio_exti_ssr_write
-#3780 : bftm_clear
-#37c0 : afio_pin_config
-#37e8 : spin_wait
-#37f4 : setup_afio_gpio
-#38ac : ckcu_clocks_enable
-#38d0 : ckcu_set_usb_prescaler
+3640 : afio_exti_ssr_write
+375c : bftm_clear                   BFTM
+379c : afio_pin_config              gpio_num pin_num af_num
+37c4 : spin_wait                    time
+37d0 : setup_afio_gpio
+3888 : ckcu_clocks_enable           ahb_mask apb0_mas apb1_mask en
+38ac : ckcu_set_usb_prescaler       prescaler
 #3aa8 : function_130_6
 #40ac : function_130_7
 #40ec : function_11
@@ -172,26 +172,22 @@
 #6ea4 : watchdog_init
 #6c58 : watchdog_reload_timer
 #72c0 : function_130_1
-7344
 #73b8 : function_unused_1
 #74ac : function_unused_2
 #74b8 : function_unused_2
-7450
-* 7540
-7550
+73a8
+* 7498
+74a8
 #7774 : copy_words
 #7784 : usb_get_ep_reg
 #7794 : function_130_9
 #784c : sram_init_func_1
 #785c : sram_init_func_2
-78e4
-78f2
-78f4
-7904 : main
+#7904 : main
 #7964 : function_130_15
 
-* 81bc : sram_task1
-* 81cc : sram_task2
+* 8118 : sram_task1
+* 8128 : sram_task2
 
 [data]
 
@@ -207,48 +203,48 @@
 * 3aa4
 * 3b0c
 * 3b14
-* 3b20
+#* 3b20
 * 3d04
 * 3d64
 * 3f78
 * 3f7c
-* 4b14
-* 4b30
-* 4e28
-* 4e44
-* 4e8c
-* 513c
-* 51b4
-* 53c0
-* 550c
-* 55ac
-* 5c10
-* 61a8
-* 6860
-* 60bc
-* 6138
-* 6140
-* 6264
-* 63bc
-* 6498
-* 6900
-* 6d60
-* 6f10
-* 6f3c
-* 7078
-* 7280
-* 75b0
-* 765c
-* 77b8
+* 4b10
+* 4b2c
+* 4e24
+* 4e34
+* 4e74
+* 5114
+* 518c
+* 539c
+* 54e8
+* 5588
+* 5bec
+* 6080
+* 60fc
+* 6104
+* 616c
+* 6228
+* 635c
+* 63f0
+* 67b8
+* 6858
+* 6cb8
+* 6e68
+* 6e94
+* 6fd0
+* 71d8
+* 7508
+* 75b4
+* 7710
 
-7cb0 : gpio_map_1 .word 16
-7d00 : gpio_map_2 .word 20
-7dbc : gpio_map_3 .word 16
+7c08 : gpio_map_1 .word 16
+7c58 : gpio_map_2 .word 20
+7d14 : gpio_map_3 .word 16
 
-8004 : usb_report1_desc
-8028 : usb_report2_desc
-80b0 : usb_report0_desc
-80f0 : usb_config_desc
+7f64 : usb_report1_desc
+7f88 : usb_report2_desc
+8010 : usb_report0_desc
+8050 : usb_config_desc
   +9 : usb_interface0_desc
   +9 : usb_hid0_desc
   +9 : usb_endpoint1_desc
@@ -259,16 +255,16 @@
   +7 : usb_interface2_desc
   +9 : usb_hid2_desc
   +9 : usb_endpoint2_desc
-814c : usb_device_desc
-8160 : usb_str0_desc
+80ac : usb_device_desc
+80c0 : usb_str0_desc
   +4 : usb_str1_desc
 
-* 81b0
-* 81c0!
+* 810c
+* 811c!
 
 [annote]
 
-7cb0 : GPIO C, pin 9
+7c08 : GPIO C, pin 9
   +8 : GPIO A, pin 5
   +8 : GPIO A, pin 6
   +8 : GPIO A, pin 7
@@ -277,7 +273,7 @@
   +8 : GPIO C, pin 14
   +8 : GPIO C, pin 15
 
-7d00 : GPIO C, pin 4
+7c58 : GPIO C, pin 4
   +8 : GPIO B, pin 6
   +8 : GPIO D, pin 0
   +8 : GPIO B, pin 11
@@ -288,7 +284,7 @@
   +8 : GPIO A, pin 3
   +8 : GPIO A, pin 4
 
-7dbc : GPIO C, pin 8
+7d14 : GPIO C, pin 8
   +8 : GPIO C, pin 7
   +8 : GPIO B, pin 5
   +8 : GPIO B, pin 4
@@ -297,7 +293,7 @@
   +8 : GPIO C, pin 6
   +8 : GPIO C, pin 5
 
-8004 : Usage Page (Vendor Defined 0xFF00)
+7f64 : Usage Page (Vendor Defined 0xFF00)
   +3 : Usage (0x01)
   +2 : Collection (Application)
   +2 : - Usage (0x02)
@@ -314,7 +310,7 @@
   +2 : - Output (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position,Non-volatile)
   +2 : End Collection
 
-8028 : Usage Page (Generic Desktop Ctrls)
+7f88 : Usage Page (Generic Desktop Ctrls)
   +2 : Usage (Sys Control)
   +2 : Collection (Application)
   +2 : - Report ID (1)
@@ -378,7 +374,7 @@
   +2 : - Input (Data,Array,Abs,No Wrap,Linear,Preferred State,No Null Position)
   +2 : End Collection
 
-80b0 : Usage Page (Generic Desktop Ctrls)
+8010 : Usage Page (Generic Desktop Ctrls)
   +2 : Usage (Keyboard)
   +2 : Collection (Application)
   +2 : - Usage Page (Kbrd/Keypad)

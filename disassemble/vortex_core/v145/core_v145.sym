@@ -6,15 +6,15 @@
 
 [code]
 
-* 3404 : reset
+*   +4 : reset
 *   +4 : nmi
 *   +4 : hard_fault
 *   +4 : mcu_fault
 *   +4 : bus_fault
 *   +4 : usage_fault
-* 342c : svccall_intr
+*  +14: svccall_intr
 *   +4 : debug_intr
-* 3438 : pendsv_intr
+*   +8 : pendsv_intr
 *   +4 : systick_intr
 *   +4
 *   +4
@@ -42,7 +42,7 @@
 *   +4
 *   +4
 *   +4
-* 34ac
+*   +8
 *   +4
 *   +4
 *   +4
@@ -52,7 +52,7 @@
 *   +4
 *   +4
 *   +4
-* 34e4 : bftm0_intr
+*  +14 : bftm0_intr
 *   +4 : bftm1_intr
 *   +4
 *   +4
@@ -65,7 +65,7 @@
 *   +4
 *   +4
 *   +4 : usb_intr
-* 351c
+*   +8
 *   +4
 *   +4
 *   +4
@@ -73,7 +73,7 @@
 *   +4
 *   +4
 *   +4
-* 3550
+*  +18
 
 3572 : generic_intr
 
@@ -136,7 +136,7 @@
 #5e54 : flash_read_packet
 6030 : reset_builtin                reset_mode
 #5e88 : ckcu_voodoo1
-#6370 : function_130_16
+6370 : matrix_init_outputs
 #6508 : function_e_54
 6820 : clock_init
 #6800 : usb_set_intr_flags
