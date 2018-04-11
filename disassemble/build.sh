@@ -1,56 +1,37 @@
 #!/bin/bash
 
-pushd () {
-    command pushd "$@" > /dev/null
-}
-
-popd () {
-    command popd "$@" > /dev/null
-}
-
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-pushd $DIR
+reas () {
+    echo "$1"
+    elf=$1.elf
+    out=$1.bin
+    ld=$DIR/$2.ld
+    tmp=/tmp/out.o
 
-pushd pok3r
-pushd builtin
-$DIR/reas.sh firmware_builtin.s $DIR/vma0.ld
-popd
-pushd v117
-$DIR/reas.sh pok3r_v117.s $DIR/vma2c.ld
-popd
-popd
+    rm -f $tmp "$elf"
 
-pushd pok3r_rgb
-pushd builtin_rgb
-$DIR/reas.sh firmware_builtin_rgb.s $DIR/vma0.ld
-popd
-pushd v140
-$DIR/reas.sh pok3r_rgb_v140.s $DIR/vma34.ld
-popd
-popd
+    arm-none-eabi-as -mcpu=cortex-m3 -mthumb "$1" -o $tmp && \
+    arm-none-eabi-ld -T "$ld" -o "$elf" $tmp && \
+    arm-none-eabi-objcopy "$elf" -O binary "$out" && \
+    echo "  out: $out"
+}
 
-pushd pok3r_rgb2/v105
-$DIR/reas.sh rgb2_v105.s $DIR/vma34.ld
-popd
+pushd $DIR > /dev/null
 
-pushd vortex_core
-pushd builtin_core
-$DIR/reas.sh vortex_core_builtin.s $DIR/vma0.ld
-popd
-pushd v145
-$DIR/reas.sh core_v145.s $DIR/vma34.ld
-popd
-popd
+reas pok3r/builtin/firmware_builtin.s               vma0
+reas pok3r/v117/pok3r_v117.s                        vma2c
 
-pushd race3
-pushd bootloader
-$DIR/reas.sh race3_bootloader.s $DIR/vma0.ld
-popd
-pushd v124
-$DIR/reas.sh race_v124.s $DIR/vma34.ld
-popd
-popd
+reas pok3r_rgb/builtin_rgb/firmware_builtin_rgb.s   vma0
+reas pok3r_rgb/v140/pok3r_rgb_v140.s                vma34
 
-popd
+reas pok3r_rgb2/v105/rgb2_v105.s                    vma34
+
+reas vortex_core/builtin_core/vortex_core_builtin.s vma0
+reas vortex_core/v145/core_v145.s                   vma34
+
+reas race3/bootloader/race3_bootloader.s            vma0
+reas race3/v124/race_v124.s                         vma34
+
+popd > /dev/null
 
