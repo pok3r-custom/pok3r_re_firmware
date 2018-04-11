@@ -4,7 +4,7 @@ speed 4000
 connect
 rsettype 2
 
-w4 40088304 8
+w4 0x40088304 8
 h
 
 w4 0x40080000 0x2800
