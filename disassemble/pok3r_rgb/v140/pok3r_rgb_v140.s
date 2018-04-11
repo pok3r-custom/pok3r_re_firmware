@@ -4080,7 +4080,7 @@
             data_5110:
 /*0x5110*/  .word 0x20000030
             data_5114:
-/*0x5114*/  .word data_7a2a
+/*0x5114*/  .word 0x00007a2a /* possible pointer */
             data_5118:
 /*0x5118*/  .word 0x20000730
             data_511c:

@@ -810,9 +810,9 @@
 /*0x397c*/      ldr r1, [pc, #0x50] /* data_39d0 */
 /*0x397e*/      ldr r2, [pc, #0x54] /* data_39d4 */
 /*0x3980*/      ldrb r3, [r1, #3]
-/*0x3982*/      ldrb r0, [r2, r0] /* case switch_6d88 */
-/*0x3984*/      cmp r3, #5 /* case switch_6dbc */
-/*0x3986*/      beq jump_39a8 /* case switch_6e08 */
+/*0x3982*/      ldrb r0, [r2, r0]
+/*0x3984*/      cmp r3, #5
+/*0x3986*/      beq jump_39a8
 /*0x3988*/      add.w r0, r0, r0, lsl #1
 /*0x398c*/      adds r4, r0, r1
 /*0x398e*/      add.w r4, r4, #0x1b2
@@ -1052,7 +1052,7 @@
             data_3b1c:
 /*0x3b1c*/  .word 0x20000734
             data_3b20:
-/*0x3b20*/  .word data_7ad2
+/*0x3b20*/  .word 0x00007ad2 /* possible pointer */
 
 
             .thumb_func
@@ -4109,7 +4109,7 @@
             data_5138:
 /*0x5138*/  .word 0x20000058
             data_513c:
-/*0x513c*/  .word data_7ad2
+/*0x513c*/  .word 0x00007ad2 /* possible pointer */
             data_5140:
 /*0x5140*/  .word 0x20000734
             data_5144:
