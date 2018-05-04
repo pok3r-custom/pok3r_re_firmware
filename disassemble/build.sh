@@ -35,6 +35,7 @@ reas pok3r_rgb/v140/pok3r_rgb_v140.s                    vma34
 reas pok3r_rgb/v140/pok3r_rgb_v140_ref.s                vma34   pok3r_rgb/v140/pok3r_rgb_v140.bin
 echo
 
+reas pok3r_rgb2/bootloader/rgb2_bootloader_ref.s        vma0    pok3r_rgb2/bootloader/rgb2_bootloader.bin
 reas pok3r_rgb2/v105/rgb2_v105.s                        vma34
 reas pok3r_rgb2/v105/rgb2_v105_ref.s                    vma34   pok3r_rgb2/v105/rgb2_v105.bin
 echo

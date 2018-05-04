@@ -5693,7 +5693,7 @@
 
 
             .thumb_func
-            call_5cdc:
+            handle_frame:
 /*0x5cdc*/      push {r4, r5, r6, lr}
 /*0x5cde*/      ldr r6, [pc, #0xd4] /* data_5db4 */
 /*0x5ce0*/      ldrb r0, [r6]
@@ -9537,7 +9537,7 @@
 /*0x7926*/      .short 0x1e40 /* subs r0, r0, #1 */ 
 /*0x7928*/      str r0, [r5]
             jump_792a:
-/*0x792a*/      bl call_5cdc
+/*0x792a*/      bl handle_frame
 /*0x792e*/      bl call_7954
 /*0x7932*/      ldrb r0, [r4]
 /*0x7934*/      cbnz r0, jump_793c

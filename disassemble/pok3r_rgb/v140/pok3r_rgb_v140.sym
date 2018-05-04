@@ -132,7 +132,7 @@
 #5c3a : pinmux_c0_gptm
 #5c88 : function_130_11
 #5cd4 : function_130_12
-#5f4c : handle_frame
+5cdc : handle_frame
 #5e54 : flash_read_packet
 #6030 : reset_builtin
 #5e88 : ckcu_voodoo1

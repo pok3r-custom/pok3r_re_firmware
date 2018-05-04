@@ -260,7 +260,7 @@
 /*0x35c0*/      b jump_35d6
             jump_35c2:
 /*0x35c2*/      ldm r1!, {r3}
-/*0x35c4*/      subs r2, r2, #4
+/*0x35c4*/      .short 0x1f12 /* subs r2, r2, #4 */ 
 /*0x35c6*/      stm r0!, {r3}
             jump_35c8:
 /*0x35c8*/      cmp r2, #4
@@ -270,7 +270,7 @@
 /*0x35ce*/      ldrb r3, [r1], #1
 /*0x35d2*/      strb r3, [r0], #1
             jump_35d6:
-/*0x35d6*/      subs r2, r2, #1
+/*0x35d6*/      .short 0x1e52 /* subs r2, r2, #1 */ 
 /*0x35d8*/      bhs jump_35ce
 /*0x35da*/      bx lr
 
@@ -281,7 +281,7 @@
             jump_35e0:
 /*0x35e0*/      strb r2, [r0], #1
             jump_35e4:
-/*0x35e4*/      subs r1, r1, #1
+/*0x35e4*/      .short 0x1e49 /* subs r1, r1, #1 */ 
 /*0x35e6*/      bhs jump_35e0
 /*0x35e8*/      bx lr
 
@@ -309,7 +309,7 @@
 /*0x3606*/      mov r3, r0
 /*0x3608*/      b jump_360c
             jump_360a:
-/*0x360a*/      adds r3, r3, #1
+/*0x360a*/      .short 0x1c5b /* adds r3, r3, #1 */ 
             jump_360c:
 /*0x360c*/      cmp r3, r2
 /*0x360e*/      bhs jump_3618
@@ -386,42 +386,42 @@
 /*0x367a*/      ldr r1, [r0]
 /*0x367c*/      cbz r1, jump_3684
 /*0x367e*/      ldr r1, [r0]
-/*0x3680*/      subs r1, r1, #1
+/*0x3680*/      .short 0x1e49 /* subs r1, r1, #1 */ 
 /*0x3682*/      str r1, [r0]
             jump_3684:
 /*0x3684*/      ldr r1, [r0, #4]
 /*0x3686*/      cbz r1, jump_368e
 /*0x3688*/      ldr r1, [r0, #4]
-/*0x368a*/      subs r1, r1, #1
+/*0x368a*/      .short 0x1e49 /* subs r1, r1, #1 */ 
 /*0x368c*/      str r1, [r0, #4]
             jump_368e:
 /*0x368e*/      ldr r0, [pc, #0x54] /* data_36e4 */
 /*0x3690*/      ldrh r1, [r0]
-/*0x3692*/      adds r1, r1, #1
+/*0x3692*/      .short 0x1c49 /* adds r1, r1, #1 */ 
 /*0x3694*/      strh r1, [r0]
 /*0x3696*/      ldr r0, [pc, #0x50] /* data_36e8 */
 /*0x3698*/      ldr r1, [r0]
 /*0x369a*/      cbz r1, jump_36a2
 /*0x369c*/      ldr r1, [r0]
-/*0x369e*/      adds r1, r1, #1
+/*0x369e*/      .short 0x1c49 /* adds r1, r1, #1 */ 
 /*0x36a0*/      str r1, [r0]
             jump_36a2:
 /*0x36a2*/      ldr r0, [pc, #0x48] /* data_36ec */
 /*0x36a4*/      ldr r1, [r0]
 /*0x36a6*/      cbz r1, jump_36ae
 /*0x36a8*/      ldr r1, [r0]
-/*0x36aa*/      subs r1, r1, #1
+/*0x36aa*/      .short 0x1e49 /* subs r1, r1, #1 */ 
 /*0x36ac*/      str r1, [r0]
             jump_36ae:
 /*0x36ae*/      ldr r0, [pc, #0x40] /* data_36f0 */
 /*0x36b0*/      ldrb r1, [r0]
-/*0x36b2*/      adds r1, r1, #1
+/*0x36b2*/      .short 0x1c49 /* adds r1, r1, #1 */ 
 /*0x36b4*/      strb r1, [r0]
 /*0x36b6*/      ldr r1, [pc, #0x3c] /* data_36f4 */
 /*0x36b8*/      ldrh r0, [r1]
 /*0x36ba*/      cmp r0, #1
 /*0x36bc*/      bls jump_36c2
-/*0x36be*/      subs r0, r0, #1
+/*0x36be*/      .short 0x1e40 /* subs r0, r0, #1 */ 
 /*0x36c0*/      strh r0, [r1]
             jump_36c2:
 /*0x36c2*/      ldr r0, [pc, #0x34] /* data_36f8 */
@@ -432,7 +432,7 @@
 /*0x36cc*/      cmp.w r1, #0xff00
 /*0x36d0*/      bhs jump_36d8
 /*0x36d2*/      ldrh r1, [r0]
-/*0x36d4*/      adds r1, r1, #1
+/*0x36d4*/      .short 0x1c49 /* adds r1, r1, #1 */ 
 /*0x36d6*/      strh r1, [r0]
             jump_36d8:
 /*0x36d8*/      pop {r4, pc}
@@ -485,7 +485,7 @@
 /*0x3734*/      uxth r1, r1
 /*0x3736*/      bl call_4534
 /*0x373a*/      ldrb r0, [r4, #1]
-/*0x373c*/      adds r0, r0, #1
+/*0x373c*/      .short 0x1c40 /* adds r0, r0, #1 */ 
 /*0x373e*/      and r0, r0, #7
 /*0x3742*/      strb r0, [r4, #1]
 /*0x3744*/      pop.w {r4, lr}
@@ -580,7 +580,7 @@
 /*0x37c4*/      add.w r0, r0, r0, lsl #2
 /*0x37c8*/      lsls r0, r0, #2
             jump_37ca:
-/*0x37ca*/      subs r0, r0, #1
+/*0x37ca*/      .short 0x1e40 /* subs r0, r0, #1 */ 
 /*0x37cc*/      bhs jump_37ca
 /*0x37ce*/      bx lr
 
@@ -867,7 +867,7 @@
 /*0x39e2*/      ldrb r3, [r0, r1]
 /*0x39e4*/      strb r3, [r2, r1]
             jump_39e6:
-/*0x39e6*/      subs r1, r1, #1
+/*0x39e6*/      .short 0x1e49 /* subs r1, r1, #1 */ 
 /*0x39e8*/      uxtb r1, r1
 /*0x39ea*/      bhs jump_39e2
 /*0x39ec*/      bx lr
@@ -918,7 +918,7 @@
 /*0x3a34*/      addw r1, r1, #0x28a
 /*0x3a38*/      bl call_408c
             jump_3a3c:
-/*0x3a3c*/      subs r4, r4, #1
+/*0x3a3c*/      .short 0x1e64 /* subs r4, r4, #1 */ 
 /*0x3a3e*/      uxtb r4, r4
 /*0x3a40*/      bhs jump_3a24
 /*0x3a42*/      pop {r4, r5, r6, pc}
@@ -930,9 +930,9 @@
 /*0x3a4a*/      mov r1, r5
 /*0x3a4c*/      mov r0, r4
 /*0x3a4e*/      bl call_408c
-/*0x3a52*/      subs r5, r5, #3
+/*0x3a52*/      .short 0x1eed /* subs r5, r5, #3 */ 
             jump_3a54:
-/*0x3a54*/      subs r4, r4, #1
+/*0x3a54*/      .short 0x1e64 /* subs r4, r4, #1 */ 
 /*0x3a56*/      uxtb r4, r4
 /*0x3a58*/      bhs jump_3a4a
 /*0x3a5a*/      pop {r4, r5, r6, pc}
@@ -1022,7 +1022,7 @@
 /*0x3ae8*/      ldrb r6, [r5, r6]
 /*0x3aea*/      strb r2, [r6, r1]
             jump_3aec:
-/*0x3aec*/      subs r0, r0, #1
+/*0x3aec*/      .short 0x1e40 /* subs r0, r0, #1 */ 
 /*0x3aee*/      uxtb r0, r0
 /*0x3af0*/      bhs jump_3ae6
 /*0x3af2*/      ldr r3, [pc, #0x28] /* data_3b1c */
@@ -1096,11 +1096,11 @@
 /*0x3b6a*/      add.w r6, r5, r6, lsl #3
 /*0x3b6e*/      strb r2, [r6, r3]
             jump_3b70:
-/*0x3b70*/      subs r0, r0, #1
+/*0x3b70*/      .short 0x1e40 /* subs r0, r0, #1 */ 
 /*0x3b72*/      uxtb r0, r0
 /*0x3b74*/      bhs jump_3b5c
             jump_3b76:
-/*0x3b76*/      subs r1, r1, #1
+/*0x3b76*/      .short 0x1e49 /* subs r1, r1, #1 */ 
 /*0x3b78*/      uxtb r1, r1
 /*0x3b7a*/      bhs jump_3b52
             jump_3b7c:
@@ -1246,7 +1246,7 @@
             jump_3c64:
 /*0x3c64*/      bl call_40d0
             jump_3c68:
-/*0x3c68*/      subs r4, r4, #1
+/*0x3c68*/      .short 0x1e64 /* subs r4, r4, #1 */ 
 /*0x3c6a*/      uxtb r4, r4
 /*0x3c6c*/      bhs jump_3c44
             switch_3c6e:
@@ -1352,7 +1352,7 @@
 /*0x3d26*/      lsls r0, r0, #0x15
 /*0x3d28*/      bpl jump_3d36
 /*0x3d2a*/      ldr r1, [pc, #0x38] /* data_3d64 */
-/*0x3d2c*/      adds r1, r1, #3
+/*0x3d2c*/      .short 0x1cc9 /* adds r1, r1, #3 */ 
             jump_3d2e:
 /*0x3d2e*/      movs r0, #0x42
 /*0x3d30*/      bl call_408c
@@ -1430,7 +1430,7 @@
 /*0x3dc4*/      and r0, r4, #3
 /*0x3dc8*/      add.w r0, r1, r0, lsl #10
 /*0x3dcc*/      ldr r1, [pc, #4] /* data_3dd4 */
-/*0x3dce*/      subs r1, r1, #4
+/*0x3dce*/      .short 0x1f09 /* subs r1, r1, #4 */ 
 /*0x3dd0*/      str r0, [r1]
             jump_3dd2:
 /*0x3dd2*/      pop {r4, pc}
@@ -1572,7 +1572,7 @@
 /*0x3ed8*/      bl call_3ea0
             jump_3edc:
 /*0x3edc*/      ldrb r0, [r4, #2]
-/*0x3ede*/      adds r0, r0, #1
+/*0x3ede*/      .short 0x1c40 /* adds r0, r0, #1 */ 
 /*0x3ee0*/      uxtb r0, r0
 /*0x3ee2*/      strb r0, [r4, #2]
 /*0x3ee4*/      cmp r0, #4
@@ -1629,11 +1629,11 @@
 /*0x3f34*/      ldrb r3, [r1], #1
 /*0x3f38*/      strb r3, [r4], #1
             jump_3f3c:
-/*0x3f3c*/      subs r0, r0, #1
+/*0x3f3c*/      .short 0x1e40 /* subs r0, r0, #1 */ 
 /*0x3f3e*/      uxtb r0, r0
 /*0x3f40*/      bhs jump_3f34
             jump_3f42:
-/*0x3f42*/      subs r2, r2, #1
+/*0x3f42*/      .short 0x1e52 /* subs r2, r2, #1 */ 
 /*0x3f44*/      uxtb r2, r2
 /*0x3f46*/      bhs jump_3f2e
 /*0x3f48*/      movs r0, #0
@@ -1721,7 +1721,7 @@
 /*0x3fd8*/      add r0, r5
 /*0x3fda*/      uxth r5, r0
             jump_3fdc:
-/*0x3fdc*/      subs r4, r4, #1
+/*0x3fdc*/      .short 0x1e64 /* subs r4, r4, #1 */ 
 /*0x3fde*/      uxtb r4, r4
 /*0x3fe0*/      bhs jump_3fd0
 /*0x3fe2*/      cmp r5, #0xe0
@@ -1816,12 +1816,12 @@
 /*0x4070*/      ldrb r4, [r0], #1
 /*0x4074*/      strb r4, [r1], #0x48
             jump_4078:
-/*0x4078*/      subs r2, r2, #1
+/*0x4078*/      .short 0x1e52 /* subs r2, r2, #1 */ 
 /*0x407a*/      uxtb r2, r2
 /*0x407c*/      bhs jump_4070
 /*0x407e*/      subs r1, #0xd7
             jump_4080:
-/*0x4080*/      subs r3, r3, #1
+/*0x4080*/      .short 0x1e5b /* subs r3, r3, #1 */ 
 /*0x4082*/      uxtb r3, r3
 /*0x4084*/      bhs jump_406c
 /*0x4086*/      pop {r4, pc}
@@ -1838,7 +1838,7 @@
 /*0x4092*/      add r2, r0
 /*0x4094*/      movs r0, #0
             jump_4096:
-/*0x4096*/      adds r0, r0, #1
+/*0x4096*/      .short 0x1c40 /* adds r0, r0, #1 */ 
 /*0x4098*/      ldrb r3, [r1], #1
 /*0x409c*/      uxtb r0, r0
 /*0x409e*/      strb r3, [r2], #0x48
@@ -1863,10 +1863,10 @@
 /*0x40b8*/      movs r1, #0x48
 /*0x40ba*/      mov r0, r6
 /*0x40bc*/      bl mem_set
-/*0x40c0*/      adds r5, r5, #1
+/*0x40c0*/      .short 0x1c6d /* adds r5, r5, #1 */ 
 /*0x40c2*/      adds r6, #0x48
             jump_40c4:
-/*0x40c4*/      subs r4, r4, #1
+/*0x40c4*/      .short 0x1e64 /* subs r4, r4, #1 */ 
 /*0x40c6*/      uxtb r4, r4
 /*0x40c8*/      bhs jump_40b6
 /*0x40ca*/      pop {r4, r5, r6, pc}
@@ -1886,7 +1886,7 @@
             jump_40dc:
 /*0x40dc*/      strb r1, [r0], #0x48
             jump_40e0:
-/*0x40e0*/      subs r2, r2, #1
+/*0x40e0*/      .short 0x1e52 /* subs r2, r2, #1 */ 
 /*0x40e2*/      uxtb r2, r2
 /*0x40e4*/      bhs jump_40dc
             jump_40e6:
@@ -2186,7 +2186,7 @@
 /*0x433c*/      cbz r0, jump_4346
             jump_433e:
 /*0x433e*/      mov r0, r4
-/*0x4340*/      subs r4, r4, #1
+/*0x4340*/      .short 0x1e64 /* subs r4, r4, #1 */ 
 /*0x4342*/      bhs jump_4332
 /*0x4344*/      pop {r4, pc}
             jump_4346:
@@ -2268,7 +2268,7 @@
 /*0x43cc*/      ldrb.w ip, [r0, r5]
 /*0x43d0*/      str.w ip, [r6, #0x10]
             jump_43d4:
-/*0x43d4*/      adds r5, r5, #1
+/*0x43d4*/      .short 0x1c6d /* adds r5, r5, #1 */ 
             jump_43d6:
 /*0x43d6*/      cmp r5, r4
 /*0x43d8*/      blo jump_43ca
@@ -2286,11 +2286,11 @@
 /*0x43ee*/      ldrb.w ip, [r0, r4]
 /*0x43f2*/      str.w ip, [r6, #0x10]
             jump_43f6:
-/*0x43f6*/      adds r4, r4, #1
+/*0x43f6*/      .short 0x1c64 /* adds r4, r4, #1 */ 
 /*0x43f8*/      cbz r1, jump_43fc
 /*0x43fa*/      strb r5, [r1, r3]
             jump_43fc:
-/*0x43fc*/      adds r3, r3, #1
+/*0x43fc*/      .short 0x1c5b /* adds r3, r3, #1 */ 
             jump_43fe:
 /*0x43fe*/      cmp r4, r2
 /*0x4400*/      blo jump_43e0
@@ -2307,7 +2307,7 @@
 /*0x4414*/      cbz r1, jump_4418
 /*0x4416*/      strb r0, [r1, r3]
             jump_4418:
-/*0x4418*/      adds r3, r3, #1
+/*0x4418*/      .short 0x1c5b /* adds r3, r3, #1 */ 
             jump_441a:
 /*0x441a*/      cmp r3, r2
 /*0x441c*/      blo jump_4408
@@ -2331,7 +2331,7 @@
 /*0x443e*/      cbz r0, jump_4448
             jump_4440:
 /*0x4440*/      mov r0, r4
-/*0x4442*/      subs r4, r4, #1
+/*0x4442*/      .short 0x1e64 /* subs r4, r4, #1 */ 
 /*0x4444*/      bhs jump_4434
 /*0x4446*/      pop {r4, r5, r6, pc}
             jump_4448:
@@ -2393,7 +2393,7 @@
 /*0x44b6*/      bl call_4328
 /*0x44ba*/      cmp r0, #1
 /*0x44bc*/      bne jump_44e0
-/*0x44be*/      adds r4, r4, #1
+/*0x44be*/      .short 0x1c64 /* adds r4, r4, #1 */ 
 /*0x44c0*/      add.w r5, r5, #0x100
 /*0x44c4*/      add.w r6, r6, #0x100
             jump_44c8:
@@ -2454,7 +2454,7 @@
 /*0x4526*/      cbz r0, jump_4530
             jump_4528:
 /*0x4528*/      mov r0, r4
-/*0x452a*/      subs r4, r4, #1
+/*0x452a*/      .short 0x1e64 /* subs r4, r4, #1 */ 
 /*0x452c*/      bhs jump_451c
 /*0x452e*/      pop {r4, pc}
             jump_4530:
@@ -2732,7 +2732,7 @@
 /*0x46e0*/      uxtb r0, r1
 /*0x46e2*/      bx lr
             jump_46e4:
-/*0x46e4*/      subs r1, r1, #1
+/*0x46e4*/      .short 0x1e49 /* subs r1, r1, #1 */ 
 /*0x46e6*/      uxth r1, r1
 /*0x46e8*/      bhs jump_46da
 /*0x46ea*/      movs r0, #0
@@ -2809,9 +2809,9 @@
 /*0x4768*/      orrs r7, r1
 /*0x476a*/      str.w r7, [r2, r0, lsl #2]
             jump_476e:
-/*0x476e*/      adds r4, r4, #3
+/*0x476e*/      .short 0x1ce4 /* adds r4, r4, #3 */ 
             jump_4770:
-/*0x4770*/      subs r5, r5, #1
+/*0x4770*/      .short 0x1e6d /* subs r5, r5, #1 */ 
 /*0x4772*/      uxtb r5, r5
 /*0x4774*/      bhs jump_474e
 /*0x4776*/      pop.w {r4, r5, r6, r7, r8, pc}
@@ -2893,7 +2893,7 @@
 /*0x4806*/      strb r0, [r1, #2]
 /*0x4808*/      b jump_47ec
             jump_480a:
-/*0x480a*/      adds r1, r1, #1
+/*0x480a*/      .short 0x1c49 /* adds r1, r1, #1 */ 
 /*0x480c*/      uxtb r1, r1
 /*0x480e*/      cmp r1, #6
 /*0x4810*/      blo jump_47f2
@@ -2905,7 +2905,7 @@
 /*0x481c*/      ldrb.w ip, [ip, #2]
 /*0x4820*/      cmp.w ip, #0
 /*0x4824*/      beq jump_4842
-/*0x4826*/      adds r1, r1, #1
+/*0x4826*/      .short 0x1c49 /* adds r1, r1, #1 */ 
 /*0x4828*/      uxtb r1, r1
 /*0x482a*/      cmp r1, #6
 /*0x482c*/      blo jump_4818
@@ -3177,7 +3177,7 @@
 /*0x4a30*/      ldrb r7, [r1, r4]
 /*0x4a32*/      cmp r6, r7
 /*0x4a34*/      beq jump_4a3e
-/*0x4a36*/      adds r4, r4, #1
+/*0x4a36*/      .short 0x1c64 /* adds r4, r4, #1 */ 
 /*0x4a38*/      uxtb r4, r4
             jump_4a3a:
 /*0x4a3a*/      cmp r4, r3
@@ -3188,7 +3188,7 @@
 /*0x4a42*/      movs r0, #0
 /*0x4a44*/      pop {r4, r5, r6, r7, pc}
             jump_4a46:
-/*0x4a46*/      adds r5, r5, #1
+/*0x4a46*/      .short 0x1c6d /* adds r5, r5, #1 */ 
 /*0x4a48*/      uxtb r5, r5
             jump_4a4a:
 /*0x4a4a*/      cmp r5, r2
@@ -3226,18 +3226,18 @@
 /*0x4a80*/      tst r4, r6
 /*0x4a82*/      bne jump_4a94
 /*0x4a84*/      cbz r1, jump_4aa4
-/*0x4a86*/      subs r1, r1, #1
+/*0x4a86*/      .short 0x1e49 /* subs r1, r1, #1 */ 
 /*0x4a88*/      ldrb r6, [r7, r2]
-/*0x4a8a*/      adds r5, r5, #1
+/*0x4a8a*/      .short 0x1c6d /* adds r5, r5, #1 */ 
 /*0x4a8c*/      strb r6, [r0], #1
 /*0x4a90*/      uxtb r1, r1
 /*0x4a92*/      uxtb r5, r5
             jump_4a94:
-/*0x4a94*/      subs r2, r2, #1
+/*0x4a94*/      .short 0x1e52 /* subs r2, r2, #1 */ 
 /*0x4a96*/      uxtb r2, r2
 /*0x4a98*/      bhs jump_4a7a
             jump_4a9a:
-/*0x4a9a*/      subs r3, r3, #1
+/*0x4a9a*/      .short 0x1e5b /* subs r3, r3, #1 */ 
 /*0x4a9c*/      uxtb r3, r3
 /*0x4a9e*/      bhs jump_4a5c
 /*0x4aa0*/      mov r0, r5
@@ -3283,7 +3283,7 @@
 /*0x4aec*/      orrs r4, r1
 /*0x4aee*/      strb r4, [r2]
             jump_4af0:
-/*0x4af0*/      subs r0, r0, #1
+/*0x4af0*/      .short 0x1e40 /* subs r0, r0, #1 */ 
 /*0x4af2*/      uxtb r0, r0
 /*0x4af4*/      bhs jump_4ad6
 /*0x4af6*/      movs r0, #0xa
@@ -3296,7 +3296,7 @@
             jump_4b02:
 /*0x4b02*/      pop {r1, r2, r3, r4, r5, r6, r7, pc}
             jump_4b04:
-/*0x4b04*/      subs r0, r0, #1
+/*0x4b04*/      .short 0x1e40 /* subs r0, r0, #1 */ 
 /*0x4b06*/      uxtb r0, r0
 /*0x4b08*/      bhs jump_4afa
 /*0x4b0a*/      movs r0, #1
@@ -3408,7 +3408,7 @@
 /*0x4be2*/      ldrb.w r1, [ip, #4]
 /*0x4be6*/      cbz r2, jump_4c20
 /*0x4be8*/      ldrb.w r0, [ip, #6]
-/*0x4bec*/      adds r0, r0, #1
+/*0x4bec*/      .short 0x1c40 /* adds r0, r0, #1 */ 
 /*0x4bee*/      uxtb r0, r0
 /*0x4bf0*/      strb.w r0, [ip, #6]
 /*0x4bf4*/      cmp r0, #3
@@ -3416,7 +3416,7 @@
 /*0x4bf8*/      mov r0, ip
 /*0x4bfa*/      strb.w r5, [ip, #6]
 /*0x4bfe*/      ldrb r0, [r0, #4]
-/*0x4c00*/      adds r0, r0, #1
+/*0x4c00*/      .short 0x1c40 /* adds r0, r0, #1 */ 
 /*0x4c02*/      cmp r2, #6
 /*0x4c04*/      beq jump_4c0c
 /*0x4c06*/      cmp r2, #7
@@ -3460,13 +3460,13 @@
             jump_4c5a:
 /*0x4c5a*/      movs r1, #3
 /*0x4c5c*/      add.w r0, ip, #7
-/*0x4c60*/      adds r3, r3, #3
+/*0x4c60*/      .short 0x1cdb /* adds r3, r3, #3 */ 
 /*0x4c62*/      b jump_4ca6
             jump_4c64:
 /*0x4c64*/      lsl.w r2, sb, r1
 /*0x4c68*/      ldrb.w r6, [ip, #7]
 /*0x4c6c*/      uxtb r2, r2
-/*0x4c6e*/      subs r3, r3, #1
+/*0x4c6e*/      .short 0x1e5b /* subs r3, r3, #1 */ 
 /*0x4c70*/      tst r6, r2
 /*0x4c72*/      ldrb r6, [r0, #-0x1]!
 /*0x4c76*/      beq jump_4c8a
@@ -3495,7 +3495,7 @@
             jump_4ca4:
 /*0x4ca4*/      strb r2, [r0]
             jump_4ca6:
-/*0x4ca6*/      subs r1, r1, #1
+/*0x4ca6*/      .short 0x1e49 /* subs r1, r1, #1 */ 
 /*0x4ca8*/      uxtb r1, r1
 /*0x4caa*/      bhs jump_4c64
             jump_4cac:
@@ -3519,7 +3519,7 @@
 /*0x4ccc*/      subs r0, r6, #2
 /*0x4cce*/      movs r1, #0
 /*0x4cd0*/      bl call_6f40
-/*0x4cd4*/      subs r6, r6, #3
+/*0x4cd4*/      .short 0x1ef6 /* subs r6, r6, #3 */ 
 /*0x4cd6*/      b jump_4cee
             jump_4cd8:
 /*0x4cd8*/      ldrb r1, [r6]
@@ -3528,16 +3528,16 @@
 /*0x4cde*/      strb r5, [r6]
 /*0x4ce0*/      b jump_4ce6
             jump_4ce2:
-/*0x4ce2*/      subs r1, r1, #2
+/*0x4ce2*/      .short 0x1e89 /* subs r1, r1, #2 */ 
 /*0x4ce4*/      strb r1, [r6]
             jump_4ce6:
-/*0x4ce6*/      subs r6, r6, #1
+/*0x4ce6*/      .short 0x1e76 /* subs r6, r6, #1 */ 
             jump_4ce8:
-/*0x4ce8*/      subs r0, r0, #1
+/*0x4ce8*/      .short 0x1e40 /* subs r0, r0, #1 */ 
 /*0x4cea*/      uxtb r0, r0
 /*0x4cec*/      bhs jump_4cd8
             jump_4cee:
-/*0x4cee*/      subs r7, r7, #1
+/*0x4cee*/      .short 0x1e7f /* subs r7, r7, #1 */ 
 /*0x4cf0*/      uxtb r7, r7
 /*0x4cf2*/      bhs jump_4cba
 /*0x4cf4*/      b jump_4e14
@@ -3564,12 +3564,12 @@
             jump_4d22:
 /*0x4d22*/      ldrb r1, [r6], #-1
 /*0x4d26*/      cbz r1, jump_4d2c
-/*0x4d28*/      subs r6, r6, #2
+/*0x4d28*/      .short 0x1eb6 /* subs r6, r6, #2 */ 
 /*0x4d2a*/      b jump_4d3c
             jump_4d2c:
 /*0x4d2c*/      ldrb r1, [r6], #-1
 /*0x4d30*/      cbz r1, jump_4d36
-/*0x4d32*/      subs r6, r6, #1
+/*0x4d32*/      .short 0x1e76 /* subs r6, r6, #1 */ 
 /*0x4d34*/      b jump_4d3c
             jump_4d36:
 /*0x4d36*/      ldrb r1, [r6], #-1
@@ -3594,19 +3594,19 @@
 /*0x4d60*/      subs r3, r3, r2
 /*0x4d62*/      strb r3, [r6]
             jump_4d64:
-/*0x4d64*/      subs r1, r1, #1
+/*0x4d64*/      .short 0x1e49 /* subs r1, r1, #1 */ 
 /*0x4d66*/      uxtb r1, r1
 /*0x4d68*/      bhs jump_4d54
-/*0x4d6a*/      subs r6, r6, #3
+/*0x4d6a*/      .short 0x1ef6 /* subs r6, r6, #3 */ 
             jump_4d6c:
-/*0x4d6c*/      subs r0, r0, #1
+/*0x4d6c*/      .short 0x1e40 /* subs r0, r0, #1 */ 
 /*0x4d6e*/      uxtb r0, r0
 /*0x4d70*/      bhs jump_4d22
             jump_4d72:
 /*0x4d72*/      b jump_4e14
             jump_4d74:
 /*0x4d74*/      ldrb.w r0, [ip, #0x58]
-/*0x4d78*/      adds r0, r0, #1
+/*0x4d78*/      .short 0x1c40 /* adds r0, r0, #1 */ 
 /*0x4d7a*/      uxtb r0, r0
 /*0x4d7c*/      strb.w r0, [ip, #0x58]
 /*0x4d80*/      cmp r0, r2
@@ -3616,7 +3616,7 @@
             jump_4d8a:
 /*0x4d8a*/      add.w r1, r0, r0, lsl #1
 /*0x4d8e*/      add.w r1, ip, r1, lsl #1
-/*0x4d92*/      adds r0, r0, #1
+/*0x4d92*/      .short 0x1c40 /* adds r0, r0, #1 */ 
 /*0x4d94*/      ldrh r2, [r1, #4]
 /*0x4d96*/      strh r2, [r1, #-0x2]
 /*0x4d9a*/      ldrb r2, [r1, #6]
@@ -3636,7 +3636,7 @@
 /*0x4dbe*/      ldrb r2, [r1, #2]
 /*0x4dc0*/      strb r2, [r1, #8]
             jump_4dc2:
-/*0x4dc2*/      subs r0, r0, #1
+/*0x4dc2*/      .short 0x1e40 /* subs r0, r0, #1 */ 
 /*0x4dc4*/      uxtb r0, r0
 /*0x4dc6*/      bhs jump_4db0
 /*0x4dc8*/      strh.w r5, [ip, #7]
@@ -3644,7 +3644,7 @@
 /*0x4dd0*/      b jump_4e14
             jump_4dd2:
 /*0x4dd2*/      ldrb.w r0, [ip, #0x27]
-/*0x4dd6*/      adds r0, r0, #1
+/*0x4dd6*/      .short 0x1c40 /* adds r0, r0, #1 */ 
 /*0x4dd8*/      uxtb r0, r0
 /*0x4dda*/      strb.w r0, [ip, #0x27]
 /*0x4dde*/      cmp r0, r2
@@ -3656,9 +3656,9 @@
 /*0x4dec*/      b jump_4e0e
             jump_4dee:
 /*0x4dee*/      ldrsb r1, [r0, #-0x1]
-/*0x4df2*/      subs r0, r0, #5
+/*0x4df2*/      .short 0x1f40 /* subs r0, r0, #5 */ 
 /*0x4df4*/      cbz r1, jump_4e0e
-/*0x4df6*/      adds r1, r1, #1
+/*0x4df6*/      .short 0x1c49 /* adds r1, r1, #1 */ 
 /*0x4df8*/      sxtb r1, r1
 /*0x4dfa*/      strb r1, [r0, #4]
 /*0x4dfc*/      ldrb r3, [r0, #3]
@@ -3671,7 +3671,7 @@
 /*0x4e0a*/      bpl jump_4e0e
 /*0x4e0c*/      strb r5, [r0, #4]
             jump_4e0e:
-/*0x4e0e*/      subs r2, r2, #1
+/*0x4e0e*/      .short 0x1e52 /* subs r2, r2, #1 */ 
 /*0x4e10*/      uxtb r2, r2
 /*0x4e12*/      bhs jump_4dee
             jump_4e14:
@@ -3927,7 +3927,7 @@
 /*0x4fd0*/      cmp ip, r2
 /*0x4fd2*/      beq jump_4fda
             jump_4fd4:
-/*0x4fd4*/      subs r1, r1, #1
+/*0x4fd4*/      .short 0x1e49 /* subs r1, r1, #1 */ 
 /*0x4fd6*/      uxtb r1, r1
 /*0x4fd8*/      bhs jump_4fcc
             jump_4fda:
@@ -3987,7 +3987,7 @@
             jump_504c:
 /*0x504c*/      b jump_5022
             jump_504e:
-/*0x504e*/      adds r1, r1, #1
+/*0x504e*/      .short 0x1c49 /* adds r1, r1, #1 */ 
 /*0x5050*/      uxtb r1, r1
 /*0x5052*/      cmp r1, #0x22
 /*0x5054*/      blo jump_5034
@@ -4038,7 +4038,7 @@
 /*0x50ae*/      movs r1, #7
 /*0x50b0*/      udiv r2, r0, r1
 /*0x50b4*/      mls r0, r1, r2, r0
-/*0x50b8*/      adds r0, r0, #1
+/*0x50b8*/      .short 0x1c40 /* adds r0, r0, #1 */ 
 /*0x50ba*/      strb r0, [r5, #0xb]
 /*0x50bc*/      b jump_50c0
             jump_50be:
@@ -4073,7 +4073,7 @@
 /*0x50f2*/      ldr r1, [pc, #0x48] /* data_513c */
 /*0x50f4*/      movs r3, #3
 /*0x50f6*/      mov r2, r3
-/*0x50f8*/      adds r1, r1, #4
+/*0x50f8*/      .short 0x1d09 /* adds r1, r1, #4 */ 
 /*0x50fa*/      mov r0, sp
 /*0x50fc*/      bl call_4a24
 /*0x5100*/      cmp r0, #0
@@ -4148,7 +4148,7 @@
             jump_5182:
 /*0x5182*/      pop {r4, r5, r6, pc}
             jump_5184:
-/*0x5184*/      adds r0, r0, #1
+/*0x5184*/      .short 0x1c40 /* adds r0, r0, #1 */ 
 /*0x5186*/      uxtb r0, r0
 /*0x5188*/      cmp r0, #0x22
 /*0x518a*/      blo jump_516a
@@ -4166,7 +4166,7 @@
 /*0x51a0*/      strb r1, [r2, r0]
 /*0x51a2*/      pop {r4, r5, r6, pc}
             jump_51a4:
-/*0x51a4*/      adds r0, r0, #1
+/*0x51a4*/      .short 0x1c40 /* adds r0, r0, #1 */ 
 /*0x51a6*/      uxtb r0, r0
 /*0x51a8*/      cmp r0, #0x22
 /*0x51aa*/      blo jump_5190
@@ -4404,7 +4404,7 @@
 /*0x5342*/      add.w r0, r0, r0, lsl #2
 /*0x5346*/      adds r1, r0, r3
 /*0x5348*/      ldr r0, [pc, #0x78] /* data_53c4 */
-/*0x534a*/      adds r1, r1, #4
+/*0x534a*/      .short 0x1d09 /* adds r1, r1, #4 */ 
 /*0x534c*/      str r1, [r0]
 /*0x534e*/      ldrb r2, [r1]
 /*0x5350*/      cbnz r2, jump_5362
@@ -4452,12 +4452,12 @@
             jump_539c:
 /*0x539c*/      movs r1, #0x55
             jump_539e:
-/*0x539e*/      adds r0, r0, #4
+/*0x539e*/      .short 0x1d00 /* adds r0, r0, #4 */ 
 /*0x53a0*/      bl mem_zero
 /*0x53a4*/      b jump_53b2
             jump_53a6:
 /*0x53a6*/      movs r1, #0x24
-/*0x53a8*/      adds r0, r0, #4
+/*0x53a8*/      .short 0x1d00 /* adds r0, r0, #4 */ 
 /*0x53aa*/      bl mem_zero
 /*0x53ae*/      bl call_6d3c
             jump_53b2:
@@ -4597,7 +4597,7 @@
 /*0x5490*/      b jump_549c
             jump_5492:
 /*0x5492*/      strb r2, [r5, #3]
-/*0x5494*/      subs r2, r2, #7
+/*0x5494*/      .short 0x1fd2 /* subs r2, r2, #7 */ 
 /*0x5496*/      cmp r2, #7
 /*0x5498*/      blo jump_549e
 /*0x549a*/      movs r0, #7
@@ -4613,7 +4613,7 @@
 /*0x54ae*/      ldrb r1, [r0, #3]
 /*0x54b0*/      cmp r1, #8
 /*0x54b2*/      bhs jump_54f8
-/*0x54b4*/      adds r1, r1, #1
+/*0x54b4*/      .short 0x1c49 /* adds r1, r1, #1 */ 
 /*0x54b6*/      b jump_54c6
             jump_54b8:
 /*0x54b8*/      bl call_6d3c
@@ -4622,7 +4622,7 @@
 /*0x54be*/      ldrb r1, [r0, #3]
 /*0x54c0*/      cmp r1, #1
 /*0x54c2*/      bls jump_54f8
-/*0x54c4*/      subs r1, r1, #1
+/*0x54c4*/      .short 0x1e49 /* subs r1, r1, #1 */ 
             jump_54c6:
 /*0x54c6*/      strb r1, [r0, #3]
 /*0x54c8*/      ldrb r0, [r5, #3]
@@ -4708,7 +4708,7 @@
 /*0x556c*/      add.w r0, r0, r0, lsl #1
 /*0x5570*/      add r0, r5
 /*0x5572*/      pop.w {r4, r5, r6, lr}
-/*0x5576*/      adds r0, r0, #4
+/*0x5576*/      .short 0x1d00 /* adds r0, r0, #4 */ 
 /*0x5578*/      b.w call_6f40
             jump_557c:
 /*0x557c*/      ldr r3, [pc, #0x2c] /* data_55ac */
@@ -4990,15 +4990,15 @@
 /*0x579c*/      movs r3, #0
 /*0x579e*/      b jump_57a2
             jump_57a0:
-/*0x57a0*/      subs r3, r3, #3
+/*0x57a0*/      .short 0x1edb /* subs r3, r3, #3 */ 
             jump_57a2:
 /*0x57a2*/      movs r5, #1
 /*0x57a4*/      lsl.w r0, r5, r4
-/*0x57a8*/      subs r0, r0, #1
+/*0x57a8*/      .short 0x1e40 /* subs r0, r0, #1 */ 
 /*0x57aa*/      ands r0, r1
 /*0x57ac*/      lsls r0, r3
 /*0x57ae*/      lsls r5, r3
-/*0x57b0*/      subs r5, r5, #1
+/*0x57b0*/      .short 0x1e6d /* subs r5, r5, #1 */ 
 /*0x57b2*/      ands r5, r2
 /*0x57b4*/      orrs r0, r5
 /*0x57b6*/      pop {r4, r5, pc}
@@ -5468,9 +5468,9 @@
 /*0x5b38*/      strh r0, [r5]
             jump_5b3a:
 /*0x5b3a*/      ldrh r0, [r5]
-/*0x5b3c*/      adds r0, r0, #1
+/*0x5b3c*/      .short 0x1c40 /* adds r0, r0, #1 */ 
 /*0x5b3e*/      strh r0, [r5]
-/*0x5b40*/      adds r4, r4, #4
+/*0x5b40*/      .short 0x1d24 /* adds r4, r4, #4 */ 
             jump_5b42:
 /*0x5b42*/      ldrh r0, [r5]
 /*0x5b44*/      cmp r0, #0xff
@@ -5543,9 +5543,9 @@
 /*0x5bc4*/      subs r0, #0x48
 /*0x5bc6*/      ldrb.w r1, [sp]
 /*0x5bca*/      strb r1, [r0]
-/*0x5bcc*/      subs r4, r4, #1
+/*0x5bcc*/      .short 0x1e64 /* subs r4, r4, #1 */ 
             jump_5bce:
-/*0x5bce*/      subs r5, r5, #1
+/*0x5bce*/      .short 0x1e6d /* subs r5, r5, #1 */ 
 /*0x5bd0*/      uxtb r5, r5
 /*0x5bd2*/      bhs jump_5bac
 /*0x5bd4*/      pop {r3, r4, r5, pc}
@@ -5737,7 +5737,7 @@
 
 
             .thumb_func
-            call_5d18:
+            handle_frame:
 /*0x5d18*/      push {r4, r5, r6, lr}
 /*0x5d1a*/      ldr r6, [pc, #0xd4] /* data_5df0 */
 /*0x5d1c*/      ldrb r0, [r6]
@@ -5769,10 +5769,19 @@
 /*0x5d4c*/      mov.w r3, #0x400
 /*0x5d50*/      cmp r0, #0x20
 /*0x5d52*/      blo jump_5d72
-/*0x5d54*/      sub.w r2, r0, #0x1f
-/*0x5d58*/      rsb r2, r2, r2, lsl #4
-/*0x5d5c*/      cmp.w r3, r2, lsl #2
-/*0x5d60*/      blt jump_5d72
+
+/* flash read patch */
+/* -------------------------------------- */
+/*0x5d54*/      cmp r0, #255
+/*0x5d56*/      bne jump_5d62
+/*0x5d58*/      ldr r0, [r5, #4]
+/*0x5d5a*/      movs r1, #60
+/*0x5d5c*/      b jump_5dc2
+/*0x5d5e*/  .short 0x46c0
+/*0x5d60*/  .short 0x46c0
+/* -------------------------------------- */
+
+            jump_5d62:
 /*0x5d62*/      rsb r0, r0, r0, lsl #4
 /*0x5d66*/      mov.w r1, #0x2880
 /*0x5d6a*/      add.w r0, r1, r0, lsl #2
@@ -5874,7 +5883,7 @@
 /*0x5e20*/      b jump_5e26
             jump_5e22:
 /*0x5e22*/      ldr r0, [pc, #0x4c] /* data_5e70 */
-/*0x5e24*/      subs r0, r0, #5
+/*0x5e24*/      .short 0x1f40 /* subs r0, r0, #5 */ 
             jump_5e26:
 /*0x5e26*/      str r0, [r1]
 /*0x5e28*/      movs r1, #0
@@ -5935,7 +5944,7 @@
 /*0x5e9c*/      adds r0, r5, r4
 /*0x5e9e*/      rsb.w r1, r4, #0x3c
 /*0x5ea2*/      pop.w {r4, r5, r6, lr}
-/*0x5ea6*/      adds r0, r0, #4
+/*0x5ea6*/      .short 0x1d00 /* adds r0, r0, #4 */ 
 /*0x5ea8*/      b.w mem_zero
 
             data_5eac:
@@ -5973,7 +5982,7 @@
 /*0x5ee8*/      mov.w r0, #0x1c20
 /*0x5eec*/      str.w r1, [r2, #0x108]
             jump_5ef0:
-/*0x5ef0*/      subs r0, r0, #1
+/*0x5ef0*/      .short 0x1e40 /* subs r0, r0, #1 */ 
 /*0x5ef2*/      bhs jump_5ef0
 /*0x5ef4*/      movs r0, #1
 /*0x5ef6*/      str.w r0, [r2, #0x108]
@@ -6040,11 +6049,11 @@
             jump_5f6a:
 /*0x5f6a*/      lsrs r4, r4, #1
             jump_5f6c:
-/*0x5f6c*/      subs r6, r6, #1
+/*0x5f6c*/      .short 0x1e76 /* subs r6, r6, #1 */ 
 /*0x5f6e*/      uxtb r6, r6
 /*0x5f70*/      bhs jump_5f32
             jump_5f72:
-/*0x5f72*/      subs r7, r7, #1
+/*0x5f72*/      .short 0x1e7f /* subs r7, r7, #1 */ 
 /*0x5f74*/      uxtb r7, r7
 /*0x5f76*/      bhs jump_5f16
 /*0x5f78*/      pop.w {r4, r5, r6, r7, r8, sb, sl, pc}
@@ -6073,7 +6082,7 @@
 /*0x5fa2*/      ldrb r1, [r5, r1]
 /*0x5fa4*/      cbnz r1, jump_5fac
             jump_5fa6:
-/*0x5fa6*/      subs r0, r0, #1
+/*0x5fa6*/      .short 0x1e40 /* subs r0, r0, #1 */ 
 /*0x5fa8*/      uxtb r0, r0
 /*0x5faa*/      bhs jump_5f9e
             jump_5fac:
@@ -6089,7 +6098,7 @@
 /*0x5fbc*/      movs r0, #0xa
 /*0x5fbe*/      b jump_5fd8
             jump_5fc0:
-/*0x5fc0*/      subs r4, r4, #1
+/*0x5fc0*/      .short 0x1e64 /* subs r4, r4, #1 */ 
 /*0x5fc2*/      ands r4, r4, #0xff
 /*0x5fc6*/      beq jump_5fb4
 /*0x5fc8*/      mov r0, r7
@@ -6098,9 +6107,9 @@
             jump_5fd0:
 /*0x5fd0*/      ldrb r3, [r1, #2]
 /*0x5fd2*/      strb r3, [r2], #1
-/*0x5fd6*/      adds r1, r1, #3
+/*0x5fd6*/      .short 0x1cc9 /* adds r1, r1, #3 */ 
             jump_5fd8:
-/*0x5fd8*/      subs r0, r0, #1
+/*0x5fd8*/      .short 0x1e40 /* subs r0, r0, #1 */ 
 /*0x5fda*/      uxtb r0, r0
 /*0x5fdc*/      bhs jump_5fd0
 /*0x5fde*/      ldr r0, [pc, #0x10] /* data_5ff0 */
@@ -6120,7 +6129,7 @@
             call_5ff4:
 /*0x5ff4*/      ldr r1, [pc, #0x10] /* data_6008 */
 /*0x5ff6*/      ldrb r0, [r1]
-/*0x5ff8*/      adds r0, r0, #1
+/*0x5ff8*/      .short 0x1c40 /* adds r0, r0, #1 */ 
 /*0x5ffa*/      strb r0, [r1]
 /*0x5ffc*/      lsls r0, r0, #0x1e
 /*0x5ffe*/      bne jump_6004
@@ -6166,7 +6175,7 @@
 /*0x604e*/      ldrb r0, [r0, #1]
 /*0x6050*/      bl call_3640
             jump_6054:
-/*0x6054*/      subs r4, r4, #1
+/*0x6054*/      .short 0x1e64 /* subs r4, r4, #1 */ 
 /*0x6056*/      uxtb r4, r4
 /*0x6058*/      bhs jump_6024
 /*0x605a*/      movs r4, #0xa
@@ -6189,7 +6198,7 @@
 /*0x6080*/      movs r2, #1
 /*0x6082*/      bl call_4538
             jump_6086:
-/*0x6086*/      subs r4, r4, #1
+/*0x6086*/      .short 0x1e64 /* subs r4, r4, #1 */ 
 /*0x6088*/      uxtb r4, r4
 /*0x608a*/      bhs jump_605e
 /*0x608c*/      movs r2, #0xff
@@ -6207,7 +6216,7 @@
 /*0x60a8*/      strb r2, [r0], #1
 /*0x60ac*/      strb r2, [r0], #1
             jump_60b0:
-/*0x60b0*/      subs r1, r1, #1
+/*0x60b0*/      .short 0x1e49 /* subs r1, r1, #1 */ 
 /*0x60b2*/      uxtb r1, r1
 /*0x60b4*/      bhs jump_60a4
 /*0x60b6*/      pop.w {r4, r5, r6, r7, r8, pc}
@@ -6241,10 +6250,10 @@
 /*0x60e0*/      movs r0, #0
 /*0x60e2*/      pop {r4, pc}
             jump_60e4:
-/*0x60e4*/      adds r0, r0, #3
-/*0x60e6*/      adds r1, r1, #1
+/*0x60e4*/      .short 0x1cc0 /* adds r0, r0, #3 */ 
+/*0x60e6*/      .short 0x1c49 /* adds r1, r1, #1 */ 
             jump_60e8:
-/*0x60e8*/      subs r2, r2, #1
+/*0x60e8*/      .short 0x1e52 /* subs r2, r2, #1 */ 
 /*0x60ea*/      uxtb r2, r2
 /*0x60ec*/      bhs jump_60d4
 /*0x60ee*/      movs r0, #1
@@ -6326,7 +6335,7 @@
 /*0x6174*/      ldr.w r0, [r5, r4, lsl #3]
 /*0x6178*/      bl call_4538
             jump_617c:
-/*0x617c*/      subs r4, r4, #1
+/*0x617c*/      .short 0x1e64 /* subs r4, r4, #1 */ 
 /*0x617e*/      uxtb r4, r4
 /*0x6180*/      bhs jump_615c
 /*0x6182*/      cbz r7, jump_6196
@@ -6371,7 +6380,7 @@
 /*0x61c8*/      ldrb r2, [r4], #-1
 /*0x61cc*/      strb r0, [r1, r2]
             jump_61ce:
-/*0x61ce*/      subs r0, r0, #1
+/*0x61ce*/      .short 0x1e40 /* subs r0, r0, #1 */ 
 /*0x61d0*/      uxtb r0, r0
 /*0x61d2*/      bhs jump_61c8
 /*0x61d4*/      pop {r4, pc}
@@ -6395,7 +6404,7 @@
 /*0x61ec*/      ldrb r5, [r4, r5]
 /*0x61ee*/      strb r2, [r3, r5]
             jump_61f0:
-/*0x61f0*/      subs r0, r0, #1
+/*0x61f0*/      .short 0x1e40 /* subs r0, r0, #1 */ 
 /*0x61f2*/      uxtb r0, r0
 /*0x61f4*/      bhs jump_61e6
 /*0x61f6*/      pop {r4, r5, pc}
@@ -6426,21 +6435,21 @@
 /*0x622a*/      b jump_6240
             jump_622c:
 /*0x622c*/      ldrb r6, [r2], #8
-/*0x6230*/      subs r4, r4, #1
+/*0x6230*/      .short 0x1e64 /* subs r4, r4, #1 */ 
 /*0x6232*/      ands r4, r4, #0xff
 /*0x6236*/      ldrh.w r6, [r7, r6, lsl #1]
 /*0x623a*/      strh r6, [r0]
 /*0x623c*/      beq jump_625a
-/*0x623e*/      adds r0, r0, #4
+/*0x623e*/      .short 0x1d00 /* adds r0, r0, #4 */ 
             jump_6240:
-/*0x6240*/      subs r1, r1, #1
+/*0x6240*/      .short 0x1e49 /* subs r1, r1, #1 */ 
 /*0x6242*/      uxtb r1, r1
 /*0x6244*/      bhs jump_622c
-/*0x6246*/      adds r3, r3, #1
+/*0x6246*/      .short 0x1c5b /* adds r3, r3, #1 */ 
 /*0x6248*/      uxtb r3, r3
 /*0x624a*/      cmp r3, #3
 /*0x624c*/      blo jump_621a
-/*0x624e*/      adds r5, r5, #1
+/*0x624e*/      .short 0x1c6d /* adds r5, r5, #1 */ 
 /*0x6250*/      uxtb r5, r5
 /*0x6252*/      cmp r5, #8
 /*0x6254*/      blo jump_620e
@@ -6575,7 +6584,7 @@
 /*0x637a*/      bl call_4578
 /*0x637e*/      adds r4, #8
             jump_6380:
-/*0x6380*/      subs r5, r5, #1
+/*0x6380*/      .short 0x1e6d /* subs r5, r5, #1 */ 
 /*0x6382*/      uxtb r5, r5
 /*0x6384*/      bhs jump_635a
 /*0x6386*/      movs r2, #1
@@ -6633,7 +6642,7 @@
 /*0x63ec*/      bl call_4538
 /*0x63f0*/      adds r4, #8
             jump_63f2:
-/*0x63f2*/      subs r5, r5, #1
+/*0x63f2*/      .short 0x1e6d /* subs r5, r5, #1 */ 
 /*0x63f4*/      uxtb r5, r5
 /*0x63f6*/      bhs jump_63ce
 /*0x63f8*/      ldr r5, [pc, #0xa0] /* data_649c */
@@ -6764,7 +6773,7 @@
 /*0x651a*/      mov.w fp, #0x4000
 /*0x651e*/      adds r4, #0x3e
 /*0x6520*/      cbz r0, jump_6530
-/*0x6522*/      subs r0, r0, #1
+/*0x6522*/      .short 0x1e40 /* subs r0, r0, #1 */ 
 /*0x6524*/      ands r0, r0, #0xff
 /*0x6528*/      strb r0, [r1]
 /*0x652a*/      bne jump_6530
@@ -6772,7 +6781,7 @@
             jump_6530:
 /*0x6530*/      mov sb, r7
             jump_6532:
-/*0x6532*/      subs r5, r5, #1
+/*0x6532*/      .short 0x1e6d /* subs r5, r5, #1 */ 
 /*0x6534*/      uxtb r5, r5
 /*0x6536*/      blo jump_6572
 /*0x6538*/      mov.w r8, #0x8000
@@ -6784,7 +6793,7 @@
 /*0x654a*/      ldrh r0, [r7]
 /*0x654c*/      movs r1, #9
 /*0x654e*/      ubfx r7, r0, #6, #1
-/*0x6552*/      subs r4, r4, #4
+/*0x6552*/      .short 0x1f24 /* subs r4, r4, #4 */ 
 /*0x6554*/      bl call_7310
 /*0x6558*/      mov r0, fp
 /*0x655a*/      str.w fp, [r6, #0x28]
@@ -6931,12 +6940,12 @@
 /*0x6668*/      ldr r2, [pc, #0x2c] /* data_6698 */
 /*0x666a*/      ldr.w r3, [r2, #0x200]
 /*0x666e*/      bic r3, r3, #7
-/*0x6672*/      adds r3, r3, #3
+/*0x6672*/      .short 0x1cdb /* adds r3, r3, #3 */ 
 /*0x6674*/      str.w r3, [r2, #0x200]
 /*0x6678*/      str r1, [r0, #0x20]
 /*0x667a*/      ldr r2, [r0, #4]
 /*0x667c*/      bic r2, r2, #3
-/*0x6680*/      adds r2, r2, #1
+/*0x6680*/      .short 0x1c52 /* adds r2, r2, #1 */ 
 /*0x6682*/      str r2, [r0, #4]
             jump_6684:
 /*0x6684*/      ldr r2, [r0, #0x34]
@@ -7100,7 +7109,7 @@
 /*0x67cc*/      movs r0, #0
 /*0x67ce*/      bl call_6974
 /*0x67d2*/      ldr r0, [r4, #0x20]
-/*0x67d4*/      adds r0, r0, #1
+/*0x67d4*/      .short 0x1c40 /* adds r0, r0, #1 */ 
 /*0x67d6*/      beq jump_6808
 /*0x67d8*/      ldrb.w r0, [r4, #0x24]
 /*0x67dc*/      cmp r0, #2
@@ -7140,7 +7149,7 @@
 /*0x6822*/      bl call_6b3c
 /*0x6826*/      bl call_6b1c
 /*0x682a*/      mov r5, r0
-/*0x682c*/      adds r0, r0, #1
+/*0x682c*/      .short 0x1c40 /* adds r0, r0, #1 */ 
 /*0x682e*/      beq jump_685a
 /*0x6830*/      mov r0, r5
 /*0x6832*/      bl call_69e4
@@ -7579,7 +7588,7 @@
 /*0x6b2c*/      sxtb r0, r1
 /*0x6b2e*/      bx lr
             jump_6b30:
-/*0x6b30*/      subs r1, r1, #1
+/*0x6b30*/      .short 0x1e49 /* subs r1, r1, #1 */ 
 /*0x6b32*/      cmp r1, #0
 /*0x6b34*/      bgt jump_6b20
 /*0x6b36*/      mov.w r0, #-1
@@ -7666,7 +7675,7 @@
 /*0x6bc8*/      movs r1, #0xc8
 /*0x6bca*/      movs r0, #0
             jump_6bcc:
-/*0x6bcc*/      adds r0, r0, #1
+/*0x6bcc*/      .short 0x1c40 /* adds r0, r0, #1 */ 
 /*0x6bce*/      cmp r0, r1
 /*0x6bd0*/      blo jump_6bcc
 /*0x6bd2*/      pop.w {r4, lr}
@@ -7906,7 +7915,7 @@
 /*0x6d52*/      adds r5, r3, r0
 /*0x6d54*/      strb r4, [r5, #4]
             jump_6d56:
-/*0x6d56*/      subs r0, r0, #1
+/*0x6d56*/      .short 0x1e40 /* subs r0, r0, #1 */ 
 /*0x6d58*/      uxtb r0, r0
 /*0x6d5a*/      bhs jump_6d4c
 /*0x6d5c*/      pop {r4, r5, pc}
@@ -7961,7 +7970,7 @@
 /*0x6da6*/      movs r1, #0x48
 /*0x6da8*/      bl mem_set
             jump_6dac:
-/*0x6dac*/      subs r5, r5, #1
+/*0x6dac*/      .short 0x1e6d /* subs r5, r5, #1 */ 
 /*0x6dae*/      uxtb r5, r5
 /*0x6db0*/      bhs jump_6d8e
             jump_6db2:
@@ -7989,7 +7998,7 @@
 /*0x6ddc*/      adds r7, #0x20
 /*0x6dde*/      uxtb r7, r7
             jump_6de0:
-/*0x6de0*/      subs r5, r5, #1
+/*0x6de0*/      .short 0x1e6d /* subs r5, r5, #1 */ 
 /*0x6de2*/      uxtb r5, r5
 /*0x6de4*/      bhs jump_6dc4
 /*0x6de6*/      ldr r5, [pc, #0x128] /* data_6f10 */
@@ -8004,15 +8013,15 @@
 /*0x6df8*/      mov r0, r4
 /*0x6dfa*/      bl call_408c
             jump_6dfe:
-/*0x6dfe*/      subs r5, r5, #1
+/*0x6dfe*/      .short 0x1e6d /* subs r5, r5, #1 */ 
             jump_6e00:
-/*0x6e00*/      subs r4, r4, #1
+/*0x6e00*/      .short 0x1e64 /* subs r4, r4, #1 */ 
 /*0x6e02*/      uxtb r4, r4
 /*0x6e04*/      bhs jump_6dec
 /*0x6e06*/      b jump_6db2
             switch_6e08:
 /*0x6e08*/      add sp, #0x2c
-/*0x6e0a*/      subs r0, r0, #4
+/*0x6e0a*/      .short 0x1f00 /* subs r0, r0, #4 */ 
 /*0x6e0c*/      pop.w {r4, r5, r6, r7, lr}
 /*0x6e10*/      uxtb r0, r0
 /*0x6e12*/      b.w jump_3a18
@@ -8068,7 +8077,7 @@
             jump_6e76:
 /*0x6e76*/      strb r0, [r6, r2]
             jump_6e78:
-/*0x6e78*/      subs r2, r2, #1
+/*0x6e78*/      .short 0x1e52 /* subs r2, r2, #1 */ 
 /*0x6e7a*/      uxtb r2, r2
 /*0x6e7c*/      bhs jump_6e6a
 /*0x6e7e*/      mov r1, r6
@@ -8084,11 +8093,11 @@
 /*0x6e8e*/      cbz r0, jump_6ea0
             jump_6e90:
 /*0x6e90*/      mov r0, r5
-/*0x6e92*/      adds r1, r1, #3
+/*0x6e92*/      .short 0x1cc9 /* adds r1, r1, #3 */ 
             jump_6e94:
 /*0x6e94*/      bl call_6f14
             jump_6e98:
-/*0x6e98*/      subs r5, r5, #1
+/*0x6e98*/      .short 0x1e6d /* subs r5, r5, #1 */ 
 /*0x6e9a*/      uxtb r5, r5
 /*0x6e9c*/      bhs jump_6e42
 /*0x6e9e*/      b jump_6db2
@@ -8097,7 +8106,7 @@
 /*0x6ea2*/      b jump_6e80
             jump_6ea4:
 /*0x6ea4*/      ldr r0, [pc, #0x68] /* data_6f10 */
-/*0x6ea6*/      adds r0, r0, #1
+/*0x6ea6*/      .short 0x1c40 /* adds r0, r0, #1 */ 
 /*0x6ea8*/      ldrb r1, [r0, r5]
 /*0x6eaa*/      and r0, r1, #7
 /*0x6eae*/      add.w r0, r0, r0, lsl #2
@@ -8126,7 +8135,7 @@
 /*0x6ede*/      lsrs r2, r2, #8
 /*0x6ee0*/      strb r2, [r3, r1]
             jump_6ee2:
-/*0x6ee2*/      subs r1, r1, #1
+/*0x6ee2*/      .short 0x1e49 /* subs r1, r1, #1 */ 
 /*0x6ee4*/      uxtb r1, r1
 /*0x6ee6*/      bhs jump_6ed8
 /*0x6ee8*/      mov r1, r3
@@ -8138,7 +8147,7 @@
 /*0x6ef4*/      mov r0, r5
 /*0x6ef6*/      bl call_40d0
             jump_6efa:
-/*0x6efa*/      subs r5, r5, #1
+/*0x6efa*/      .short 0x1e6d /* subs r5, r5, #1 */ 
 /*0x6efc*/      uxtb r5, r5
 /*0x6efe*/      bhs jump_6ea4
 /*0x6f00*/      b jump_6db2
@@ -8172,9 +8181,9 @@
 /*0x6f2a*/      mov r0, r4
 /*0x6f2c*/      bl call_408c
             jump_6f30:
-/*0x6f30*/      subs r5, r5, #1
+/*0x6f30*/      .short 0x1e6d /* subs r5, r5, #1 */ 
             jump_6f32:
-/*0x6f32*/      subs r4, r4, #1
+/*0x6f32*/      .short 0x1e64 /* subs r4, r4, #1 */ 
 /*0x6f34*/      uxtb r4, r4
 /*0x6f36*/      bhs jump_6f22
 /*0x6f38*/      pop.w {r4, r5, r6, r7, r8, pc}
@@ -8203,7 +8212,7 @@
 /*0x6f5e*/      lsrs r0, r0, #3
 /*0x6f60*/      strb r0, [r4], #1
             jump_6f64:
-/*0x6f64*/      subs r2, r2, #1
+/*0x6f64*/      .short 0x1e52 /* subs r2, r2, #1 */ 
 /*0x6f66*/      uxtb r2, r2
 /*0x6f68*/      bhs jump_6f58
 /*0x6f6a*/      pop {r3, r4, r5, pc}
@@ -8275,10 +8284,10 @@
 /*0x6fd2*/      mov r0, r4
 /*0x6fd4*/      pop {r4, pc}
             jump_6fd6:
-/*0x6fd6*/      adds r4, r4, #1
+/*0x6fd6*/      .short 0x1c64 /* adds r4, r4, #1 */ 
 /*0x6fd8*/      uxtb r4, r4
             jump_6fda:
-/*0x6fda*/      subs r0, r0, #1
+/*0x6fda*/      .short 0x1e40 /* subs r0, r0, #1 */ 
 /*0x6fdc*/      uxtb r0, r0
 /*0x6fde*/      bhs jump_6fc4
 /*0x6fe0*/      movs r0, #0x60
@@ -8334,7 +8343,7 @@
 /*0x702c*/      cmp r1, r3
 /*0x702e*/      beq jump_706e
             jump_7030:
-/*0x7030*/      subs r0, r0, #1
+/*0x7030*/      .short 0x1e40 /* subs r0, r0, #1 */ 
 /*0x7032*/      uxtb r0, r0
 /*0x7034*/      bhs jump_702a
             jump_7036:
@@ -8357,10 +8366,10 @@
 /*0x705c*/      ldrh r5, [r5, #0x28]
 /*0x705e*/      cmp.w r3, r5, lsl #22
 /*0x7062*/      beq jump_706e
-/*0x7064*/      adds r1, r1, #1
+/*0x7064*/      .short 0x1c49 /* adds r1, r1, #1 */ 
 /*0x7066*/      strb r1, [r4, #2]
             jump_7068:
-/*0x7068*/      subs r0, r0, #1
+/*0x7068*/      .short 0x1e40 /* subs r0, r0, #1 */ 
 /*0x706a*/      uxtb r0, r0
 /*0x706c*/      bhs jump_7056
             jump_706e:
@@ -8386,7 +8395,7 @@
 /*0x708e*/      ldrh r0, [r1]
 /*0x7090*/      ldr r2, [r2]
 /*0x7092*/      add.w r4, r2, r0, lsl #2
-/*0x7096*/      adds r0, r0, #1
+/*0x7096*/      .short 0x1c40 /* adds r0, r0, #1 */ 
 /*0x7098*/      strh r0, [r1]
 /*0x709a*/      ldrb r0, [r4, #1]
 /*0x709c*/      movs r1, #4
@@ -8482,7 +8491,7 @@
 /*0x7164*/      ldr r1, [pc, #0x44] /* data_71ac */
 /*0x7166*/      ldr r1, [r1]
 /*0x7168*/      add.w r4, r1, r0, lsl #2
-/*0x716c*/      adds r0, r0, #1
+/*0x716c*/      .short 0x1c40 /* adds r0, r0, #1 */ 
 /*0x716e*/      strh r0, [r5]
 /*0x7170*/      ldr r0, [r6]
 /*0x7172*/      bl call_4a1e
@@ -8549,9 +8558,9 @@
             jump_71e4:
 /*0x71e4*/      ldrd r0, r1, [r5]
 /*0x71e8*/      str r1, [r0, #0x28]
-/*0x71ea*/      subs r6, r6, #1
+/*0x71ea*/      .short 0x1e76 /* subs r6, r6, #1 */ 
 /*0x71ec*/      uxtb r6, r6
-/*0x71ee*/      subs r4, r4, #3
+/*0x71ee*/      .short 0x1ee4 /* subs r4, r4, #3 */ 
 /*0x71f0*/      nop 
 /*0x71f2*/      nop 
 /*0x71f4*/      movs r0, #0xff
@@ -8611,7 +8620,7 @@
 /*0x7260*/      bne jump_7264
 /*0x7262*/      strb r1, [r4, #2]
             jump_7264:
-/*0x7264*/      subs r0, r0, #1
+/*0x7264*/      .short 0x1e40 /* subs r0, r0, #1 */ 
             jump_7266:
 /*0x7266*/      strb r0, [r4]
             jump_7268:
@@ -8643,7 +8652,7 @@
 /*0x7292*/      ldr r1, [pc, #0x44] /* data_72d8 */
 /*0x7294*/      ldr r6, [pc, #0x44] /* data_72dc */
 /*0x7296*/      udiv r4, r0, r1
-/*0x729a*/      subs r4, r4, #1
+/*0x729a*/      .short 0x1e64 /* subs r4, r4, #1 */ 
 /*0x729c*/      strh.w r4, [sp]
 /*0x72a0*/      movs r5, #0
 /*0x72a2*/      strh.w r5, [sp, #2]
@@ -8692,7 +8701,7 @@
 /*0x72fc*/      str r2, [r1, #0x24]
 /*0x72fe*/      nop 
             jump_7300:
-/*0x7300*/      subs r0, r0, #1
+/*0x7300*/      .short 0x1e40 /* subs r0, r0, #1 */ 
 /*0x7302*/      uxtb r0, r0
 /*0x7304*/      bhs jump_72f6
 /*0x7306*/      str r4, [r1, #0x28]
@@ -8727,7 +8736,7 @@
 /*0x732e*/      str r4, [r5, #0x24]
 /*0x7330*/      and.w r0, r6, r0, lsl #1
             jump_7334:
-/*0x7334*/      subs r1, r1, #1
+/*0x7334*/      .short 0x1e49 /* subs r1, r1, #1 */ 
 /*0x7336*/      uxtb r1, r1
 /*0x7338*/      bhs jump_7320
 /*0x733a*/      pop {r4, r5, r6, r7, pc}
@@ -8849,7 +8858,7 @@
 /*0x7414*/      ldr r1, [pc, #0x24] /* data_743c */
 /*0x7416*/      movs r2, #2
 /*0x7418*/      strb r4, [r5, #1]
-/*0x741a*/      subs r1, r1, #2
+/*0x741a*/      .short 0x1e89 /* subs r1, r1, #2 */ 
 /*0x741c*/      b jump_742c
             jump_741e:
 /*0x741e*/      ldrb r0, [r5, #3]
@@ -8943,7 +8952,7 @@
 /*0x74c6*/      b jump_74cc
             jump_74c8:
 /*0x74c8*/      ldr r1, [pc, #0x70] /* data_753c */
-/*0x74ca*/      adds r1, r1, #4
+/*0x74ca*/      .short 0x1d09 /* adds r1, r1, #4 */ 
             jump_74cc:
 /*0x74cc*/      strd r1, r4, [r0, #0x1c]
 /*0x74d0*/      b jump_7530
@@ -8993,7 +9002,7 @@
 /*0x7526*/      b jump_752e
             jump_7528:
 /*0x7528*/      ldr r2, [pc, #0x10] /* data_753c */
-/*0x752a*/      subs r2, r2, #4
+/*0x752a*/      .short 0x1f12 /* subs r2, r2, #4 */ 
 /*0x752c*/      strb r1, [r2, #4]
             jump_752e:
 /*0x752e*/      str r5, [r0, #0x20]
@@ -9349,7 +9358,7 @@
 /*0x779c*/      ldr r1, [pc, #0x1c] /* data_77bc */
 /*0x779e*/      sxtb r0, r5
 /*0x77a0*/      bl call_6a04
-/*0x77a4*/      adds r5, r5, #1
+/*0x77a4*/      .short 0x1c6d /* adds r5, r5, #1 */ 
 /*0x77a6*/      cmp r5, #8
 /*0x77a8*/      blo jump_779c
 /*0x77aa*/      movs r0, #6
@@ -9406,7 +9415,7 @@
 
             .thumb_func
             call_780c:
-/*0x780c*/      subs r2, r2, #1
+/*0x780c*/      .short 0x1e52 /* subs r2, r2, #1 */ 
 /*0x780e*/      bmi jump_781a
 /*0x7810*/      ldr.w r3, [r0, r2, lsl #2]
 /*0x7814*/      str.w r3, [r1, r2, lsl #2]
@@ -9504,11 +9513,11 @@
 
 
             .thumb_func
-            sram_task1:
+            loc_78e4:
 /*0x78e4*/      b jump_78ec
             jump_78e6:
 /*0x78e6*/      ldm r0!, {r3}
-/*0x78e8*/      subs r2, r2, #4
+/*0x78e8*/      .short 0x1f12 /* subs r2, r2, #4 */ 
 /*0x78ea*/      stm r1!, {r3}
             jump_78ec:
 /*0x78ec*/      cmp r2, #0
@@ -9520,12 +9529,12 @@
 /*0x78f2*/      bx lr
 
             .thumb_func
-            sram_task2:
+            loc_78f4:
 /*0x78f4*/      movs r0, #0
 /*0x78f6*/      b jump_78fc
             jump_78f8:
 /*0x78f8*/      stm r1!, {r0}
-/*0x78fa*/      subs r2, r2, #4
+/*0x78fa*/      .short 0x1f12 /* subs r2, r2, #4 */ 
             jump_78fc:
 /*0x78fc*/      cmp r2, #0
 /*0x78fe*/      bne jump_78f8
@@ -9573,7 +9582,7 @@
 /*0x7966*/      bl call_5f88
             jump_796a:
 /*0x796a*/      ldrh r0, [r4, #4]
-/*0x796c*/      adds r0, r0, #1
+/*0x796c*/      .short 0x1c40 /* adds r0, r0, #1 */ 
 /*0x796e*/      strh r0, [r4, #4]
 /*0x7970*/      bl call_79fc
 /*0x7974*/      movs r0, #1
@@ -9606,7 +9615,7 @@
 /*0x79b6*/      bl call_5f88
             jump_79ba:
 /*0x79ba*/      ldrh r0, [r4, #4]
-/*0x79bc*/      adds r0, r0, #1
+/*0x79bc*/      .short 0x1c40 /* adds r0, r0, #1 */ 
 /*0x79be*/      lsls r0, r0, #0x10
 /*0x79c0*/      lsrs r0, r0, #0x10
 /*0x79c2*/      strh r0, [r4, #4]
@@ -9615,10 +9624,10 @@
 /*0x79c8*/      cmp r0, r6
 /*0x79ca*/      bls jump_79d2
 /*0x79cc*/      ldr r0, [r5]
-/*0x79ce*/      subs r0, r0, #1
+/*0x79ce*/      .short 0x1e40 /* subs r0, r0, #1 */ 
 /*0x79d0*/      str r0, [r5]
             jump_79d2:
-/*0x79d2*/      bl call_5d18
+/*0x79d2*/      bl handle_frame
 /*0x79d6*/      bl call_79fc
 /*0x79da*/      ldrb r0, [r4]
 /*0x79dc*/      cbnz r0, jump_79e4
@@ -9728,7 +9737,7 @@
 /*0x7aae*/      beq jump_7ac4
 /*0x7ab0*/      ldr r0, [pc, #0x18] /* data_7acc */
 /*0x7ab2*/      ldrb r2, [r5, #2]
-/*0x7ab4*/      adds r0, r0, #6
+/*0x7ab4*/      .short 0x1d80 /* adds r0, r0, #6 */ 
 /*0x7ab6*/      ldrb r1, [r0, #1]
 /*0x7ab8*/      add r1, r2
 /*0x7aba*/      strb r1, [r0, #1]
@@ -11402,11 +11411,11 @@
 /*0x81b0*/  .word data_81d0
 /*0x81b4*/  .word 0x20000000
 /*0x81b8*/  .word 0x0000006c
-/*0x81bc*/  .word sram_task1
+/*0x81bc*/  .word 0x000078e4 /* possible pointer */
 /*0x81c0*/  .word data_823c
 /*0x81c4*/  .word 0x2000006c
 /*0x81c8*/  .word 0x00002174
-/*0x81cc*/  .word sram_task2
+/*0x81cc*/  .word 0x000078f4 /* possible pointer */
 
             data_81d0:
 /*0x81d0*/  .byte 0x00

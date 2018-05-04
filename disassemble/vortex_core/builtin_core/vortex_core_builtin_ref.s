@@ -3,11 +3,9 @@
 .text
 .thumb
 
-/*0x0000*/  .byte 0x30
-/*0x0001*/  .byte 0x07
-/*0x0002*/  .byte 0x00
-/*0x0003*/  .byte 0x20
 
+            vectors:
+/*0x0000*/  .word 0x20000730
 /*0x0004*/  .word reset
 /*0x0008*/  .word generic_fault
 /*0x000c*/  .word generic_fault
@@ -24,10 +22,10 @@
             .thumb_func
             call_24:
 /*0x0024*/      ldr r0, [pc, #0] /* data_28 */
-/*0x0026*/      bx r0 /* jump_1efc */
+/*0x0026*/      bx r0 /* main */
 
             data_28:
-/*0x0028*/  .word jump_1efc
+/*0x0028*/  .word main
             data_2c:
 /*0x002c*/  .word 0x20000730
 
@@ -4268,11 +4266,8 @@
 
 
             .thumb_func
-            jump_1efc:
-/*0x1efc*/      ldr r0, [pc, #0x90] /* data_1f90 */
-
-            .thumb_func
             main:
+/*0x1efc*/      ldr r0, [pc, #0x90] /* data_1f90 */
 /*0x1efe*/      ldr r3, [r0]
 /*0x1f00*/      ldr r2, [pc, #0x90] /* data_1f94 */
 /*0x1f02*/      adds r1, r2, #5

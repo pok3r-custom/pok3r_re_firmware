@@ -24,6 +24,7 @@ reas pok3r/v117                 firmware_v117.bin           pok3r_v117_ref.s    
 reas pok3r_rgb/builtin_rgb      firmware_builtin_rgb.bin    firmware_builtin_rgb_ref.s  0x0     symbols_builtin_rgb.sym
 reas pok3r_rgb/v140             pok3r_rgb_v140.bin          pok3r_rgb_v140_ref.s        0x3400  pok3r_rgb_v140.sym
 
+reas pok3r_rgb2/bootloader      rgb2_bootloader.bin         rgb2_bootloader_ref.s       0x0     rgb2_bootloader.sym
 reas pok3r_rgb2/v105            rgb2_v105.bin               rgb2_v105_ref.s             0x3400  rgb2_v105.sym
 
 reas vortex_core/builtin_core   firmware_builtin_core.bin   vortex_core_builtin_ref.s   0x0     symbols_builtin_core.sym

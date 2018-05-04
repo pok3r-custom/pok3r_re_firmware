@@ -4,6 +4,7 @@ build:
 	@sh disassemble/build.sh
 
 reassemble:
+	@echo "** Reference Firmware Disassemble"
 	@sh disassemble/reas.sh $(abspath ../reassemble-build/reassemble)
 
 jlink:
