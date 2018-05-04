@@ -288,7 +288,7 @@
             .thumb_func
             mem_zero: /* (dest, size) */
 /*0x35ea*/      movs r2, #0
-/*0x35ec*/      b mem_set
+/*0x35ec*/      b mem_set /* (dest, size, val) */
 
             .thumb_func
             mem_set2: /* (dest, val, size) */
@@ -297,7 +297,7 @@
 /*0x35f2*/      mov r2, r1
 /*0x35f4*/      mov r4, r0
 /*0x35f6*/      mov r1, r3
-/*0x35f8*/      bl mem_set
+/*0x35f8*/      bl mem_set /* (dest, size, val) */
 /*0x35fc*/      mov r0, r4
 /*0x35fe*/      pop {r4, pc}
 
@@ -380,7 +380,7 @@
             bftm0_intr:
 /*0x366c*/      push {r4, lr}
 /*0x366e*/      ldr r0, [pc, #0x6c] /* data_36dc */
-/*0x3670*/      bl bftm_clear
+/*0x3670*/      bl bftm_clear /* (BFTM) */
 /*0x3674*/      bl call_5fb8
 /*0x3678*/      ldr r0, [pc, #0x64] /* data_36e0 */
 /*0x367a*/      ldr r1, [r0]
@@ -462,7 +462,7 @@
             bftm1_intr:
 /*0x36fc*/      push {r4, lr}
 /*0x36fe*/      ldr r0, [pc, #0x4c] /* data_374c */
-/*0x3700*/      bl bftm_clear
+/*0x3700*/      bl bftm_clear /* (BFTM) */
 /*0x3704*/      ldr r4, [pc, #0x48] /* data_3750 */
 /*0x3706*/      ldr r0, [r4, #4]
 /*0x3708*/      ldrh r1, [r0, #4]
@@ -470,7 +470,7 @@
 /*0x370c*/      uxth r1, r1
 /*0x370e*/      bl call_45a0
 /*0x3712*/      movs r0, #0xa
-/*0x3714*/      bl spin_wait
+/*0x3714*/      bl spin_wait /* (time) */
 /*0x3718*/      movs r0, #2
 /*0x371a*/      bl call_7238
 /*0x371e*/      ldr r1, [pc, #0x34] /* data_3754 */
@@ -594,7 +594,7 @@
 /*0x37de*/      mov r8, r0
 /*0x37e0*/      movs r3, #1
 /*0x37e2*/      mov r1, r5
-/*0x37e4*/      bl ckcu_clocks_enable
+/*0x37e4*/      bl ckcu_clocks_enable /* (ahb_mask, apb0_mas, apb1_mask, en) */
 /*0x37e8*/      ldr r6, [pc, #0x94] /* data_3880 */
 /*0x37ea*/      movs r2, #0
 /*0x37ec*/      mov r1, r5
@@ -625,19 +625,19 @@
 /*0x382a*/      movs r2, #1
 /*0x382c*/      movs r1, #0xb
 /*0x382e*/      movs r0, #0
-/*0x3830*/      bl afio_pin_config
+/*0x3830*/      bl afio_pin_config /* (gpio_num, pin_num, af_num) */
 /*0x3834*/      movs r2, #1
 /*0x3836*/      movs r1, #0xd
 /*0x3838*/      movs r0, #2
-/*0x383a*/      bl afio_pin_config
+/*0x383a*/      bl afio_pin_config /* (gpio_num, pin_num, af_num) */
 /*0x383e*/      movs r2, #1
 /*0x3840*/      movs r1, #0xe
 /*0x3842*/      movs r0, #2
-/*0x3844*/      bl afio_pin_config
+/*0x3844*/      bl afio_pin_config /* (gpio_num, pin_num, af_num) */
 /*0x3848*/      movs r2, #1
 /*0x384a*/      movs r1, #0xf
 /*0x384c*/      movs r0, #2
-/*0x384e*/      bl afio_pin_config
+/*0x384e*/      bl afio_pin_config /* (gpio_num, pin_num, af_num) */
 /*0x3852*/      ldr r0, [pc, #0x30] /* data_3884 */
 /*0x3854*/      ldr r0, [r0, #4]
 /*0x3856*/      lsls r0, r0, #0x15
@@ -645,17 +645,17 @@
 /*0x385a*/      movs r2, #1
 /*0x385c*/      movs r1, #0xe
 /*0x385e*/      mov r0, r2
-/*0x3860*/      bl afio_pin_config
+/*0x3860*/      bl afio_pin_config /* (gpio_num, pin_num, af_num) */
 /*0x3864*/      movs r2, #1
 /*0x3866*/      movs r1, #0xf
 /*0x3868*/      mov r0, r2
-/*0x386a*/      bl afio_pin_config
+/*0x386a*/      bl afio_pin_config /* (gpio_num, pin_num, af_num) */
             jump_386e:
 /*0x386e*/      mov r1, r4
 /*0x3870*/      movs r3, #0
 /*0x3872*/      mov r2, r4
 /*0x3874*/      mov r0, r8
-/*0x3876*/      bl ckcu_clocks_enable
+/*0x3876*/      bl ckcu_clocks_enable /* (ahb_mask, apb0_mas, apb1_mask, en) */
 /*0x387a*/      movs r0, #1
 /*0x387c*/      pop.w {r4, r5, r6, r7, r8, pc}
 
@@ -820,7 +820,7 @@
 /*0x3992*/      movs r2, #3
 /*0x3994*/      mov r1, r4
 /*0x3996*/      ldr r0, [pc, #0x30] /* data_39c8 */
-/*0x3998*/      bl memcmp
+/*0x3998*/      bl memcmp /* (ptr1, ptr2, size) */
 /*0x399c*/      cbz r0, jump_39bc
 /*0x399e*/      ldrh r0, [r5]
 /*0x39a0*/      strh r0, [r4]
@@ -1008,7 +1008,7 @@
 /*0x3ac4*/      ldr r0, [pc, #0x48] /* data_3b10 */
 /*0x3ac6*/      movs r1, #0xd8
 /*0x3ac8*/      subs r0, #0x90
-/*0x3aca*/      bl mem_zero
+/*0x3aca*/      bl mem_zero /* (dest, size) */
 /*0x3ace*/      ldr r4, [pc, #0x4c] /* data_3b1c */
 /*0x3ad0*/      ldr r1, [pc, #0x38] /* data_3b0c */
 /*0x3ad2*/      ldrb r0, [r4, #0xe8]!
@@ -1052,7 +1052,7 @@
             data_3b1c:
 /*0x3b1c*/  .word 0x20000730
             data_3b20:
-/*0x3b20*/  .word 0x00007a2a
+/*0x3b20*/  .word 0x00007a2a /* possible pointer */
 
 
             .thumb_func
@@ -1194,14 +1194,14 @@
 /*0x3c0e*/      bhs switch_3c6e
 /*0x3c10*/      tbb [pc, r0]
 
-/*0x3c14*/  .byte 0x2d
-/*0x3c15*/  .byte 0x04
-/*0x3c16*/  .byte 0x04
-/*0x3c17*/  .byte 0x04
-/*0x3c18*/  .byte 0x0d
-/*0x3c19*/  .byte 0x0f
-/*0x3c1a*/  .byte 0x16
-/*0x3c1b*/  .byte 0x3b
+/*0x3c14*/  .byte 0x2d /* case switch_3c6e */
+/*0x3c15*/  .byte 0x04 /* case switch_3c1c */
+/*0x3c16*/  .byte 0x04 /* case switch_3c1c */
+/*0x3c17*/  .byte 0x04 /* case switch_3c1c */
+/*0x3c18*/  .byte 0x0d /* case switch_3c2e */
+/*0x3c19*/  .byte 0x0f /* case switch_3c32 */
+/*0x3c1a*/  .byte 0x16 /* case switch_3c40 */
+/*0x3c1b*/  .byte 0x3b /* case switch_3c8a */
 
             switch_3c1c:
 /*0x3c1c*/      ldr r1, [pc, #0xe0] /* data_3d00 */
@@ -1221,7 +1221,7 @@
 /*0x3c36*/      movs r1, #0xd8
             jump_3c38:
 /*0x3c38*/      pop.w {r4, r5, r6, lr}
-/*0x3c3c*/      b.w mem_set
+/*0x3c3c*/      b.w mem_set /* (dest, size, val) */
             switch_3c40:
 /*0x3c40*/      movs r4, #0x48
 /*0x3c42*/      b jump_3c68
@@ -1268,7 +1268,7 @@
             switch_3c8a:
 /*0x3c8a*/      movs r1, #0xd8
 /*0x3c8c*/      ldr r0, [pc, #0x70] /* data_3d00 */
-/*0x3c8e*/      bl mem_zero
+/*0x3c8e*/      bl mem_zero /* (dest, size) */
 /*0x3c92*/      ldrb r0, [r5, #4]
 /*0x3c94*/      cbz r0, jump_3ca2
 /*0x3c96*/      movs r0, #0
@@ -1549,12 +1549,12 @@
 /*0x3eaa*/      movs r2, #0xff
 /*0x3eac*/      movs r1, #0xc0
 /*0x3eae*/      adds r0, #0x28
-/*0x3eb0*/      bl mem_set
+/*0x3eb0*/      bl mem_set /* (dest, size, val) */
 /*0x3eb4*/      ldr r0, [pc, #0x14] /* data_3ecc */
 /*0x3eb6*/      movs r2, #0xff
 /*0x3eb8*/      movs r1, #0xc8
 /*0x3eba*/      adds r0, #0xea
-/*0x3ebc*/      bl mem_set
+/*0x3ebc*/      bl mem_set /* (dest, size, val) */
 /*0x3ec0*/      bl call_3f1c
 /*0x3ec4*/      pop.w {r4, lr}
 /*0x3ec8*/      b.w call_3bec
@@ -1647,12 +1647,12 @@
 /*0x3f5c*/      strb r0, [r5, #0x11]
 /*0x3f5e*/      movs r1, #0xd8
 /*0x3f60*/      ldr r0, [pc, #0x1c] /* data_3f80 */
-/*0x3f62*/      bl mem_zero
+/*0x3f62*/      bl mem_zero /* (dest, size) */
 /*0x3f66*/      pop.w {r4, r5, r6, lr}
 /*0x3f6a*/      ldr r0, [pc, #0x14] /* data_3f80 */
 /*0x3f6c*/      movs r1, #0xf
 /*0x3f6e*/      adds r0, #0xd8
-/*0x3f70*/      b.w mem_zero
+/*0x3f70*/      b.w mem_zero /* (dest, size) */
 
             data_3f74:
 /*0x3f74*/  .word 0x20000730
@@ -1759,11 +1759,11 @@
 /*0x4026*/      bhs jump_405c
 /*0x4028*/      tbb [pc, r4]
 
-/*0x402c*/  .byte 0x03
-/*0x402d*/  .byte 0x07
-/*0x402e*/  .byte 0x0c
-/*0x402f*/  .byte 0x10
-/*0x4030*/  .byte 0x13
+/*0x402c*/  .byte 0x03 /* case switch_4032 */
+/*0x402d*/  .byte 0x07 /* case switch_403a */
+/*0x402e*/  .byte 0x0c /* case switch_4044 */
+/*0x402f*/  .byte 0x10 /* case switch_404c */
+/*0x4030*/  .byte 0x13 /* case switch_4052 */
 /*0x4031*/  .byte 0x00
 
             switch_4032:
@@ -1862,7 +1862,7 @@
 /*0x40b6*/      ldrb r2, [r5]
 /*0x40b8*/      movs r1, #0x48
 /*0x40ba*/      mov r0, r6
-/*0x40bc*/      bl mem_set
+/*0x40bc*/      bl mem_set /* (dest, size, val) */
 /*0x40c0*/      .short 0x1c6d /* adds r5, r5, #1 */ 
 /*0x40c2*/      adds r6, #0x48
             jump_40c4:
@@ -1933,7 +1933,7 @@
 /*0x4128*/      movs r1, #0x20
 /*0x412a*/      movs r3, #1
 /*0x412c*/      mov r0, r2
-/*0x412e*/      bl ckcu_clocks_enable
+/*0x412e*/      bl ckcu_clocks_enable /* (ahb_mask, apb0_mas, apb1_mask, en) */
 /*0x4132*/      mov.w r0, #0x4000
 /*0x4136*/      asrs r5, r0, #4
 /*0x4138*/      strd r0, r5, [sp]
@@ -1994,7 +1994,7 @@
 /*0x41a2*/      mov.w r0, #0x20000
 /*0x41a6*/      movs r3, #1
 /*0x41a8*/      mov r2, r1
-/*0x41aa*/      bl ckcu_clocks_enable
+/*0x41aa*/      bl ckcu_clocks_enable /* (ahb_mask, apb0_mas, apb1_mask, en) */
 /*0x41ae*/      ldr r6, [pc, #0x38] /* data_41e8 */
 /*0x41b0*/      mov.w r5, #0x400
 /*0x41b4*/      movs r2, #0
@@ -2040,16 +2040,16 @@
 /*0x420c*/      movs r2, #0
 /*0x420e*/      movs r1, #7
 /*0x4210*/      movs r0, #1
-/*0x4212*/      bl afio_pin_config
+/*0x4212*/      bl afio_pin_config /* (gpio_num, pin_num, af_num) */
 /*0x4216*/      movs r2, #0
 /*0x4218*/      movs r1, #8
 /*0x421a*/      movs r0, #1
-/*0x421c*/      bl afio_pin_config
+/*0x421c*/      bl afio_pin_config /* (gpio_num, pin_num, af_num) */
 /*0x4220*/      pop.w {r4, r5, r6, lr}
 /*0x4224*/      movs r2, #0
 /*0x4226*/      movs r1, #9
 /*0x4228*/      movs r0, #1
-/*0x422a*/      b.w afio_pin_config
+/*0x422a*/      b.w afio_pin_config /* (gpio_num, pin_num, af_num) */
 
 /*0x422e*/  .byte 0x00
 /*0x422f*/  .byte 0x00
@@ -2074,15 +2074,15 @@
 /*0x424e*/      movs r2, #5
 /*0x4250*/      movs r1, #7
 /*0x4252*/      movs r0, #1
-/*0x4254*/      bl afio_pin_config
+/*0x4254*/      bl afio_pin_config /* (gpio_num, pin_num, af_num) */
 /*0x4258*/      movs r2, #5
 /*0x425a*/      movs r1, #8
 /*0x425c*/      movs r0, #1
-/*0x425e*/      bl afio_pin_config
+/*0x425e*/      bl afio_pin_config /* (gpio_num, pin_num, af_num) */
 /*0x4262*/      movs r2, #5
 /*0x4264*/      movs r1, #9
 /*0x4266*/      movs r0, #1
-/*0x4268*/      bl afio_pin_config
+/*0x4268*/      bl afio_pin_config /* (gpio_num, pin_num, af_num) */
 /*0x426c*/      pop.w {r4, r5, r6, lr}
 /*0x4270*/      b.w jump_444c
 
@@ -2181,7 +2181,7 @@
 /*0x4330*/      b jump_433e
             jump_4332:
 /*0x4332*/      movs r0, #0x64
-/*0x4334*/      bl spin_wait
+/*0x4334*/      bl spin_wait /* (time) */
 /*0x4338*/      bl call_418c
 /*0x433c*/      cbz r0, jump_4346
             jump_433e:
@@ -2211,7 +2211,7 @@
 /*0x4362*/      bl call_43b4
 /*0x4366*/      str r5, [r4, #0x24]
 /*0x4368*/      movs r0, #0xa
-/*0x436a*/      bl spin_wait
+/*0x436a*/      bl spin_wait /* (time) */
 /*0x436e*/      pop {r3, r4, r5, pc}
 
             data_4370:
@@ -2326,7 +2326,7 @@
 /*0x4432*/      b jump_4440
             jump_4434:
 /*0x4434*/      mov r0, r5
-/*0x4436*/      bl spin_wait
+/*0x4436*/      bl spin_wait /* (time) */
 /*0x443a*/      bl call_418c
 /*0x443e*/      cbz r0, jump_4448
             jump_4440:
@@ -2350,7 +2350,7 @@
 /*0x4462*/      bl call_43b4
 /*0x4466*/      str r5, [r4, #0x24]
 /*0x4468*/      movs r0, #0xa
-/*0x446a*/      bl spin_wait
+/*0x446a*/      bl spin_wait /* (time) */
 /*0x446e*/      pop {r3, r4, r5, pc}
 
             data_4470:
@@ -2449,7 +2449,7 @@
 /*0x451a*/      b jump_4528
             jump_451c:
 /*0x451c*/      movs r0, #0x64
-/*0x451e*/      bl spin_wait
+/*0x451e*/      bl spin_wait /* (time) */
 /*0x4522*/      bl call_418c
 /*0x4526*/      cbz r0, jump_4530
             jump_4528:
@@ -2679,7 +2679,7 @@
 /*0x4682*/      beq jump_46b8
 /*0x4684*/      movs r1, #0xa
 /*0x4686*/      ldr r0, [pc, #0x34] /* data_46bc */
-/*0x4688*/      bl mem_zero
+/*0x4688*/      bl mem_zero /* (dest, size) */
 /*0x468c*/      ldr r0, [pc, #0x30] /* data_46c0 */
 /*0x468e*/      ldrb r1, [r0, #1]
 /*0x4690*/      lsls r2, r1, #0x19
@@ -2782,7 +2782,7 @@
 /*0x472e*/      mov r4, r0
 /*0x4730*/      movs r1, #0x50
 /*0x4732*/      ldr r0, [pc, #0x48] /* data_477c */
-/*0x4734*/      bl mem_zero
+/*0x4734*/      bl mem_zero /* (dest, size) */
 /*0x4738*/      ldr r0, [pc, #0x40] /* data_477c */
 /*0x473a*/      movs r1, #0
 /*0x473c*/      subs r0, #0xa
@@ -4080,7 +4080,7 @@
             data_5110:
 /*0x5110*/  .word 0x20000030
             data_5114:
-/*0x5114*/  .word 0x00007a2a
+/*0x5114*/  .word 0x00007a2a /* possible pointer */
             data_5118:
 /*0x5118*/  .word 0x20000730
             data_511c:
@@ -4426,12 +4426,12 @@
 /*0x5378*/      movs r1, #0x55
             jump_537a:
 /*0x537a*/      .short 0x1d00 /* adds r0, r0, #4 */ 
-/*0x537c*/      bl mem_zero
+/*0x537c*/      bl mem_zero /* (dest, size) */
 /*0x5380*/      b jump_538e
             jump_5382:
 /*0x5382*/      movs r1, #0x24
 /*0x5384*/      .short 0x1d00 /* adds r0, r0, #4 */ 
-/*0x5386*/      bl mem_zero
+/*0x5386*/      bl mem_zero /* (dest, size) */
 /*0x538a*/      bl call_6c94
             jump_538e:
 /*0x538e*/      ldr r1, [pc, #0x14] /* data_53a4 */
@@ -4714,7 +4714,7 @@
             call_558c:
 /*0x558c*/      movs r1, #0xd8
 /*0x558e*/      ldr r0, [pc, #4] /* data_5594 */
-/*0x5590*/      b.w mem_zero
+/*0x5590*/      b.w mem_zero /* (dest, size) */
 
             data_5594:
 /*0x5594*/  .word 0x2000032e
@@ -4728,12 +4728,12 @@
 /*0x55a0*/      bhs switch_55c8
 /*0x55a2*/      tbb [pc, r0]
 
-/*0x55a6*/  .byte 0x03
-/*0x55a7*/  .byte 0x06
-/*0x55a8*/  .byte 0x09
-/*0x55a9*/  .byte 0x0c
-/*0x55aa*/  .byte 0x11
-/*0x55ab*/  .byte 0x0f
+/*0x55a6*/  .byte 0x03 /* case switch_55ac */
+/*0x55a7*/  .byte 0x06 /* case switch_55b2 */
+/*0x55a8*/  .byte 0x09 /* case switch_55b8 */
+/*0x55a9*/  .byte 0x0c /* case switch_55be */
+/*0x55aa*/  .byte 0x11 /* case switch_55c8 */
+/*0x55ab*/  .byte 0x0f /* case switch_55c4 */
 
             switch_55ac:
 /*0x55ac*/      bl call_3d74
@@ -4790,7 +4790,7 @@
 /*0x5608*/      mov r0, r4
 /*0x560a*/      bl call_376a
 /*0x560e*/      mov r0, r4
-/*0x5610*/      bl bftm_clear
+/*0x5610*/      bl bftm_clear /* (BFTM) */
 /*0x5614*/      movs r0, #0x29
 /*0x5616*/      bl call_574c
 /*0x561a*/      bl call_5c20
@@ -4807,7 +4807,7 @@
 /*0x563c*/      mov r0, r4
 /*0x563e*/      bl call_3796
 /*0x5642*/      mov r0, r4
-/*0x5644*/      bl bftm_clear
+/*0x5644*/      bl bftm_clear /* (BFTM) */
 /*0x5648*/      movs r1, #1
 /*0x564a*/      mov r0, r4
 /*0x564c*/      bl call_376a
@@ -4864,7 +4864,7 @@
 /*0x56a4*/      mov.w r2, #0x10000
 /*0x56a8*/      movs r3, #1
 /*0x56aa*/      mov r1, r0
-/*0x56ac*/      bl ckcu_clocks_enable
+/*0x56ac*/      bl ckcu_clocks_enable /* (ahb_mask, apb0_mas, apb1_mask, en) */
 /*0x56b0*/      pop.w {r4, lr}
 /*0x56b4*/      movw r1, #0x8c9f
 /*0x56b8*/      ldr r0, [pc, #4] /* data_56c0 */
@@ -5576,7 +5576,7 @@
 /*0x5c02*/      movs r1, #0
 /*0x5c04*/      lsls r0, r2, #9
 /*0x5c06*/      movs r3, #1
-/*0x5c08*/      bl ckcu_clocks_enable
+/*0x5c08*/      bl ckcu_clocks_enable /* (ahb_mask, apb0_mas, apb1_mask, en) */
 /*0x5c0c*/      movs r2, #1
 /*0x5c0e*/      pop.w {r4, lr}
 /*0x5c12*/      mov r1, r2
@@ -5595,14 +5595,14 @@
 /*0x5c20*/      movs r2, #0
 /*0x5c22*/      mov r1, r2
 /*0x5c24*/      movs r0, #2
-/*0x5c26*/      b.w afio_pin_config
+/*0x5c26*/      b.w afio_pin_config /* (gpio_num, pin_num, af_num) */
 
             .thumb_func
             call_5c2a:
 /*0x5c2a*/      movs r2, #4
 /*0x5c2c*/      movs r1, #0
 /*0x5c2e*/      movs r0, #2
-/*0x5c30*/      b.w afio_pin_config
+/*0x5c30*/      b.w afio_pin_config /* (gpio_num, pin_num, af_num) */
 
             .thumb_func
             call_5c34:
@@ -5752,7 +5752,7 @@
 /*0x5d52*/      movs r2, #0x20
 /*0x5d54*/      mov r1, r3
 /*0x5d56*/      adds r0, r5, #4
-/*0x5d58*/      bl memcpy
+/*0x5d58*/      bl memcpy /* (dest, src, size) */
 /*0x5d5c*/      ldr r0, [pc, #0x5c] /* data_5dbc */
 /*0x5d5e*/      ldr.w r1, [r0, #0x180]
 /*0x5d62*/      str r1, [r5, #0x24]
@@ -5787,7 +5787,7 @@
 /*0x5d94*/      movs r1, #0x3c
 /*0x5d96*/      adds r0, r5, #4
             jump_5d98:
-/*0x5d98*/      bl mem_zero
+/*0x5d98*/      bl mem_zero /* (dest, size) */
 /*0x5d9c*/      movs r0, #2
 /*0x5d9e*/      strb r0, [r6]
             jump_5da0:
@@ -5837,7 +5837,7 @@
 /*0x5dee*/      mov.w r0, #0x10000
 /*0x5df2*/      movs r3, #1
 /*0x5df4*/      mov r2, r1
-/*0x5df6*/      bl ckcu_clocks_enable
+/*0x5df6*/      bl ckcu_clocks_enable /* (ahb_mask, apb0_mas, apb1_mask, en) */
 /*0x5dfa*/      ldr r1, [pc, #0x3c] /* data_5e38 */
 /*0x5dfc*/      mov.w r0, #0x200
 /*0x5e00*/      str r0, [r1, #0x24]
@@ -5846,7 +5846,7 @@
 /*0x5e08*/      movs r0, #0
 /*0x5e0a*/      bl call_6884
 /*0x5e0e*/      movw r0, #0x4e20
-/*0x5e12*/      bl spin_wait
+/*0x5e12*/      bl spin_wait /* (time) */
 /*0x5e16*/      dsb sy
 /*0x5e1a*/      ldr r0, [pc, #0x20] /* data_5e3c */
 /*0x5e1c*/      ldr r1, [r0]
@@ -5886,13 +5886,13 @@
 /*0x5e56*/      beq jump_5e60
 /*0x5e58*/      mov r2, r4
 /*0x5e5a*/      adds r0, r5, #4
-/*0x5e5c*/      bl memcpy
+/*0x5e5c*/      bl memcpy /* (dest, src, size) */
             jump_5e60:
 /*0x5e60*/      adds r0, r5, r4
 /*0x5e62*/      rsb.w r1, r4, #0x3c
 /*0x5e66*/      pop.w {r4, r5, r6, lr}
 /*0x5e6a*/      .short 0x1d00 /* adds r0, r0, #4 */ 
-/*0x5e6c*/      b.w mem_zero
+/*0x5e6c*/      b.w mem_zero /* (dest, size) */
 
             data_5e70:
 /*0x5e70*/  .word 0x20000028
@@ -6049,7 +6049,7 @@
 /*0x5f86*/      ands r4, r4, #0xff
 /*0x5f8a*/      beq jump_5f78
 /*0x5f8c*/      mov r0, r7
-/*0x5f8e*/      bl spin_wait
+/*0x5f8e*/      bl spin_wait /* (time) */
 /*0x5f92*/      b jump_5f5a
             jump_5f94:
 /*0x5f94*/      ldrb r3, [r1, #2]
@@ -6099,7 +6099,7 @@
 /*0x5fd8*/      mov.w r0, #0xf0000
 /*0x5fdc*/      movs r3, #1
 /*0x5fde*/      mov r2, r6
-/*0x5fe0*/      bl ckcu_clocks_enable
+/*0x5fe0*/      bl ckcu_clocks_enable /* (ahb_mask, apb0_mas, apb1_mask, en) */
 /*0x5fe4*/      movs r4, #8
 /*0x5fe6*/      b jump_6018
             jump_5fe8:
@@ -6151,7 +6151,7 @@
 /*0x6050*/      movs r2, #0xff
 /*0x6052*/      movs r1, #0xa
 /*0x6054*/      ldr r0, [pc, #0x2c] /* data_6084 */
-/*0x6056*/      bl mem_set
+/*0x6056*/      bl mem_set /* (dest, size, val) */
 /*0x605a*/      movs r0, #0
 /*0x605c*/      bl call_60bc
 /*0x6060*/      movs r1, #0xa
@@ -6220,7 +6220,7 @@
 /*0x60c0*/      movs r2, #0x50
 /*0x60c2*/      ldr r1, [pc, #0x38] /* data_60fc */
 /*0x60c4*/      ldr r0, [pc, #0x38] /* data_6100 */
-/*0x60c6*/      bl memcpy
+/*0x60c6*/      bl memcpy /* (dest, src, size) */
 /*0x60ca*/      cbz r4, jump_60ea
 /*0x60cc*/      bl call_6174
 /*0x60d0*/      cmp r4, #1
@@ -6319,7 +6319,7 @@
 /*0x6178*/      movs r2, #0xff
 /*0x617a*/      adds r1, r2, #1
 /*0x617c*/      subw r0, r4, #0x14f
-/*0x6180*/      bl mem_set
+/*0x6180*/      bl mem_set /* (dest, size, val) */
 /*0x6184*/      movs r0, #0x50
 /*0x6186*/      subw r1, r4, #0x14f
 /*0x618a*/      b jump_6192
@@ -6419,7 +6419,7 @@
 /*0x6232*/      mov.w r2, #0x20000
 /*0x6236*/      mov.w r0, #0x70000
 /*0x623a*/      movs r3, #1
-/*0x623c*/      bl ckcu_clocks_enable
+/*0x623c*/      bl ckcu_clocks_enable /* (ahb_mask, apb0_mas, apb1_mask, en) */
 /*0x6240*/      movw r1, #0xea60
 /*0x6244*/      ldr r0, [pc, #0x90] /* data_62d8 */
 /*0x6246*/      bl call_3792
@@ -6500,7 +6500,7 @@
 /*0x62f6*/      mov r0, r4
 /*0x62f8*/      bl call_376a
 /*0x62fc*/      mov r0, r4
-/*0x62fe*/      bl bftm_clear
+/*0x62fe*/      bl bftm_clear /* (BFTM) */
 /*0x6302*/      ldr r1, [pc, #0x4c] /* data_6350 */
 /*0x6304*/      asrs r0, r4, #0x14
 /*0x6306*/      str.w r0, [r1, #0x180]
@@ -6579,12 +6579,12 @@
 /*0x6396*/      str r0, [r1, #0x28]
 /*0x6398*/      lsls r1, r0, #8
 /*0x639a*/      ldr r0, [pc, #0x5c] /* data_63f8 */
-/*0x639c*/      bl mem_zero
+/*0x639c*/      bl mem_zero /* (dest, size) */
 /*0x63a0*/      ldr r1, [pc, #0x58] /* data_63fc */
 /*0x63a2*/      movs r0, #0
 /*0x63a4*/      strb r0, [r1, #1]
 /*0x63a6*/      movs r0, #0x64
-/*0x63a8*/      bl spin_wait
+/*0x63a8*/      bl spin_wait /* (time) */
 /*0x63ac*/      bl call_6458
 /*0x63b0*/      movs r0, #2
 /*0x63b2*/      bl call_7238
@@ -6599,7 +6599,7 @@
 /*0x63ca*/      mov r0, r4
 /*0x63cc*/      bl call_3796
 /*0x63d0*/      mov r0, r4
-/*0x63d2*/      bl bftm_clear
+/*0x63d2*/      bl bftm_clear /* (BFTM) */
 /*0x63d6*/      movs r1, #1
 /*0x63d8*/      mov r0, r4
 /*0x63da*/      bl call_376a
@@ -6880,7 +6880,7 @@
 /*0x6602*/      str.w r1, [r0, #0x15]
 /*0x6606*/      movs r1, #0x1d
 /*0x6608*/      ldr r0, [pc, #8] /* data_6614 */
-/*0x660a*/      b.w mem_zero
+/*0x660a*/      b.w mem_zero /* (dest, size) */
 
 /*0x660e*/  .byte 0x00
 /*0x660f*/  .byte 0x00
@@ -7137,9 +7137,9 @@
 /*0x6800*/      mov.w r0, #0x400
 /*0x6804*/      movs r2, #0x40
 /*0x6806*/      movs r3, #1
-/*0x6808*/      bl ckcu_clocks_enable
+/*0x6808*/      bl ckcu_clocks_enable /* (ahb_mask, apb0_mas, apb1_mask, en) */
 /*0x680c*/      movs r0, #2
-/*0x680e*/      bl ckcu_set_usb_prescaler
+/*0x680e*/      bl ckcu_set_usb_prescaler /* (prescaler) */
 /*0x6812*/      ldr r4, [pc, #0x48] /* data_685c */
 /*0x6814*/      ldr r0, [pc, #0x40] /* data_6858 */
 /*0x6816*/      str r0, [r4, #8]
@@ -7158,7 +7158,7 @@
 /*0x6838*/      movs r0, #1
 /*0x683a*/      bl call_6884
 /*0x683e*/      movs r0, #0xfa
-/*0x6840*/      bl spin_wait
+/*0x6840*/      bl spin_wait /* (time) */
 /*0x6844*/      ldrb.w r0, [r4, #0x34]
 /*0x6848*/      pop.w {r4, lr}
 /*0x684c*/      and r1, r0, #1
@@ -7849,12 +7849,12 @@
 /*0x6cd4*/      bhs jump_6d0a
 /*0x6cd6*/      tbb [pc, r0]
 
-/*0x6cda*/  .byte 0x03
-/*0x6cdb*/  .byte 0x03
-/*0x6cdc*/  .byte 0x1d
-/*0x6cdd*/  .byte 0x56
-/*0x6cde*/  .byte 0x43
-/*0x6cdf*/  .byte 0x43
+/*0x6cda*/  .byte 0x03 /* case switch_6ce0 */
+/*0x6cdb*/  .byte 0x03 /* case switch_6ce0 */
+/*0x6cdc*/  .byte 0x1d /* case switch_6d14 */
+/*0x6cdd*/  .byte 0x56 /* case switch_6d86 */
+/*0x6cde*/  .byte 0x43 /* case switch_6d60 */
+/*0x6cdf*/  .byte 0x43 /* case switch_6d60 */
 
             switch_6ce0:
 /*0x6ce0*/      movs r5, #3
@@ -7873,7 +7873,7 @@
 /*0x6cf6*/      add.w r0, r5, r5, lsl #3
 /*0x6cfa*/      add.w r0, r7, r0, lsl #3
 /*0x6cfe*/      movs r1, #0x48
-/*0x6d00*/      bl mem_set
+/*0x6d00*/      bl mem_set /* (dest, size, val) */
             jump_6d04:
 /*0x6d04*/      .short 0x1e6d /* subs r5, r5, #1 */ 
 /*0x6d06*/      uxtb r5, r5
@@ -8532,7 +8532,7 @@
 /*0x71c0*/      cmp r6, #0
 /*0x71c2*/      beq jump_71ce
 /*0x71c4*/      movs r0, #5
-/*0x71c6*/      bl spin_wait
+/*0x71c6*/      bl spin_wait /* (time) */
 /*0x71ca*/      subs r5, #8
 /*0x71cc*/      b jump_713c
             jump_71ce:
@@ -8710,7 +8710,7 @@
 /*0x72f6*/      ldr r2, [pc, #0xa8] /* data_73a0 */
 /*0x72f8*/      rsb.w r1, r0, #0x40
 /*0x72fc*/      add r0, r2
-/*0x72fe*/      bl mem_zero
+/*0x72fe*/      bl mem_zero /* (dest, size) */
 /*0x7302*/      ldrb r0, [r5, #6]
 /*0x7304*/      bic r0, r0, #0x10
 /*0x7308*/      strb r0, [r5, #6]
@@ -9352,7 +9352,7 @@
 /*0x7790*/      mov sl, r1
 /*0x7792*/      movs r3, #1
 /*0x7794*/      mov r0, r2
-/*0x7796*/      bl ckcu_clocks_enable
+/*0x7796*/      bl ckcu_clocks_enable /* (ahb_mask, apb0_mas, apb1_mask, en) */
 /*0x779a*/      ldr r0, [pc, #0x90] /* data_782c */
 /*0x779c*/      bl call_6644
 /*0x77a0*/      ldr r5, [pc, #0x8c] /* data_7830 */
@@ -9388,7 +9388,7 @@
 /*0x77ee*/      beq jump_7804
 /*0x77f0*/      bl call_6c48
 /*0x77f4*/      mov.w r0, #0x3e8
-/*0x77f8*/      bl spin_wait
+/*0x77f8*/      bl spin_wait /* (time) */
 /*0x77fc*/      str r6, [r5, #0x58]
 /*0x77fe*/      movs r0, #0
 /*0x7800*/      bl call_5c34
@@ -9409,7 +9409,7 @@
 /*0x7820*/      pop.w {r4, r5, r6, r7, r8, sb, sl, lr}
 /*0x7824*/      movs r3, #0
 /*0x7826*/      mov r0, r2
-/*0x7828*/      b.w ckcu_clocks_enable
+/*0x7828*/      b.w ckcu_clocks_enable /* (ahb_mask, apb0_mas, apb1_mask, en) */
 
             data_782c:
 /*0x782c*/  .word 0x200006f4
@@ -9420,35 +9420,36 @@
             data_7838:
 /*0x7838*/  .word 0x20000034
 
-
-            .thumb_func
-            sram_task1:
-/*0x783c*/      b jump_7844
-            jump_783e:
-/*0x783e*/      ldm r0!, {r3}
-/*0x7840*/      .short 0x1f12 /* subs r2, r2, #4 */ 
-/*0x7842*/      stm r1!, {r3}
-            jump_7844:
-/*0x7844*/      cmp r2, #0
-/*0x7846*/      bne jump_783e
-/*0x7848*/      bx lr
-
+/*0x783c*/  .byte 0x02
+/*0x783d*/  .byte 0xe0
+/*0x783e*/  .byte 0x08
+/*0x783f*/  .byte 0xc8
+/*0x7840*/  .byte 0x12
+/*0x7841*/  .byte 0x1f
+/*0x7842*/  .byte 0x08
+/*0x7843*/  .byte 0xc1
+/*0x7844*/  .byte 0x00
+/*0x7845*/  .byte 0x2a
+/*0x7846*/  .byte 0xfa
+/*0x7847*/  .byte 0xd1
+/*0x7848*/  .byte 0x70
+/*0x7849*/  .byte 0x47
 /*0x784a*/  .byte 0x70
 /*0x784b*/  .byte 0x47
-
-
-            .thumb_func
-            sram_task2:
-/*0x784c*/      movs r0, #0
-/*0x784e*/      b jump_7854
-            jump_7850:
-/*0x7850*/      stm r1!, {r0}
-/*0x7852*/      .short 0x1f12 /* subs r2, r2, #4 */ 
-            jump_7854:
-/*0x7854*/      cmp r2, #0
-/*0x7856*/      bne jump_7850
-/*0x7858*/      bx lr
-
+/*0x784c*/  .byte 0x00
+/*0x784d*/  .byte 0x20
+/*0x784e*/  .byte 0x01
+/*0x784f*/  .byte 0xe0
+/*0x7850*/  .byte 0x01
+/*0x7851*/  .byte 0xc1
+/*0x7852*/  .byte 0x12
+/*0x7853*/  .byte 0x1f
+/*0x7854*/  .byte 0x00
+/*0x7855*/  .byte 0x2a
+/*0x7856*/  .byte 0xfb
+/*0x7857*/  .byte 0xd1
+/*0x7858*/  .byte 0x70
+/*0x7859*/  .byte 0x47
 /*0x785a*/  .byte 0x00
 /*0x785b*/  .byte 0x00
 
@@ -9474,7 +9475,7 @@
 /*0x7892*/      movs r0, #0
 /*0x7894*/      bl call_55f8
 /*0x7898*/      movs r0, #0xa
-/*0x789a*/      bl spin_wait
+/*0x789a*/      bl spin_wait /* (time) */
 /*0x789e*/      movs r0, #1
 /*0x78a0*/      bl call_5f4c
 /*0x78a4*/      bl call_4e38
@@ -9765,7 +9766,7 @@
 /*0x7a85*/  .byte 0xf5
 /*0x7a86*/  .byte 0x13
 /*0x7a87*/  .byte 0xf6
-/*0x7a88*/  .byte 0x14
+/*0x7a88*/  .byte 0x14 /* (dest, size) */
 /*0x7a89*/  .byte 0xf4
 /*0x7a8a*/  .byte 0x09
 /*0x7a8b*/  .byte 0xf2
@@ -9942,7 +9943,7 @@
 /*0x7b31*/  .byte 0x02
 /*0x7b32*/  .byte 0x03
 /*0x7b33*/  .byte 0x07
-/*0x7b34*/  .byte 0x07
+/*0x7b34*/  .byte 0x07 /* (dest, size) */
 /*0x7b35*/  .byte 0x07
 /*0x7b36*/  .byte 0x07
 /*0x7b37*/  .byte 0x06
@@ -10161,22 +10162,22 @@
 /*0x7c07*/  .byte 0x00
 
             gpio_map_1:
-/*0x7c08*/  .word 0x400b4000
+/*0x7c08*/  .word 0x400b4000 /* GPIO C, pin 9 */
 /*0x7c0c*/  .word 0x00000200
-/*0x7c10*/  .word 0x400b0000
+/*0x7c10*/  .word 0x400b0000 /* GPIO A, pin 5 */
 /*0x7c14*/  .word 0x00000020
-/*0x7c18*/  .word 0x400b0000
+/*0x7c18*/  .word 0x400b0000 /* GPIO A, pin 6 */
 /*0x7c1c*/  .word 0x00000040
-/*0x7c20*/  .word 0x400b0000
+/*0x7c20*/  .word 0x400b0000 /* GPIO A, pin 7 */
 /*0x7c24*/  .word 0x00000080
-/*0x7c28*/  .word 0x400b4000
+/*0x7c28*/  .word 0x400b4000 /* GPIO C, pin 11 */
 /*0x7c2c*/  .word 0x00000800
-/*0x7c30*/  .word 0x400b4000
+/*0x7c30*/  .word 0x400b4000 /* GPIO C, pin 13 */
 /*0x7c34*/  .word 0x00002000
-/*0x7c38*/  .word 0x400b4000
-/*0x7c3c*/  .word 0x00004000
-/*0x7c40*/  .word 0x400b4000
-/*0x7c44*/  .word 0x00008000
+/*0x7c38*/  .word 0x400b4000 /* GPIO C, pin 14 */
+/*0x7c3c*/  .word 0x00004000 /* possible pointer */
+/*0x7c40*/  .word 0x400b4000 /* GPIO C, pin 15 */
+/*0x7c44*/  .word 0x00008000 /* possible pointer */
 
 /*0x7c48*/  .byte 0x02
 /*0x7c49*/  .byte 0x09
@@ -10196,26 +10197,26 @@
 /*0x7c57*/  .byte 0x0f
 
             gpio_map_2:
-/*0x7c58*/  .word 0x400b4000
+/*0x7c58*/  .word 0x400b4000 /* GPIO C, pin 4 */
 /*0x7c5c*/  .word 0x00000010
-/*0x7c60*/  .word 0x400b2000
+/*0x7c60*/  .word 0x400b2000 /* GPIO B, pin 6 */
 /*0x7c64*/  .word 0x00000040
-/*0x7c68*/  .word 0x400b6000
+/*0x7c68*/  .word 0x400b6000 /* GPIO D, pin 0 */
 /*0x7c6c*/  .word 0x00000001
-/*0x7c70*/  .word 0x400b2000
+/*0x7c70*/  .word 0x400b2000 /* GPIO B, pin 11 */
 /*0x7c74*/  .word 0x00000800
-/*0x7c78*/  .word 0x400b0000
+/*0x7c78*/  .word 0x400b0000 /* GPIO A, pin 11 */
 /*0x7c7c*/  .word 0x00000800
-/*0x7c80*/  .word 0x400b0000
+/*0x7c80*/  .word 0x400b0000 /* GPIO A, pin 0 */
 /*0x7c84*/  .word 0x00000001
-/*0x7c88*/  .word 0x400b0000
+/*0x7c88*/  .word 0x400b0000 /* GPIO A, pin 1 */
 /*0x7c8c*/  .word 0x00000002
-/*0x7c90*/  .word 0x400b0000
+/*0x7c90*/  .word 0x400b0000 /* GPIO A, pin 2 */
 /*0x7c94*/  .word 0x00000004
-/*0x7c98*/  .word 0x400b0000
+/*0x7c98*/  .word 0x400b0000 /* GPIO A, pin 3 */
 /*0x7c9c*/  .word 0x00000008
             data_7ca0:
-/*0x7ca0*/  .word 0x400b0000
+/*0x7ca0*/  .word 0x400b0000 /* GPIO A, pin 4 */
 /*0x7ca4*/  .word 0x00000010
 
 /*0x7ca8*/  .byte 0x2d
@@ -10330,21 +10331,21 @@
 /*0x7d13*/  .byte 0x00
 
             gpio_map_3:
-/*0x7d14*/  .word 0x400b4000
+/*0x7d14*/  .word 0x400b4000 /* GPIO C, pin 8 */
 /*0x7d18*/  .word 0x00000100
-/*0x7d1c*/  .word 0x400b4000
+/*0x7d1c*/  .word 0x400b4000 /* GPIO C, pin 7 */
 /*0x7d20*/  .word 0x00000080
-/*0x7d24*/  .word 0x400b2000
+/*0x7d24*/  .word 0x400b2000 /* GPIO B, pin 5 */
 /*0x7d28*/  .word 0x00000020
-/*0x7d2c*/  .word 0x400b2000
+/*0x7d2c*/  .word 0x400b2000 /* GPIO B, pin 4 */
 /*0x7d30*/  .word 0x00000010
-/*0x7d34*/  .word 0x400b2000
+/*0x7d34*/  .word 0x400b2000 /* GPIO B, pin 3 */
 /*0x7d38*/  .word 0x00000008
-/*0x7d3c*/  .word 0x400b2000
+/*0x7d3c*/  .word 0x400b2000 /* GPIO B, pin 2 */
 /*0x7d40*/  .word 0x00000004
-/*0x7d44*/  .word 0x400b4000
+/*0x7d44*/  .word 0x400b4000 /* GPIO C, pin 6 */
 /*0x7d48*/  .word 0x00000040
-/*0x7d4c*/  .word 0x400b4000
+/*0x7d4c*/  .word 0x400b4000 /* GPIO C, pin 5 */
 /*0x7d50*/  .word 0x00000020
 
 /*0x7d54*/  .byte 0x00
@@ -10877,244 +10878,244 @@
 /*0x7f62*/  .byte 0x00
 /*0x7f63*/  .byte 0x00
             usb_report1_desc:
-/*0x7f64*/  .byte 0x06
+/*0x7f64*/  .byte 0x06 /* Usage Page (Vendor Defined 0xFF00) */
 /*0x7f65*/  .byte 0x00
 /*0x7f66*/  .byte 0xff
-/*0x7f67*/  .byte 0x09
+/*0x7f67*/  .byte 0x09 /* Usage (0x01) */
 /*0x7f68*/  .byte 0x01
-/*0x7f69*/  .byte 0xa1
+/*0x7f69*/  .byte 0xa1 /* Collection (Application) */
 /*0x7f6a*/  .byte 0x01
-/*0x7f6b*/  .byte 0x09
+/*0x7f6b*/  .byte 0x09 /* - Usage (0x02) */
 /*0x7f6c*/  .byte 0x02
-/*0x7f6d*/  .byte 0x15
+/*0x7f6d*/  .byte 0x15 /* - Logical Minimum (0) */
 /*0x7f6e*/  .byte 0x00
-/*0x7f6f*/  .byte 0x26
+/*0x7f6f*/  .byte 0x26 /* - Logical Maximum (255) */
 /*0x7f70*/  .byte 0xff
 /*0x7f71*/  .byte 0x00
-/*0x7f72*/  .byte 0x75
+/*0x7f72*/  .byte 0x75 /* - Report Size (8) */
 /*0x7f73*/  .byte 0x08
-/*0x7f74*/  .byte 0x95
+/*0x7f74*/  .byte 0x95 /* - Report Count (64) */
 /*0x7f75*/  .byte 0x40
-/*0x7f76*/  .byte 0x81
+/*0x7f76*/  .byte 0x81 /* - Input (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position) */
 /*0x7f77*/  .byte 0x02
-/*0x7f78*/  .byte 0x09
+/*0x7f78*/  .byte 0x09 /* - Usage (0x03) */
 /*0x7f79*/  .byte 0x03
-/*0x7f7a*/  .byte 0x15
+/*0x7f7a*/  .byte 0x15 /* - Logical Minimum (0) */
 /*0x7f7b*/  .byte 0x00
-/*0x7f7c*/  .byte 0x26
+/*0x7f7c*/  .byte 0x26 /* - Logical Maximum (255) */
 /*0x7f7d*/  .byte 0xff
 /*0x7f7e*/  .byte 0x00
-/*0x7f7f*/  .byte 0x75
+/*0x7f7f*/  .byte 0x75 /* - Report Size (8) */
 /*0x7f80*/  .byte 0x08
-/*0x7f81*/  .byte 0x95
+/*0x7f81*/  .byte 0x95 /* - Report Count (64) */
 /*0x7f82*/  .byte 0x40
-/*0x7f83*/  .byte 0x91
+/*0x7f83*/  .byte 0x91 /* - Output (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position,Non-volatile) */
 /*0x7f84*/  .byte 0x02
-/*0x7f85*/  .byte 0xc0
+/*0x7f85*/  .byte 0xc0 /* End Collection */
 /*0x7f86*/  .byte 0x00
 /*0x7f87*/  .byte 0x00
             usb_report2_desc:
-/*0x7f88*/  .byte 0x05
+/*0x7f88*/  .byte 0x05 /* Usage Page (Generic Desktop Ctrls) */
 /*0x7f89*/  .byte 0x01
-/*0x7f8a*/  .byte 0x09
+/*0x7f8a*/  .byte 0x09 /* Usage (Sys Control) */
 /*0x7f8b*/  .byte 0x80
-/*0x7f8c*/  .byte 0xa1
+/*0x7f8c*/  .byte 0xa1 /* Collection (Application) */
 /*0x7f8d*/  .byte 0x01
-/*0x7f8e*/  .byte 0x85
+/*0x7f8e*/  .byte 0x85 /* - Report ID (1) */
 /*0x7f8f*/  .byte 0x01
-/*0x7f90*/  .byte 0x19
+/*0x7f90*/  .byte 0x19 /* - Usage Minimum (Sys Power Down) */
 /*0x7f91*/  .byte 0x81
-/*0x7f92*/  .byte 0x29
+/*0x7f92*/  .byte 0x29 /* - Usage Maximum (Sys Wake Up) */
 /*0x7f93*/  .byte 0x83
-/*0x7f94*/  .byte 0x15
+/*0x7f94*/  .byte 0x15 /* - Logical Minimum (0) */
 /*0x7f95*/  .byte 0x00
-/*0x7f96*/  .byte 0x25
+/*0x7f96*/  .byte 0x25 /* - Logical Maximum (1) */
 /*0x7f97*/  .byte 0x01
-/*0x7f98*/  .byte 0x95
+/*0x7f98*/  .byte 0x95 /* - Report Count (3) */
 /*0x7f99*/  .byte 0x03
-/*0x7f9a*/  .byte 0x75
+/*0x7f9a*/  .byte 0x75 /* - Report Size (1) */
 /*0x7f9b*/  .byte 0x01
-/*0x7f9c*/  .byte 0x81
+/*0x7f9c*/  .byte 0x81 /* - Input (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position) */
 /*0x7f9d*/  .byte 0x02
-/*0x7f9e*/  .byte 0x95
+/*0x7f9e*/  .byte 0x95 /* - Report Count (1) */
 /*0x7f9f*/  .byte 0x01
-/*0x7fa0*/  .byte 0x75
+/*0x7fa0*/  .byte 0x75 /* - Report Size (5) */
 /*0x7fa1*/  .byte 0x05
-/*0x7fa2*/  .byte 0x81
+/*0x7fa2*/  .byte 0x81 /* - Input (Const,Array,Abs,No Wrap,Linear,Preferred State,No Null Position) */
 /*0x7fa3*/  .byte 0x01
-/*0x7fa4*/  .byte 0xc0
-/*0x7fa5*/  .byte 0x05
+/*0x7fa4*/  .byte 0xc0 /* End Collection */
+/*0x7fa5*/  .byte 0x05 /* Usage Page (Consumer) */
 /*0x7fa6*/  .byte 0x0c
-/*0x7fa7*/  .byte 0x09
+/*0x7fa7*/  .byte 0x09 /* Usage (Consumer Control) */
 /*0x7fa8*/  .byte 0x01
-/*0x7fa9*/  .byte 0xa1
+/*0x7fa9*/  .byte 0xa1 /* Collection (Application) */
 /*0x7faa*/  .byte 0x01
-/*0x7fab*/  .byte 0x85
+/*0x7fab*/  .byte 0x85 /* - Report ID (2) */
 /*0x7fac*/  .byte 0x02
-/*0x7fad*/  .byte 0x15
+/*0x7fad*/  .byte 0x15 /* - Logical Minimum (0) */
 /*0x7fae*/  .byte 0x00
-/*0x7faf*/  .byte 0x25
+/*0x7faf*/  .byte 0x25 /* - Logical Maximum (1) */
 /*0x7fb0*/  .byte 0x01
-/*0x7fb1*/  .byte 0x95
+/*0x7fb1*/  .byte 0x95 /* - Report Count (18) */
 /*0x7fb2*/  .byte 0x12
-/*0x7fb3*/  .byte 0x75
+/*0x7fb3*/  .byte 0x75 /* - Report Size (1) */
 /*0x7fb4*/  .byte 0x01
 /*0x7fb5*/  .byte 0x0a
-/*0x7fb6*/  .byte 0x83
+/*0x7fb6*/  .byte 0x83 /* - Usage (AL Consumer Control Configuration) */
 /*0x7fb7*/  .byte 0x01
 /*0x7fb8*/  .byte 0x0a
-/*0x7fb9*/  .byte 0x8a
+/*0x7fb9*/  .byte 0x8a /* - Usage (AL Email Reader) */
 /*0x7fba*/  .byte 0x01
 /*0x7fbb*/  .byte 0x0a
-/*0x7fbc*/  .byte 0x92
+/*0x7fbc*/  .byte 0x92 /* - Usage (AL Calculator) */
 /*0x7fbd*/  .byte 0x01
 /*0x7fbe*/  .byte 0x0a
-/*0x7fbf*/  .byte 0x94
+/*0x7fbf*/  .byte 0x94 /* - Usage (AL Local Machine Browser) */
 /*0x7fc0*/  .byte 0x01
-/*0x7fc1*/  .byte 0x09
+/*0x7fc1*/  .byte 0x09 /* - Usage (Play/Pause) */
 /*0x7fc2*/  .byte 0xcd
-/*0x7fc3*/  .byte 0x09
+/*0x7fc3*/  .byte 0x09 /* - Usage (Stop) */
 /*0x7fc4*/  .byte 0xb7
-/*0x7fc5*/  .byte 0x09
+/*0x7fc5*/  .byte 0x09 /* - Usage (Scan Previous Track) */
 /*0x7fc6*/  .byte 0xb6
-/*0x7fc7*/  .byte 0x09
+/*0x7fc7*/  .byte 0x09 /* - Usage (Scan Next Track) */
 /*0x7fc8*/  .byte 0xb5
-/*0x7fc9*/  .byte 0x09
+/*0x7fc9*/  .byte 0x09 /* - Usage (Mute) */
 /*0x7fca*/  .byte 0xe2
-/*0x7fcb*/  .byte 0x09
+/*0x7fcb*/  .byte 0x09 /* - Usage (Volume Decrement) */
 /*0x7fcc*/  .byte 0xea
-/*0x7fcd*/  .byte 0x09
+/*0x7fcd*/  .byte 0x09 /* - Usage (Volume Increment) */
 /*0x7fce*/  .byte 0xe9
 /*0x7fcf*/  .byte 0x0a
-/*0x7fd0*/  .byte 0x21
+/*0x7fd0*/  .byte 0x21 /* - Usage (AC Search) */
 /*0x7fd1*/  .byte 0x02
 /*0x7fd2*/  .byte 0x0a
-/*0x7fd3*/  .byte 0x23
+/*0x7fd3*/  .byte 0x23 /* - Usage (AC Home) */
 /*0x7fd4*/  .byte 0x02
 /*0x7fd5*/  .byte 0x0a
-/*0x7fd6*/  .byte 0x24
+/*0x7fd6*/  .byte 0x24 /* - Usage (AC Back) */
 /*0x7fd7*/  .byte 0x02
 /*0x7fd8*/  .byte 0x0a
-/*0x7fd9*/  .byte 0x25
+/*0x7fd9*/  .byte 0x25 /* - Usage (AC Forward) */
 /*0x7fda*/  .byte 0x02
 /*0x7fdb*/  .byte 0x0a
-/*0x7fdc*/  .byte 0x26
+/*0x7fdc*/  .byte 0x26 /* - Usage (AC Stop) */
 /*0x7fdd*/  .byte 0x02
 /*0x7fde*/  .byte 0x0a
-/*0x7fdf*/  .byte 0x27
+/*0x7fdf*/  .byte 0x27 /* - Usage (AC Refresh) */
 /*0x7fe0*/  .byte 0x02
 /*0x7fe1*/  .byte 0x0a
-/*0x7fe2*/  .byte 0x2a
+/*0x7fe2*/  .byte 0x2a /* - Usage (AC Bookmarks) */
 /*0x7fe3*/  .byte 0x02
-/*0x7fe4*/  .byte 0x81
+/*0x7fe4*/  .byte 0x81 /* - Input (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position) */
 /*0x7fe5*/  .byte 0x02
-/*0x7fe6*/  .byte 0x95
+/*0x7fe6*/  .byte 0x95 /* - Report Count (1) */
 /*0x7fe7*/  .byte 0x01
-/*0x7fe8*/  .byte 0x75
+/*0x7fe8*/  .byte 0x75 /* - Report Size (14) */
 /*0x7fe9*/  .byte 0x0e
-/*0x7fea*/  .byte 0x81
+/*0x7fea*/  .byte 0x81 /* - Input (Const,Array,Abs,No Wrap,Linear,Preferred State,No Null Position) */
 /*0x7feb*/  .byte 0x01
-/*0x7fec*/  .byte 0xc0
-/*0x7fed*/  .byte 0x05
+/*0x7fec*/  .byte 0xc0 /* End Collection */
+/*0x7fed*/  .byte 0x05 /* Usage Page (Generic Desktop Ctrls) */
 /*0x7fee*/  .byte 0x01
-/*0x7fef*/  .byte 0x09
+/*0x7fef*/  .byte 0x09 /* Usage (Keyboard) */
 /*0x7ff0*/  .byte 0x06
-/*0x7ff1*/  .byte 0xa1
+/*0x7ff1*/  .byte 0xa1 /* Collection (Application) */
 /*0x7ff2*/  .byte 0x01
-/*0x7ff3*/  .byte 0x85
+/*0x7ff3*/  .byte 0x85 /* - Report ID (4) */
 /*0x7ff4*/  .byte 0x04
-/*0x7ff5*/  .byte 0x05
+/*0x7ff5*/  .byte 0x05 /* - Usage Page (Kbrd/Keypad) */
 /*0x7ff6*/  .byte 0x07
-/*0x7ff7*/  .byte 0x95
+/*0x7ff7*/  .byte 0x95 /* - Report Count (1) */
 /*0x7ff8*/  .byte 0x01
-/*0x7ff9*/  .byte 0x75
+/*0x7ff9*/  .byte 0x75 /* - Report Size (8) */
 /*0x7ffa*/  .byte 0x08
-/*0x7ffb*/  .byte 0x81
+/*0x7ffb*/  .byte 0x81 /* - Input (Const,Var,Abs,No Wrap,Linear,Preferred State,No Null Position) */
 /*0x7ffc*/  .byte 0x03
-/*0x7ffd*/  .byte 0x95
+/*0x7ffd*/  .byte 0x95 /* - Report Count (232) */
 /*0x7ffe*/  .byte 0xe8
-/*0x7fff*/  .byte 0x75
+/*0x7fff*/  .byte 0x75 /* - Report Size (1) */
 /*0x8000*/  .byte 0x01
-/*0x8001*/  .byte 0x15
+/*0x8001*/  .byte 0x15 /* - Logical Minimum (0) */
 /*0x8002*/  .byte 0x00
-/*0x8003*/  .byte 0x25
+/*0x8003*/  .byte 0x25 /* - Logical Maximum (1) */
 /*0x8004*/  .byte 0x01
-/*0x8005*/  .byte 0x05
+/*0x8005*/  .byte 0x05 /* - Usage Page (Kbrd/Keypad) */
 /*0x8006*/  .byte 0x07
-/*0x8007*/  .byte 0x19
+/*0x8007*/  .byte 0x19 /* - Usage Minimum (0x00) */
 /*0x8008*/  .byte 0x00
-/*0x8009*/  .byte 0x29
+/*0x8009*/  .byte 0x29 /* - Usage Maximum (0xE7) */
 /*0x800a*/  .byte 0xe7
-/*0x800b*/  .byte 0x81
+/*0x800b*/  .byte 0x81 /* - Input (Data,Array,Abs,No Wrap,Linear,Preferred State,No Null Position) */
 /*0x800c*/  .byte 0x00
-/*0x800d*/  .byte 0xc0
+/*0x800d*/  .byte 0xc0 /* End Collection */
 /*0x800e*/  .byte 0x00
 /*0x800f*/  .byte 0x00
             usb_report0_desc:
-/*0x8010*/  .byte 0x05
+/*0x8010*/  .byte 0x05 /* Usage Page (Generic Desktop Ctrls) */
 /*0x8011*/  .byte 0x01
-/*0x8012*/  .byte 0x09
+/*0x8012*/  .byte 0x09 /* Usage (Keyboard) */
 /*0x8013*/  .byte 0x06
-/*0x8014*/  .byte 0xa1
+/*0x8014*/  .byte 0xa1 /* Collection (Application) */
 /*0x8015*/  .byte 0x01
-/*0x8016*/  .byte 0x05
+/*0x8016*/  .byte 0x05 /* - Usage Page (Kbrd/Keypad) */
 /*0x8017*/  .byte 0x07
-/*0x8018*/  .byte 0x19
+/*0x8018*/  .byte 0x19 /* - Usage Minimum (0xE0) */
 /*0x8019*/  .byte 0xe0
-/*0x801a*/  .byte 0x29
+/*0x801a*/  .byte 0x29 /* - Usage Maximum (0xE7) */
 /*0x801b*/  .byte 0xe7
-/*0x801c*/  .byte 0x15
+/*0x801c*/  .byte 0x15 /* - Logical Minimum (0) */
 /*0x801d*/  .byte 0x00
-/*0x801e*/  .byte 0x25
+/*0x801e*/  .byte 0x25 /* - Logical Maximum (1) */
 /*0x801f*/  .byte 0x01
-/*0x8020*/  .byte 0x75
+/*0x8020*/  .byte 0x75 /* - Report Size (1) */
 /*0x8021*/  .byte 0x01
-/*0x8022*/  .byte 0x95
+/*0x8022*/  .byte 0x95 /* - Report Count (8) */
 /*0x8023*/  .byte 0x08
-/*0x8024*/  .byte 0x81
+/*0x8024*/  .byte 0x81 /* - Input (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position) */
 /*0x8025*/  .byte 0x02
-/*0x8026*/  .byte 0x95
+/*0x8026*/  .byte 0x95 /* - Report Count (1) */
 /*0x8027*/  .byte 0x01
-/*0x8028*/  .byte 0x75
+/*0x8028*/  .byte 0x75 /* - Report Size (8) */
 /*0x8029*/  .byte 0x08
-/*0x802a*/  .byte 0x81
+/*0x802a*/  .byte 0x81 /* - Input (Const,Var,Abs,No Wrap,Linear,Preferred State,No Null Position) */
 /*0x802b*/  .byte 0x03
-/*0x802c*/  .byte 0x95
+/*0x802c*/  .byte 0x95 /* - Report Count (3) */
 /*0x802d*/  .byte 0x03
-/*0x802e*/  .byte 0x75
+/*0x802e*/  .byte 0x75 /* - Report Size (1) */
 /*0x802f*/  .byte 0x01
-/*0x8030*/  .byte 0x05
+/*0x8030*/  .byte 0x05 /* - Usage Page (LEDs) */
 /*0x8031*/  .byte 0x08
-/*0x8032*/  .byte 0x19
+/*0x8032*/  .byte 0x19 /* - Usage Minimum (Num Lock) */
 /*0x8033*/  .byte 0x01
-/*0x8034*/  .byte 0x29
+/*0x8034*/  .byte 0x29 /* - Usage Maximum (Scroll Lock) */
 /*0x8035*/  .byte 0x03
-/*0x8036*/  .byte 0x91
+/*0x8036*/  .byte 0x91 /* - Output (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position,Non-volatile) */
 /*0x8037*/  .byte 0x02
-/*0x8038*/  .byte 0x95
+/*0x8038*/  .byte 0x95 /* - Report Count (1) */
 /*0x8039*/  .byte 0x01
-/*0x803a*/  .byte 0x75
+/*0x803a*/  .byte 0x75 /* - Report Size (5) */
 /*0x803b*/  .byte 0x05
-/*0x803c*/  .byte 0x91
+/*0x803c*/  .byte 0x91 /* - Output (Const,Var,Abs,No Wrap,Linear,Preferred State,No Null Position,Non-volatile) */
 /*0x803d*/  .byte 0x03
-/*0x803e*/  .byte 0x95
+/*0x803e*/  .byte 0x95 /* - Report Count (6) */
 /*0x803f*/  .byte 0x06
-/*0x8040*/  .byte 0x75
+/*0x8040*/  .byte 0x75 /* - Report Size (8) */
 /*0x8041*/  .byte 0x08
-/*0x8042*/  .byte 0x15
+/*0x8042*/  .byte 0x15 /* - Logical Minimum (0) */
 /*0x8043*/  .byte 0x00
-/*0x8044*/  .byte 0x26
+/*0x8044*/  .byte 0x26 /* - Logical Maximum (164) */
 /*0x8045*/  .byte 0xa4
 /*0x8046*/  .byte 0x00
-/*0x8047*/  .byte 0x05
+/*0x8047*/  .byte 0x05 /* - Usage Page (Kbrd/Keypad) */
 /*0x8048*/  .byte 0x07
-/*0x8049*/  .byte 0x19
+/*0x8049*/  .byte 0x19 /* - Usage Minimum (0x00) */
 /*0x804a*/  .byte 0x00
-/*0x804b*/  .byte 0x29
+/*0x804b*/  .byte 0x29 /* - Usage Maximum (0xA4) */
 /*0x804c*/  .byte 0xa4
-/*0x804d*/  .byte 0x81
+/*0x804d*/  .byte 0x81 /* - Input (Data,Array,Abs,No Wrap,Linear,Preferred State,No Null Position) */
 /*0x804e*/  .byte 0x00
-/*0x804f*/  .byte 0xc0
+/*0x804f*/  .byte 0xc0 /* End Collection */
             usb_config_desc:
 /*0x8050*/  .byte 0x09
 /*0x8051*/  .byte 0x02
@@ -11324,11 +11325,11 @@
 /*0x810c*/  .word data_812c
 /*0x8110*/  .word 0x20000000
 /*0x8114*/  .word 0x00000068
-/*0x8118*/  .word sram_task1
+/*0x8118*/  .word 0x0000783c /* possible pointer */
 /*0x811c*/  .word data_8194
 /*0x8120*/  .word 0x20000068
 /*0x8124*/  .word 0x00002178
-/*0x8128*/  .word sram_task2
+/*0x8128*/  .word 0x0000784c /* possible pointer */
 
             data_812c:
 /*0x812c*/  .byte 0x00

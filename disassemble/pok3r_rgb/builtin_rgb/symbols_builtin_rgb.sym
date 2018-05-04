@@ -1,4 +1,6 @@
 
+[code]
+
 0x1c   : entry
 0x30   : load_jump_fw
 0x40   : memcpy

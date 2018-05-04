@@ -1,4 +1,6 @@
- 
+
+[code]
+
 * 3404 : reset
 * 3408 : nmi
 * 340c : hard_fault

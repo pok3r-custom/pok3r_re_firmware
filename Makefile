@@ -1,4 +1,11 @@
 
+build:
+	@echo "** Build Disassembled Firmware"
+	@sh disassemble/build.sh
+
+reassemble:
+	@sh disassemble/reas.sh $(abspath ../reassemble-build/reassemble)
+
 jlink:
 	JLinkExe -Device HT32F1654 -CommanderScript util/connect.jlink
 	#JLinkExe -Device HT32F1655 -CommanderScript util/connect.jlink
@@ -12,6 +19,11 @@ erase_cykb:
 pok3r_bootloader:
 	cp disassemble/pok3r/builtin/firmware_builtin.bin .tmp.bin
 	JLinkExe -Device HT32F1655 -CommanderScript util/flash.jlink
+	rm .tmp.bin
+
+rgb_bootloader:
+	cp disassemble/pok3r_rgb/builtin_rgb/firmware_builtin_rgb.bin .tmp.bin
+	JLinkExe -Device HT32F1654 -CommanderScript util/flash.jlink
 	rm .tmp.bin
 
 core_bootloader:

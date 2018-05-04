@@ -186,8 +186,8 @@
 #7904 : main
 #7964 : function_130_15
 
-* 8118 : sram_task1
-* 8128 : sram_task2
+#* 8118 : sram_task1
+#* 8128 : sram_task2
 
 [data]
 
