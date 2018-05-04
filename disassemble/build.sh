@@ -40,16 +40,16 @@ reas pok3r_rgb2/v105/rgb2_v105.s                        vma34
 reas pok3r_rgb2/v105/rgb2_v105_ref.s                    vma34   pok3r_rgb2/v105/rgb2_v105.bin
 echo
 
-reas vortex_core/builtin_core/vortex_core_builtin.s     vma0
-reas vortex_core/builtin_core/vortex_core_builtin_ref.s vma0    vortex_core/builtin_core/firmware_builtin_core.bin
-reas vortex_core/v145/core_v145.s                       vma34
-reas vortex_core/v145/core_v145_ref.s                   vma34   vortex_core/v145/core_v145.bin
+reas core/builtin_core/vortex_core_builtin.s            vma0
+reas core/builtin_core/vortex_core_builtin_ref.s        vma0    core/builtin_core/firmware_builtin_core.bin
+reas core/v145/core_v145.s                              vma34
+reas core/v145/core_v145_ref.s                          vma34   core/v145/core_v145.bin
 echo
 
-reas race3/bootloader/race3_bootloader.s                vma0
-reas race3/bootloader/race3_bootloader_ref.s            vma0    race3/bootloader/race3_bootloader.bin
-reas race3/v124/race_v124.s                             vma34
-reas race3/v124/race_v124_ref.s                         vma34   race3/v124/race_v124.bin
+reas race/bootloader/race_bootloader.s                  vma0
+reas race/bootloader/race_bootloader_ref.s              vma0    race/bootloader/race_bootloader.bin
+reas race/v124/race_v124.s                             vma34
+reas race/v124/race_v124_ref.s                         vma34    race/v124/race_v124.bin
 echo
 
 reas vibe/v113/vibe_v113_ref.s                          vma34   vibe/v113/vibe_v113.bin
