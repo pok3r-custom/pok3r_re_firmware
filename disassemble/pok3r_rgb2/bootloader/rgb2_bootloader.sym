@@ -53,12 +53,12 @@
 #167c: generate
 #16bc: firmware_check
 
-192c : function_192c
-1a28 : function_1a28
-1b10 : function_1b10
-1b1c : function_1b1c
-1eb0 : function_1eb0
-1ebe : function_1ebe
+192c
+1a28
+1b10
+1b1c
+1eb0
+1ebe
 
 #0x1e48 : check_fw_sp_pc
 

@@ -33,4 +33,6 @@ reas vortex_core/v145           core_v145.bin               core_v145_ref.s     
 reas race3/bootloader           race3_bootloader.bin        race3_bootloader_ref.s      0x0     symbols.sym
 reas race3/v124                 race_v124.bin               race_v124_ref.s             0x3400  symbols.sym
 
+reas vibe/v113                  vibe_v113.bin               vibe_v113_ref.s             0x3400  vibe_v113.sym
+
 popd > /dev/null

@@ -50,6 +50,9 @@ reas race3/bootloader/race3_bootloader.s                vma0
 reas race3/bootloader/race3_bootloader_ref.s            vma0    race3/bootloader/race3_bootloader.bin
 reas race3/v124/race_v124.s                             vma34
 reas race3/v124/race_v124_ref.s                         vma34   race3/v124/race_v124.bin
+echo
+
+reas vibe/v113/vibe_v113_ref.s                          vma34   vibe/v113/vibe_v113.bin
 
 popd > /dev/null
 

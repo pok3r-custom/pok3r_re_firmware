@@ -3482,7 +3482,7 @@
 
 
             .thumb_func
-            function_192c:
+            loc_192c:
 /*0x192c*/      movs r1, #1
 /*0x192e*/      lsls r1, r0
 /*0x1930*/      ldr r0, [pc, #8] /* data_193c */
@@ -3614,7 +3614,7 @@
 
 
             .thumb_func
-            function_1a28:
+            loc_1a28:
 /*0x1a28*/      push {r4, r5, r6, r7, lr}
 /*0x1a2a*/      ldrh r1, [r0]
 /*0x1a2c*/      mov.w r6, #0x100
@@ -3736,7 +3736,7 @@
 
 
             .thumb_func
-            function_1b10:
+            loc_1b10:
 /*0x1b10*/      ldr r2, [pc, #4] /* data_1b18 */
 /*0x1b12*/      movs r1, #1
 /*0x1b14*/      strb r1, [r2, r0]
@@ -3747,7 +3747,7 @@
 
 
             .thumb_func
-            function_1b1c:
+            loc_1b1c:
 /*0x1b1c*/      ldrb r2, [r0, #3]
 /*0x1b1e*/      ldrh r1, [r0, #4]
 /*0x1b20*/      movs r3, #1
@@ -4227,7 +4227,7 @@
 
 
             .thumb_func
-            function_1eb0:
+            loc_1eb0:
 /*0x1eb0*/      b jump_1eb8
             jump_1eb2:
 /*0x1eb2*/      ldm r0!, {r3}
@@ -4239,7 +4239,7 @@
 /*0x1ebc*/      bx lr
 
             .thumb_func
-            function_1ebe:
+            loc_1ebe:
 /*0x1ebe*/      movs r0, #0
 /*0x1ec0*/      b jump_1ec6
             jump_1ec2:

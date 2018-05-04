@@ -1,0 +1,93 @@
+
+[data]
+
+3400 : vectors .word
+
+[code]
+
+*   +4 : reset
+*   +4 : nmi
+*   +4 : hard_fault
+*   +4 : mcu_fault
+*   +4 : bus_fault
+*   +4 : usage_fault
+*  +14: svccall_intr
+*   +4 : debug_intr
+*   +8 : pendsv_intr
+*   +4 : systick_intr
+*   +4
+*   +4
+*   +4
+*   +4
+*   +4
+*   +4
+*   +4
+*   +4
+*   +4
+*   +4
+*   +4
+*   +4
+*   +4
+*   +4
+*   +4
+*   +4
+*   +4
+*   +4
+*   +4
+*   +4
+*   +4
+*   +4
+*   +4
+*   +4
+*   +4
+*   +4
+*   +8
+*   +4
+*   +4
+*   +4
+*   +4
+*   +4
+*   +4
+*   +4
+*   +4
+*   +4
+*  +14 : bftm0_intr
+*   +4 : bftm1_intr
+*   +4
+*   +4
+*   +4
+*   +4
+*   +4
+*   +4
+*   +4
+*   +4
+*   +4
+*   +4
+*   +4 : usb_intr
+*   +8
+*   +4
+*   +4
+*   +4
+*   +4
+*   +4
+*   +4
+*   +4
+*  +18
+
+356e : generic_intr
+
+35c2
+
+5ef8 : handle_frame
+#6118 : flash_read_packet
+
+775c
+776a
+776c
+
+77a8 : main
+
+[data]
+
+3bf8 : bootloader_crc_magic
+3c00 : flash_3c00_data
