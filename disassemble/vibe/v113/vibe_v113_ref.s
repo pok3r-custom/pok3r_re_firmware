@@ -308,12 +308,12 @@
 /*0x3604*/      cmp r4, r5
 /*0x3606*/      blo jump_35f6
 /*0x3608*/      bl call_3580
+
             data_360c:
-/*0x360c*/      strh r0, [r7, #0xe]
-/*0x360e*/      movs r0, r0
+/*0x360c*/  .word 0x000081f8 /* possible pointer */
             data_3610:
-/*0x3610*/      strh r0, [r3, #0x10]
-/*0x3612*/      movs r0, r0
+/*0x3610*/  .word 0x00008218 /* possible pointer */
+
 
             .thumb_func
             bftm0_intr:

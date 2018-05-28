@@ -292,12 +292,12 @@
 /*0x2df0*/      cmp r4, r5
 /*0x2df2*/      blo jump_2de2
 /*0x2df4*/      bl call_2d88
+
             data_2df8:
-/*0x2df8*/      ldrh r0, [r6, #0x3e]
-/*0x2dfa*/      movs r0, r0
+/*0x2df8*/  .word data_8ff0
             data_2dfc:
-/*0x2dfc*/      str r0, [sp, #0x40]
-/*0x2dfe*/      movs r0, r0
+/*0x2dfc*/  .word data_9010
+
 
             .thumb_func
             sram_decode_static:

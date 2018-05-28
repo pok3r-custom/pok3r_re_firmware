@@ -26,3 +26,9 @@
 0x012c : bftm1_intr
 
 0x1c2c : main
+
+[data]
+
+# Force data on some "code" that isn't code
+a4!
+a8!

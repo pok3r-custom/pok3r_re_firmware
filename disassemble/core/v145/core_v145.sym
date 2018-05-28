@@ -12,7 +12,7 @@
 *   +4 : mcu_fault
 *   +4 : bus_fault
 *   +4 : usage_fault
-*  +14: svccall_intr
+*  +14 : svccall_intr
 *   +4 : debug_intr
 *   +8 : pendsv_intr
 *   +4 : systick_intr

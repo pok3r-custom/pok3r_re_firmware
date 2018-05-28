@@ -3,15 +3,13 @@
 .text
 .thumb
 
-/*0x3400*/  .byte 0xe0
-/*0x3401*/  .byte 0x3f
-/*0x3402*/  .byte 0x00
-/*0x3403*/  .byte 0x20
 
+            vectors:
+/*0x3400*/  .word 0x20003fe0
 /*0x3404*/  .word reset
 /*0x3408*/  .word nmi
 /*0x340c*/  .word hard_fault
-/*0x3410*/  .word mmu_fault
+/*0x3410*/  .word mcu_fault
 /*0x3414*/  .word bus_fault
 /*0x3418*/  .word usage_fault
 
@@ -32,7 +30,7 @@
 /*0x342a*/  .byte 0x00
 /*0x342b*/  .byte 0x00
 
-/*0x342c*/  .word scvcall_intr
+/*0x342c*/  .word svccall_intr
 /*0x3430*/  .word debug_intr
 
 /*0x3434*/  .byte 0x00
@@ -170,8 +168,8 @@
 /*0x355e*/      b hard_fault
 
             .thumb_func
-            mmu_fault:
-/*0x3560*/      b mmu_fault
+            mcu_fault:
+/*0x3560*/      b mcu_fault
 
             .thumb_func
             bus_fault:
@@ -182,8 +180,8 @@
 /*0x3564*/      b usage_fault
 
             .thumb_func
-            scvcall_intr:
-/*0x3566*/      b scvcall_intr
+            svccall_intr:
+/*0x3566*/      b svccall_intr
 
             .thumb_func
             debug_intr:
@@ -337,12 +335,12 @@
 /*0x3628*/      cmp r4, r5
 /*0x362a*/      blo jump_361a
 /*0x362c*/      bl call_3580
+
             data_3630:
-/*0x3630*/      strh r4, [r5, #0x14]
-/*0x3632*/      movs r0, r0
+/*0x3630*/  .word 0x000082ac /* possible pointer */
             data_3634:
-/*0x3634*/      strh r4, [r1, #0x16]
-/*0x3636*/      movs r0, r0
+/*0x3634*/  .word 0x000082cc /* possible pointer */
+
 
             .thumb_func
             bftm0_intr:

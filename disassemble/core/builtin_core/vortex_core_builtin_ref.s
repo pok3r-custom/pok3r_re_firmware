@@ -109,12 +109,12 @@
 /*0x009c*/      cmp r4, r5
 /*0x009e*/      blo jump_8e
 /*0x00a0*/      bl call_24
+
             data_a4:
-/*0x00a4*/      movs r2, #0x38
-/*0x00a6*/      movs r0, r0
+/*0x00a4*/  .word 0x00002238 /* possible pointer */
             data_a8:
-/*0x00a8*/      movs r2, #0x58
-/*0x00aa*/      movs r0, r0
+/*0x00a8*/  .word 0x00002258 /* possible pointer */
+
 
             .thumb_func
             call_ac:

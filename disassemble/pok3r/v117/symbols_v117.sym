@@ -1,4 +1,8 @@
 
+[data]
+
+2c00 : vectors
+
 [code]
 
 * 2c04: reset
@@ -346,7 +350,9 @@
 
 [data]
 
-2c00: vectors
+# Force data on some "code" that isn't code
+2df8!
+2dfc!
 
 8998: usb_report0_desc
 89d8: usb_report1_desc

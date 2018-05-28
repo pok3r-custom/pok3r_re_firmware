@@ -1,31 +1,72 @@
 
+[data]
+
+0 : vectors .word
+
 [code]
 
-0x1c   : entry
-0x30   : load_jump_fw
-0x40   : memcpy
-0x64   : mem_set
-0x72   : mem_zero
-0x76   : mem_set2
-0x88   : sram_init
-0xd8   : bftm_set_counter
-0xf4   : bftm_clear
-0x118  : reset
-0x124  : generic_fault
-0x1d8  : bftm_set_mien
-0x2cc  : ckcu_clocks_enable
-0x2f0  : ckcu_set_usb_prescaler
-0x304  : flash_page_erase
-0x314  : flash_commit
-0x668  : nvic_disable_intr
-0x7b0  : decrypt_packet
-0x7ec  : flash_write_buffer
-0x810  : handle_frame
-0x9e8  : reset_builtin
-0xa6c  : flash_read_packet
-0x1560 : get_event
-0x1628 : generate
-0x1668 : firmware_check
-0x1e48 : check_fw_sp_pc
-0x1ea4 : main
+* +4 : reset
+* +4
+* +4
+* +4
+* +4
+* +4
 
+* 3c : systick_intr
+* e4 : bftm0_intr
+* e8 : bftm1_intr
+* ec
+* f0
+* 114 : usb_intr
+
+124 : generic_fault
+126 : generic_intr
+
+1c   : entry
+30   : load_jump_fw
+40   : memcpy
+64   : mem_set
+72   : mem_zero
+76   : mem_set2
+88   : sram_init
+d8   : bftm_set_counter
+f4   : bftm_clear
+1d8  : bftm_set_mien
+2cc  : ckcu_clocks_enable
+2f0  : ckcu_set_usb_prescaler
+304  : flash_page_erase
+314  : flash_commit
+668  : nvic_disable_intr
+7b0  : decrypt_packet
+7ec  : flash_write_buffer
+810  : handle_frame
+9e8  : reset_builtin
+a6c  : flash_read_packet
+1560 : get_event
+1628 : generate
+1668 : firmware_check
+1e48 : check_fw_sp_pc
+1ea4 : main
+
+18a8
+19a4
+1a8c
+1a98
+1e2c
+1e3a
+
+[data]
+
+# Force data on some "code" that isn't code
+* a4!
+* a8!
+
+0400: read_400_data
+
+1fd4 : gpio_map_3
+2024 : gpio_map_2
+2074 : gpio_map_1
+20bc : usb_report1_desc
+20ec : usb_report2_desc
+2148 : usb_report0_desc
+2188 : usb_descriptors

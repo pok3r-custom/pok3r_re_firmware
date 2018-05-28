@@ -11,13 +11,15 @@ reas () {
 
     rm -f $tmp "$elf"
 
-    arm-none-eabi-as -mcpu=cortex-m3 -mthumb "$1" -o $tmp && \
+    #arm-none-eabi-as -mcpu=cortex-m3 -mthumb "$1" -o $tmp && \
+    arm-none-eabi-as "$1" -o $tmp && \
     arm-none-eabi-ld -T "$ld" -o "$elf" $tmp && \
     arm-none-eabi-objcopy "$elf" -O binary "$out" && \
     echo "  out: $out"
 
     if [[ ! -z "$3" ]]; then
-        md5sum "$out" "$3"
+        #sha1sum "$out" "$3" && echo "reassemble OK"
+        cmp -s "$out" "$3" && echo "  OK" || echo "  DIFFER"
     fi
 }
 

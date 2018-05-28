@@ -3,6 +3,7 @@
 .text
 .thumb
 
+            vectors:
 /*0x0000*/  .byte 0xd8
 /*0x0001*/  .byte 0x0e
 /*0x0002*/  .byte 0x00
@@ -99,12 +100,12 @@
 /*0x0064*/      cmp r4, r5
 /*0x0066*/      blo jump_56
 /*0x0068*/      bl call_28
+
             data_6c:
-/*0x006c*/      movs r2, #0xac
-/*0x006e*/      movs r0, r0
+/*0x006c*/  .word 0x000022ac /* possible pointer */
             data_70:
-/*0x0070*/      movs r2, #0xcc
-/*0x0072*/      movs r0, r0
+/*0x0070*/  .word 0x000022cc /* possible pointer */
+
 
             .thumb_func
             call_74:

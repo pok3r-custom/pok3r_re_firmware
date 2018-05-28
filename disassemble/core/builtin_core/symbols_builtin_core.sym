@@ -66,6 +66,10 @@
 
 [data]
 
+# Force data on some "code" that isn't code
+a4!
+a8!
+
 0400: read_400_data
 
 1fdc: data_1fdc

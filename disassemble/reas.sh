@@ -12,7 +12,7 @@ reas () {
     sym="$dir/$5"
     echo "$in"
 
-    $reasm -OA -a $adr -s "$sym" "$in" "$out" > /dev/null
+    $reasm -EOA -a $adr -s "$sym" "$in" "$out" > /dev/null
     echo "  out: $out"
 }
 

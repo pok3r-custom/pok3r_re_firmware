@@ -1,5 +1,6 @@
 
 [code]
+
 0x20   : entry
 0x48   : load_jump_fw
 0x50   : sram_init
@@ -58,6 +59,13 @@
 0x1f90 : firmware_decrypt
 
 [data]
+
+0 : vectors
+
+# Force data on some "code" that isn't code
+6c!
+70!
+
 0x2024 : usb_report0_desc
 0x2064 : usb_report1_desc
 0x2088 : usb_report2_desc
