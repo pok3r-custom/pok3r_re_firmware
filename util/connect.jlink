@@ -2,11 +2,14 @@
 si SWD
 speed 4000
 connect
-rsettype 2
+#rsettype 2
 
 w4 40088304 8
 
 mem32 0 10
 mem32 2800 10
 mem32 3000 10
+mem32 1ff00000 4
+mem32 1ff00010 1
+mem32 1ff00020 1
 

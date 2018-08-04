@@ -2,9 +2,9 @@
 si SWD
 speed 4000
 connect
-rsettype 2
+#rsettype 2
 
-loadbin .tmp.bin 0x0
+loadbin /tmp/flash.bin 0x0
 rx 100
 
 q
