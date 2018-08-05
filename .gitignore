@@ -1,6 +1,7 @@
 # Build Files
 .dep
-build
+/build/
+/unlocker/build/
 util/jlink_flashloader/FlashLoader_HT32/Output
 .tmp.bin
 /*.bin
