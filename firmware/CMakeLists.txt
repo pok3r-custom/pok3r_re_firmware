@@ -58,6 +58,15 @@ SET(VORTEX_CORE_SOURCES
     board/ht32/ht32f1654.c
 )
 
+SET(UNLOCK_SOURCES
+    board/ht32/startup.s
+    ht32f165x_flash.S
+    board/cortex-m3.c
+    board/pok3r_board.c
+    board/ht32/ht32f165x.c
+    board/ht32/ht32f1655.c
+)
+
 FILE(GLOB_RECURSE DEMO_FILES demo/*.c demo/*.h demo/*.s demo/*.ld)
 
 SET(FILES
@@ -121,6 +130,12 @@ ConfigureBoard("vortex_core_custom"
     "${VORTEX_CORE_SOURCES}"
     ht32f1654.ld
     "-DBOARD=3 -DCPU=2"
+)
+
+ConfigureBoard("pok3r_unlock"
+    "${UNLOCK_SOURCES}"
+    ht32f1655.ld
+    "-DBOARD=1 -DCPU=1"
 )
 
 ### =================== BUILD =================== ###

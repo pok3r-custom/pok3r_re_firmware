@@ -1,0 +1,161 @@
+001:029:004:DESCRIPTOR         1530247764.477186
+ 05 01 09 06 A1 01 05 07 19 E0 29 E7 15 00 25 01
+ 95 08 75 01 81 02 05 08 19 01 29 05 95 05 75 01
+ 91 02 95 01 75 03 91 01 05 07 19 00 29 F7 15 00
+ 25 01 95 F8 75 01 81 02 C0
+
+001:029:003:DESCRIPTOR         1530247764.477425
+ 06 31 FF 09 74 A1 01 09 75 15 00 26 FF 00 95 20
+ 75 08 81 02 09 76 15 00 26 FF 00 95 20 75 08 91
+ 02 C0
+
+001:029:001:DESCRIPTOR         1530247764.477629
+ 06 00 FF 09 01 A1 01 09 02 15 00 26 FF 00 95 40
+ 75 08 81 02 09 03 15 00 26 FF 00 95 40 75 08 91
+ 02 C0
+
+001:029:002:DESCRIPTOR         1530247764.477845
+ 05 01 09 80 A1 01 85 02 16 01 00 26 03 00 1A 81
+ 00 2A 83 00 75 10 95 01 81 00 C0 05 0C 09 01 A1
+ 01 85 03 16 01 00 26 9C 02 1A 01 00 2A 9C 02 75
+ 10 95 01 81 00 C0
+
+001:029:000:DESCRIPTOR         1530247764.478075
+ 05 01 09 06 A1 01 05 07 19 E0 29 E7 15 00 25 01
+ 95 08 75 01 81 02 95 01 75 08 81 01 05 08 19 01
+ 29 05 95 05 75 01 91 02 95 01 75 03 91 01 05 07
+ 19 00 29 FF 15 00 26 FF 00 95 06 75 08 81 00 C0
+
+NKRO Keyboard
+
+0x05, 0x01,        // Usage Page (Generic Desktop Ctrls)
+0x09, 0x06,        // Usage (Keyboard)
+0xA1, 0x01,        // Collection (Application)
+0x05, 0x07,        //   Usage Page (Kbrd/Keypad)
+0x19, 0xE0,        //   Usage Minimum (0xE0)
+0x29, 0xE7,        //   Usage Maximum (0xE7)
+0x15, 0x00,        //   Logical Minimum (0)
+0x25, 0x01,        //   Logical Maximum (1)
+0x95, 0x08,        //   Report Count (8)
+0x75, 0x01,        //   Report Size (1)
+0x81, 0x02,        //   Input (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
+0x05, 0x08,        //   Usage Page (LEDs)
+0x19, 0x01,        //   Usage Minimum (Num Lock)
+0x29, 0x05,        //   Usage Maximum (Kana)
+0x95, 0x05,        //   Report Count (5)
+0x75, 0x01,        //   Report Size (1)
+0x91, 0x02,        //   Output (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position,Non-volatile)
+0x95, 0x01,        //   Report Count (1)
+0x75, 0x03,        //   Report Size (3)
+0x91, 0x01,        //   Output (Const,Array,Abs,No Wrap,Linear,Preferred State,No Null Position,Non-volatile)
+0x05, 0x07,        //   Usage Page (Kbrd/Keypad)
+0x19, 0x00,        //   Usage Minimum (0x00)
+0x29, 0xF7,        //   Usage Maximum (0xF7)
+0x15, 0x00,        //   Logical Minimum (0)
+0x25, 0x01,        //   Logical Maximum (1)
+0x95, 0xF8,        //   Report Count (-8)
+0x75, 0x01,        //   Report Size (1)
+0x81, 0x02,        //   Input (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
+0xC0,              // End Collection
+
+API
+
+0x06, 0x31, 0xFF,  // Usage Page (Vendor Defined 0xFF31)
+0x09, 0x74,        // Usage (0x74)
+0xA1, 0x01,        // Collection (Application)
+0x09, 0x75,        //   Usage (0x75)
+0x15, 0x00,        //   Logical Minimum (0)
+0x26, 0xFF, 0x00,  //   Logical Maximum (255)
+0x95, 0x20,        //   Report Count (32)
+0x75, 0x08,        //   Report Size (8)
+0x81, 0x02,        //   Input (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
+0x09, 0x76,        //   Usage (0x76)
+0x15, 0x00,        //   Logical Minimum (0)
+0x26, 0xFF, 0x00,  //   Logical Maximum (255)
+0x95, 0x20,        //   Report Count (32)
+0x75, 0x08,        //   Report Size (8)
+0x91, 0x02,        //   Output (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position,Non-volatile)
+0xC0,              // End Collection
+
+Console
+
+0x06, 0x00, 0xFF,  // Usage Page (Vendor Defined 0xFF00)
+0x09, 0x01,        // Usage (0x01)
+0xA1, 0x01,        // Collection (Application)
+0x09, 0x02,        //   Usage (0x02)
+0x15, 0x00,        //   Logical Minimum (0)
+0x26, 0xFF, 0x00,  //   Logical Maximum (255)
+0x95, 0x40,        //   Report Count (64)
+0x75, 0x08,        //   Report Size (8)
+0x81, 0x02,        //   Input (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
+0x09, 0x03,        //   Usage (0x03)
+0x15, 0x00,        //   Logical Minimum (0)
+0x26, 0xFF, 0x00,  //   Logical Maximum (255)
+0x95, 0x40,        //   Report Count (64)
+0x75, 0x08,        //   Report Size (8)
+0x91, 0x02,        //   Output (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position,Non-volatile)
+0xC0,              // End Collection
+
+Extrakey
+
+0x05, 0x01,        // Usage Page (Generic Desktop Ctrls)
+0x09, 0x80,        // Usage (Sys Control)
+0xA1, 0x01,        // Collection (Application)
+0x85, 0x02,        //   Report ID (2)
+0x16, 0x01, 0x00,  //   Logical Minimum (1)
+0x26, 0x03, 0x00,  //   Logical Maximum (3)
+0x1A, 0x81, 0x00,  //   Usage Minimum (Sys Power Down)
+0x2A, 0x83, 0x00,  //   Usage Maximum (Sys Wake Up)
+0x75, 0x10,        //   Report Size (16)
+0x95, 0x01,        //   Report Count (1)
+0x81, 0x00,        //   Input (Data,Array,Abs,No Wrap,Linear,Preferred State,No Null Position)
+0xC0,              // End Collection
+0x05, 0x0C,        // Usage Page (Consumer)
+0x09, 0x01,        // Usage (Consumer Control)
+0xA1, 0x01,        // Collection (Application)
+0x85, 0x03,        //   Report ID (3)
+0x16, 0x01, 0x00,  //   Logical Minimum (1)
+0x26, 0x9C, 0x02,  //   Logical Maximum (668)
+0x1A, 0x01, 0x00,  //   Usage Minimum (Consumer Control)
+0x2A, 0x9C, 0x02,  //   Usage Maximum (AC Distribute Vertically)
+0x75, 0x10,        //   Report Size (16)
+0x95, 0x01,        //   Report Count (1)
+0x81, 0x00,        //   Input (Data,Array,Abs,No Wrap,Linear,Preferred State,No Null Position)
+0xC0,              // End Collection
+
+Boot Keyboard?
+
+0x05, 0x01,        // Usage Page (Generic Desktop Ctrls)
+0x09, 0x06,        // Usage (Keyboard)
+0xA1, 0x01,        // Collection (Application)
+0x05, 0x07,        //   Usage Page (Kbrd/Keypad)
+0x19, 0xE0,        //   Usage Minimum (0xE0)
+0x29, 0xE7,        //   Usage Maximum (0xE7)
+0x15, 0x00,        //   Logical Minimum (0)
+0x25, 0x01,        //   Logical Maximum (1)
+0x95, 0x08,        //   Report Count (8)
+0x75, 0x01,        //   Report Size (1)
+0x81, 0x02,        //   Input (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
+0x95, 0x01,        //   Report Count (1)
+0x75, 0x08,        //   Report Size (8)
+0x81, 0x01,        //   Input (Const,Array,Abs,No Wrap,Linear,Preferred State,No Null Position)
+0x05, 0x08,        //   Usage Page (LEDs)
+0x19, 0x01,        //   Usage Minimum (Num Lock)
+0x29, 0x05,        //   Usage Maximum (Kana)
+0x95, 0x05,        //   Report Count (5)
+0x75, 0x01,        //   Report Size (1)
+0x91, 0x02,        //   Output (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position,Non-volatile)
+0x95, 0x01,        //   Report Count (1)
+0x75, 0x03,        //   Report Size (3)
+0x91, 0x01,        //   Output (Const,Array,Abs,No Wrap,Linear,Preferred State,No Null Position,Non-volatile)
+0x05, 0x07,        //   Usage Page (Kbrd/Keypad)
+0x19, 0x00,        //   Usage Minimum (0x00)
+0x29, 0xFF,        //   Usage Maximum (0xFF)
+0x15, 0x00,        //   Logical Minimum (0)
+0x26, 0xFF, 0x00,  //   Logical Maximum (255)
+0x95, 0x06,        //   Report Count (6)
+0x75, 0x08,        //   Report Size (8)
+0x81, 0x00,        //   Input (Data,Array,Abs,No Wrap,Linear,Preferred State,No Null Position)
+0xC0,              // End Collection
+
+// 243 bytes

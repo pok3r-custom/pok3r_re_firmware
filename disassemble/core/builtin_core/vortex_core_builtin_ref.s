@@ -475,7 +475,7 @@
 
 
             .thumb_func
-            call_328:
+            flash_page_erase:
 /*0x0328*/      ldr r1, [pc, #8] /* data_334 */
 /*0x032a*/      str r0, [r1]
 /*0x032c*/      movs r0, #8
@@ -1184,7 +1184,7 @@
 
 
             .thumb_func
-            call_7f0:
+            decrypt_packet:
 /*0x07f0*/      push {r4, r5, r6, r7, lr}
 /*0x07f2*/      sub sp, #0x100
 /*0x07f4*/      mov r4, r0
@@ -1217,7 +1217,7 @@
 /*0x082a*/      pop {r4, r5, r6, r7, pc}
 
             .thumb_func
-            call_82c:
+            flash_write_buffer:
 /*0x082c*/      push {r4, r5, r6, lr}
 /*0x082e*/      lsrs r2, r2, #2
 /*0x0830*/      movs r4, #4
@@ -1358,9 +1358,9 @@
             jump_93e:
 /*0x093e*/      b jump_9c0
             jump_940:
-/*0x0940*/      bl call_328
+/*0x0940*/      bl flash_page_erase
 /*0x0944*/      cbnz r0, jump_960
-/*0x0946*/      bl call_166c
+/*0x0946*/      bl watchdog_reload_timer
 /*0x094a*/      ldr r0, [r6, #8]
 /*0x094c*/      add.w r0, r0, #0x400
 /*0x0950*/      str r0, [r6, #8]
@@ -1417,7 +1417,7 @@
             jump_9a4:
 /*0x09a4*/      adds r0, r6, #4
             jump_9a6:
-/*0x09a6*/      bl call_aac
+/*0x09a6*/      bl flash_read_packet
 /*0x09aa*/      movs r4, #1
             jump_9ac:
 /*0x09ac*/      ldrb r0, [r5]
@@ -1450,12 +1450,12 @@
             jump_9e2:
 /*0x09e2*/      mov r1, r0
 /*0x09e4*/      adds r0, r6, #4
-/*0x09e6*/      bl call_7f0
+/*0x09e6*/      bl decrypt_packet
             jump_9ea:
 /*0x09ea*/      ldrb r2, [r6, #1]
 /*0x09ec*/      adds r1, r6, #4
 /*0x09ee*/      ldr r0, [r5, #4]
-/*0x09f0*/      bl call_82c
+/*0x09f0*/      bl flash_write_buffer
 /*0x09f4*/      ldrb r0, [r6, #1]
 /*0x09f6*/      ldr r1, [r5, #4]
 /*0x09f8*/      add r0, r1
@@ -1518,9 +1518,6 @@
 /*0x0a64*/      mov.w r0, #0x200
 /*0x0a68*/      str r0, [r1, #0x24]
 /*0x0a6a*/      movs r0, #0x35
-
-            .thumb_func
-            flash_read_packet:
 /*0x0a6c*/      bl call_690
 /*0x0a70*/      movs r0, #0
 /*0x0a72*/      bl call_12b8
@@ -1552,7 +1549,7 @@
 
 
             .thumb_func
-            call_aac:
+            flash_read_packet:
 /*0x0aac*/      push {r4, r5, r6, lr}
 /*0x0aae*/      mov r4, r1
 /*0x0ab0*/      ldr r2, [pc, #0x24] /* data_ad8 */
@@ -3105,7 +3102,7 @@
 
 
             .thumb_func
-            call_166c:
+            watchdog_reload_timer:
 /*0x166c*/      ldr r1, [pc, #8] /* data_1678 */
 /*0x166e*/      ldr r0, [pc, #4] /* data_1674 */
 /*0x1670*/      str r0, [r1]
@@ -4162,7 +4159,7 @@
 /*0x1e2a*/      ldr.w r0, [sb]
 /*0x1e2e*/      tst.w r0, #0xc0
 /*0x1e32*/      beq jump_1e48
-/*0x1e34*/      bl call_166c
+/*0x1e34*/      bl watchdog_reload_timer
 /*0x1e38*/      mov.w r0, #0x3e8
 /*0x1e3c*/      bl call_102
 /*0x1e40*/      str r6, [r5, #0x58]
@@ -4222,7 +4219,7 @@
 /*0x1e9a*/      bx lr
 
             .thumb_func
-            call_1e9c:
+            check_fw_sp_pc:
 /*0x1e9c*/      mov.w r0, #0x3400
 /*0x1ea0*/      ldr r1, [r0]
 /*0x1ea2*/      sub.w r1, r1, #0x20000000
@@ -4290,7 +4287,7 @@
 /*0x1f1e*/      ldr r0, [r0]
 /*0x1f20*/      cmp r0, r1
 /*0x1f22*/      beq jump_1f28
-/*0x1f24*/      bl call_1e9c
+/*0x1f24*/      bl check_fw_sp_pc
             jump_1f28:
 /*0x1f28*/      bl call_614
 /*0x1f2c*/      bl call_238
@@ -4328,7 +4325,7 @@
 /*0x1f84*/      movs r0, #1
 /*0x1f86*/      bl call_7d8
             jump_1f8a:
-/*0x1f8a*/      bl call_166c
+/*0x1f8a*/      bl watchdog_reload_timer
 /*0x1f8e*/      b jump_1f4c
 
             data_1f90:

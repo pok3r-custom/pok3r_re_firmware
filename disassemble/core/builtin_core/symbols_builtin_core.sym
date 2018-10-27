@@ -12,44 +12,45 @@
 *   +4
 *   +4
 
-* 003c: systick_intr
-* 00e4: bftm0_intr
-* 00e8: bftm1_intr
-* 00ec
-* 00f0
-* 0114: usb_intr
+* 3c: systick_intr
+* e4: bftm0_intr
+* e8: bftm1_intr
+* ec
+* f0
+* 114: usb_intr
 
-001c: entry
-0030: load_jump_fw
-0040: memcpy
-0064: mem_set
-0072: mem_zero
-0076: mem_set2
-0088: sram_init
+1c: entry
+30: load_jump_fw
+40: memcpy
+64: mem_set
+72: mem_zero
+76: mem_set2
+88: sram_init
 
-00d8: bftm_set_counter
-00f4: bftm_clear
+d8: bftm_set_counter
+f4: bftm_clear
 
-0124: generic_fault
-0126: generic_intr
-02f0: ckcu_clocks_enable
+124: generic_fault
+126: generic_intr
+2f0: ckcu_clocks_enable
 
-0444: function_444
+328: flash_page_erase
 
-0850: handle_frame
-0a28: reset_builtin
-0a6c: flash_read_packet
+444: function_444
 
-#0x1d8  : bftm_set_mien
-#0x2f0  : ckcu_set_usb_prescaler
-#0x304  : flash_page_erase
-#0x314  : flash_commit
-#0x668  : nvic_disable_intr
-#0x7b0  : decrypt_packet
-#0x7ec  : flash_write_buffer
-#0xa6c  : flash_read_packet
-#0x1560 : get_event
+7f0: decrypt_packet
+82c: flash_write_buffer
+850: handle_frame
+a28: reset_builtin
+aac: flash_read_packet
 
+#1d8  : bftm_set_mien
+#2f0  : ckcu_set_usb_prescaler
+#314  : flash_commit
+#668  : nvic_disable_intr
+#1560 : get_event
+
+166c: watchdog_reload_timer
 167c: generate
 16bc: firmware_check
 
@@ -60,7 +61,7 @@
 1e80: function_1e80
 1e8e: function_1e8e
 
-#0x1e48 : check_fw_sp_pc
+1e9c : check_fw_sp_pc
 
 1efc: main
 
