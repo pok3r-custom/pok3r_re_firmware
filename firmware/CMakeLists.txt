@@ -23,10 +23,6 @@ SET(HEADERS
     board/vortex_core_board.h
 )
 
-SET(STARTUP_SOURCE
-    board/ht32/startup.s
-)
-
 SET(COMMON_SOURCES
     main.c
     descriptor.c
@@ -72,12 +68,12 @@ FILE(GLOB_RECURSE DEMO_FILES demo/*.c demo/*.h demo/*.s demo/*.ld)
 SET(FILES
     ${HEADERS}
     ${COMMON_SOURCES}
-    ${STARTUP_SOURCE}
 
     ${POK3R_SOURCES}
     ${POK3R_RGB_SOURCES}
     ${VORTEX_CORE_SOURCES}
 
+    Makefile.in
     ht32f1654.ld
     ht32f1655.ld
     openocd.cfg
@@ -108,7 +104,7 @@ FUNCTION(ConfigureBoard NAME SRCS LINK DEFS)
     # Custom make command
     SET(BOARD_BIN "${BOARD_DIR}/${NAME}.bin")
     ADD_CUSTOM_COMMAND(OUTPUT ${BOARD_BIN}
-        DEPENDS ${HEADERS} ${STARTUP_SOURCE} ${SRCS} ${LINK}
+        DEPENDS ${HEADERS} ${SRCS} ${LINK}
         WORKING_DIRECTORY ${BOARD_DIR}
         COMMAND make -f ${BOARD_MAKE}
     )
@@ -142,13 +138,9 @@ ConfigureBoard("pok3r_unlock"
 
 ADD_CUSTOM_TARGET(firmware-dummy SOURCES ${FILES})
 
-IF(CMAKE_SYSTEM_NAME MATCHES "Linux")
-
-    # Firmware target
-    ADD_CUSTOM_TARGET(firmware ALL
-        DEPENDS ${pok3r_custom_BIN}
-        #DEPENDS ${pok3r_custom_rgb_BIN}
-        #DEPENDS ${vortex_core_custom_BIN}
+# Firmware target
+ADD_CUSTOM_TARGET(firmware ALL
+    DEPENDS ${pok3r_custom_BIN}
+    #DEPENDS ${pok3r_custom_rgb_BIN}
+    #DEPENDS ${vortex_core_custom_BIN}
     )
-
-ENDIF()
