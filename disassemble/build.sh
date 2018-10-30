@@ -50,11 +50,18 @@ echo
 
 reas race/bootloader/race_bootloader.s                  vma0
 reas race/bootloader/race_bootloader_ref.s              vma0    race/bootloader/race_bootloader.bin
-reas race/v124/race_v124.s                             vma34
-reas race/v124/race_v124_ref.s                         vma34    race/v124/race_v124.bin
+reas race/v124/race_v124.s                              vma34
+reas race/v124/race_v124_ref.s                          vma34    race/v124/race_v124.bin
 echo
 
 reas vibe/v113/vibe_v113_ref.s                          vma34   vibe/v113/vibe_v113.bin
+echo
+
+reas md200/v112/md200_v112_ref.s                        vma34   md200/v112/md200_v112.bin
+echo
+
+reas md600/v148/md600_v148_ref.s                        vma34   md600/v148/md600_v148.bin
+echo
 
 popd > /dev/null
 

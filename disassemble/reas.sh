@@ -35,4 +35,9 @@ reas race/v124                  race_v124.bin               race_v124_ref.s     
 
 reas vibe/v113                  vibe_v113.bin               vibe_v113_ref.s             0x3400  vibe_v113.sym
 
+reas md200/bootloader           md200_bootloader.bin        md200_bootloader_ref.s      0x0     md200_bootloader.sym
+reas md200/v112                 md200_v112.bin              md200_v112_ref.s            0x3400  md200_v112.sym
+
+reas md600/v148                 md600_v148.bin              md600_v148_ref.s            0x3400  md600_v148.sym
+
 popd > /dev/null

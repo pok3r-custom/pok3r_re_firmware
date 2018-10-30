@@ -1,0 +1,408 @@
+# Mistel MD600 v148
+
+[data]
+
+3400 : vectors .word
+
+[code]
+
+*   +4 : reset
+*   +4 : nmi
+*   +4 : hard_fault
+*   +4 : mcu_fault
+*   +4 : bus_fault
+*   +4 : usage_fault
+*  +14 : svccall_intr
+*   +4 : debug_intr
+*   +8 : pendsv_intr
+*   +4 : systick_intr
+*   +4
+*   +4
+*   +4
+*   +4
+*   +4
+*   +4
+*   +4
+*   +4
+*   +4
+*   +4
+*   +4
+*   +4
+*   +4
+*   +4
+*   +4
+*   +4
+*   +4
+*   +4
+*   +4
+*   +4
+*   +4
+*   +4
+*   +4
+*   +4
+*   +4
+*   +4
+*   +8
+*   +4
+*   +4
+*   +4
+*   +4
+*   +4
+*   +4
+*   +4
+*   +4
+*   +4
+*  +14 : bftm0_intr
+*   +4 : bftm1_intr
+*   +4
+*   +4
+*   +4
+*   +4
+*   +4
+*   +4
+*   +4
+*   +4
+*   +4
+*   +4
+*   +4 : usb_intr
+*   +8
+*   +4
+*   +4
+*   +4
+*   +4
+*   +4
+*   +4
+*   +4
+*  +18
+
+3572 : generic_intr
+
+3580 : entry
+3594 : rand
+35a8 : srand                        seed
+35b8 : memcpy                       dest src size
+35dc : mem_set                      dest size val
+35ea : mem_zero                     dest size
+35ee : mem_set2                     dest val size
+3600 : memcmp                       ptr1 ptr2 size
+361c : sram_init
+#3640 : afio_exti_ssr_write
+#375c : bftm_clear                   BFTM
+#379c : afio_pin_config              gpio_num pin_num af_num
+3828 : spin_wait                    time
+3834 : setup_afio_gpio
+#3888 : ckcu_clocks_enable           ahb_mask apb0_mas apb1_mask en
+#38ac : ckcu_set_usb_prescaler       prescaler
+#3aa8 : function_130_6
+#40ac : function_130_7
+#40ec : function_11
+#4114 : function_29
+#418c : function_10
+#4198 : function_82
+#41ec : pinmux_b789_gpio
+#4234 : pinmux_b789_spi
+#4278 : function_e_38
+#42c4 : function_e_39
+#42fc : function_76
+#4328 : function_78
+#434c : function_42
+#4374 : function_25
+#43b4 : spi_write_read
+#4424 : function_e_40
+#4474 : function_27
+#44ec : function_77
+#4510 : function_28
+#4538 : gpio_set_input_output
+#4548 : gpio_set_output_current
+#4558 : gpio_set_input_enable
+#4568 : gpio_set_open_drain
+#4578 : gpio_set_pin_pull_up_down
+#45a0 : gpio_set_pin
+#45a4 : gpio_set_reset_pin
+#45ae : gptm_enable_disable
+#5608 : function_130_10
+5bc8 : setup_intr_priority
+#59a4 : nvic_disable_intr
+#59ba : calc_nvic_priority
+#59ec : ppb_set_nvic_priority
+#5a0c : nvic_set_vtor
+#57f4 : jump_pinmux_b789_gpio
+#57f8 : jump_pinmux_b789_spi
+#5c30 : pinmux_c0_gpio
+#5c3a : pinmux_c0_gptm
+#5c88 : function_130_11
+#5cd4 : function_130_12
+6324 : handle_frame
+#5e54 : flash_read_packet
+#5830 : reset_builtin
+#5e88 : ckcu_voodoo1
+#6370 : function_130_16
+#6508 : function_e_54
+#6820 : clock_init
+#6800 : usb_set_intr_flags
+#680c : usb_init
+#6878 : usb_dp_wake_up
+#6894 : usb_dp_pull_up
+#68b0 : usb_ckcu_voodoo
+#68bc : usb_ep_data_toggle
+#68cc : usb_ep_stall
+#68dc : usb_set_ep_intr
+#68e8 : usb_get_ep_buff
+#6900 : usb_get_ep_buff_end
+#6924 : usb_get_ep_len
+#6932 : function_e_67
+#694c : usb_get_ep_intr
+#695a : usb_get_ep_tcnt
+#696c : function_e_70
+#6992 : usb_read_ep_buff
+#69cc : usb_recv
+#69fc : function_e_71
+#6a0c : function_e_72
+#6a18 : function_e_73
+#6a2c : usb_copy_send
+#6a74 : usb_enable_intr
+#6a84 : function_e_75
+#6aa4 : usb_get_intr_flags
+#6ab8 : usb_set_lpmode_pdwn
+#68c8 : usb_clear_csr
+#6ad8 : function_28
+#6b50 : ptr_write_data
+#6b94 : function_130_2
+#6c1c : usb_intr
+#6ea4 : watchdog_init
+#6c58 : watchdog_reload_timer
+#72c0 : function_130_1
+#73b8 : function_unused_1
+#74ac : function_unused_2
+#74b8 : function_unused_2
+#73a8
+#* 7498
+#74a8
+#7774 : copy_words
+#7784 : usb_get_ep_reg
+#7794 : function_130_9
+#784c : sram_init_func_1
+#785c : sram_init_func_2
+838c : main
+#7964 : function_130_15
+
+#* 8118 : sram_task1
+#* 8128 : sram_task2
+
+[data]
+
+* 3638! : sram_defs .word 8
+* 363c! : sram_init_data
+
+3bf8: bootloader_crc_magic
+3c00: flash_3c00_data
+
+#* 3758
+#* 39d8
+#* 3a5c
+#* 3aa4
+#* 3b0c
+#* 3b14
+#* 3b20
+#* 3d04
+#* 3d64
+#* 3f78
+#* 3f7c
+#* 4b10
+#* 4b2c
+#* 4e24
+#* 4e34
+#* 4e74
+#* 5114
+#* 518c
+#* 539c
+#* 54e8
+#* 5588
+#* 5bec
+#* 6080
+#* 60fc
+#* 6104
+#* 616c
+#* 6228
+#* 635c
+#* 63f0
+#* 67b8
+#* 6858
+#* 6cb8
+#* 6e68
+#* 6e94
+#* 6fd0
+#* 71d8
+#* 7508
+#* 75b4
+#* 7710
+
+#7c08 : gpio_map_1 .word 16
+#7c58 : gpio_map_2 .word 20
+#7d14 : gpio_map_3 .word 16
+
+#7f64 : usb_report1_desc
+#7f88 : usb_report2_desc
+#8010 : usb_report0_desc
+#8050 : usb_config_desc
+#  +9 : usb_interface0_desc
+#  +9 : usb_hid0_desc
+#  +9 : usb_endpoint1_desc
+#  +7 : usb_interface1_desc
+#  +9 : usb_hid1_desc
+#  +9 : usb_endpoint3_desc
+#  +7 : usb_endpoint4_desc
+#  +7 : usb_interface2_desc
+#  +9 : usb_hid2_desc
+#  +9 : usb_endpoint2_desc
+#80ac : usb_device_desc
+#80c0 : usb_str0_desc
+#  +4 : usb_str1_desc
+
+#* 810c
+#* 811c!
+
+[annote]
+
+#7c08 : GPIO C, pin 9
+#  +8 : GPIO A, pin 5
+#  +8 : GPIO A, pin 6
+#  +8 : GPIO A, pin 7
+#  +8 : GPIO C, pin 11
+#  +8 : GPIO C, pin 13
+#  +8 : GPIO C, pin 14
+#  +8 : GPIO C, pin 15
+
+#7c58 : GPIO C, pin 4
+#  +8 : GPIO B, pin 6
+#  +8 : GPIO D, pin 0
+#  +8 : GPIO B, pin 11
+#  +8 : GPIO A, pin 11
+#  +8 : GPIO A, pin 0
+#  +8 : GPIO A, pin 1
+#  +8 : GPIO A, pin 2
+#  +8 : GPIO A, pin 3
+#  +8 : GPIO A, pin 4
+
+#7d14 : GPIO C, pin 8
+#  +8 : GPIO C, pin 7
+#  +8 : GPIO B, pin 5
+#  +8 : GPIO B, pin 4
+#  +8 : GPIO B, pin 3
+#  +8 : GPIO B, pin 2
+#  +8 : GPIO C, pin 6
+#  +8 : GPIO C, pin 5
+
+#7f64 : Usage Page (Vendor Defined 0xFF00)
+#  +3 : Usage (0x01)
+#  +2 : Collection (Application)
+#  +2 : - Usage (0x02)
+#  +2 : - Logical Minimum (0)
+#  +2 : - Logical Maximum (255)
+#  +3 : - Report Size (8)
+#  +2 : - Report Count (64)
+#  +2 : - Input (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
+#  +2 : - Usage (0x03)
+#  +2 : - Logical Minimum (0)
+#  +2 : - Logical Maximum (255)
+#  +3 : - Report Size (8)
+#  +2 : - Report Count (64)
+#  +2 : - Output (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position,Non-volatile)
+#  +2 : End Collection
+
+#7f88 : Usage Page (Generic Desktop Ctrls)
+#  +2 : Usage (Sys Control)
+#  +2 : Collection (Application)
+#  +2 : - Report ID (1)
+#  +2 : - Usage Minimum (Sys Power Down)
+#  +2 : - Usage Maximum (Sys Wake Up)
+#  +2 : - Logical Minimum (0)
+#  +2 : - Logical Maximum (1)
+#  +2 : - Report Count (3)
+#  +2 : - Report Size (1)
+#  +2 : - Input (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
+#  +2 : - Report Count (1)
+#  +2 : - Report Size (5)
+#  +2 : - Input (Const,Array,Abs,No Wrap,Linear,Preferred State,No Null Position)
+#  +2 : End Collection
+#  +1 : Usage Page (Consumer)
+#  +2 : Usage (Consumer Control)
+#  +2 : Collection (Application)
+#  +2 : - Report ID (2)
+#  +2 : - Logical Minimum (0)
+#  +2 : - Logical Maximum (1)
+#  +2 : - Report Count (18)
+#  +2 : - Report Size (1)
+#  +3 : - Usage (AL Consumer Control Configuration)
+#  +3 : - Usage (AL Email Reader)
+#  +3 : - Usage (AL Calculator)
+#  +3 : - Usage (AL Local Machine Browser)
+#  +2 : - Usage (Play/Pause)
+#  +2 : - Usage (Stop)
+#  +2 : - Usage (Scan Previous Track)
+#  +2 : - Usage (Scan Next Track)
+#  +2 : - Usage (Mute)
+#  +2 : - Usage (Volume Decrement)
+#  +2 : - Usage (Volume Increment)
+#  +3 : - Usage (AC Search)
+#  +3 : - Usage (AC Home)
+#  +3 : - Usage (AC Back)
+#  +3 : - Usage (AC Forward)
+#  +3 : - Usage (AC Stop)
+#  +3 : - Usage (AC Refresh)
+#  +3 : - Usage (AC Bookmarks)
+#  +2 : - Input (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
+#  +2 : - Report Count (1)
+#  +2 : - Report Size (14)
+#  +2 : - Input (Const,Array,Abs,No Wrap,Linear,Preferred State,No Null Position)
+#  +2 : End Collection
+#  +1 : Usage Page (Generic Desktop Ctrls)
+#  +2 : Usage (Keyboard)
+#  +2 : Collection (Application)
+#  +2 : - Report ID (4)
+#  +2 : - Usage Page (Kbrd/Keypad)
+#  +2 : - Report Count (1)
+#  +2 : - Report Size (8)
+#  +2 : - Input (Const,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
+#  +2 : - Report Count (232)
+#  +2 : - Report Size (1)
+#  +2 : - Logical Minimum (0)
+#  +2 : - Logical Maximum (1)
+#  +2 : - Usage Page (Kbrd/Keypad)
+#  +2 : - Usage Minimum (0x00)
+#  +2 : - Usage Maximum (0xE7)
+#  +2 : - Input (Data,Array,Abs,No Wrap,Linear,Preferred State,No Null Position)
+#  +2 : End Collection
+
+#8010 : Usage Page (Generic Desktop Ctrls)
+#  +2 : Usage (Keyboard)
+#  +2 : Collection (Application)
+#  +2 : - Usage Page (Kbrd/Keypad)
+#  +2 : - Usage Minimum (0xE0)
+#  +2 : - Usage Maximum (0xE7)
+#  +2 : - Logical Minimum (0)
+#  +2 : - Logical Maximum (1)
+#  +2 : - Report Size (1)
+#  +2 : - Report Count (8)
+#  +2 : - Input (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
+#  +2 : - Report Count (1)
+#  +2 : - Report Size (8)
+#  +2 : - Input (Const,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
+#  +2 : - Report Count (3)
+#  +2 : - Report Size (1)
+#  +2 : - Usage Page (LEDs)
+#  +2 : - Usage Minimum (Num Lock)
+#  +2 : - Usage Maximum (Scroll Lock)
+#  +2 : - Output (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position,Non-volatile)
+#  +2 : - Report Count (1)
+#  +2 : - Report Size (5)
+#  +2 : - Output (Const,Var,Abs,No Wrap,Linear,Preferred State,No Null Position,Non-volatile)
+#  +2 : - Report Count (6)
+#  +2 : - Report Size (8)
+#  +2 : - Logical Minimum (0)
+#  +2 : - Logical Maximum (164)
+#  +3 : - Usage Page (Kbrd/Keypad)
+#  +2 : - Usage Minimum (0x00)
+#  +2 : - Usage Maximum (0xA4)
+#  +2 : - Input (Data,Array,Abs,No Wrap,Linear,Preferred State,No Null Position)
+#  +2 : End Collection
