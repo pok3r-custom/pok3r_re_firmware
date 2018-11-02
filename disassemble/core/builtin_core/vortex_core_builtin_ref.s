@@ -20,7 +20,7 @@
 /*0x0020*/      bl sram_init
 
             .thumb_func
-            call_24:
+            start:
 /*0x0024*/      ldr r0, [pc, #0] /* data_28 */
 /*0x0026*/      bx r0 /* main */
 
@@ -108,12 +108,12 @@
             jump_9c:
 /*0x009c*/      cmp r4, r5
 /*0x009e*/      blo jump_8e
-/*0x00a0*/      bl call_24
+/*0x00a0*/      bl start
 
             data_a4:
-/*0x00a4*/  .word 0x00002238 /* possible pointer */
+/*0x00a4*/  .word data_2238
             data_a8:
-/*0x00a8*/  .word 0x00002258 /* possible pointer */
+/*0x00a8*/  .word data_2258
 
 
             .thumb_func
@@ -863,7 +863,7 @@
 /*0x0577*/  .byte 0x00
 
             data_578:
-/*0x0578*/  .word 0x00001fdc /* possible pointer */
+/*0x0578*/  .word data_1fdc
             data_57c:
 /*0x057c*/  .word 0x20000038
             data_580:
@@ -1811,7 +1811,7 @@
 /*0x0c9c*/      pop.w {r4, r5, r6, r7, r8, pc}
 
             data_ca0:
-/*0x0ca0*/  .word 0x00002014 /* possible pointer */
+/*0x0ca0*/  .word data_2014
             data_ca4:
 /*0x0ca4*/  .word 0x2000000d
             data_ca8:
@@ -1849,7 +1849,7 @@
 /*0x0ce4*/      pop.w {r4, r5, r6, r7, r8, pc}
 
             data_ce8:
-/*0x0ce8*/  .word 0x00002064 /* possible pointer */
+/*0x0ce8*/  .word data_2064
 
 
             .thumb_func
@@ -1949,7 +1949,7 @@
             data_dd0:
 /*0x0dd0*/  .word 0x400b0000
             data_dd4:
-/*0x0dd4*/  .word 0x0000209c /* possible pointer */
+/*0x0dd4*/  .word data_209c
 
             jump_dd8:
 /*0x0dd8*/      push {r4, lr}
@@ -2428,7 +2428,7 @@
 /*0x11eb*/  .byte 0x00
 
             data_11ec:
-/*0x11ec*/  .word 0x0000221c /* possible pointer */
+/*0x11ec*/  .word data_221c
             data_11f0:
 /*0x11f0*/  .word 0x20000040
 
@@ -2518,7 +2518,7 @@
 /*0x128b*/  .byte 0x00
 
             data_128c:
-/*0x128c*/  .word 0x000021ec /* possible pointer */
+/*0x128c*/  .word data_21ec
             data_1290:
 /*0x1290*/  .word 0x200002f4
             data_1294:
@@ -3149,7 +3149,7 @@
 /*0x16b6*/      pop {r4, r5, r6, pc}
 
             data_16b8:
-/*0x16b8*/  .word 0x00001f9c /* possible pointer */
+/*0x16b8*/  .word data_1f9c
 
 
             .thumb_func
@@ -3344,7 +3344,7 @@
             data_1838:
 /*0x1838*/  .word 0x200000d9
             data_183c:
-/*0x183c*/  .word 0x00002094 /* possible pointer */
+/*0x183c*/  .word data_2094
             data_1840:
 /*0x1840*/  .word 0x400b0000
             data_1844:
@@ -3700,11 +3700,11 @@
             data_1ad8:
 /*0x1ad8*/  .word 0x2000001f
             data_1adc:
-/*0x1adc*/  .word 0x00001ae1 /* possible pointer */
+/*0x1adc*/  .word loc_1ae0
 
 
             .thumb_func
-            function_1ae0:
+            loc_1ae0:
 /*0x1ae0*/      ldr r2, [pc, #4] /* data_1ae8 */
 /*0x1ae2*/      movs r1, #1
 /*0x1ae4*/      strb r1, [r2, r0]
@@ -3779,7 +3779,7 @@
 /*0x1b4b*/  .byte 0x00
 
             data_1b4c:
-/*0x1b4c*/  .word 0x00002150 /* possible pointer */
+/*0x1b4c*/  .word data_2150
 
 
             .thumb_func
@@ -3871,7 +3871,7 @@
 /*0x1bf4*/      b.w call_1450
 
             data_1bf8:
-/*0x1bf8*/  .word 0x0000221c /* possible pointer */
+/*0x1bf8*/  .word data_221c
 
             jump_1bfc:
 /*0x1bfc*/      push {r4, lr}
@@ -4055,7 +4055,7 @@
 /*0x1d53*/  .byte 0x00
 
             data_1d54:
-/*0x1d54*/  .word 0x0000221c /* possible pointer */
+/*0x1d54*/  .word data_221c
             data_1d58:
 /*0x1d58*/  .word 0x20000040
 
@@ -4335,6 +4335,7 @@
             data_1f98:
 /*0x1f98*/  .word 0x20000004
 
+            data_1f9c:
 /*0x1f9c*/  .byte 0x01
 /*0x1f9d*/  .byte 0x23
 /*0x1f9e*/  .byte 0x45
@@ -4456,6 +4457,7 @@
 /*0x2011*/  .byte 0x00
 /*0x2012*/  .byte 0x00
 /*0x2013*/  .byte 0x00
+            data_2014:
 /*0x2014*/  .byte 0x00
 /*0x2015*/  .byte 0x40
 /*0x2016*/  .byte 0x0b
@@ -4536,6 +4538,7 @@
 /*0x2061*/  .byte 0x0e
 /*0x2062*/  .byte 0x02
 /*0x2063*/  .byte 0x0f
+            data_2064:
 /*0x2064*/  .byte 0x00
 /*0x2065*/  .byte 0x00
 /*0x2066*/  .byte 0x0b
@@ -4584,6 +4587,7 @@
 /*0x2091*/  .byte 0x00
 /*0x2092*/  .byte 0x00
 /*0x2093*/  .byte 0x00
+            data_2094:
 /*0x2094*/  .byte 0x00
 /*0x2095*/  .byte 0x00
 /*0x2096*/  .byte 0x0b
@@ -4592,6 +4596,7 @@
 /*0x2099*/  .byte 0x00
 /*0x209a*/  .byte 0x00
 /*0x209b*/  .byte 0x00
+            data_209c:
 /*0x209c*/  .byte 0x00
 /*0x209d*/  .byte 0x40
 /*0x209e*/  .byte 0x0b
@@ -4772,6 +4777,7 @@
 /*0x214d*/  .byte 0x00
 /*0x214e*/  .byte 0x00
 /*0x214f*/  .byte 0x00
+            data_2150:
 /*0x2150*/  .byte 0x05
 /*0x2151*/  .byte 0x01
 /*0x2152*/  .byte 0x09
@@ -4928,6 +4934,7 @@
 /*0x21e9*/  .byte 0x00
 /*0x21ea*/  .byte 0x01
 /*0x21eb*/  .byte 0x00
+            data_21ec:
 /*0x21ec*/  .byte 0x12
 /*0x21ed*/  .byte 0x01
 /*0x21ee*/  .byte 0x10
@@ -4976,6 +4983,7 @@
 /*0x2219*/  .byte 0x00
 /*0x221a*/  .byte 0x00
 /*0x221b*/  .byte 0x00
+            data_221c:
 /*0x221c*/  .byte 0x59
 /*0x221d*/  .byte 0x10
 /*0x221e*/  .byte 0x00
@@ -5004,6 +5012,7 @@
 /*0x2235*/  .byte 0x18
 /*0x2236*/  .byte 0x00
 /*0x2237*/  .byte 0x00
+            data_2238:
 /*0x2238*/  .byte 0x58
 /*0x2239*/  .byte 0x22
 /*0x223a*/  .byte 0x00
@@ -5036,6 +5045,7 @@
 /*0x2255*/  .byte 0x1e
 /*0x2256*/  .byte 0x00
 /*0x2257*/  .byte 0x00
+            data_2258:
 /*0x2258*/  .byte 0x01
 /*0x2259*/  .byte 0x00
 /*0x225a*/  .byte 0x00

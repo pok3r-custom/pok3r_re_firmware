@@ -12,14 +12,19 @@
 *   +4
 *   +4
 
-* 3c: systick_intr
-* e4: bftm0_intr
-* e8: bftm1_intr
-* ec
-* f0
-* 114: usb_intr
+*   3c : systick_intr
+*   e4 : bftm0_intr
+*   e8 : bftm1_intr
+*   ec
+*   f0
+*  114 : usb_intr
+
+124: generic_fault
+126: generic_intr
 
 1c: entry
+24: start
+* 28 : main
 30: load_jump_fw
 40: memcpy
 64: mem_set
@@ -30,8 +35,6 @@
 d8: bftm_set_counter
 f4: bftm_clear
 
-124: generic_fault
-126: generic_intr
 2f0: ckcu_clocks_enable
 
 328: flash_page_erase
@@ -63,15 +66,27 @@ aac: flash_read_packet
 
 1e9c : check_fw_sp_pc
 
-1efc: main
+* 1adc
 
 [data]
 
 # Force data on some "code" that isn't code
-a4!
-a8!
+*a4!
+*a8!
 
 0400: read_400_data
+
+* 578
+* ca0
+* ce8
+* dd4
+* 11ec
+* 128c
+* 16b8
+* 183c
+* 1b4c
+* 1bf8
+* 1d54
 
 1fdc: data_1fdc
 

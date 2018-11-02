@@ -189,6 +189,13 @@
 #* 8118 : sram_task1
 #* 8128 : sram_task2
 
+7340 : orphan_7340
+
+* 7e58
+* 7e60
+* 7e6c
+* 7e70
+
 [data]
 
 * 3638! : sram_defs .word 8
@@ -197,49 +204,42 @@
 3bf8: bootloader_crc_magic
 3c00: flash_3c00_data
 
-#* 3758
-#* 39d8
-#* 3a5c
-#* 3aa4
-#* 3b0c
-#* 3b14
-#* 3b20
-#* 3d04
-#* 3d64
-#* 3f78
-#* 3f7c
-#* 4b10
-#* 4b2c
-#* 4e24
-#* 4e34
-#* 4e74
-#* 5114
-#* 518c
-#* 539c
-#* 54e8
-#* 5588
-#* 5bec
-#* 6080
-#* 60fc
-#* 6104
-#* 616c
-#* 6228
-#* 635c
-#* 63f0
-#* 67b8
-#* 6858
-#* 6cb8
-#* 6e68
-#* 6e94
-#* 6fd0
-#* 71d8
-#* 7508
-#* 75b4
-#* 7710
+* 37a0
+* 3a98
+* 3b1c
+* 3b68
+* 3c88
+* 4a34
+* 4a44
+* 4ac8
+* 4bc0
+* 4c14
+* 4ca4
+* 4df8
+* 4e94
+* 4fd4
+* 5540
+* 5af8
+* 5b58
+* 5b9c
+* 5c6c
+* 5dc4
+* 5ea0
+* 61c0
+* 6330
+* 65ac
+* 664c
+* 6abc
+* 6c68
+* 6c94
+* 6fd4
+* 7138
+* 7458
+* 75b4
 
-#7c08 : gpio_map_1 .word 16
-#7c58 : gpio_map_2 .word 20
-#7d14 : gpio_map_3 .word 16
+7a18 : gpio_map_1 .word 16
+7a68 : gpio_map_2 .word 8
+7a8c : gpio_map_3 .word 16
 
 #7f64 : usb_report1_desc
 #7f88 : usb_report2_desc

@@ -237,7 +237,7 @@
 
 7ed4 : gpio_map_1 .word 16
 7f24 : gpio_map_2 .word 14
-7fc8 : gpio_map_3 .word 
+7fc8 : gpio_map_3 .word 8
 
 * 8228
 * 822c

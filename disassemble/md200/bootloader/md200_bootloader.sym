@@ -6,33 +6,73 @@
 
 [code]
 
-#*   +4 : reset
-*   +8 : nmi
+*   +4 : reset
+*   +4 : nmi
 *   +4 : hard_fault
 *   +4 : mcu_fault
 *   +4 : bus_fault
 *   +4 : usage_fault
 
-#* 0x00e4
-#* 0x00e8
-#* 0x00ec
-#* 0x00f0
+*   3c : systick_intr
+*   e4 : bftm0_intr
+*   e8 : bftm1_intr
+*   ec
+*   f0
+*  114 : usb_intr
 
-0x001c : entry
-0x0088 : sram_init
+124 : generic_fault
+126 : generic_intr
 
-#0x003c : systick_intr
-#0x00ac : bftm0_intr
-#0x0114 : usb_intr
-#0x0118 : reset
-#0x0120 : generic_fault
-#0x0122 : generic_intr
-#0x012c : bftm1_intr
+1c : entry
+24 : start
+* 28 : main
+30 : load_jump_fw
+40: memcpy
+64: mem_set
+72: mem_zero
+76: mem_set2
+88 : sram_init
 
-#0x1c2c : main
+#* e4
+#* e8
+#* ec
+#* f0
+
+7e8 : handle_frame
+1620 : watchdog_reload_timer
+
+1a98 : orphan_1a98
+
+* 21c4
+* 21cc
+* 21d8
+* 21dc
+
+# these two pointers do not have the low bit set, they are reassembled incorrectly
+#* 21ec
+#* 21fc
 
 [data]
 
 # Force data on some "code" that isn't code
-a4!
-a8!
+*a4!
+*a8!
+
+0400: read_400_data
+
+* 1c0
+* 510
+* c38
+* c7c
+* dd4
+* eb0
+* 11a0
+* 1240
+* 166c
+* 17f0
+* 1bb0
+* 1d0c
+
+1fb4 : gpio_map_1 .word 16
+2004 : gpio_map_2 .word 8
+2024 : gpio_map_3 .word 16

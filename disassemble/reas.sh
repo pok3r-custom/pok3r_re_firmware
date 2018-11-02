@@ -18,6 +18,8 @@ reas () {
 
 pushd $DIR > /dev/null
 
+#    Directory                  Firmware Binary             Output Source               VMA     Symbol File
+
 reas pok3r/builtin              firmware_builtin.bin        firmware_builtin_ref.s      0x0     symbols_builtin.sym
 reas pok3r/v117                 firmware_v117.bin           pok3r_v117_ref.s            0x2c00  symbols_v117.sym
 

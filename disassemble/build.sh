@@ -25,6 +25,8 @@ reas () {
 
 pushd $DIR > /dev/null
 
+#    Assembler Source                                   VMA     Comparison Binary
+
 reas pok3r/builtin/firmware_builtin.s                   vma0
 reas pok3r/builtin/firmware_builtin_ref.s               vma0    pok3r/builtin/firmware_builtin.bin
 reas pok3r/v117/pok3r_v117.s                            vma2c
@@ -51,12 +53,13 @@ echo
 reas race/bootloader/race_bootloader.s                  vma0
 reas race/bootloader/race_bootloader_ref.s              vma0    race/bootloader/race_bootloader.bin
 reas race/v124/race_v124.s                              vma34
-reas race/v124/race_v124_ref.s                          vma34    race/v124/race_v124.bin
+reas race/v124/race_v124_ref.s                          vma34   race/v124/race_v124.bin
 echo
 
 reas vibe/v113/vibe_v113_ref.s                          vma34   vibe/v113/vibe_v113.bin
 echo
 
+reas md200/bootloader/md200_bootloader_ref.s            vma0    md200/bootloader/md200_bootloader.bin
 reas md200/v112/md200_v112_ref.s                        vma34   md200/v112/md200_v112.bin
 echo
 
