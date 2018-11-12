@@ -55,6 +55,11 @@ core_bootloader:
 	JLinkExe -Device HT32F1654 -CommanderScript util/flash.jlink
 	rm /tmp/flash.bin
 
+md200_bootloader:
+	cp disassemble/md200/bootloader/md200_bootloader.bin /tmp/flash.bin
+	JLinkExe -Device HT32F1654 -CommanderScript util/flash.jlink
+	rm /tmp/flash.bin
+
 mass_erase:
 	JLinkExe -Device HT32F1654 -CommanderScript util/mass-erase.jlink
 

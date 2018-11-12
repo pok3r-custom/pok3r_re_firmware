@@ -37,6 +37,8 @@ reas race/v124                  race_v124.bin               race_v124_ref.s     
 
 reas vibe/v113                  vibe_v113.bin               vibe_v113_ref.s             0x3400  vibe_v113.sym
 
+reas cypher/v136                cypher_v136.bin             cypher_v136_ref.s           0x3200  cypher_v136.sym
+
 reas md200/bootloader           md200_bootloader.bin        md200_bootloader_ref.s      0x0     md200_bootloader.sym
 reas md200/v112                 md200_v112.bin              md200_v112_ref.s            0x3400  md200_v112.sym
 

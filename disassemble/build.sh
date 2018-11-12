@@ -59,6 +59,9 @@ echo
 reas vibe/v113/vibe_v113_ref.s                          vma34   vibe/v113/vibe_v113.bin
 echo
 
+reas cypher/v136/cypher_v136_ref.s                      vma32   cypher/v136/cypher_v136.bin
+echo
+
 reas md200/bootloader/md200_bootloader_ref.s            vma0    md200/bootloader/md200_bootloader.bin
 reas md200/v112/md200_v112_ref.s                        vma34   md200/v112/md200_v112.bin
 echo

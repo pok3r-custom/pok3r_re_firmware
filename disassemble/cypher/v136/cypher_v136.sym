@@ -1,0 +1,432 @@
+# Vortex Cypher V136
+
+# uses some HT32F523xx
+
+[data]
+
+3200 : vectors .word
+
+[code]
+
+*   +4 : reset
+*   +4 : nmi
+*   +4 : hard_fault
+
+*  +20 : svccall_intr
+
+*   +c : pendsv_intr
+*   +4 : systick_intr
+*   +4
+*   +4
+*   +4
+*   +4
+*   +4
+*   +4
+*   +4
+*   +4
+*   +4
+
+*   +8
+*   +4
+*   +4
+*   +4
+*   +4
+
+*   +c
+*   +4 : bftm1_intr
+*   +4
+*   +4
+*   +4 : spi0_intr
+*   +4 : spi1_intr
+*   +4
+*   +4
+*   +4
+*   +4
+*   +4
+*   +4
+*   +4 : usb_intr
+*   +4
+*   +4
+
+32d2 : generic_intr
+
+32dc : entry
+#3594 : rand
+#35a8 : srand                        seed
+#35b8 : memcpy                       dest src size
+#35dc : mem_set                      dest size val
+#35ea : mem_zero                     dest size
+#35ee : mem_set2                     dest val size
+#3600 : memcmp                       ptr1 ptr2 size
+338c : sram_init
+#3640 : afio_exti_ssr_write
+#375c : bftm_clear                   BFTM
+#379c : afio_pin_config              gpio_num pin_num af_num
+#380c : spin_wait                    time
+#3818 : setup_afio_gpio
+#3888 : ckcu_clocks_enable           ahb_mask apb0_mas apb1_mask en
+#38ac : ckcu_set_usb_prescaler       prescaler
+3af8 : spin_handler
+#3aa8 : function_130_6
+#40ac : function_130_7
+#40ec : function_11
+#4114 : function_29
+#418c : function_10
+#4198 : function_82
+#41ec : pinmux_b789_gpio
+#4234 : pinmux_b789_spi
+#4278 : function_e_38
+#42c4 : function_e_39
+#42fc : function_76
+#4328 : function_78
+#434c : function_42
+#4374 : function_25
+#43b4 : spi_write_read
+#4424 : function_e_40
+#4474 : function_27
+#44ec : function_77
+#4510 : function_28
+#4538 : gpio_set_input_output
+#4548 : gpio_set_output_current
+#4558 : gpio_set_input_enable
+#4568 : gpio_set_open_drain
+#4578 : gpio_set_pin_pull_up_down
+#45a0 : gpio_set_pin
+#45a4 : gpio_set_reset_pin
+#45ae : gptm_enable_disable
+#5608 : function_130_10
+#50e8 : setup_intr_priority
+#59a4 : nvic_disable_intr
+#59ba : calc_nvic_priority
+#59ec : ppb_set_nvic_priority
+#5a0c : nvic_set_vtor
+#57f4 : jump_pinmux_b789_gpio
+#57f8 : jump_pinmux_b789_spi
+#5c30 : pinmux_c0_gpio
+#5c3a : pinmux_c0_gptm
+#5c88 : function_130_11
+#5cd4 : function_130_12
+#574c : handle_frame
+#5e54 : flash_read_packet
+#5830 : reset_builtin
+#5e88 : ckcu_voodoo1
+#6370 : function_130_16
+#6508 : function_e_54
+#6820 : clock_init
+#6800 : usb_set_intr_flags
+#680c : usb_init
+#6878 : usb_dp_wake_up
+#6894 : usb_dp_pull_up
+#68b0 : usb_ckcu_voodoo
+#68bc : usb_ep_data_toggle
+#68cc : usb_ep_stall
+#68dc : usb_set_ep_intr
+#68e8 : usb_get_ep_buff
+#6900 : usb_get_ep_buff_end
+#6924 : usb_get_ep_len
+#6932 : function_e_67
+#694c : usb_get_ep_intr
+#695a : usb_get_ep_tcnt
+#696c : function_e_70
+#6992 : usb_read_ep_buff
+#69cc : usb_recv
+#69fc : function_e_71
+#6a0c : function_e_72
+#6a18 : function_e_73
+#6a2c : usb_copy_send
+#6a74 : usb_enable_intr
+#6a84 : function_e_75
+#6aa4 : usb_get_intr_flags
+#6ab8 : usb_set_lpmode_pdwn
+#68c8 : usb_clear_csr
+#6ad8 : function_28
+#6b50 : ptr_write_data
+#6b94 : function_130_2
+#6c1c : usb_intr
+#6ea4 : watchdog_init
+#6c58 : watchdog_reload_timer
+#72c0 : function_130_1
+#73b8 : function_unused_1
+#74ac : function_unused_2
+#74b8 : function_unused_2
+#73a8
+#* 7498
+#74a8
+#7774 : copy_words
+#7784 : usb_get_ep_reg
+#7794 : function_130_9
+#784c : sram_init_func_1
+#785c : sram_init_func_2
+a088 : main
+#7964 : function_130_15
+
+#* 8118 : sram_task1
+#* 8128 : sram_task2
+
+* 348c
+* 3b5c
+* 4160
+* 54a0
+* 55fc
+* 70c0
+* 7260
+* 8cd8
+* 90e8
+* 93a0
+* a1d0
+* a1ec
+* b310
+* b320
+
+[data]
+
+* 3768
+* 3a3c
+* 3acc
+* 3af4
+* 3b58
+* 3b6c
+* 3d3c
+* 41ec
+* 41f0
+* 4830
+* 4974
+* 49c8
+* 4ae0
+* 4b04
+* 4c94
+* 4e50
+* 4f44
+* 4f80
+* 5088
+* 512c
+* 51b8
+* 521c
+* 54b8
+* 560c
+* 58ec
+* 5964
+* 5af4
+* 5ba8
+* 5ca4
+* 5ef8
+* 5efc
+* 5f38
+* 5fd0
+* 6e40
+* 6e54
+* 7200
+* 7314
+* 7318
+* 7368
+* 736c
+* 73a8
+* 73ac
+* 7410
+* 7414
+* 7594
+* 75d4
+* 7638
+* 77d4
+* 7874
+* 791c
+* 79b4
+* 8088
+* 8090
+* 8b48
+* 9288
+* 93b4
+* 9410
+* 95b8
+* 95f4
+* 964c
+* 9718
+* 9724
+* 9744
+* 9868
+* 986c
+* 9ad8
+* 9c28
+* 9c34
+* 9f54
+* 9fac
+* 9fcc
+* a004
+* a03c
+* a3f8
+* a400
+* b304
+
+* 33a8! : sram_defs .word 8
+* 33ac! : sram_init_data
+
+3bf8: bootloader_crc_magic
+3c00: flash_3c00_data
+
+a6ec : gpio_map_1 .word 20
+
+#7f64 : usb_report1_desc
+#7f88 : usb_report2_desc
+#8010 : usb_report0_desc
+#8050 : usb_config_desc
+#  +9 : usb_interface0_desc
+#  +9 : usb_hid0_desc
+#  +9 : usb_endpoint1_desc
+#  +7 : usb_interface1_desc
+#  +9 : usb_hid1_desc
+#  +9 : usb_endpoint3_desc
+#  +7 : usb_endpoint4_desc
+#  +7 : usb_interface2_desc
+#  +9 : usb_hid2_desc
+#  +9 : usb_endpoint2_desc
+#80ac : usb_device_desc
+#80c0 : usb_str0_desc
+#  +4 : usb_str1_desc
+
+#* 810c
+#* 811c!
+
+[annote]
+
+#7c08 : GPIO C, pin 9
+#  +8 : GPIO A, pin 5
+#  +8 : GPIO A, pin 6
+#  +8 : GPIO A, pin 7
+#  +8 : GPIO C, pin 11
+#  +8 : GPIO C, pin 13
+#  +8 : GPIO C, pin 14
+#  +8 : GPIO C, pin 15
+
+#7c58 : GPIO C, pin 4
+#  +8 : GPIO B, pin 6
+#  +8 : GPIO D, pin 0
+#  +8 : GPIO B, pin 11
+#  +8 : GPIO A, pin 11
+#  +8 : GPIO A, pin 0
+#  +8 : GPIO A, pin 1
+#  +8 : GPIO A, pin 2
+#  +8 : GPIO A, pin 3
+#  +8 : GPIO A, pin 4
+
+#7d14 : GPIO C, pin 8
+#  +8 : GPIO C, pin 7
+#  +8 : GPIO B, pin 5
+#  +8 : GPIO B, pin 4
+#  +8 : GPIO B, pin 3
+#  +8 : GPIO B, pin 2
+#  +8 : GPIO C, pin 6
+#  +8 : GPIO C, pin 5
+
+#7f64 : Usage Page (Vendor Defined 0xFF00)
+#  +3 : Usage (0x01)
+#  +2 : Collection (Application)
+#  +2 : - Usage (0x02)
+#  +2 : - Logical Minimum (0)
+#  +2 : - Logical Maximum (255)
+#  +3 : - Report Size (8)
+#  +2 : - Report Count (64)
+#  +2 : - Input (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
+#  +2 : - Usage (0x03)
+#  +2 : - Logical Minimum (0)
+#  +2 : - Logical Maximum (255)
+#  +3 : - Report Size (8)
+#  +2 : - Report Count (64)
+#  +2 : - Output (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position,Non-volatile)
+#  +2 : End Collection
+
+#7f88 : Usage Page (Generic Desktop Ctrls)
+#  +2 : Usage (Sys Control)
+#  +2 : Collection (Application)
+#  +2 : - Report ID (1)
+#  +2 : - Usage Minimum (Sys Power Down)
+#  +2 : - Usage Maximum (Sys Wake Up)
+#  +2 : - Logical Minimum (0)
+#  +2 : - Logical Maximum (1)
+#  +2 : - Report Count (3)
+#  +2 : - Report Size (1)
+#  +2 : - Input (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
+#  +2 : - Report Count (1)
+#  +2 : - Report Size (5)
+#  +2 : - Input (Const,Array,Abs,No Wrap,Linear,Preferred State,No Null Position)
+#  +2 : End Collection
+#  +1 : Usage Page (Consumer)
+#  +2 : Usage (Consumer Control)
+#  +2 : Collection (Application)
+#  +2 : - Report ID (2)
+#  +2 : - Logical Minimum (0)
+#  +2 : - Logical Maximum (1)
+#  +2 : - Report Count (18)
+#  +2 : - Report Size (1)
+#  +3 : - Usage (AL Consumer Control Configuration)
+#  +3 : - Usage (AL Email Reader)
+#  +3 : - Usage (AL Calculator)
+#  +3 : - Usage (AL Local Machine Browser)
+#  +2 : - Usage (Play/Pause)
+#  +2 : - Usage (Stop)
+#  +2 : - Usage (Scan Previous Track)
+#  +2 : - Usage (Scan Next Track)
+#  +2 : - Usage (Mute)
+#  +2 : - Usage (Volume Decrement)
+#  +2 : - Usage (Volume Increment)
+#  +3 : - Usage (AC Search)
+#  +3 : - Usage (AC Home)
+#  +3 : - Usage (AC Back)
+#  +3 : - Usage (AC Forward)
+#  +3 : - Usage (AC Stop)
+#  +3 : - Usage (AC Refresh)
+#  +3 : - Usage (AC Bookmarks)
+#  +2 : - Input (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
+#  +2 : - Report Count (1)
+#  +2 : - Report Size (14)
+#  +2 : - Input (Const,Array,Abs,No Wrap,Linear,Preferred State,No Null Position)
+#  +2 : End Collection
+#  +1 : Usage Page (Generic Desktop Ctrls)
+#  +2 : Usage (Keyboard)
+#  +2 : Collection (Application)
+#  +2 : - Report ID (4)
+#  +2 : - Usage Page (Kbrd/Keypad)
+#  +2 : - Report Count (1)
+#  +2 : - Report Size (8)
+#  +2 : - Input (Const,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
+#  +2 : - Report Count (232)
+#  +2 : - Report Size (1)
+#  +2 : - Logical Minimum (0)
+#  +2 : - Logical Maximum (1)
+#  +2 : - Usage Page (Kbrd/Keypad)
+#  +2 : - Usage Minimum (0x00)
+#  +2 : - Usage Maximum (0xE7)
+#  +2 : - Input (Data,Array,Abs,No Wrap,Linear,Preferred State,No Null Position)
+#  +2 : End Collection
+
+#8010 : Usage Page (Generic Desktop Ctrls)
+#  +2 : Usage (Keyboard)
+#  +2 : Collection (Application)
+#  +2 : - Usage Page (Kbrd/Keypad)
+#  +2 : - Usage Minimum (0xE0)
+#  +2 : - Usage Maximum (0xE7)
+#  +2 : - Logical Minimum (0)
+#  +2 : - Logical Maximum (1)
+#  +2 : - Report Size (1)
+#  +2 : - Report Count (8)
+#  +2 : - Input (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
+#  +2 : - Report Count (1)
+#  +2 : - Report Size (8)
+#  +2 : - Input (Const,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
+#  +2 : - Report Count (3)
+#  +2 : - Report Size (1)
+#  +2 : - Usage Page (LEDs)
+#  +2 : - Usage Minimum (Num Lock)
+#  +2 : - Usage Maximum (Scroll Lock)
+#  +2 : - Output (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position,Non-volatile)
+#  +2 : - Report Count (1)
+#  +2 : - Report Size (5)
+#  +2 : - Output (Const,Var,Abs,No Wrap,Linear,Preferred State,No Null Position,Non-volatile)
+#  +2 : - Report Count (6)
+#  +2 : - Report Size (8)
+#  +2 : - Logical Minimum (0)
+#  +2 : - Logical Maximum (164)
+#  +3 : - Usage Page (Kbrd/Keypad)
+#  +2 : - Usage Minimum (0x00)
+#  +2 : - Usage Maximum (0xA4)
+#  +2 : - Input (Data,Array,Abs,No Wrap,Linear,Preferred State,No Null Position)
+#  +2 : End Collection
