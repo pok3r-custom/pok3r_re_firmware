@@ -25,3 +25,5 @@ util/jlink_flashloader/FlashLoader_HT32/*.jlink
 *.id2
 *.nam
 
+.idea/
+venv/
