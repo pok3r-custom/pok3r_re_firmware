@@ -3,6 +3,7 @@ import sys
 import os
 import argparse
 import struct
+import binascii
 
 
 pok3r_xor_key = [
@@ -58,6 +59,9 @@ def decode_package_data(indata):
     """
     Decode the encryption scheme used by the updater program.
     Produced from IDA disassembly in sub_401000 of POK3R v117 updater.
+
+    Encryption is periodic every 10 bytes, so encrypted data can be partially decrypted
+    from any multiple of 10 offset.
     """
 
     data = bytearray(indata)
@@ -80,6 +84,7 @@ def decode_package_data(indata):
         data[i] = (((data[i] - 7) << 4) + (data[i] >> 4)) & 0xFF
 
     return data
+
 
 def decode_pok3r_firmware(data):
     swap_key = [
@@ -126,11 +131,10 @@ class UpdateFirmware:
         self.version = ""
         self.info = info
         self.firmware = fw
+        self.app_vid_pid = (0, 0)
+        self.boot_vid_pid = (0, 0)
 
     def show_info(self):
-        if not len(self.info):
-            return
-
         verlen, = struct.unpack("<I", self.info[:4])
         a, b, c, d, e, f, vid, pid = struct.unpack("<IIIIIIHH", self.info[120:120+28])
         h, = struct.unpack("<I", self.info[176:176+4])
@@ -154,14 +158,21 @@ class UpdateFirmware:
         print("Description: %s" % self.desc)
         print("Version: %s" % self.version)
         print("Layout: %s" % self.name)
-        print("  Firmware - %d bytes" % len(self.firmware))
-        print("  Info - %d bytes" % len(self.info))
-        for i in range(0, len(self.info), 32):
-            print("    %s" % "".join(["%02x" % x for x in self.info[i:i+32]]))
-        self.show_info()
+        print("App VID/PID: %04x:%04x" % self.app_vid_pid)
+        print("Boot VID/PID: %04x:%04x" % self.boot_vid_pid)
+        print("Firmware: %d bytes" % len(self.firmware))
+        if len(self.info):
+            print("Info - %d bytes" % len(self.info))
+            for i in range(0, len(self.info), 32):
+                print("    %s" % "".join(["%02x" % x for x in self.info[i:i+32]]))
+            self.show_info()
 
 
 class UpdatePackage:
+    SIG_MAAJONSN = ".maajonsn"
+    SIG_MAAV102 = ".maaV102"
+    SIG_MAAV105 = ".maaV105"
+
     def __init__(self, exe, name=""):
         self.exe = exe
         info = os.stat(self.exe)
@@ -175,27 +186,60 @@ class UpdatePackage:
         self.pkgver = ""
         self.sig = ""
 
+    def find_type(self):
+        max_sig_len = 30
+        with open(self.exe, "rb") as f:
+            f.seek(self.exelen - max_sig_len)
+            data = f.read(max_sig_len)
+
+            for i in range(0, 10, 2):
+                check = decode_package_data(data[i:])
+                # print(check)
+                f = check.find(b'.maa')
+                if f != -1:
+                    sig = check[f:].decode("ascii").partition("\x00")[0]
+                    return sig
+
+        return None
+
+    def decode(self):
+        sig = self.find_type()
+        if sig == self.SIG_MAAJONSN:
+            self.decode_maajonsn()
+        elif sig == self.SIG_MAAV102:
+            self.decode_maav102()
+        elif sig == self.SIG_MAAV105:
+            self.decode_maav105()
+        else:
+            raise Exception("Unknown Package Signature")
+
     def decode_maajonsn(self):
         self.firmware = []
+        sig_expect = self.SIG_MAAJONSN
 
         strings_len = 0x4b8
         strings_start = self.exelen - strings_len
         offset_company = 0x10
         offset_product = offset_company + 0x208
         offset_sec_len = 0x420
-        offset_layout = 0x424
-        offset_version = 0x460
-        offset_sig = 0x4ae
+        offset_layout = offset_sec_len + 4
+        offset_version = offset_layout + 60
+        sig_len = 10
+        offset_sig = strings_len - sig_len
 
         with open(self.exe, "rb") as f:
             f.seek(strings_start)
             strs = f.read(strings_len)
             strs = decode_package_data(strs)
 
+            vid, pid, bvid, bpid = struct.unpack("<IIII", strs[:offset_company])
+
+            self.sig = strs[offset_sig:offset_sig+sig_len].decode("ascii").partition("\x00")[0]
+            assert self.sig == sig_expect
+
             self.company = strs[offset_company:offset_company+0x200].decode("utf-16").partition("\x00")[0]
             self.product = strs[offset_product:offset_product+0x200].decode("utf-16").partition("\x00")[0]
             self.pkgver = strs[offset_version:offset_version+12].decode("ascii").partition("\x00")[0]
-            self.sig = strs[offset_sig:strings_len].decode("ascii").partition("\x00")[0]
 
             sec_len, = struct.unpack("<I", strs[offset_sec_len:offset_sec_len+4])
             layout = strs[offset_layout:offset_layout+0x20].decode("utf-16").partition("\x00")[0]
@@ -210,10 +254,13 @@ class UpdatePackage:
 
             fw = UpdateFirmware(layout, bytes(), fsec)
             fw.version = self.pkgver
+            fw.app_vid_pid = (vid, pid)
+            fw.boot_vid_pid = (bvid, bpid)
             self.firmware.append(fw)
 
     def decode_maav102(self):
         self.firmware = []
+        sig_expect = self.SIG_MAAV102
 
         strings_len = 0xb24
         strings_start = self.exelen - strings_len
@@ -221,18 +268,21 @@ class UpdatePackage:
         offset_company = offset_desc + 0x208
         offset_product = offset_company + 0x208
         offset_version = offset_product + 0x208
-        offset_sig = 0xb19
+        sig_len = 11
+        offset_sig = strings_len - sig_len
 
         with open(self.exe, "rb") as f:
             f.seek(strings_start)
             strs = f.read(strings_len)
             strs = decode_package_data(strs)
 
+            self.sig = strs[offset_sig:offset_sig+sig_len].decode("ascii").partition("\x00")[0]
+            assert self.sig == sig_expect
+
             self.pkgdesc = strs[offset_desc:offset_desc + 0x200].decode("utf-16").partition("\x00")[0]
             self.company = strs[offset_company:offset_company+0x200].decode("utf-16").partition("\x00")[0]
             self.product = strs[offset_product:offset_product+0x200].decode("utf-16").partition("\x00")[0]
             self.pkgver = strs[offset_version:offset_version + 0x200].decode("utf-16").partition("\x00")[0]
-            self.sig = strs[offset_sig:strings_len].decode("ascii").partition("\x00")[0]
 
             total = strings_len
             start = 0xac8 - (0x50 * 8)
@@ -267,6 +317,7 @@ class UpdatePackage:
 
     def decode_maav105(self):
         self.firmware = []
+        sig_expect = self.SIG_MAAV105
 
         strings_len = 0x2b58
         strings_start = self.exelen - strings_len
@@ -274,18 +325,21 @@ class UpdatePackage:
         offset_company = offset_pkgdesc + 0x208
         offset_product = offset_company + 0x208
         offset_pkgver = offset_product + 0x208
-        offset_sig = self.exelen - strings_start - 13
+        sig_len = 13
+        offset_sig = strings_len - sig_len
 
         with open(self.exe, "rb") as f:
             f.seek(strings_start)
             strs = f.read(strings_len)
             strs = decode_package_data(strs)
 
+            self.sig = strs[offset_sig:offset_sig+sig_len].decode("ascii").partition("\x00")[0]
+            assert self.sig == sig_expect
+
             self.pkgdesc = strs[offset_pkgdesc:offset_pkgdesc+0x200].decode("utf-16").partition("\x00")[0]
             self.company = strs[offset_company:offset_company+0x200].decode("utf-16").partition("\x00")[0]
             self.product = strs[offset_product:offset_product+0x200].decode("utf-16").partition("\x00")[0]
             self.pkgver = strs[offset_pkgver:offset_pkgver+0x200].decode("utf-16").partition("\x00")[0]
-            self.sig = strs[offset_sig:offset_sig+13].decode("ascii").partition("\x00")[0]
 
             list_pos = 0xc8
             sec_start = 0x1F1600
@@ -344,10 +398,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     package = UpdatePackage(args.exe)
+    package.decode()
 
-    package.decode_maajonsn()
-    # package.decode_maav102()
-    # package.decode_maav105()
     package.print_info()
 
     for i, f in enumerate(package.firmware):
