@@ -4,6 +4,7 @@ import os
 import argparse
 import struct
 import binascii
+import string
 
 
 pok3r_xor_key = [
@@ -44,10 +45,9 @@ def xor_decode_encode(data, xor_key):
     Decode the encryption scheme used by the POK3R RGB firmware.
     Just XOR encryption with fixed 52-byte key.
     """
-
     odata = bytearray()
     for i in range(0, len(data), 4):
-        key = xor_key[(i // 4) % 13]
+        key = xor_key[(i // 4) % len(xor_key)]
         w1, = struct.unpack("<I", data[i:i+4])
         w2 = (w1 ^ key) & 0xFFFFFFFF
         odata += struct.pack("<I", w2)
@@ -63,7 +63,6 @@ def decode_package_data(indata):
     Encryption is periodic every 10 bytes, so encrypted data can be partially decrypted
     from any multiple of 10 offset.
     """
-
     data = bytearray(indata)
     # Swap bytes 4 apart, skip 5
     for i in range(4, len(data), 5):
@@ -124,6 +123,29 @@ def decode_pok3r_firmware(data):
     return odata
 
 
+def kbp_decode(data, key):
+    """
+    Decode the encryption scheme used by the KBP updaters.
+    """
+    odata = bytearray()
+    for i in range(len(data)):
+        b = data[i]
+        b = b ^ key[i & 3]
+        b = b ^ i
+        b = b & 0xFF
+        odata += bytearray([b])
+
+    return odata
+
+
+def dump_bytes(data):
+    for i in range(0, len(data), 32):
+        c = data[i:i+32]
+        h = " ".join([ binascii.hexlify(c[j:j+4]).decode("ascii") for j in range(0, len(c), 4) ])
+        s = "".join([ chr(b) if chr(b) in string.printable else "." for b in c ])
+        print("%04x: %-71s | %s" % (i, h, s))
+
+
 class UpdateFirmware:
     def __init__(self, name, info, fw):
         self.name = name
@@ -172,21 +194,30 @@ class UpdatePackage:
     SIG_MAAJONSN = ".maajonsn"
     SIG_MAAV102 = ".maaV102"
     SIG_MAAV105 = ".maaV105"
+    TYPE_KBP = "KBP"
+    TYPE_COOLERMASTER = "COOLERMASTER"
 
-    def __init__(self, exe, name=""):
+    def __init__(self, exe, type=None, name=""):
         self.exe = exe
-        info = os.stat(self.exe)
-        self.exelen = info.st_size
+        self.type = type
+        self.name = name
+
+        self.exelen = None
         self.firmware = []
 
-        self.name = name
         self.pkgdesc = ""
         self.company = ""
         self.product = ""
         self.pkgver = ""
         self.sig = ""
 
+    def get_size(self):
+        if self.exelen is None:
+            info = os.stat(self.exe)
+            self.exelen = info.st_size
+
     def find_type(self):
+        self.get_size()
         max_sig_len = 30
         with open(self.exe, "rb") as f:
             f.seek(self.exelen - max_sig_len)
@@ -194,7 +225,7 @@ class UpdatePackage:
 
             for i in range(0, 10, 2):
                 check = decode_package_data(data[i:])
-                # print(check)
+                print(check)
                 f = check.find(b'.maa')
                 if f != -1:
                     sig = check[f:].decode("ascii").partition("\x00")[0]
@@ -203,19 +234,24 @@ class UpdatePackage:
         return None
 
     def decode(self):
-        sig = self.find_type()
-        if sig == self.SIG_MAAJONSN:
+        if self.type is None:
+            self.type = self.find_type()
+
+        if self.type == self.SIG_MAAJONSN:
             self.decode_maajonsn()
-        elif sig == self.SIG_MAAV102:
+        elif self.type == self.SIG_MAAV102:
             self.decode_maav102()
-        elif sig == self.SIG_MAAV105:
+        elif self.type == self.SIG_MAAV105:
             self.decode_maav105()
+        elif self.type == self.TYPE_KBP:
+            self.decode_kbp_cykb()
         else:
             raise Exception("Unknown Package Signature")
 
     def decode_maajonsn(self):
         self.firmware = []
         sig_expect = self.SIG_MAAJONSN
+        self.get_size()
 
         strings_len = 0x4b8
         strings_start = self.exelen - strings_len
@@ -261,6 +297,7 @@ class UpdatePackage:
     def decode_maav102(self):
         self.firmware = []
         sig_expect = self.SIG_MAAV102
+        self.get_size()
 
         strings_len = 0xb24
         strings_start = self.exelen - strings_len
@@ -318,6 +355,7 @@ class UpdatePackage:
     def decode_maav105(self):
         self.firmware = []
         sig_expect = self.SIG_MAAV105
+        self.get_size()
 
         strings_len = 0x2b58
         strings_start = self.exelen - strings_len
@@ -379,6 +417,44 @@ class UpdatePackage:
                     fw.version = version
                     self.firmware.append(fw)
 
+    def decode_kbp_cykb(self):
+        self.firmware = []
+        sig_expect = self.SIG_MAAJONSN
+        self.get_size()
+
+        strings_len = 0x23c
+        strings_start = self.exelen - strings_len
+        header_len = 0x10
+        header_start = strings_start - 0x10
+        fw_start = 0x54000
+
+        with open(self.exe, "rb") as f:
+            f.seek(header_start)
+            strs0 = f.read(header_len)
+
+            # calculate XOR key from first 4 bytes of header
+            key = bytearray([ k ^ i for i, k in enumerate(strs0[:4]) ])
+
+            strs0 = kbp_decode(strs0, key)
+
+            f.seek(strings_start)
+            strs1 = f.read(strings_len)
+            strs1 = kbp_decode(strs1, key)
+
+            dump_bytes(strs1)
+
+            fw_len, = struct.unpack("<I", strs0[4:4+4])
+            print("FW Len: %d" % fw_len)
+
+            f.seek(fw_start)
+            fsec = f.read(fw_len)
+            fsec = kbp_decode(fsec, key)
+            fsec = decode_pok3r_firmware(fsec)
+
+            fw = UpdateFirmware("", bytes(), fsec)
+            fw.version = self.pkgver
+            self.firmware.append(fw)
+
     def print_info(self):
         print("Description: %s" % self.pkgdesc)
         print("Company: %s" % self.company)
@@ -398,6 +474,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     package = UpdatePackage(args.exe)
+    package.type = UpdatePackage.TYPE_KBP
     package.decode()
 
     package.print_info()
@@ -407,5 +484,3 @@ if __name__ == "__main__":
         with open(ofile, "wb") as w:
             w.write(f.firmware)
         print("Firmware %d Written to %s" % (i, ofile))
-
-
