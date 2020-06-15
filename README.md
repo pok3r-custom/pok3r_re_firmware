@@ -23,16 +23,15 @@ For the tool developed for communicating with and updating the firmware on Vorte
 (and similar) keyboards, see 
 [pok3rtool](https://github.com/pok3r-custom/pok3rtool).
 
-For the effort at developing new firmware for these keyboards based on TMK, see
-[tmk_pok3r](https://github.com/pok3r-custom/tmk_pok3r).
+For the effort at developing new firmware for these keyboards based on QMK, see
+[qmk_pok3r](https://github.com/pok3r-custom/qmk_pok3r).
 
 ### POK3R Firmware Patch
 A very small firmware patch will allow the contents of the flash storage to be read out over USB,
 with the protocol used to read the version number during an update. This is effectively
-accomplished by changing a single byte in the Vortex firmware updater. In the v117 updater,
-changing the byte `0x09` at `0x1A7E5E` to `0x07` will patch the firmware update to allow reading
-flash. This circumvents a test in the code that normally only allows reading between 0x2800 and
-0x2C00. The relevant disassembly for this is at 0x7240 of the v117 firmware. See patch_v117.txt.
+accomplished by changing a single byte in the Vortex firmware. This circumvents a test in the
+code that normally only allows reading between 0x2800 and 0x2C00. The relevant disassembly for
+this is at 0x7240 of the v117 firmware. See patch_v117.txt.
 
 A patched version of the firmware is provided, see `firmware_v117_patched.bin`. This can be
 loaded with `pok3rtool flash`.
