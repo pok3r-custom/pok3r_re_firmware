@@ -1,0 +1,64 @@
+;-----------------------------------------------------------------------;
+; HT32 USB Communication Devices Class(CDC Serial) installation file    ;
+;-----------------------------------------------------------------------;
+
+[Version]
+Signature="$Windows NT$"
+Class=Ports
+ClassGuid={4D36E978-E325-11CE-BFC1-08002BE10318}
+Provider=%HoltekCDC%
+DriverVer=11/17/2011,1.2.0
+CatalogFile=ht32_virtual_com.cat
+
+[MANUFACTURER]
+%HoltekCDC%=VirtualComDevice, NTx86, NTamd64
+
+[DestinationDirs]
+DefaultDestDir = 12
+
+;---------------------------------------;
+;  Windows XP/Vista/7 Support           ;
+;---------------------------------------;
+
+[VirtualComDevice.NTx86]
+%DESCRIPTION%=HoltekDriverInstall, USB\VID_04D9&PID_8008
+%DESCRIPTION%=HoltekDriverInstall, USB\VID_04D9&PID_8008&MI_00
+%DESCRIPTION%=HoltekDriverInstall, USB\VID_04D9&PID_8008&MI_0B
+
+%DESCRIPTION%=HoltekDriverInstall, USB\VID_04D9&PID_802f&MI_01
+
+[VirtualComDevice.NTamd64]
+%DESCRIPTION%=HoltekDriverInstall, USB\VID_04D9&PID_8008
+%DESCRIPTION%=HoltekDriverInstall, USB\VID_04D9&PID_8008&MI_00
+%DESCRIPTION%=HoltekDriverInstall, USB\VID_04D9&PID_8008&MI_0B
+
+%DESCRIPTION%=HoltekDriverInstall, USB\VID_04D9&PID_802f&MI_01
+
+[HoltekDriverInstall]
+include = mdmcpq.inf
+CopyFiles = FakeModemCopyFileSection
+AddReg = HoltekDriverAddReg
+
+[HoltekDriverAddReg]
+HKR,,DevLoader,,*ntkern
+HKR,,NTMPDriver,,usbser.sys
+HKR,,EnumPropPages32,,"MsPorts.dll,SerialPortPropPageProvider"
+
+[HoltekDriverInstall.Services]
+AddService = usbser, 0x00000002, DriverServiceInst
+
+[DriverServiceInst]
+DisplayName=%SERVICE%
+ServiceType = 1 ; SERVICE_KERNEL_DRIVER
+StartType = 3 ; SERVICE_DEMAND_START
+ErrorControl = 1 ; SERVICE_ERROR_NORMAL
+ServiceBinary= %12%\usbser.sys
+
+;---------------------------------------;
+;    String Definitions                 ;
+;---------------------------------------;
+
+[Strings]
+HoltekCDC = "Holtek Semiconductor Inc."
+DESCRIPTION = "Holtek USB Virtual COM Port"
+SERVICE = "Holtek USB Virtual COM Port"

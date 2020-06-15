@@ -1,0 +1,113 @@
+/*----------------------------------------------------------------------------------------------------------*/
+/* Holtek Semiconductor Inc.                                                                                */
+/*                                                                                                          */
+/* Copyright (c) 2011 by Holtek Semiconductor Inc.                                                          */
+/* All rights reserved.                                                                                     */
+/*                                                                                                          */
+/*------------------------------------------------------------------------------------------------------------
+  File Name        : FlashMacro.mac
+  Version          : V1.01
+  Date             : 2019-03-16
+  Description      : HT32 Programming macro script for IAR EWARM.
+------------------------------------------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------------------------------------*/
+/* Please copy this file to your project folder (.eww) and modify the value inside the InitOBValue()        */
+/* function according to your requirement.                                                                  */
+/*                                                                                                          */
+/* You can load this file automatically from the IAR Embedded Workbench. From the Project menu select       */
+/* Options..., then in the C-SPY options page select Use setup file and add the path of this file.          */
+/*----------------------------------------------------------------------------------------------------------*/
+
+InitOBValue()
+{
+  /*--------------------------------------------------------------------------------------------------------*/
+  /* Default values of Option Byte, modify them according to your requirement. After start debug session,   */
+  /* you can modify them by ht32f_set_ob() function in quick watch window.                                  */
+  /*--------------------------------------------------------------------------------------------------------*/
+  OB_PP0 = 0xFFFFFFFF;        /* 0x1FF0_0000                                                                */
+  OB_PP1 = 0xFFFFFFFF;        /* 0x1FF0_0004                                                                */
+  OB_PP2 = 0xFFFFFFFF;        /* 0x1FF0_0008                                                                */
+  OB_PP3 = 0xFFFFFFFF;        /* 0x1FF0_000C                                                                */
+  OB_CP  = 0xFFFFFFFF;        /* 0x1FF0_0010                                                                */
+
+  /* Program Option Byte automatically                                                                      */
+  //PROGRAM_OB = 1;
+}
+
+/* OB_PP[127:0]:  Setting of Program/Erase Protection for Main Flash Page n                                 */
+/*                Enable page erase/program protection to prevent unwanted change of Flash contents.        */
+/*                0: Enable Protection                                                                      */
+/*                1: Disable Protection                                                                     */
+
+/* OB_CP[0]:      Global Security Protection                                                                */
+/*                Enable Security protection to prevent illegal Flash code/data access.                     */
+/*                0: Enable                                                                                 */
+/*                1: Disable                                                                                */
+
+/* OB_CP[1]:      Option Byte Protection                                                                    */
+/*                Enable Option Byte erase/program protection to prevent unwanted change of Option Byte.    */
+/*                0: Enable                                                                                 */
+/*                1: Disable                                                                                */
+
+/*----------------------------------------------------------------------------------------------------------*/
+/* The following functions can be called from the C-SPY debugger quick watch window. All output will go the */
+/* debug log window. Notice that in some case after execution of functions the flash memory will be erased. */
+/* Besides, some functions may trigger a system reset in order to reload the Option Byte setting.           */
+/*----------------------------------------------------------------------------------------------------------*/
+/* The following functions are available (defined in the FlashHT32Fxxxx.mac file).
+
+   ht32f_erase_ob()
+   + Erase Option Byte.
+
+   ht32f_masserase()
+   + Erase all Flash including main Flash and Option Bytes. Use this function to disable
+     Security protection or Option Byte protection.
+
+   ht32f_program(address, data)
+   + Program one word according to the parameter address and data.
+
+   ht32f_set_ob(0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF)
+   + Set the value of Option Bytes for ht32f_program_ob function (OB_PP0 ~ OB_PP3, OB_CP, and OB_CK).
+
+   ht32f_program_ob()
+   + Program Option Bytes according to the value set by ht32f_set_ob().
+
+   ht32f_read_ob()
+   + Read the value of Option Bytes (OB_PP0 ~ OB_PP3, OB_CP, and OB_CK).
+
+   ht32f_update_ob()
+   + Apply erase and program operations of Option Byte automatically.
+                                                                                                            */
+/*----------------------------------------------------------------------------------------------------------*/
+
+
+/*----------------------------------------------------------------------------------------------------------*/
+/* DO NOT MODIFY THE FOLLOWING FUNCTIONS                                                                    */
+/*----------------------------------------------------------------------------------------------------------*/
+
+__var OB_PP0;
+__var OB_PP1;
+__var OB_PP2;
+__var OB_PP3;
+__var OB_CP;
+__var PROGRAM_OB;
+
+execUserSetup()
+{
+  __message "HT32F: FlashMacro.mac->execUserSetup()....";
+  __registerMacroFile("$TOOLKIT_DIR$\\config\\flashloader\\Holtek\\FlashHT32Fxxxx.mac");
+
+  PROGRAM_OB = 0;
+
+  InitOBValue();
+
+  if (PROGRAM_OB == 1)
+  {
+    ht32f_set_ob(OB_PP0, OB_PP1, OB_PP2, OB_PP3, OB_CP);
+    ht32f_check_protection();
+    ht32f_update_ob();
+  }
+
+  return 0;
+}

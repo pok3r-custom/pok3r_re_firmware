@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<workspace>
+  <project>
+    <path>$WS_DIR$\Project_12366_AP.ewp</path>
+  </project>
+  <project>
+    <path>$WS_DIR$\Project_12366_IAP.ewp</path>
+  </project>
+  <batchBuild>
+    <batchDefinition>
+      <name>Project</name>
+      <member>
+        <project>Project_12366_AP</project>
+        <configuration>AP</configuration>
+      </member>
+      <member>
+        <project>Project_12366_IAP</project>
+        <configuration>IAP</configuration>
+      </member>
+    </batchDefinition>
+  </batchBuild>
+</workspace>
+
+
