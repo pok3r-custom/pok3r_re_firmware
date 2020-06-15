@@ -1,6 +1,6 @@
 #include "ht32.h"
 
-#define DEFAULT_ISR(N) void __attribute__((weak)) N(){ _generic_intr(); }
+#define DEFAULT_ISR(N) void N(void) __attribute__((weak, alias("_generic_intr")));
 
 // Default ISRs
 

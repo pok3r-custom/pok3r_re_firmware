@@ -25,8 +25,8 @@ install:
 	cp -R util/jlink_flashloader/Holtek /tmp/Devices
 
 jlink:
-	#JLinkExe -Device HT32F1654 -CommanderScript util/connect.jlink
-	JLinkExe -Device HT32F1655 -CommanderScript util/connect.jlink
+	JLinkExe -Device HT32F1654 -CommanderScript util/connect.jlink
+	#JLinkExe -Device HT32F1655 -CommanderScript util/connect.jlink
 
 erase_pok3r:
 	JLinkExe -Device HT32F1655 -CommanderScript util/version-erase1655.jlink
@@ -57,6 +57,11 @@ core_bootloader:
 
 md200_bootloader:
 	cp disassemble/md200/bootloader/md200_bootloader.bin /tmp/flash.bin
+	JLinkExe -Device HT32F1654 -CommanderScript util/flash.jlink
+	rm /tmp/flash.bin
+
+flash_test:
+	arm-none-eabi-objcopy HT32.elf -O binary /tmp/flash.bin
 	JLinkExe -Device HT32F1654 -CommanderScript util/flash.jlink
 	rm /tmp/flash.bin
 
