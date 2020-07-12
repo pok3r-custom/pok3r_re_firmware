@@ -54,11 +54,11 @@ try:
 
     jlink.set_tif(pylink.enums.JLinkInterfaces.SWD)
     try:
-        jlink.connect("HT32F1654", 4000, verbose=True)
+        # jlink.connect("HT32F1654", 4000, verbose=True)
         # jlink.connect("HT32F1655", 4000, verbose=True)
         # jlink.connect("HT32F1755", 4000, verbose=True)
         # jlink.connect("HT32F52351", 4000, verbose=True)
-        # jlink.connect("HT32F52352", 4000, verbose=True)
+        jlink.connect("HT32F52352", 4000, verbose=True)
     except pylink.errors.JLinkException as e:
         print(e)
         pass
