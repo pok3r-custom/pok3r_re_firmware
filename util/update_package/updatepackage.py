@@ -123,15 +123,15 @@ def decode_pok3r_firmware(data):
     return odata
 
 
-def kbp_decode(data, key):
+def kbp_decode(data, key, offset=0):
     """
     Decode the encryption scheme used by the KBP updaters.
     """
     odata = bytearray()
     for i in range(len(data)):
         b = data[i]
-        b = b ^ key[i & 3]
-        b = b ^ i
+        b = b ^ key[(i+offset) & 3]
+        b = b ^ (i+offset)
         b = b & 0xFF
         odata += bytearray([b])
 
@@ -142,7 +142,7 @@ def dump_bytes(data):
     for i in range(0, len(data), 32):
         c = data[i:i+32]
         h = " ".join([ binascii.hexlify(c[j:j+4]).decode("ascii") for j in range(0, len(c), 4) ])
-        s = "".join([ chr(b) if chr(b) in string.printable else "." for b in c ])
+        s = "".join([ chr(b) if chr(b) in string.ascii_letters + string.digits + string.punctuation + " " else "." for b in c ])
         print("%04x: %-71s | %s" % (i, h, s))
 
 
@@ -191,16 +191,17 @@ class UpdateFirmware:
 
 
 class UpdatePackage:
-    SIG_MAAJONSN = ".maajonsn"
-    SIG_MAAV102 = ".maaV102"
-    SIG_MAAV105 = ".maaV105"
-    TYPE_KBP = "KBP"
-    TYPE_COOLERMASTER = "COOLERMASTER"
+    SIG_MAAJONSN = b".maajonsn"
+    SIG_MAAV102 = b".maaV102"
+    SIG_MAAV105 = b".maaV105"
+    SIG_KBP = b"lins"
+    SIG_COOLERMASTER = b"MT"
 
-    def __init__(self, exe, type=None, name=""):
+    def __init__(self, exe, type=None, name="", version=(0,0,0)):
         self.exe = exe
         self.type = type
         self.name = name
+        self.version = version
 
         self.exelen = None
         self.firmware = []
@@ -223,13 +224,24 @@ class UpdatePackage:
             f.seek(self.exelen - max_sig_len)
             data = f.read(max_sig_len)
 
+            # try to find .maa signatures
             for i in range(0, 10, 2):
                 check = decode_package_data(data[i:])
-                print(check)
-                f = check.find(b'.maa')
-                if f != -1:
-                    sig = check[f:].decode("ascii").partition("\x00")[0]
+                # print(check)
+                p = check.find(b'.maa')
+                if p != -1:
+                    sig = check[p:].partition(b"\x00")[0]
                     return sig
+
+            # try to find KBP signature
+            strings_len = 0x23c
+            f.seek(self.exelen - strings_len - 0x10)
+            keydat = f.read(4)
+            # calculate XOR key from first 4 bytes of header
+            key = bytearray([ k ^ i for i, k in enumerate(keydat[:4]) ])
+            sig = kbp_decode(data[-4:], key, strings_len - 4)
+            if sig == self.SIG_KBP:
+                return sig
 
         return None
 
@@ -243,8 +255,10 @@ class UpdatePackage:
             self.decode_maav102()
         elif self.type == self.SIG_MAAV105:
             self.decode_maav105()
-        elif self.type == self.TYPE_KBP:
+        elif self.type == self.SIG_KBP:
             self.decode_kbp_cykb()
+        elif self.type == self.SIG_COOLERMASTER:
+            self.decode_coolermaster()
         else:
             raise Exception("Unknown Package Signature")
 
@@ -270,7 +284,7 @@ class UpdatePackage:
 
             vid, pid, bvid, bpid = struct.unpack("<IIII", strs[:offset_company])
 
-            self.sig = strs[offset_sig:offset_sig+sig_len].decode("ascii").partition("\x00")[0]
+            self.sig = strs[offset_sig:offset_sig+sig_len].partition(b"\x00")[0]
             assert self.sig == sig_expect
 
             self.company = strs[offset_company:offset_company+0x200].decode("utf-16").partition("\x00")[0]
@@ -313,7 +327,7 @@ class UpdatePackage:
             strs = f.read(strings_len)
             strs = decode_package_data(strs)
 
-            self.sig = strs[offset_sig:offset_sig+sig_len].decode("ascii").partition("\x00")[0]
+            self.sig = strs[offset_sig:offset_sig+sig_len].partition(b"\x00")[0]
             assert self.sig == sig_expect
 
             self.pkgdesc = strs[offset_desc:offset_desc + 0x200].decode("utf-16").partition("\x00")[0]
@@ -371,7 +385,7 @@ class UpdatePackage:
             strs = f.read(strings_len)
             strs = decode_package_data(strs)
 
-            self.sig = strs[offset_sig:offset_sig+sig_len].decode("ascii").partition("\x00")[0]
+            self.sig = strs[offset_sig:offset_sig+sig_len].partition(b"\x00")[0]
             assert self.sig == sig_expect
 
             self.pkgdesc = strs[offset_pkgdesc:offset_pkgdesc+0x200].decode("utf-16").partition("\x00")[0]
@@ -419,7 +433,7 @@ class UpdatePackage:
 
     def decode_kbp_cykb(self):
         self.firmware = []
-        sig_expect = self.SIG_MAAJONSN
+        sig_expect = self.SIG_KBP
         self.get_size()
 
         strings_len = 0x23c
@@ -427,6 +441,8 @@ class UpdatePackage:
         header_len = 0x10
         header_start = strings_start - 0x10
         fw_start = 0x54000
+        offset_sig = strings_len - 4
+        sig_len = 4
 
         with open(self.exe, "rb") as f:
             f.seek(header_start)
@@ -434,14 +450,17 @@ class UpdatePackage:
 
             # calculate XOR key from first 4 bytes of header
             key = bytearray([ k ^ i for i, k in enumerate(strs0[:4]) ])
+            print("Key: %02x%02x%02x%02x" % tuple(key))
 
             strs0 = kbp_decode(strs0, key)
 
             f.seek(strings_start)
             strs1 = f.read(strings_len)
             strs1 = kbp_decode(strs1, key)
-
             dump_bytes(strs1)
+
+            self.sig = strs1[offset_sig:offset_sig+sig_len].partition(b"\x00")[0]
+            assert self.sig == sig_expect
 
             fw_len, = struct.unpack("<I", strs0[4:4+4])
             print("FW Len: %d" % fw_len)
@@ -454,6 +473,49 @@ class UpdatePackage:
             fw = UpdateFirmware("", bytes(), fsec)
             fw.version = self.pkgver
             self.firmware.append(fw)
+
+    def decode_coolermaster(self):
+        self.firmware = []
+        sig_expect = self.SIG_COOLERMASTER
+        self.get_size()
+
+        strings_len = 0x23c
+        strings_start = self.exelen - strings_len
+        name_start = self.exelen - 2
+        header_start = strings_start - 0x10
+        fw_start = 0x54000
+        sig_len = 2
+
+        with open(self.exe, "rb") as f:
+
+            name_len = 0
+            while True:
+                f.seek(name_start - 1)
+                c = f.read(1)
+                if c == b"\x00":
+                    break
+                name_len += 1
+                name_start -= 1
+
+            f.seek(name_start)
+            str0 = f.read(name_len)
+            name = str0.decode("ascii")
+            print(name)
+
+            size_start = name_start - 4
+            f.seek(size_start)
+            str1 = f.read(4)
+            fw_len, = struct.unpack("<I", str1)
+
+            fw_start = size_start - 9 - fw_len + 0x405
+            f.seek(fw_start)
+            fwdat = bytearray(f.read(fw_len))
+
+            for i in range(len(fwdat)):
+                fwdat[i] = fwdat[i] ^ 0xA5
+
+            dump_bytes(fwdat)
+
 
     def print_info(self):
         print("Description: %s" % self.pkgdesc)
@@ -474,7 +536,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     package = UpdatePackage(args.exe)
-    package.type = UpdatePackage.TYPE_KBP
+    package.type = UpdatePackage.SIG_KBP
     package.decode()
 
     package.print_info()
