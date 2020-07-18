@@ -1,0 +1,98 @@
+// **********************************************************************
+// *                    SEGGER Microcontroller GmbH                     *
+// *                        The Embedded Experts                        *
+// **********************************************************************
+// *                                                                    *
+// *            (c) 2014 - 2018 SEGGER Microcontroller GmbH             *
+// *            (c) 2001 - 2018 Rowley Associates Limited               *
+// *                                                                    *
+// *           www.segger.com     Support: support@segger.com           *
+// *                                                                    *
+// **********************************************************************
+// *                                                                    *
+// * All rights reserved.                                               *
+// *                                                                    *
+// * Redistribution and use in source and binary forms, with or         *
+// * without modification, are permitted provided that the following    *
+// * conditions are met:                                                *
+// *                                                                    *
+// * - Redistributions of source code must retain the above copyright   *
+// *   notice, this list of conditions and the following disclaimer.    *
+// *                                                                    *
+// * - Neither the name of SEGGER Microcontroller GmbH                  *
+// *   nor the names of its contributors may be used to endorse or      *
+// *   promote products derived from this software without specific     *
+// *   prior written permission.                                        *
+// *                                                                    *
+// * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND             *
+// * CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,        *
+// * INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF           *
+// * MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE           *
+// * DISCLAIMED.                                                        *
+// * IN NO EVENT SHALL SEGGER Microcontroller GmbH BE LIABLE FOR        *
+// * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR           *
+// * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT  *
+// * OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;    *
+// * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF      *
+// * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT          *
+// * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE  *
+// * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH   *
+// * DAMAGE.                                                            *
+// *                                                                    *
+// **********************************************************************
+
+define memory with size = 4G;
+//
+// Block definitions
+//
+define block ctors { section .ctors, section .ctors.*, block with alphabetical order { init_array } };
+define block dtors { section .dtors, section .dtors.*, block with reverse alphabetical order { fini_array } };
+define block exidx { section .ARM.exidx, section .ARM.exidx.* };
+define block tbss  { section .tbss,  section .tbss.*  };
+define block tdata { section .tdata, section .tdata.* };
+define block tls   { block tbss, block tdata };
+define block tdata_load { copy of block tdata };
+define block heap  with size = __HEAPSIZE__,  alignment = 8, /* fill =0x00, */ readwrite access { };
+define block stack with size = __STACKSIZE__, alignment = 8, /* fill =0xCD, */ readwrite access { };
+//
+// Explicit initialization settings for sections
+//
+do not initialize                           { section .non_init, section .non_init.* };
+initialize by copy /* with packing=auto */  { section .data, section .data.* };
+initialize by copy /* with packing=auto */  { section .fast, section .fast.* };
+//
+// ROM Placement
+//
+place at start of FLASH                 { 
+                                           section .vectors                         // Vector table section
+                                        };
+place in FLASH with minimum size order  { 
+                                           section .init, section .init.*,          // Init code section
+                                           section .text, section .text.*,          // Code section
+                                           section .rodata, section .rodata.*,      // Read-only data section
+                                           section .segger.*,                       // Auto-generated initialization
+                                           block exidx,                             // ARM exception unwinding block
+                                           block ctors,                             // Constructors block
+                                           block dtors                              // Destructors block
+                                         };
+place in FLASH                           { 
+                                           block tdata_load                       // Thread-local-storage load image
+                                         };
+//                                      
+// RAM Placement                        
+//                                      
+place in RAM                             {                                          // Special sections
+                                           section .non_init, section .non_init.*,  // No initialization section
+                                           block tls                                // Thread-local-storage block
+                                         };
+place in RAM with auto order             {                                          // Initialized sections
+                                           section .fast, section .fast.*,          // "ramfunc" section
+                                           section .data, section .data.*,          // Initialized data section
+                                           section .bss, section .bss.*             // Static data section
+                                         };
+place in RAM                             { 
+                                           /* expandable */ block heap              // Heap reserved block
+                                         };
+place at end of RAM                      { 
+                                           block stack                              // Stack reserved block at the end
+                                         };

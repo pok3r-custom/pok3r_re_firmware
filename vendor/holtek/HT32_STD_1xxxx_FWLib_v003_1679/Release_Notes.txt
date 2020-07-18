@@ -1,0 +1,288 @@
+/*********************************************************************************************************//**
+ * @file    Release_Notes.txt
+ * @version v0.0.3
+ * @date    2019-04-19
+ * @brief   The Release notes of HT32 Firmware Library.
+ *************************************************************************************************************
+ * @attention
+ *
+ * Firmware Disclaimer Information
+ *
+ * 1. The customer hereby acknowledges and agrees that the program technical documentation, including the
+ *    code, which is supplied by Holtek Semiconductor Inc., (hereinafter referred to as "HOLTEK") is the
+ *    proprietary and confidential intellectual property of HOLTEK, and is protected by copyright law and
+ *    other intellectual property laws.
+ *
+ * 2. The customer hereby acknowledges and agrees that the program technical documentation, including the
+ *    code, is confidential information belonging to HOLTEK, and must not be disclosed to any third parties
+ *    other than HOLTEK and the customer.
+ *
+ * 3. The program technical documentation, including the code, is provided "as is" and for customer reference
+ *    only. After delivery by HOLTEK, the customer shall use the program technical documentation, including
+ *    the code, at their own risk. HOLTEK disclaims any expressed, implied or statutory warranties, including
+ *    the warranties of merchantability, satisfactory quality and fitness for a particular purpose.
+ *
+ * <h2><center>Copyright (C) Holtek Semiconductor Inc. All rights reserved</center></h2>
+ ************************************************************************************************************/
+
+// Supported Device
+// ========================================
+//   HT32F1653, HT32F1654
+//   HT32F1655, HT32F1656
+//   HT32F12345
+//   HT32F12365, HT32F12366
+//   HT32F22366
+
+/*----------------------------------------------------------------------------------------------------------*/
+/* HT32F1xxxx_FWLib_v003_1679                                                                               */
+/*----------------------------------------------------------------------------------------------------------*/
+  Release Date: 2019-04-19
+
+  Main Changes
+  + Fix error of "CKCU_HSIAutoTrimClkConfig()" function which cause the HSI auto-trim not work.
+  + Modify following define of ADC.
+    ADC_CH_GNDREF -> ADC_CH_GND_VREF
+    ADC_CH_VREF   -> ADC_CH_VDD_VREF
+
+  Others
+  + None.
+
+/*----------------------------------------------------------------------------------------------------------*/
+/* HT32F1xxxx_FWLib_v003_1673                                                                               */
+/*----------------------------------------------------------------------------------------------------------*/
+  Release Date: 2019-04-09
+
+  Main Changes
+  + Add SEGGER Embedded Studio IDE support (beta version).
+  + Update "ht32f1xxxx_usbd.c" and "ht32_usbd_core.c", add Force USB Reset Control function (apply to specific
+    model only).
+  + Update Create Project script, add Script folder in project_template.
+  + Add "TM/TriggerCounter" example.
+  + Add "USBD/HID_Keyboard_Mass_Storage" example.
+
+  Others
+  + Update comment of example code.
+  + Update define of "USBD/Mass_Storage" example.
+  + Update "EXTI/WakeUp_DeepSleepMode1" Example, add LED3 (for some SK have only LED2 and LED3 on board).
+  + Update/sync startup.s/system.c files.
+  + Update/sync "HT32F1xxxx_01_DebugSupport.ini".
+  + Update/sync "ht32_op.s" and "ht32_op.c".
+  + Update "BootProcess" function.
+  + Update/sync "FlashMacro.mac".
+
+/*----------------------------------------------------------------------------------------------------------*/
+/* HT32F1xxxx_FWLib_v002_1496                                                                               */
+/*----------------------------------------------------------------------------------------------------------*/
+  Release Date: 2018-12-17
+
+  Main Changes
+  + Modify Control IN/OUT method of USB Core, to fix USB transfer problem when CPU in the lower speed or late
+    USB interrupt case.
+  + Add workaround for PDMA CH3 issue (Interrupt Enable bit of CH3 is not work).
+
+  Others
+  + Add "USBD_DisableDefaultPull()" function to disable pull resistance when the USB is not use.
+  + Rename RTC example as below.
+    "Calendar" -> "Time_BackupDomain"
+  + Add new example.
+    "RTC/Calendar_BackupDomain"
+    "FMC/EnableProtectionByFW"
+  + Update "EXTI/WakeUp_DeepSleepMode1" example.
+  + Update coding style.
+
+/*----------------------------------------------------------------------------------------------------------*/
+/* HT32F1xxxx_FWLib_v002_1406                                                                               */
+/*----------------------------------------------------------------------------------------------------------*/
+  Release Date: 2018-09-30
+
+  Main Changes
+  + Update HardFault_Handler of "ht32f1xxxx_01_it.c",add the debug instruction and system reset.
+  + Add "RAND/Random_Number" example and update "ht32_rand.c".
+  + Add  "__HT_check_sp" and "__HT_check_heap" symbol into startup.s and watchpoint command into
+    "HT32F1xxxx_01_DebugSupport.ini" for debug stack/heap underflow, overflow, and overwrite.
+  + Update "USBD/HID_Keyboard_Joystick" and "USBD/HID_Mouse" example, change the set flag sequence
+    (before USBDCore_EPTWriteINData).
+  + Add GNU Make support of GNU Arm compiler.
+
+  Others
+  + Add "objcooy.txt" which shows how to use obj tools of GNU Arm compiler.
+  + Update format and coding style.
+
+/*----------------------------------------------------------------------------------------------------------*/
+/* HT32F1xxxx_FWLib_v002_1367                                                                               */
+/*----------------------------------------------------------------------------------------------------------*/
+  Release Date: 2018-08-02
+
+  Main Changes
+  + Add GNU Arm compiler support.
+    - Add project_template related files
+    - "startup_ht32f5xxxx_gcc_nn.s"
+    - "linker.ld" (link script)
+  + Update "ht32f5xxxx_tm.c/.h", add following functions which have TM_CH_n parameter.
+    void TM_ForcedOREF(HT_TM_TypeDef* TMx, TM_CH_Enum TM_CH_n, TM_OM_Enum ForcedAction)
+    void TM_SetCaptureCompare(HT_TM_TypeDef* TMx, TM_CH_Enum TM_CH_n, u16 Cmp)
+    void TM_SetAsymmetricCompare(HT_TM_TypeDef* TMx, TM_CH_Enum TM_CH_n, u16 Cmp)
+    u32 TM_GetCaptureCompare(HT_TM_TypeDef* TMx, TM_CH_Enum TM_CH_n)
+
+  Others
+  + Add "USBD/HID_Keyboard_Virtual_COM" example.
+  + Fix compile error when turn on Library debug mode (HT32_LIB_DEBUG = 1).
+  + Modify "example/NVIC/Vector_Table_Offset" example code to support GUN compiler.
+  + Simplify "example/USART/HyperTerminal_TxRx_Interrupt" example.
+
+/*----------------------------------------------------------------------------------------------------------*/
+/* HT32F1xxxx_FWLib_v001_1302                                                                               */
+/*----------------------------------------------------------------------------------------------------------*/
+  Release Date: 2018-06-11
+
+  Main Changes
+  + Add SourceryG++Lite compiler support.
+    - Add project_template related files
+    - "startup_ht32f1xxxx_cs3_nn.s"
+    - "linker.ld" (link script)
+  + Add DMA support of "utilities/common/spi_flash.c".
+  + Add "EXTI_GetEdgeFlag()" function.
+  + Add LIBCFG_AES_SWAP function to process endian issue of AES.
+
+  Others
+  + Update "ht32f1xxxx_conf.h" for AUTO_RETURN (\r) option.
+  + Update format of IAR "startup_ht32f1xxxx_01.s".
+  + Fix "LIBCFC_CKCU_USB_PLL" typing error of ht32fxxxx_libcfg.h and example code (shall be LIBCFG_CKCU_USB_PLL).
+  + Fix IAP_PPBIT define error of "IAP/IAP_UI" example.
+  + Update "ht32f1xxxx_ckcu.c" to remove unnecessary register write of PLL.
+
+/*----------------------------------------------------------------------------------------------------------*/
+/* HT32F1xxxx_FWLib_v001_1153                                                                               */
+/*----------------------------------------------------------------------------------------------------------*/
+  Release Date: 2018-02-28
+
+  Main Changes
+  + Add "USBD/USB_UAC_Sound_RateControl" Example.
+  + Add "I2C_SpeedOffset" parameter of I2C_InitTypeDef to reach real I2C speed.
+    Note: Related examples are also updated.
+  + Change EBI timing of "ebi_lcd.c" to fix LCD display problem on HT32F12345 with ESK32-A2A31.
+  + Add "CKCU/HSI_AutoTrim_By_USB" Example.
+  + Update "CKCU_HSIAutoTrimIsReady" function of "ht32f5xxxx_ckcu.c".
+
+  Others
+  + Update format and coding style.
+
+/*----------------------------------------------------------------------------------------------------------*/
+/* HT32F1xxxx_FWLib_v001_1023                                                                               */
+/*----------------------------------------------------------------------------------------------------------*/
+  Release Date: 2017-12-30
+
+  Main Changes
+  + Update boot related functions of "startup_ht32f1xxxx_nn.s" and "system_ht32f1xxxx_nn.c".
+  + Update "ht32_op.c" and "ht32_op.s" to support enable WDT function by Flash Option byte (Apply to specific
+    model only).
+  + Add "GPIO_DisableDebugPort()"" function to disable SWD function.
+
+  Others
+  + Fix IAR Project setting error of IAP Example.
+  + Add "RTC_LSILoadTrimData()" function.
+  + Add "LIBCFG_RTC_LSI_LOAD_TRIM" define of HT32F165x.
+  + Remove useless "RTC_LSICmd()"" function.
+  + Update following examples, remove LSI enable code (LSI default on).
+    "PWRCU/DeepSleepMode1"
+    "PWRCU/BackupData"
+    "PWRCU/DeepSleepMode2"
+    "PWRCU/PowerDownMode"
+    "RTC/Calendar"
+  + Update I2S and USB UAC related examples (Coding style and remove unuse define).
+  + Update USB Example, remove invalid remote wakeup configuration by define (Only HID class support Remote
+    Wakeup).
+
+/*----------------------------------------------------------------------------------------------------------*/
+/* HT32F1xxxx_FWLib_v001_933                                                                                */
+/*----------------------------------------------------------------------------------------------------------*/
+  Release Date: 2017-11-17
+
+  Main Changes
+  + Fix AES typing error of "ht32f1xxxx_aes.c/.h" (EBC to ECB).
+  + Fix TM define error of "ht32f1xxxx_tm.c/.h".
+
+  Others
+  + Update "ht32_virtual_com.inf" file, add Digital Signature.
+  + Update typing error of example code.
+
+/*----------------------------------------------------------------------------------------------------------*/
+/* HT32F1xxxx_FWLib_v001_899                                                                                */
+/*----------------------------------------------------------------------------------------------------------*/
+  Release Date: 2017-10-19
+
+  Main Changes
+  + Update "SDIO/SDCard" Example code. Fix read Card SCR problem which causes SDIO working on 1-bit mode
+    abnormally.
+
+  Others
+  + Update project setting.
+  + Remove some project files. Use "CreateProject.bat" to copy project files automatically.
+  + Add "LIBCFG_CHIPNAME" define.
+
+/*----------------------------------------------------------------------------------------------------------*/
+/* HT32F1xxxx_FWLib_v001_785                                                                                */
+/*----------------------------------------------------------------------------------------------------------*/
+  Release Date: 2017-08-31
+
+  Main Changes
+  + Fix "ht32f1xxxx_conf.h" typing error ("_ADC" to "_AES").
+  + Fix AES typing error (EBC to ECB).
+
+  Others
+  + Update "ht32_usbd_core.c" to support vendor function.
+  + Add "USE_MEM_HT32F1xxxx" define into project.
+  + Add "USE_MEM_HT32F1xxxx" default define into "ht32f1xxxx_xx_libcfg.h".
+  + Rename "system_ht32f1xxxx.h" to "system_ht32f1xxxx_01.h" for PACK requirement.
+  + Update IAP examples.
+
+/*----------------------------------------------------------------------------------------------------------*/
+/* HT32F1xxxx_FWLib_v001_671                                                                                */
+/*----------------------------------------------------------------------------------------------------------*/
+  Release Date: 2017-07-27
+
+  Main Changes
+  + None
+
+  Others
+  + Update "ht32_op.c", add CK_CODE/CK_DATA/CK_CODEOP in Option Bytes (same format with e-Writer32).
+  + Modify USB/Mass_Storage example for WIN10 compatibility issue.
+  + Add "USE_MEM_HT32F1xxxx" support for memory size define (LIBCFG_FLASH_SIZE/LIBCFG_RAM_SIZE).
+  + Add IAR EWARMv8 project template (create by IAR EWARE v8.11).
+  + Upgrade the version of IAR EWARM project template from v6.20 to v6.50.
+    Note:
+    1. Supported CMSIS-DAP: IAR EWARM v6.50 and above.
+    2. RDI/e-Link32 is not supported anymore from the v8.xx of IAR EWARM.
+
+  Known Issue:
+  + IAP example is not ready, will be update in next release.
+
+/*----------------------------------------------------------------------------------------------------------*/
+/* HT32F1xxxx_FWLib_v001_552                                                                                */
+/*----------------------------------------------------------------------------------------------------------*/
+  Release Date: 2017-07-17
+
+  Main Changes
+  + Add example code.
+  + Update TM for PDMA support.
+  + Fix "USART_RXTL_01/04/08/14" define error.
+  + Fix "HT32F_DVB_BuzzerFun()" define error of "ht32f1xxxx_board_01.c".
+  + Fix pin assignment error of "ht32f12366_sk.h"
+
+  Others
+  + Add BUTTON_MODE_WAKE_UP support for "ht32f1xxxx_sk.c/.h".
+  + Update typing error and coding style.
+  + Remove warning on old MDK-ARM version.
+  + Update project setting.
+  + Add DEINIT_ENABLE setting of "ht32f1xxxx_system_nn.c".
+
+/*----------------------------------------------------------------------------------------------------------*/
+/* HT32F1xxxx_FWLib_v001_167                                                                                */
+/*----------------------------------------------------------------------------------------------------------*/
+  Release Date: 2017-06-14
+
+  Main Changes
+  + Initial version.
+
+  Others
+  +

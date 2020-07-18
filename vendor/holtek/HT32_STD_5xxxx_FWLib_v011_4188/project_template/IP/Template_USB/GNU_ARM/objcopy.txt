@@ -1,0 +1,29 @@
+/*----------------------------------------------------------------------------------------------------------*/
+/* Holtek Semiconductor Inc.                                                                                */
+/*                                                                                                          */
+/* Copyright (C) Holtek Semiconductor Inc.                                                                  */
+/* All rights reserved.                                                                                     */
+/*                                                                                                          */
+/*------------------------------------------------------------------------------------------------------------
+  File Name        : objcioy.txt
+  Version          : V1.00
+  Date             : 2018-08-03
+  Description      : The objcopy command example for bin and text.
+------------------------------------------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------------------------------------*/
+/* Convert ELF format to Binary                                                                             */
+/*----------------------------------------------------------------------------------------------------------*/
+arm-none-eabi-objcopy.exe -O binary "!L.elf"  "!L.bin"
+
+/*----------------------------------------------------------------------------------------------------------*/
+/* Convert ELF format to Disassembles                                                                       */
+/*----------------------------------------------------------------------------------------------------------*/
+cmd.exe /Q /C arm-none-eabi-objdump.exe -D "!L.elf"  > "!L.text"
+cmd.exe /Q /C arm-none-eabi-objdump.exe -S "!L.elf"  > "!L.text"
+
+Note:
+1. -D: disassemble
+2. -S: disassemble including C code.
+3. You can also use fromelf.exe in command line manually to get disassemble file (use in command line).
+   "fromelf --text -c -o HT32.text HT32.elf"

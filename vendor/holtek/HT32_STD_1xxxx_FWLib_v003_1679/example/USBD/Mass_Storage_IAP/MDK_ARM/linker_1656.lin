@@ -1,0 +1,33 @@
+;/*---------------------------------------------------------------------------------------------------------*/
+;/* Holtek Semiconductor Inc.                                                                               */
+;/*                                                                                                         */
+;/* Copyright (c) 2014 by Holtek Semiconductor Inc.                                                         */
+;/* All rights reserved.                                                                                    */
+;/*                                                                                                         */
+;/*-----------------------------------------------------------------------------------------------------------
+;  File Name        : linker.lin
+;  Version          : V1.00
+;  Date             : 2014-06-30
+;  Description      : Linker Control File (scatter-loading) for IAP.
+;-----------------------------------------------------------------------------------------------------------*/
+
+IAP 0x00000000 0x00002000   ; 8 kB for IAP
+{
+  IAP +0
+  {
+    iap_1656.o (IAP, +FIRST)     ; IAP Program
+  }
+}
+
+AP 0x00002000               ; User application start from 0x2000
+{
+  AP +0
+  {
+    *.o (RESET, +FIRST)
+    * (+RO)
+  }
+  RAM 0x20000000
+  {
+    * (+RW +ZI)
+  }
+}

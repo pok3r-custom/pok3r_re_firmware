@@ -1,0 +1,80 @@
+<!DOCTYPE CrossStudio_Project_File>
+<solution Name="52230" target="8" version="2">
+  <project Name="52230">
+    <configuration
+      Name="Common"
+      arm_architecture="v6M"
+      arm_core_type="Cortex-M0+"
+      arm_endian="Little"
+      arm_fp_abi="Soft"
+      arm_fpu_type="None"
+      arm_linker_heap_size="0"
+      arm_linker_process_stack_size="0"
+      arm_linker_stack_size="512"
+      arm_linker_variant="SEGGER"
+      arm_simulator_memory_simulation_parameter="RX 00000000,00007c00,FFFFFFFF;RWX 20000000,00001000,CDCDCDCD"
+      arm_target_device_name="HT32F52230"
+      arm_target_interface_type="SWD"
+      build_intermediate_directory="HT32/$(ProjectName)/Obj"
+      build_output_directory="HT32/$(ProjectName)/Exe"
+      build_output_file_name="$(OutDir)/HT32$(EXE)"
+      debug_target_connection="J-Link"
+      gcc_debugging_level="Level 3"
+      gcc_enable_all_warnings="Yes"
+      gcc_optimization_level="Level 1"
+      link_linker_script_file="$(ProjectDir)/linker.icf"
+      linker_output_format="hex"
+      linker_section_placements_segments="FLASH RX 0x00000000 0x00007c00;RAM RWX 0x20000000 0x00001000"
+      project_directory=""
+      project_type="Executable" />
+    <folder Name="User">
+      <file file_name="../main.c" />
+      <file file_name="../ht32f5xxxx_01_it.c" />
+    </folder>
+    <folder Name="Config">
+      <file file_name="../ht32f5xxxx_conf.h" />
+    </folder>
+    <folder Name="CMSIS">
+      <file file_name="../system_ht32f5xxxx_02.c" />
+    </folder>
+    <folder Name="emStudio">
+      <file file_name="startup_ht32f5xxxx_es_01.s" />
+      <file file_name="../../../../library/Device/Holtek/HT32F5xxxx/Source/emStudio/SEGGER_THUMB_Startup.s" />
+    </folder>
+    <folder Name="Library">
+      <file file_name="../../../../library/HT32F5xxxx_Driver/src/ht32_cm0plus_misc.c" />
+      <file file_name="../../../../library/HT32F5xxxx_Driver/src/ht32f5xxxx_adc.c" />
+      <file file_name="../../../../library/HT32F5xxxx_Driver/src/ht32f5xxxx_bftm.c" />
+      <file file_name="../../../../library/HT32F5xxxx_Driver/src/ht32f5xxxx_ckcu.c" />
+      <file file_name="../../../../library/HT32F5xxxx_Driver/src/ht32f5xxxx_exti.c" />
+      <file file_name="../../../../library/HT32F5xxxx_Driver/src/ht32f5xxxx_flash.c" />
+      <file file_name="../../../../library/HT32F5xxxx_Driver/src/ht32f5xxxx_gpio.c" />
+      <file file_name="../../../../library/HT32F5xxxx_Driver/src/ht32f5xxxx_i2c.c" />
+      <file file_name="../../../../library/HT32F5xxxx_Driver/src/ht32f5xxxx_pwrcu.c" />
+      <file file_name="../../../../library/HT32F5xxxx_Driver/src/ht32f5xxxx_rstcu.c" />
+      <file file_name="../../../../library/HT32F5xxxx_Driver/src/ht32f5xxxx_spi.c" />
+      <file file_name="../../../../library/HT32F5xxxx_Driver/src/ht32f5xxxx_tm.c" />
+      <file file_name="../../../../library/HT32F5xxxx_Driver/src/ht32f5xxxx_usart.c" />
+      <file file_name="../../../../library/HT32F5xxxx_Driver/src/ht32f5xxxx_wdt.c" />
+    </folder>
+    <folder Name="Retarget">
+      <file file_name="../../../../library/HT32F5xxxx_Driver/src/ht32_retarget.c" />
+      <file file_name="../../../../library/HT32F5xxxx_Driver/src/ht32_serial.c" />
+      <file file_name="../../../../library/HT32F5xxxx_Driver/src/printf.c" />
+    </folder>
+    <folder Name="Utilities">
+      <file file_name="../../../../utilities/ht32_board.c" />
+      <file file_name="../../../../utilities/common/i2c_eeprom.c" />
+      <file file_name="../../../../utilities/common/spi_lcd.c" />
+      <file file_name="../../../../utilities/common/spi_flash.c" />
+    </folder>
+    <folder Name="Doc">
+      <file file_name="../readme.txt" />
+    </folder>
+    <configuration Name="HT32"
+      c_preprocessor_definitions="USE_HT32_DRIVER;USE_HT32F52230_SK;USE_HT32F52220_30;USE_MEM_HT32F52230;USE_HT32_CHIP=1"
+      c_user_include_directories="..\\;..\\..\\..\\..\\library\\CMSIS\\Include;..\\..\\..\\..\\library\\Device\\Holtek\\HT32F5xxxx\\Include;..\\..\\..\\..\\library\\HT32F5xxxx_Driver\\inc;..\\..\\..\\..\\library\\HT32_USBD_Library\\inc;..\\..\\..\\..\\utilities"
+    />
+  </project>
+  <configuration Name="HT32" />
+</solution>

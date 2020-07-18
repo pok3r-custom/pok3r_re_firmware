@@ -5,7 +5,7 @@ build:
 
 reassemble:
 	@echo "** Reference Firmware Disassemble"
-	@sh disassemble/reas.sh $(abspath ../reassemble-GCC-Debug/reassemble)
+	@sh disassemble/reas.sh $(abspath ../reassemble-Default/reassemble.exe)
 
 jlink_dir = /opt/SEGGER/JLink
 jlink_lib_dir = /opt/SEGGER/JLink/JLink_Linux_V632g_x86_64
