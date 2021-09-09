@@ -1,0 +1,63 @@
+<!DOCTYPE CrossStudio_Project_File>
+<solution Name="Flashloader" target="8" version="2">
+  <project Name="Flashloader">
+    <configuration
+      Name="Common"
+      Target="Cortex-A5"
+      arm_architecture="v6M"
+      arm_core_type="Cortex-M0"
+      arm_endian="Little"
+      arm_fp_abi="Soft"
+      arm_fpu_type=""
+      arm_instruction_set="Thumb"
+      arm_library_instruction_set="Thumb"
+      arm_library_optimization="Small"
+      arm_linker_fiq_stack_size="0"
+      arm_linker_heap_size="0"
+      arm_linker_irq_stack_size="0"
+      arm_linker_process_stack_size="8"
+      arm_linker_stack_size="256"
+      arm_linker_svc_stack_size="0"
+      arm_simulator_memory_simulation_parameter="RWX 00000000,00100000,FFFFFFFF;RWX 20000000,00010000,CDCDCDCD"
+      arm_target_device_name="Cortex-M0"
+      arm_target_interface_type="JTAG"
+      arm_unaligned_access="No"
+      debug_enable_RTT="No"
+      debug_target_connection="J-Link"
+      gcc_debugging_level="Level 3"
+      gcc_optimization_level="Level 2 for size"
+      linker_keep_symbols="PRGDATA_StartMarker;SEGGER_OFL_Api;FlashDevice;_vectors"
+      linker_memory_map_file="$(ProjectDir)/Setup/MemoryMap.xml"
+      linker_output_format="hex"
+      linker_section_placement_file="$(ProjectDir)/Setup/Placement.xml"
+      linker_section_placements_segments=""
+      speed="1000" />
+    <configuration
+      Name="Debug"
+      arm_architecture="v7M"
+      arm_core_type="Cortex-M3"
+      arm_endian="Little"
+      arm_fpu_type=""
+      arm_target_device_name="Cortex-M3"
+      arm_target_interface_type="SWD"
+      gcc_optimization_level="Level 0"
+      speed="1000" />
+    <folder Name="Src">
+      <file file_name="Src/FlashDev.c" />
+      <file file_name="Src/FlashOS.h" />
+      <file file_name="Src/FlashPrg.c" />
+      <file file_name="Src/SEGGER_OFL_Lib_CortexM_BE.a">
+        <configuration Name="Common" build_exclude_from_build="Yes" />
+      </file>
+      <file file_name="Src/SEGGER_OFL_Lib_CortexM_LE.a" />
+      <file file_name="Src/main.c" />
+      <file file_name="Src/Startup.s" />
+    </folder>
+    <folder Name="Setup">
+      <file file_name="Setup/MemoryMap.xml" />
+      <file file_name="Setup/Placement.xml" />
+    </folder>
+  </project>
+  <configuration Name="Release" />
+  <configuration Name="Debug" />
+</solution>

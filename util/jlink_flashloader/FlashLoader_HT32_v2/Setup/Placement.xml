@@ -1,0 +1,25 @@
+<!DOCTYPE Linker_Placement_File>
+<Root name="RAM Section Placement">
+  <MemorySegment name="RAM">
+    <ProgramSection alignment="4" load="Yes" name="PrgCode" /> <!-- Open flash loader specific: Marks the start of the RAMCode -->
+    <ProgramSection alignment="4" load="Yes" name=".vectors" />
+    <ProgramSection alignment="4" load="Yes" name=".init" />
+    <ProgramSection alignment="4" load="Yes" name=".init_rodata" />
+    <ProgramSection alignment="4" load="Yes" name=".text" />
+    <ProgramSection alignment="4" load="Yes" name=".rodata" />
+    <ProgramSection alignment="4" load="Yes" name=".dtors" />
+    <ProgramSection alignment="4" load="Yes" name=".ctors" />
+    <ProgramSection alignment="4" load="Yes" name=".tdata" />
+    <ProgramSection alignment="4" load="No" name="PrgData" /> <!-- Open flash loader specific: Marks the start of the data section (statics, globals, ...) -->
+    <ProgramSection alignment="4" load="No" name=".data" />
+    <ProgramSection alignment="4" load="No" name=".fast" />
+    <ProgramSection alignment="4" load="No" name=".ARM.exidx" address_symbol="__exidx_start" end_symbol="__exidx_end" />
+    <ProgramSection alignment="4" load="No" name=".bss" />
+    <ProgramSection alignment="4" load="No" name=".non_init" />
+    <ProgramSection alignment="4" size="__HEAPSIZE__" load="No" name=".heap" />
+    <ProgramSection alignment="8" size="__STACKSIZE__" load="No" name=".stack" />
+    <ProgramSection alignment="8" size="__STACKSIZE_PROCESS__" load="No" name=".stack_process" />
+    <ProgramSection alignment="4" load="No" name=".tbss" />
+    <ProgramSection alignment="4" load="Yes" name="DevDscr" /> <!-- Special placement (constant again but it's all RAMCode...). Must be the last section acc. to open flash loader spec. -->
+  </MemorySegment>
+</Root>
