@@ -50,6 +50,16 @@ rgb_bootloader:
 	JLinkExe -Device HT32F1654 -CommanderScript util/flash.jlink
 	rm /tmp/flash.bin
 
+rgb_qmk:
+	cp ../qmk_pok3r_2/vortex_pok3r_rgb_default_60_ansi.bin /tmp/flash.bin
+	JLinkExe -Device HT32F1654 -CommanderScript util/flash.jlink
+	rm /tmp/flash.bin
+
+rgb_vial:
+	cp ../vial-qmk/vortex_pok3r_rgb_vial.bin /tmp/flash.bin
+	JLinkExe -Device HT32F1654 -CommanderScript util/flash.jlink
+	rm /tmp/flash.bin
+
 core_bootloader:
 	cp disassemble/core/builtin_core/firmware_builtin_core.bin /tmp/flash.bin
 	JLinkExe -Device HT32F1654 -CommanderScript util/flash.jlink

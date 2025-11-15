@@ -16,8 +16,9 @@ disassemble/**/*.s.elf
 # IDE Files
 *.user
 *.user.*
-util/jlink_flashloader/FlashLoader_HT32/*.emSession
-util/jlink_flashloader/FlashLoader_HT32/*.jlink
+*.emSession
+util/jlink_flashloader/FlashLoader_HT32/Output/
+util/jlink_flashloader/FlashLoader_HT32_v2/Output/
 *.jdebug
 
 *.id0

@@ -5,12 +5,35 @@ import os
 import time
 import shutil
 import tempfile
+import argparse
+import logging
+import ctypes
+
 import pylink
 
-copy_xml = True
+parser = argparse.ArgumentParser()
+parser.add_argument("--device", default="HT32F1654")
+parser.add_argument("addr", nargs="?", type=lambda v: int(v, 0), default=0)
+parser.add_argument("file", nargs="?")
+parser.add_argument("--verbose", "-v", action="count", default=0)
+args = parser.parse_args()
+
+level = logging.INFO
+if args.verbose > 0:
+    level = logging.DEBUG
+
+logging.basicConfig(level=level, stream=sys.stdout, format="%(name)-15s %(levelname)-5s - %(message)s")
+log = logging.getLogger(__name__)
+
+jlink_log = logging.getLogger("jlink")
+detail_buffer = bytearray()
+
+device_name = args.device
+
+copy_xml = False
 
 xmlpath = os.path.abspath("jlink_flashloader/JLinkDevices.xml")
-devspath = os.path.abspath("jlink_flashloader/Devices")
+devspath = os.path.abspath("jlink_flashloader/Holtek")
 tmpxmlpath = os.path.join(tempfile.gettempdir(), "JLinkDevices.xml")
 tmpdevspath = os.path.join(tempfile.gettempdir(), "Devices")
 
@@ -19,66 +42,79 @@ try:
         shutil.copy(xmlpath, tmpxmlpath)
         shutil.copytree(devspath, tmpdevspath)
 
-    jlink = pylink.JLink()
-    #jlink = pylink.JLink(log=open("log.txt", "w"))
+    # jlink = pylink.JLink()
+    lib = pylink.Library()
+    lib.unload()
+    lib._lib = ctypes.cdll.LoadLibrary("/opt/SEGGER/JLink/libjlinkarm.so")
+    jlink = pylink.JLink(lib)
 
-    print("Library: " + jlink._library._lib._name)
+    def log_handler(text : bytes):
+        jlink_log.info(text.decode("ascii"))
+    jlink.log_handler = log_handler
 
-    print("Devices: " + str(jlink.num_supported_devices()))
+    def detail_log_handler(text : bytes):
+        global detail_buffer
+        detail_buffer += text
+        # log.debug(text)
+        b, d, a = detail_buffer.partition(b"\n")
+        while d:
+            jlink_log.debug(b.strip(b"\r").decode("ascii"))
+            detail_buffer = a
+            b, d, a = detail_buffer.partition(b"\n")
+    jlink.detailed_log_handler = detail_log_handler
+
+    log.info("Library: " + jlink._library._lib._name)
+
+    log.info("Devices: " + str(jlink.num_supported_devices()))
     for i in range(jlink.num_supported_devices()):
         device = jlink.supported_device(i)
-        if device.name == "HT32F1654":
-            print("Found: " + device.name)
+        if device.name == device_name:
+            log.info("Found: " + device.name)
 
-    print("Connect JLink...")
+    log.info("Connect JLink...")
     jlink.open()
 
-    print("XML: %s" % xmlpath)
-    jlink.exec_command("JLinkDevicesXMLPath = " + xmlpath)
+    # print("XML: %s" % xmlpath)
+    # cmd = "JLinkDevicesXMLPath " + xmlpath
+    # print(cmd)
+    # jlink.exec_command(cmd)
 
-    print("Devices: " + str(jlink.num_supported_devices()))
+    log.info("Devices: " + str(jlink.num_supported_devices()))
 
     #print("WORKAROUND: wait for background SEGGER task to timeout")
     #time.sleep(8)
 
-    print("JLink: " + jlink.product_name)
-    print("Hardware: " + jlink.hardware_version)
-    print("Firmware: " + jlink.firmware_version)
+    log.info("JLink: " + jlink.product_name)
+    log.info("Hardware: " + jlink.hardware_version)
+    log.info("Firmware: " + jlink.firmware_version)
 
     #check = 0xFFFFFFE0 + 0xFFFFFFFF + 0xFFFFFFFF + 0xFFFFFFFF + 0xFFFFFFFC
     check = 0xFFFFFFE0 + 0xFFFFFFFF + 0xFFFFFFFF + 0xFFFFFFFF + 0xFFFFFFFF
     check = check & 0xFFFFFFFF
     # print("%X" % check)
 
-    print("Connect Device...")
+    log.info("Connect Device...")
 
     jlink.set_tif(pylink.enums.JLinkInterfaces.SWD)
-    try:
-        # jlink.connect("HT32F1654", 4000, verbose=True)
-        # jlink.connect("HT32F1655", 4000, verbose=True)
-        # jlink.connect("HT32F1755", 4000, verbose=True)
-        # jlink.connect("HT32F52351", 4000, verbose=True)
-        jlink.connect("HT32F52352", 4000, verbose=True)
-    except pylink.errors.JLinkException as e:
-        print(e)
-        pass
+    jlink.connect(device_name, 4000, verbose=True)
 
-    #print(jlink.register_list())
+    if args.file:
+        jlink.halt()
 
-    if len(sys.argv) > 2:
-        addr = int(sys.argv[1], 0)
-        fw = sys.argv[2]
-        print("Flash %04x %s" % (addr, fw))
+        log.info("Erase")
+        jlink.erase()
 
-        jlink.flash_file(fw, addr)
+        log.info("Flash %04x %s" % (args.addr, args.file))
+        jlink.flash_file(args.file, args.addr)
 
     else:
-        addr = 0x0
-        len = 32
-        print("Read %04x %d" % (addr, len))
-        print("".join(["%02X" % x for x in jlink.memory_read(addr, len)]))
+        size = 32
+        log.info("Read %04x %d" % (args.addr, size))
+        data = bytes(jlink.memory_read(args.addr, size))
+        log.info(data.hex())
 
-    print("Done")
+except pylink.errors.JLinkException as e:
+    log.exception(e)
 
 finally:
     if copy_xml:

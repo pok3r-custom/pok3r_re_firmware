@@ -1,0 +1,807 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!-- File naming: <vendor>_<part/series name>.svd -->
+<!--
+  Copyright (C) 2012 ARM Limited. All rights reserved.
+
+  Purpose: System Viewer Description (SVD) Example (Schema Version 1.1)
+           This is a description of a none-existent and incomplete device
+		   for demonstration purposes only.
+
+  Redistribution and use in source and binary forms, with or without
+  modification, are permitted provided that the following conditions are met:
+   - Redistributions of source code must retain the above copyright
+     notice, this list of conditions and the following disclaimer.
+   - Redistributions in binary form must reproduce the above copyright
+     notice, this list of conditions and the following disclaimer in the
+     documentation and/or other materials provided with the distribution.
+   - Neither the name of ARM nor the names of its contributors may be used
+     to endorse or promote products derived from this software without
+     specific prior written permission.
+
+  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+  ARE DISCLAIMED. IN NO EVENT SHALL COPYRIGHT HOLDERS AND CONTRIBUTORS BE
+  LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+  SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+  CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+  POSSIBILITY OF SUCH DAMAGE.
+ -->
+<device schemaVersion="1.2" xmlns:xs="http://www.w3.org/2001/XMLSchema-instance" xs:noNamespaceSchemaLocation="CMSIS-SVD.xsd">
+    <vendor>ARM Ltd.</vendor>
+    <!-- device vendor name -->
+    <vendorID>ARM</vendorID>
+    <!-- device vendor short name -->
+    <name>ARMCM3</name>
+    <!-- name of part-->
+    <series>ARMCM</series>
+    <!-- device series the device belongs to -->
+    <version>1.2</version>
+    <!-- version of this description, adding CMSIS-SVD 1.1 tags -->
+    <description>ARM 32-bit Cortex-M3 Microcontroller based device, CPU clock up to 80MHz, etc. </description>
+    <licenseText>
+        <!-- this license text will appear in header file. \n force line breaks -->
+        ARM Limited (ARM) is supplying this software for use with Cortex-M\n
+        processor based microcontroller, but can be equally used for other\n
+        suitable  processor architectures. This file can be freely distributed.\n
+        Modifications to this file shall be clearly marked.\n
+        \n
+        THIS SOFTWARE IS PROVIDED "AS IS".  NO WARRANTIES, WHETHER EXPRESS, IMPLIED\n
+        OR STATUTORY, INCLUDING, BUT NOT LIMITED TO, IMPLIED WARRANTIES OF\n
+        MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE APPLY TO THIS SOFTWARE.\n
+        ARM SHALL NOT, IN ANY CIRCUMSTANCES, BE LIABLE FOR SPECIAL, INCIDENTAL, OR\n
+        CONSEQUENTIAL DAMAGES, FOR ANY REASON WHATSOEVER.
+    </licenseText>
+    <cpu>
+        <!-- details about the cpu embedded in the device -->
+        <name>CM3</name>
+        <revision>r1p1</revision>
+        <endian>little</endian>
+        <mpuPresent>false</mpuPresent>
+        <fpuPresent>false</fpuPresent>
+        <nvicPrioBits>4</nvicPrioBits>
+        <vendorSystickConfig>false</vendorSystickConfig>
+    </cpu>
+    <addressUnitBits>8</addressUnitBits>
+    <!-- byte addressable memory -->
+    <width>32</width>
+    <!-- bus width is 32 bits -->
+    <!-- default settings implicitly inherited by subsequent sections -->
+    <size>32</size>
+    <!-- this is the default size (number of bits) of all peripherals
+                                                                         and register that do not define "size" themselves -->
+    <access>read-write</access>
+    <!-- default access permission for all subsequent registers -->
+    <resetValue>0x00000000</resetValue>
+    <!-- by default all bits of the registers are initialized to 0 on reset -->
+    <resetMask>0xFFFFFFFF</resetMask>
+    <!-- by default all 32Bits of the registers are used -->
+    <peripherals>
+        <!-- SysTick -->
+        <peripheral>
+            <name>SysTick</name>
+            <description>24Bit System Tick Timer for use in RTOS</description>
+            <baseAddress>0xE000E010</baseAddress>
+            <addressBlock>
+                <offset>0</offset>
+                <size>0x10</size>
+                <usage>registers</usage>
+            </addressBlock>
+            <registers>
+                <register>
+                    <name>CSR</name>
+                    <description>SysTick Control and Status Register</description>
+                    <addressOffset>0</addressOffset>
+                    <size>32</size>
+                    <resetValue>0x4</resetValue>
+                    <resetMask>0xFFFFFFFF</resetMask>
+                    <fields>
+                        <field>
+                            <name>ENABLE</name>
+                            <description>Enable SysTick Timer</description>
+                            <bitOffset>0</bitOffset>
+                            <bitWidth>1</bitWidth>
+                            <access>read-write</access>
+                            <enumeratedValues>
+                                <enumeratedValue>
+                                    <name>0</name>
+                                    <description>disabled</description>
+                                    <value>0</value>
+                                </enumeratedValue>
+                                <enumeratedValue>
+                                    <name>1</name>
+                                    <description>enabled</description>
+                                    <value>1</value>
+                                </enumeratedValue>
+                            </enumeratedValues>
+                        </field>
+                        <field>
+                            <name>TICKINT</name>
+                            <description>Generate Tick Interrupt</description>
+                            <bitOffset>1</bitOffset>
+                            <bitWidth>1</bitWidth>
+                            <access>read-write</access>
+                            <enumeratedValues>
+                                <enumeratedValue>
+                                    <name>0</name>
+                                    <description>Enable SysTick Exception</description>
+                                    <value>0</value>
+                                </enumeratedValue>
+                                <enumeratedValue>
+                                    <name>1</name>
+                                    <description>Disable SysTick Exception</description>
+                                    <value>1</value>
+                                </enumeratedValue>
+                            </enumeratedValues>
+                        </field>
+                        <field>
+                            <name>CLKSOURCE</name>
+                            <description>Source to count from</description>
+                            <bitOffset>2</bitOffset>
+                            <bitWidth>1</bitWidth>
+                            <access>read-write</access>
+                            <enumeratedValues>
+                                <enumeratedValue>
+                                    <name>0</name>
+                                    <description>External Clock</description>
+                                    <value>0</value>
+                                </enumeratedValue>
+                                <enumeratedValue>
+                                    <name>1</name>
+                                    <description>CPU Clock</description>
+                                    <value>1</value>
+                                </enumeratedValue>
+                            </enumeratedValues>
+                        </field>
+                        <field>
+                            <name>COUNTFLAG</name>
+                            <description>SysTick counted to zero</description>
+                            <bitOffset>16</bitOffset>
+                            <bitWidth>1</bitWidth>
+                            <access>read-write</access>
+                        </field>
+                    </fields>
+                </register>
+                <register>
+                    <name>RVR</name>
+                    <description>SysTick Reload Value Register</description>
+                    <addressOffset>0x4</addressOffset>
+                    <resetValue>0</resetValue>
+                    <resetMask>0xFFFFFFFF</resetMask>
+                    <fields>
+                        <field>
+                            <name>RELOAD</name>
+                            <description>Value to auto reload SysTick after reaching zero</description>
+                            <bitOffset>0</bitOffset>
+                            <bitWidth>24</bitWidth>
+                        </field>
+                    </fields>
+                </register>
+                <register>
+                    <name>CVR</name>
+                    <description>SysTick Current Value Register</description>
+                    <addressOffset>0x8</addressOffset>
+                    <resetValue>0</resetValue>
+                    <resetMask>0xFFFFFFFF</resetMask>
+                    <fields>
+                        <field>
+                            <name>CURRENT</name>
+                            <description>Current value</description>
+                            <bitOffset>0</bitOffset>
+                            <bitWidth>24</bitWidth>
+                        </field>
+                    </fields>
+                </register>
+                <register>
+                    <name>CALIB</name>
+                    <description>SysTick Calibration Value Register</description>
+                    <addressOffset>0xC</addressOffset>
+                    <resetValue>0</resetValue>
+                    <resetMask>0xFFFFFFFF</resetMask>
+                    <fields>
+                        <field>
+                            <name>TENMS</name>
+                            <description>Reload value to use for 10ms timing</description>
+                            <bitOffset>0</bitOffset>
+                            <bitWidth>24</bitWidth>
+                            <access>read-only</access>
+                        </field>
+                        <field>
+                            <name>SKEW</name>
+                            <description>Clock Skew</description>
+                            <bitOffset>30</bitOffset>
+                            <bitWidth>1</bitWidth>
+                            <access>read-only</access>
+                            <enumeratedValues>
+                                <enumeratedValue>
+                                    <name>0</name>
+                                    <description>10ms calibration value is exact</description>
+                                    <value>0</value>
+                                </enumeratedValue>
+                                <enumeratedValue>
+                                    <name>1</name>
+                                    <description>10ms calibration value is inexact, because of the clock frequency</description>
+                                    <value>1</value>
+                                </enumeratedValue>
+                            </enumeratedValues>
+                        </field>
+                        <field>
+                            <name>NOREF</name>
+                            <description>No Ref</description>
+                            <bitOffset>31</bitOffset>
+                            <bitWidth>1</bitWidth>
+                            <access>read-only</access>
+                            <enumeratedValues>
+                                <enumeratedValue>
+                                    <name>0</name>
+                                    <description>Ref Clk available</description>
+                                    <value>0</value>
+                                </enumeratedValue>
+                                <enumeratedValue>
+                                    <name>1</name>
+                                    <description>Ref Clk not available</description>
+                                    <value>1</value>
+                                </enumeratedValue>
+                            </enumeratedValues>
+                        </field>
+                    </fields>
+                </register>
+            </registers>
+        </peripheral>
+        <!-- WDT -->
+        <peripheral>
+            <name>WDT</name>
+            <description>Watchdog Timer</description>
+            <baseAddress>0x40001000</baseAddress>
+            <addressBlock>
+                <offset>0</offset>
+                <size>0x10</size>
+                <usage>registers</usage>
+            </addressBlock>
+            <interrupt>
+                <name>WDT</name>
+                <value>1</value>
+            </interrupt>
+            <registers>
+                <register>
+                    <name>CSR</name>
+                    <description>Watchdog Control and Status Register</description>
+                    <addressOffset>0</addressOffset>
+                    <resetValue>0x4</resetValue>
+                    <resetMask>0xFFFFFFFF</resetMask>
+                </register>
+            </registers>
+        </peripheral>
+        <!-- SCB -->
+        <peripheral>
+            <name>SCB</name>
+            <description>System Control Block</description>
+            <baseAddress>0xE000ED00</baseAddress>
+            <addressBlock>
+                <offset>0</offset>
+                <size>0x40</size>
+                <usage>registers</usage>
+            </addressBlock>
+            <registers>
+                <register>
+                    <name>CPUID</name>
+                    <addressOffset>0x00</addressOffset>
+                    <access>read</access>
+                    <description>CPUID Base Register</description>
+                    <fields>
+                        <field>
+                            <name>IMPLEMENTER</name>
+                            <bitRange>[31:24]</bitRange>
+                        </field>
+                        <field>
+                            <name>VARIANT</name>
+                            <bitRange>[23:20]</bitRange>
+                        </field>
+                        <field>
+                            <name>PARTNO</name>
+                            <bitRange>[15:4]</bitRange>
+                        </field>
+                        <field>
+                            <name>REVISION</name>
+                            <bitRange>[3:0]</bitRange>
+                        </field>
+                    </fields>
+                </register>
+                <register>
+                    <name>ICSR</name>
+                    <addressOffset>0x04</addressOffset>
+                    <description>Interrupt Control State Register</description>
+                    <fields>
+                        <field>
+                            <name>NMIPENDSET</name>
+                            <bitRange>[31:31]</bitRange>
+                            <description>Setting this bit will activate an NMI. Since NMI is higher priority than other exceptions, the NMI exception will activate as soon as it is registered.</description>
+                        </field>
+                        <field>
+                            <name>PENDSVSET</name>
+                            <bitRange>[28:28]</bitRange>
+                            <description>Set a pending PendSV interrupt. This is normally used to request a context switch. Reads back with current state (1 if Pending, 0 if not).</description>
+                        </field>
+                        <field>
+                            <name>PENDSVCLR</name>
+                            <bitRange>[27:27]</bitRange>
+                            <description>Clear a pending PendSV interrupt.</description>
+                        </field>
+                        <field>
+                            <name>PENDSTSET</name>
+                            <bitRange>[26:26]</bitRange>
+                            <description>Set a pending SysTick. Reads back with current state (1 if Pending, 0 if not).</description>
+                        </field>
+                        <field>
+                            <name>PENDSTCLR</name>
+                            <bitRange>[25:25]</bitRange>
+                            <description>Clear a pending SysTick (whether set here or by the timer hardware).</description>
+                        </field>
+                        <field>
+                            <name>ISRPREEMPT</name>
+                            <bitRange>[23:23]</bitRange>
+                            <description>If set, a pending exception will be serviced on exit from the debug halt state.</description>
+                        </field>
+                        <field>
+                            <name>ISRPENDING</name>
+                            <bitRange>[22:22]</bitRange>
+                            <description>Indicates if an external configurable (NVIC generated) interrupt is pending.</description>
+                        </field>
+                        <field>
+                            <name>VECTPENDING</name>
+                            <bitRange>[20:12]</bitRange>
+                            <description>Indicates the exception number for the highest priority pending exception. value == 0: no pending exceptions</description>
+                        </field>
+                        <field>
+                            <name>RETTOBASE</name>
+                            <bitRange>[11:11]</bitRange>
+                            <description>This bit is 1 when the set of all active exceptions minus the IPSR_current_exception yields the empty set.</description>
+                        </field>
+                        <field>
+                            <name>VECTACTIVE</name>
+                            <bitRange>[8:0]</bitRange>
+                            <description>0:thread mode. &gt;1:the exception number for the current executing exception</description>
+                        </field>
+                    </fields>
+                </register>
+                <register>
+                    <name>VTOR</name>
+                    <addressOffset>0x08</addressOffset>
+                    <description>Vector Table Offset Register</description>
+                    <fields>
+                        <field>
+                            <name>TBLBASE</name>
+                            <bitRange>[29:29]</bitRange>
+                            <description>0:Table base is in CODE, base address 0x00000000. 1:Table base is in RAM, base address 0x20000000</description>
+                        </field>
+                        <field>
+                            <name>TBLOFF</name>
+                            <bitRange>[28:7]</bitRange>
+                            <description>Table offset address[28:7] from the base address defined by TBLBASE.</description>
+                        </field>
+                    </fields>
+                </register>
+                <register>
+                    <name>AIRCR</name>
+                    <addressOffset>0x0C</addressOffset>
+                    <description>Application Interrupt/Reset Control Register</description>
+                    <fields>
+                        <field>
+                            <name>VECTKEYSTAT</name>
+                            <bitRange>[31:16]</bitRange>
+                            <description>Key and status</description>
+                        </field>
+                        <field>
+                            <name>ENDIANESS</name>
+                            <bitRange>[15:15]</bitRange>
+                            <description>Big endian</description>
+                        </field>
+                        <field>
+                            <name>PRIGROUP</name>
+                            <bitRange>[10:8]</bitRange>
+                            <description>Causes a signal to be asserted to the outer system that indicates a reset is requested.</description>
+                        </field>
+                        <field>
+                            <name>SYSRESETREQ</name>
+                            <bitRange>[2:2]</bitRange>
+                            <description>Interrupt priority grouping</description>
+                        </field>
+                        <field>
+                            <name>VECTCLRACTIVE</name>
+                            <bitRange>[1:1]</bitRange>
+                            <description>Clear active vector</description>
+                        </field>
+                        <field>
+                            <name>VECTRESET</name>
+                            <bitRange>[0:0]</bitRange>
+                            <description>System Reset</description>
+                        </field>
+                    </fields>
+                </register>
+                <register>
+                    <name>SCR</name>
+                    <addressOffset>0x10</addressOffset>
+                    <description>System Control Register</description>
+                    <fields>
+                        <field>
+                            <name>SEVONPEND</name>
+                            <bitRange>[4:4]</bitRange>
+                            <description>WFE to wake up when an interrupt moves from inactive to pended.</description>
+                        </field>
+                        <field>
+                            <name>SLEEPDEEP</name>
+                            <bitRange>[2:2]</bitRange>
+                            <description>Sleep deep</description>
+                        </field>
+                        <field>
+                            <name>SLEEPONEXIT</name>
+                            <bitRange>[1:1]</bitRange>
+                            <description>Sleep on exit when returning from Handler mode to Thread mode.</description>
+                        </field>
+                    </fields>
+                </register>
+                <register>
+                    <name>CCR</name>
+                    <addressOffset>0x14</addressOffset>
+                    <description>Configuration and Control Register</description>
+                    <fields>
+                        <field>
+                            <name>STKALIGN</name>
+                            <bitRange>[9:9]</bitRange>
+                            <description>1: on exception entry, the SP used prior to the exception is adjusted to be 8-byte aligned and the context to restore it is saved.0: only 4-byte alignment is guaranteed for the SP used prior to the exception on exception entry.</description>
+                        </field>
+                        <field>
+                            <name>BFHFNMIGN</name>
+                            <bitRange>[8:8]</bitRange>
+                            <description>When enabled (=1), this causes handlers running at priority -1 and -2 to ignore Precise data access faults. When disabled (=0), these bus faults will cause a lock-up as explained in Unrecoverable exception cases on page B1-43.</description>
+                        </field>
+                        <field>
+                            <name>DIV_0_TRP</name>
+                            <bitRange>[4:4]</bitRange>
+                            <description>Enable bit (=1) for trap on Divide by 0.</description>
+                        </field>
+                        <field>
+                            <name>UNALIGN_TRP</name>
+                            <bitRange>[3:3]</bitRange>
+                            <description>Enable bit (=1) for trapping unaligned half or full word accesses.</description>
+                        </field>
+                        <field>
+                            <name>USERSETMPEND</name>
+                            <bitRange>[1:1]</bitRange>
+                            <description>When this bit is set (=1), the core allows unprivileged (user) code to write the Software Trigger Interrupt register. See Software Trigger Interrupt Register on page B3-23.</description>
+                        </field>
+                        <field>
+                            <name>NONBASETHRDENA</name>
+                            <bitRange>[0:0]</bitRange>
+                            <description>0 (default): Thread state can only be entered at the Base level of activation (will fault if attempted to another level of activation).</description>
+                        </field>
+                    </fields>
+                </register>
+                <register>
+                    <name>SHPR1</name>
+                    <addressOffset>0x18</addressOffset>
+                    <description>System Handlers 4-7 Priority Register</description>
+                </register>
+                <register>
+                    <name>SHPR2</name>
+                    <addressOffset>0x1C</addressOffset>
+                    <description>System Handlers 8-11 Priority Register</description>
+                </register>
+                <register>
+                    <name>SHPR3</name>
+                    <addressOffset>0x20</addressOffset>
+                    <description>System Handlers 12-15 Priority Register</description>
+                </register>
+                <register>
+                    <name>SHCSR</name>
+                    <addressOffset>0x24</addressOffset>
+                    <description>System Handler Control and State Register</description>
+                    <fields>
+                        <field>
+                            <name>USGFAULTENA</name>
+                            <bitRange>[18:18]</bitRange>
+                            <description>Enable for UsageFault. </description>
+                        </field>
+                        <field>
+                            <name>BUSFAULTENA</name>
+                            <bitRange>[17:17]</bitRange>
+                            <description>Enable for BusFault. </description>
+                        </field>
+                        <field>
+                            <name>MEMFAULTENA</name>
+                            <bitRange>[16:16]</bitRange>
+                            <description>Enable for MemManage fault.</description>
+                        </field>
+                        <field>
+                            <name>SVCALLPENDED</name>
+                            <bitRange>[15:15]</bitRange>
+                            <description>Reads as 1 if SVCall is Pending.</description>
+                        </field>
+                        <field>
+                            <name>BUSFAULTPENDED</name>
+                            <bitRange>[14:14]</bitRange>
+                            <description>Reads as 1 if BusFault is Pending.</description>
+                        </field>
+                        <field>
+                            <name>MEMFAULTPENDED</name>
+                            <bitRange>[13:13]</bitRange>
+                            <description>Reads as 1 if MemManage is Pending.</description>
+                        </field>
+                        <field>
+                            <name>USGFAULTPENDED</name>
+                            <bitRange>[12:12]</bitRange>
+                            <description>Reads as 1 if UsageFault is Pending.</description>
+                        </field>
+                        <field>
+                            <name>SYSTICKACT</name>
+                            <bitRange>[11:11]</bitRange>
+                            <description>Reads as 1 if SysTick is Active.</description>
+                        </field>
+                        <field>
+                            <name>PENDSVACT</name>
+                            <bitRange>[10:10]</bitRange>
+                            <description>Reads as 1 if PendSV is Active.</description>
+                        </field>
+                        <field>
+                            <name>MONITORACT</name>
+                            <bitRange>[8:8]</bitRange>
+                            <description>Reads as 1 if the Monitor is Active.</description>
+                        </field>
+                        <field>
+                            <name>SVCALLACT</name>
+                            <bitRange>[7:7]</bitRange>
+                            <description>Reads as 1 if SVCall is Active.</description>
+                        </field>
+                        <field>
+                            <name>USGFAULTACT</name>
+                            <bitRange>[3:3]</bitRange>
+                            <description>Reads as 1 if UsageFault is Active.</description>
+                        </field>
+                        <field>
+                            <name>BUSFAULTACT</name>
+                            <bitRange>[1:1]</bitRange>
+                            <description>Reads as 1 if BusFault is Active.</description>
+                        </field>
+                        <field>
+                            <name>MEMFAULTACT</name>
+                            <bitRange>[0:0]</bitRange>
+                            <description>Reads as 1 if MemManage is Active.</description>
+                        </field>
+                    </fields>
+                </register>
+                <register>
+                    <name>CFSR</name>
+                    <addressOffset>0x28</addressOffset>
+                    <description>Configurable Fault Status Registers</description>
+                </register>
+                <register>
+                    <name>BFSR</name>
+                    <addressOffset>0x29</addressOffset>
+                    <size>8</size>
+                    <description>BusFault Status Register</description>
+                    <fields>
+                        <field>
+                            <name>BFARVALID</name>
+                            <bitRange>[7:7]</bitRange>
+                            <description>This bit is set if the BFAR register has valid contents.</description>
+                        </field>
+                        <field>
+                            <name>STKERR</name>
+                            <bitRange>[4:4]</bitRange>
+                            <description>This bit indicates a derived bus fault has occurred on exception entry.</description>
+                        </field>
+                        <field>
+                            <name>UNSTKERR</name>
+                            <bitRange>[3:3]</bitRange>
+                            <description>This bit indicates a derived bus fault has occurred on exception return.</description>
+                        </field>
+                        <field>
+                            <name>IMPRECISERR</name>
+                            <bitRange>[2:2]</bitRange>
+                            <description>Imprecise data access error.</description>
+                        </field>
+                        <field>
+                            <name>PRECISERR</name>
+                            <bitRange>[1:1]</bitRange>
+                            <description>Precise data access error. The BFAR is written with the faulting address.</description>
+                        </field>
+                        <field>
+                            <name>IBUSERR</name>
+                            <bitRange>[0:0]</bitRange>
+                            <description>This bit indicates a bus fault on an instruction prefetch.</description>
+                        </field>
+                    </fields>
+                </register>
+                <register>
+                    <name>UFSR</name>
+                    <addressOffset>0x2A</addressOffset>
+                    <size>16</size>
+                    <description>UsageFault Status Register</description>
+                    <fields>
+                        <field>
+                            <name>DIVBYZERO</name>
+                            <bitRange>[9:9]</bitRange>
+                            <description>Divide by zero error. When SDIV or UDIV instruction is used with a divisor of 0, this fault will occur if DIV_0_TRP is enabled.</description>
+                        </field>
+                        <field>
+                            <name>UNALIGNED</name>
+                            <bitRange>[8:8]</bitRange>
+                            <description>Unaligned access error. Multi-word accesses always fault if not word aligned. Unaligned word and halfwords can be configured to fault (UNALIGN_TRP is enabled)</description>
+                        </field>
+                        <field>
+                            <name>NOCP</name>
+                            <bitRange>[3:3]</bitRange>
+                            <description>Coprocessor access error (the coprocessor is disabled or not present)</description>
+                        </field>
+                        <field>
+                            <name>INVPC</name>
+                            <bitRange>[2:2]</bitRange>
+                            <description>Integrity check error on EXC_RETURN.</description>
+                        </field>
+                        <field>
+                            <name>INVSTATE</name>
+                            <bitRange>[1:1]</bitRange>
+                            <description>Invalid EPSR.T bit or illegal EPSR.IT bits for executing instruction</description>
+                        </field>
+                        <field>
+                            <name>UNDEFINSTR</name>
+                            <bitRange>[0:0]</bitRange>
+                            <description>Undefined instruction executed (including those associated with an enabled Coprocessor).</description>
+                        </field>
+                    </fields>
+                </register>
+                <register>
+                    <name>HFSR</name>
+                    <addressOffset>0x2C</addressOffset>
+                    <description>Hard Fault Status Register</description>
+                    <fields>
+                        <field>
+                            <name>DEBUGEVT</name>
+                            <bitRange>[31:31]</bitRange>
+                            <description>Debug event, and the Debug Fault Status Register has been updated. Only set when halting debug is disabled (C_DEBUGEN = 0)</description>
+                        </field>
+                        <field>
+                            <name>FORCED</name>
+                            <bitRange>[30:30]</bitRange>
+                            <description>Configurable fault cannot be activated due to priority or because it is disabled. Priority escalated to a HardFault exception.</description>
+                        </field>
+                        <field>
+                            <name>VECTTBL</name>
+                            <bitRange>[1:1]</bitRange>
+                            <description>Fault was due to vector table read on exception processing.</description>
+                        </field>
+                    </fields>
+                </register>
+                <register>
+                    <name>DFSR</name>
+                    <addressOffset>0x30</addressOffset>
+                    <description>Debug Fault Status Register</description>
+                    <fields>
+                        <field>
+                            <name>EXTERNAL</name>
+                            <bitRange>[4:4]</bitRange>
+                            <description>An asynchronous exception generated due to the assertion of EDBGRQ.</description>
+                        </field>
+                        <field>
+                            <name>VCATCH</name>
+                            <bitRange>[3:3]</bitRange>
+                            <description>Vector catch triggered. Corresponding FSR will contain the primary cause of the exception.</description>
+                        </field>
+                        <field>
+                            <name>DWTTRAP</name>
+                            <bitRange>[2:2]</bitRange>
+                            <description>Data Watchpoint and Trace trap. Indicates that the core halted due to at least one DWT trap event.</description>
+                        </field>
+                        <field>
+                            <name>BKPT</name>
+                            <bitRange>[1:1]</bitRange>
+                            <description>BKPT instruction executed or breakpoint match in FPB.</description>
+                        </field>
+                        <field>
+                            <name>HALTED</name>
+                            <bitRange>[0:0]</bitRange>
+                            <description>Halt request, including step debug command. Stopped on next instruction.</description>
+                        </field>
+                    </fields>
+                </register>
+                <register>
+                    <name>MMAR</name>
+                    <addressOffset>0x34</addressOffset>
+                    <description>MemManage Address Register</description>
+                </register>
+                <register>
+                    <name>BFAR</name>
+                    <addressOffset>0x38</addressOffset>
+                    <description>BusFault Address Register</description>
+                </register>
+                <register>
+                    <name>AFSR</name>
+                    <addressOffset>0x3C</addressOffset>
+                    <description>Auxiliary Fault Status Register</description>
+                </register>
+            </registers>
+        </peripheral>
+        <!-- NVIC -->
+        <peripheral>
+            <name>NVIC</name>
+            <description>Nested Vectored Interrupt Controller</description>
+            <baseAddress>0xE000E000</baseAddress>
+            <addressBlock>
+                <offset>0</offset>
+                <size>0xF04</size>
+                <usage>registers</usage>
+            </addressBlock>
+            <registers>
+                <register>
+                    <name>ISER0</name>
+                    <addressOffset>0x100</addressOffset>
+                    <description>Irq 0 to 31 Set Enable Register</description>
+                </register>
+                <register>
+                    <name>ISER1</name>
+                    <addressOffset>0x104</addressOffset>
+                    <description>Irq 32 to 63 Set Enable Register</description>
+                </register>
+                <register>
+                    <name>ICER0</name>
+                    <addressOffset>0x180</addressOffset>
+                    <description>Irq 0 to 31 Clear Enable Register</description>
+                </register>
+                <register>
+                    <name>ICER1</name>
+                    <addressOffset>0x184</addressOffset>
+                    <description>Irq 32 to 63 Clear Enable Register</description>
+                </register>
+                <register>
+                    <name>ISPR0</name>
+                    <addressOffset>0x200</addressOffset>
+                    <description>Irq 0 to 31 Set Pending Register</description>
+                </register>
+                <register>
+                    <name>ISPR1</name>
+                    <addressOffset>0x204</addressOffset>
+                    <description>Irq 32 to 63 Set Pending Register</description>
+                </register>
+                <register>
+                    <name>ICPR0</name>
+                    <addressOffset>0x280</addressOffset>
+                    <description>Irq 0 to 31 Clear Pending Register</description>
+                </register>
+                <register>
+                    <name>ICPR1</name>
+                    <addressOffset>0x284</addressOffset>
+                    <description>Irq 32 to 63 Clear Pending Register</description>
+                </register>
+                <register>
+                    <name>IABR0</name>
+                    <addressOffset>0x300</addressOffset>
+                    <description>Irq 0 to 31 Active Status Register</description>
+                </register>
+                <register>
+                    <name>IABR1</name>
+                    <addressOffset>0x304</addressOffset>
+                    <description>Irq 32 to 63 Active Status Register</description>
+                </register>
+                <register>
+                    <name>IPR0</name>
+                    <addressOffset>0x400</addressOffset>
+                    <description>Irq 0 to 31 Priority-Level Register</description>
+                </register>
+                <register>
+                    <name>IPR1</name>
+                    <addressOffset>0x404</addressOffset>
+                    <description>Irq 32 to 63 Priority-Level Register</description>
+                </register>
+                <register>
+                    <name>STIR</name>
+                    <addressOffset>0xF00</addressOffset>
+                    <access>write</access>
+                    <description>Software Trigger Interrupt Register</description>
+                </register>
+            </registers>
+        </peripheral>
+    </peripherals>
+</device>

@@ -1,0 +1,3035 @@
+Peripherals,HT32F1654,HT32F1653
+Main Flash (KB),63,3
+Option Btes Flash,1,1
+SRAM (KB),16,8
+Time s,MCTM,
+"",GPTM,
+"",BFTM,
+"",RTC,1
+"",WDT,1
+Commnication,CSIF,1
+USB,1,
+SCI,1,
+USART,,
+UART,,
+SPI,,
+I C,,
+I S,1,
+EBI,1,
+CRC,1,
+GPIO,Up to9,
+EXTI,16,
+"1-bit ADCNmbe  of channels",1,
+"",Max. 16 Channels,
+OPA/Compa ato,,
+CPU f eqenc,Up to 7MHz,
+Ope ating voltage,.7 V ~ 3.6 V,
+Ope ating tempe ate,-0 °C ~ +8°C,
+"",,,,
+"",,,,
+"",TPIU,SW-DP,,
+"","Co texTM-M3P ocessofMax: 7MHz",,"Flash MemInte fac",
+"",,,,
+"",,,,
+"",,,,
+"","PDMACont olRegiste s","FMCCont olRegiste s","GPIOA~E",
+"",,,,
+"AHBPe iphe als","CRC-16/3",,,
+NVIC,,,,
+"",,,,"Powe ed bVDD18POR1.8 VPLLfMax: 1MHz",,,
+"",,,,,,,"POR1.8 V"
+"Flash MemInte fac",,"FlashMemo",,,,,
+"",,,,,,,
+"",,,,,,,
+"",,,,,,,"PLLfMax: 1MHz"
+"",,,,,,,
+"",,,,,,,
+"PDMACont olRegiste s","FMCCont olRegiste s","GPIOA~E","CKCU/RSTCUCont ol Registe s",,,,
+"HSE~ 16 MHz",,,,,,,
+"AHBPe iphe als","CRC-16/3","USBCont ol/DataRegiste s",,,,,
+"",,,,,,,
+"",,,,,,,
+"",,,,,,,
+"Flash MemInte fac",
+"FlashMemo"
+"Powe ed bVDD18POR1.8 VPLLfMax: 1MHz"
+"PLLfMax: 1MHz"
+""
+"Powe ed bVDD18POR1.8 VPLLfMax: 1MHz"
+"POR1.8 V"
+""
+"",
+"",
+"",
+"",
+NVIC,
+"",
+Registe s,Registe s,A~E,Cont ol Registe s
+"AHBPe iphe als","CRC-16/3","USBCont ol/DataRegiste s",
+"SRAMCont olle"
+SR,M
+"",,,,
+"",,,,"HSE~ 16 MHz"
+"",,,,
+"",,,,
+"",,,,
+"",,,"HSI8 MHz",
+"",,,,
+"",,,,
+"",,,"LDO1.8 V",
+"",,,,
+"BODLVD",,,,
+"",,,,
+""
+""
+"",
+"PDMA8 Channels"
+"Exte nal BsInte afce"
+"LDO1.8 V"
+"",
+"",
+""
+"","SRAMCont olleSRAMPDMAExte nal Bs8 ChannelsInte afceBs Mat ixAHB to APBUSBB idgeDeviceICodeDCodeSstemUSART0WDTDMAeqestUART0USART1SPI0IntepteqestUART1ISSPI1AAFIOIC 0 ~ 1EXTIGPTM 0 ~ 1MCTM0BFTM 0 ~ 1MCTM1SCI",,,"SRAMCont olle",SR,M,,,,,8 MHz,,,,,,,,
+"",,,,,,,,,,,,,,,,,,,
+"",,,,,,,,,,,,,,,,"LDO1.8 V",,,
+"",,"PDMA8 Channels",,,,,,,,,,,,,,,,,
+"",,,,,,,,,,,,,,,,,,,
+"",,,,,,,,"Exte nal BsInte afce",,,,,,,,,,,
+"",,,,,,,,,,,,,,,,,,,
+"",,,,,,,,,,,,,,,,,,,
+"",,,,,,,,,,,,,,,,"BODLVD",,,
+"",,,,,,,,,,,,,,,,,,,
+"",,,,,,,,"AHB to APBB idge","USBDevice",,,,,,,,,,
+"",,,,,,,,,"AHB to APBB idge","AHB to APBB idge",,,,,,,,,
+"",,,,,,,,,,,,,,,,,,,
+"",,,,,,,,,,,,,,,,,,,
+"",,,,,,,,,,,,,,,,,,,
+"",,,,,,,,,,,,,,,,,,,
+"",,,,,,,,,,,,,,,,,,,
+"",,,,,,,,,,,,,,,,,,,
+"",,,,,,,,,,,,,,,,,,,
+"",,,,,,,,,,,,,,,,,,,
+"",,,,,,"SART0DMA",,,,,,,,,,,,,
+"",,,,,,,,,,,,,,,,,,,
+"",,,,,,,,,,,,,,,,,,,
+"",,,,,,,,,,,,,,,,,,,
+"",,,,SART0,,,,,,,,,,,,,,,
+"",,,,,,,,,,,,,WDT,,,,,,
+"",,,,,,,,,,,,,,,,,,,
+"",,,eq,,,,,,,,,,,,,,,,
+"",,,,,,,,,,,,,,,,,,,
+"",,,,,ART0,,,Intept,qe,t,,,,,,,,,
+"",,,,,,,,,,,,,,,,,,,
+"",,,,,,,,,,,,,,,,,,,
+"",,,,,,,,,,,,,,,,,,,
+"",,,,,,,,,,,,,,,,,,,
+"",,,,SPI0,,,,,RT1,,,,,,,,,,
+"",,,,,,,,,,,,,,,,,,,
+"",,,,,,,,,,,,,,,,,,,
+"",,,,,,,,,,,,,,,,,,,
+"",,,,,,IS,,,,,PI1,,,,,,,,
+"",,,,,,,,,,AF,,,,,,,,,
+"",,,,,,,,,,,,,,,,,,,
+"",,,,AFIO,,,,,,,,,,,,,,,
+"",,,,,,,,,,,,,,,,,,,
+"",,,,,,,,,,,,,,,,,,,
+"",,,,,,,,,,,,,,,,,,,
+"",,,,,,,,,,,,,,,,,,,
+"",,,,EXTI,,,,,,,,,,,,,,,
+"",,,,,,,,,,,,,,,,,,,
+"",,,,,,,,M 0 ~ 1,,,,,,,,,,,
+"",,,,,,,,,,,,,,,,,,,
+"",,,,CTM0,,,,,,,,,,,,,,,
+"",,,,,,,,,,,,,,,,,,,
+"",,,,,,,,,,,,,,,,,,,
+"",,,,,,,,,,,,,,,,,,,
+"",,,,,,,M 0 ~ 1,,,,,,,,,,,,
+"",,,,CTM1,,,,,,,,,,,,,,,
+"",,,,,,,,,,,,,,,,,,,
+"",,,,,,,,,,,,,,,,,,,
+"",,,,SCI,,,,,,,,,,,,,,,
+"",,,,,,,,,,,,,,,,,,,
+"",,,,,,,,,,,,,,,,,,,
+"",,,,,,,,,,,,,,,,,,,
+"",,,,,,,,,,,,,,,,,,,
+"SRAMCont olleSRAMPDMAExte nal Bs8 ChannelsInte afceBs Mat ixAHB to APBUSBB idgeDeviceICodeDCodeSstemUSART0WDTDMAeqestUART0USART1SPI0IntepteqestUART1ISSPI1AAFIOIC 0 ~ 1EXTIGPTM 0 ~ 1MCTM0BFTM 0 ~ 1MCTM1SCI"
+t
+""
+""
+""
+"SRAMCont olleSRAMPDMAExte nal Bs8 ChannelsInte afceBs Mat ixAHB to APBUSBB idgeDeviceICodeDCodeSstemUSART0WDTDMAeqestUART0USART1SPI0IntepteqestUART1ISSPI1AAFIOIC 0 ~ 1EXTIGPTM 0 ~ 1MCTM0BFTM 0 ~ 1MCTM1SCI",
+t,
+"SRAMCont olleSRAMPDMAExte nal Bs8 ChannelsInte afceBs Mat ixAHB to APBUSBB idgeDeviceICodeDCodeSstemUSART0WDTDMAeqestUART0USART1SPI0IntepteqestUART1ISSPI1AAFIOIC 0 ~ 1EXTIGPTM 0 ~ 1MCTM0BFTM 0 ~ 1MCTM1SCI"
+""
+"SRAMCont olleSRAMPDMAExte nal Bs8 ChannelsInte afceBs Mat ixAHB to APBUSBB idgeDeviceICodeDCodeSstemUSART0WDTDMAeqestUART0USART1SPI0IntepteqestUART1ISSPI1AAFIOIC 0 ~ 1EXTIGPTM 0 ~ 1MCTM0BFTM 0 ~ 1MCTM1SCI"
+""
+""
+"SRAMCont olleSRAMPDMAExte nal Bs8 ChannelsInte afceBs Mat ixAHB to APBUSBB idgeDeviceICodeDCodeSstemUSART0WDTDMAeqestUART0USART1SPI0IntepteqestUART1ISSPI1AAFIOIC 0 ~ 1EXTIGPTM 0 ~ 1MCTM0BFTM 0 ~ 1MCTM1SCI",,
+"",,
+"",,
+"USBDevice",,
+"",,
+"SRAMCont olleSRAMPDMAExte nal Bs8 ChannelsInte afceBs Mat ixAHB to APBUSBB idgeDeviceICodeDCodeSstemUSART0WDTDMAeqestUART0USART1SPI0IntepteqestUART1ISSPI1AAFIOIC 0 ~ 1EXTIGPTM 0 ~ 1MCTM0BFTM 0 ~ 1MCTM1SCI"
+""
+""
+"SRAMCont olleSRAMPDMAExte nal Bs8 ChannelsInte afceBs Mat ixAHB to APBUSBB idgeDeviceICodeDCodeSstemUSART0WDTDMAeqestUART0USART1SPI0IntepteqestUART1ISSPI1AAFIOIC 0 ~ 1EXTIGPTM 0 ~ 1MCTM0BFTM 0 ~ 1MCTM1SCI"
+t
+""
+"SRAMCont olleSRAMPDMAExte nal Bs8 ChannelsInte afceBs Mat ixAHB to APBUSBB idgeDeviceICodeDCodeSstemUSART0WDTDMAeqestUART0USART1SPI0IntepteqestUART1ISSPI1AAFIOIC 0 ~ 1EXTIGPTM 0 ~ 1MCTM0BFTM 0 ~ 1MCTM1SCI",
+t,
+"SRAMCont olleSRAMPDMAExte nal Bs8 ChannelsInte afceBs Mat ixAHB to APBUSBB idgeDeviceICodeDCodeSstemUSART0WDTDMAeqestUART0USART1SPI0IntepteqestUART1ISSPI1AAFIOIC 0 ~ 1EXTIGPTM 0 ~ 1MCTM0BFTM 0 ~ 1MCTM1SCI"
+t
+""
+"SRAMCont olleSRAMPDMAExte nal Bs8 ChannelsInte afceBs Mat ixAHB to APBUSBB idgeDeviceICodeDCodeSstemUSART0WDTDMAeqestUART0USART1SPI0IntepteqestUART1ISSPI1AAFIOIC 0 ~ 1EXTIGPTM 0 ~ 1MCTM0BFTM 0 ~ 1MCTM1SCI",
+"",
+"SRAMCont olleSRAMPDMAExte nal Bs8 ChannelsInte afceBs Mat ixAHB to APBUSBB idgeDeviceICodeDCodeSstemUSART0WDTDMAeqestUART0USART1SPI0IntepteqestUART1ISSPI1AAFIOIC 0 ~ 1EXTIGPTM 0 ~ 1MCTM0BFTM 0 ~ 1MCTM1SCI"
+"SART0DMA"
+""
+"SRAMCont olleSRAMPDMAExte nal Bs8 ChannelsInte afceBs Mat ixAHB to APBUSBB idgeDeviceICodeDCodeSstemUSART0WDTDMAeqestUART0USART1SPI0IntepteqestUART1ISSPI1AAFIOIC 0 ~ 1EXTIGPTM 0 ~ 1MCTM0BFTM 0 ~ 1MCTM1SCI"
+""
+"SRAMCont olleSRAMPDMAExte nal Bs8 ChannelsInte afceBs Mat ixAHB to APBUSBB idgeDeviceICodeDCodeSstemUSART0WDTDMAeqestUART0USART1SPI0IntepteqestUART1ISSPI1AAFIOIC 0 ~ 1EXTIGPTM 0 ~ 1MCTM0BFTM 0 ~ 1MCTM1SCI"
+""
+"SRAMCont olleSRAMPDMAExte nal Bs8 ChannelsInte afceBs Mat ixAHB to APBUSBB idgeDeviceICodeDCodeSstemUSART0WDTDMAeqestUART0USART1SPI0IntepteqestUART1ISSPI1AAFIOIC 0 ~ 1EXTIGPTM 0 ~ 1MCTM0BFTM 0 ~ 1MCTM1SCI"
+"USBDevice"
+"SRAMCont olleSRAMPDMAExte nal Bs8 ChannelsInte afceBs Mat ixAHB to APBUSBB idgeDeviceICodeDCodeSstemUSART0WDTDMAeqestUART0USART1SPI0IntepteqestUART1ISSPI1AAFIOIC 0 ~ 1EXTIGPTM 0 ~ 1MCTM0BFTM 0 ~ 1MCTM1SCI"
+""
+""
+"SRAMCont olleSRAMPDMAExte nal Bs8 ChannelsInte afceBs Mat ixAHB to APBUSBB idgeDeviceICodeDCodeSstemUSART0WDTDMAeqestUART0USART1SPI0IntepteqestUART1ISSPI1AAFIOIC 0 ~ 1EXTIGPTM 0 ~ 1MCTM0BFTM 0 ~ 1MCTM1SCI"
+t
+""
+""
+""
+"SRAMCont olleSRAMPDMAExte nal Bs8 ChannelsInte afceBs Mat ixAHB to APBUSBB idgeDeviceICodeDCodeSstemUSART0WDTDMAeqestUART0USART1SPI0IntepteqestUART1ISSPI1AAFIOIC 0 ~ 1EXTIGPTM 0 ~ 1MCTM0BFTM 0 ~ 1MCTM1SCI"
+"Exte nal BsInte afce"
+"SRAMCont olleSRAMPDMAExte nal Bs8 ChannelsInte afceBs Mat ixAHB to APBUSBB idgeDeviceICodeDCodeSstemUSART0WDTDMAeqestUART0USART1SPI0IntepteqestUART1ISSPI1AAFIOIC 0 ~ 1EXTIGPTM 0 ~ 1MCTM0BFTM 0 ~ 1MCTM1SCI",
+t,
+"",
+"",
+"",
+"SRAMCont olleSRAMPDMAExte nal Bs8 ChannelsInte afceBs Mat ixAHB to APBUSBB idgeDeviceICodeDCodeSstemUSART0WDTDMAeqestUART0USART1SPI0IntepteqestUART1ISSPI1AAFIOIC 0 ~ 1EXTIGPTM 0 ~ 1MCTM0BFTM 0 ~ 1MCTM1SCI"
+"PDMA8 Channels"
+"SRAMCont olleSRAMPDMAExte nal Bs8 ChannelsInte afceBs Mat ixAHB to APBUSBB idgeDeviceICodeDCodeSstemUSART0WDTDMAeqestUART0USART1SPI0IntepteqestUART1ISSPI1AAFIOIC 0 ~ 1EXTIGPTM 0 ~ 1MCTM0BFTM 0 ~ 1MCTM1SCI"
+""
+""
+"SRAMCont olleSRAMPDMAExte nal Bs8 ChannelsInte afceBs Mat ixAHB to APBUSBB idgeDeviceICodeDCodeSstemUSART0WDTDMAeqestUART0USART1SPI0IntepteqestUART1ISSPI1AAFIOIC 0 ~ 1EXTIGPTM 0 ~ 1MCTM0BFTM 0 ~ 1MCTM1SCI",
+"SART0DMA",
+"",
+"SRAMCont olleSRAMPDMAExte nal Bs8 ChannelsInte afceBs Mat ixAHB to APBUSBB idgeDeviceICodeDCodeSstemUSART0WDTDMAeqestUART0USART1SPI0IntepteqestUART1ISSPI1AAFIOIC 0 ~ 1EXTIGPTM 0 ~ 1MCTM0BFTM 0 ~ 1MCTM1SCI"
+"SART0DMA"
+SART0
+"SRAMCont olleSRAMPDMAExte nal Bs8 ChannelsInte afceBs Mat ixAHB to APBUSBB idgeDeviceICodeDCodeSstemUSART0WDTDMAeqestUART0USART1SPI0IntepteqestUART1ISSPI1AAFIOIC 0 ~ 1EXTIGPTM 0 ~ 1MCTM0BFTM 0 ~ 1MCTM1SCI"
+t
+""
+"SRAMCont olleSRAMPDMAExte nal Bs8 ChannelsInte afceBs Mat ixAHB to APBUSBB idgeDeviceICodeDCodeSstemUSART0WDTDMAeqestUART0USART1SPI0IntepteqestUART1ISSPI1AAFIOIC 0 ~ 1EXTIGPTM 0 ~ 1MCTM0BFTM 0 ~ 1MCTM1SCI"
+""
+""
+"SRAMCont olleSRAMPDMAExte nal Bs8 ChannelsInte afceBs Mat ixAHB to APBUSBB idgeDeviceICodeDCodeSstemUSART0WDTDMAeqestUART0USART1SPI0IntepteqestUART1ISSPI1AAFIOIC 0 ~ 1EXTIGPTM 0 ~ 1MCTM0BFTM 0 ~ 1MCTM1SCI"
+""
+""
+"",
+"LDO1.8 V"
+"",
+""
+""
+""
+""
+"SRAMCont olleSRAMPDMAExte nal Bs8 ChannelsInte afceBs Mat ixAHB to APBUSBB idgeDeviceICodeDCodeSstemUSART0WDTDMAeqestUART0USART1SPI0IntepteqestUART1ISSPI1AAFIOIC 0 ~ 1EXTIGPTM 0 ~ 1MCTM0BFTM 0 ~ 1MCTM1SCI",,,,,
+"",,,"SART0DMA",,
+"",,,,,
+"",,SART0,,,
+"",,,,,
+"",,,ART0,,
+"",,,,,
+"",,SPI0,,,
+"",,,,,
+"",,,IS,,
+"",,,,,
+"",,AFIO,,,
+"",,,,,
+"",,EXTI,,,
+"",,,,,
+"",,CTM0,,,
+"",,,,,
+"",,CTM1,,,
+"",,,,,
+"",,,,,
+"",ADC,,,,
+OPA/CMP,,,,,
+"1-bitSAR ADC"
+"",,,
+"",,,C
+"",,,
+P,,CU,
+"",,,
+"",,,
+"PWRSWVBAK",,,
+"",,,
+"",,,
+"",,,
+"",,,
+"",,,
+"",,,
+"PWRSWVBAK",
+"",
+"",
+"",
+"",
+"",
+""
+"",
+"",
+"",
+""
+"AnalogCMP"
+""
+OPA/CMP
+""
+"PORBVBAK 3.3 V"
+""
+""
+""
+"",
+"",,,CMP
+"",,,,,
+"",,,,,
+"","OPA/CMPPowe ed bVDD18",OPA/CMP,,,
+"PORBLSIVBAK 3.3 V3kHzBREGLSE3768 HzBackp Domain"
+BREG
+"PORBLSIVBAK 3.3 V3kHzBREGLSE3768 HzBackp Domain","PORBVBAK 3.3 V"
+BREG,
+""
+"",
+Notation,Example,Description
+0x,0xa0,"The nmbe  sting with a 0x p efix indicates a hexadecimalnmbe ."
+0xnnnn_nnnn,0x000_0100,3-bit Hexadecimal add ess o  data.
+b,b0101,"The number string with a lowercase b prefix indicates a binarynmbe ."
+NAME [n],ADDR [],"Specific bit of NAME. NAME can be a register or field of register.For example, ADDR [5] means bit 5 of ADDR register (field)."
+NAME [m:n],ADDR [11:],"Specific bits of NAME. NAME can be aegisteofield ofegiste . Fo  example  ADDR [11:] means bit 11 toof ADDRregister (field)."
+X,b10X1,Don’t ca e notation which means anvale is allowed.
+RW,"1918SERDYIEPLLRDYIERW    0RW    0",Softwa e canead and w ite to this bit.
+"",SERDYIE,PLLRDYIE
+RO,"3HSIRDYHSERDYRO    1RO    0",Softwa e can onlead this bit. W ite ope ation has no effo t.
+"",HSIRDY,HSERDY
+RC,"10PDFBAK_PORFRC    0RC    1","Softwae canead this bit. Read opeation cleas it to 0atomaticall."
+"",PDF,BAK_PORF
+WC,"3SERDYFPLLRDYFWC    0WC    0","Softwa e canead this bit o  clea  it bw iting 1. W ite 0 to it hasno effo t."
+"",SERDYF,PLLRDYF
+WO,"3130DB_CKSRCWO    0WO    0",Softwa e can onlw ite to this bit. Read ope ation alwasetns 0.
+"",,DB_CKSRC
+Rese ved,"10LLRDYRese vedRO    0","Reserved bit(s) for future use. Software should not rely on thevale of theese ved bit. In gene al caseese ved bits a e setto 0. Note thatese ved bit mst be kept ateset vale."
+"",LLRDY,Rese ved
+Wo d,,Data length of wo d is 3-bit.
+Half-wo d,,Data length of half-wo d is 16-bit.
+Bte,,Data length of bte is 8-bit.
+"1918SERDYIEPLLRDYIERW    0RW    0",
+SERDYIE,PLLRDYIE
+"3HSIRDYHSERDYRO    1RO    0",
+HSIRDY,HSERDY
+"10PDFBAK_PORFRC    0RC    1",
+PDF,BAK_PORF
+"3SERDYFPLLRDYFWC    0WC    0",
+SERDYF,PLLRDYF
+"3130DB_CKSRCWO    0WO    0",
+"",DB_CKSRC
+"10LLRDYRese vedRO    0",
+LLRDY,Rese ved
+""
+"PDMACont olRegiste s","FMCCont olRegiste s","GPIOA~D","CKCU/RSTCUCont ol Registe s"
+""
+""
+""
+""
+Rese ved
+P ivate pe iphe al bs
+Rese ved
+EBI Selection Bank
+Rese ved
+APB/AHB bit band alias
+Rese ved
+AHB pe iphe als
+APB pe iphe als
+Rese ved
+SRAM bit band alias
+Rese ved
+"Up to16 KB on-chip SRAM"
+Rese ved
+Option bte alias
+Rese ved
+Boot loade
+Rese ved
+"Up to6KB on-chip Flash"
+""
+""
+""
+""
+""
+""
+""
+""
+"",Rese ved,
+"",,GPIOA~D
+"",,Rese ved
+"",,USB
+"",,Rese ved
+"",,EBI
+"",,Rese ved
+"",,PDMA
+"",,Rese ved
+"",,CRC-16/3
+"",,CKCU/RSTCU
+"",,Rese ved
+"",,FMC
+"","0x007_80000x007_70000x007_60000x007_00000x006_F0000x006_E0000x006_B0000x006_A0000x006_90000x006_80000x00_90000x00_80000x00_A0000x00_90000x00_80000x00_0000x00_0000x00_30000x00_0000x00_10000x00_0000",Rese ved
+"",BFTM1,
+"",BFTM0,
+"",Rese ved,
+"",GPTM1,
+"",GPTM0,
+"",Rese ved,
+"",RTC/PWRCU,
+"",Rese ved,
+"",WDT,
+"",Rese ved,
+"",CMP0/CMP1,
+"",Rese ved,
+"",IC1,
+"",IC0,
+"",Rese ved,
+"",SPI1,
+"",SCI,
+"",Rese ved,
+"",UART1,
+"",USART1,
+"",Rese ved,
+MCTM1,,
+MCTM0,,
+Rese ved,,
+IS,,
+Rese ved,,
+EXTI,,
+Rese ved,,
+AFIO,,
+Rese ved,,
+ADC,,
+Rese ved,,
+SPI0,,
+Rese ved,,
+UART0,,
+USART0,,
+""
+""
+""
+Start Address,End Address,Peripheral,Bus,Register map
+0x000_0000,0x000_0FFF,USART0,APB0,
+0x000_1000,0x000_1FFF,UART0,,
+0x000_000,0x000_3FFF,Rese ved,,
+0x000_000,0x000_FFF,SPI0,,
+0x000_000,0x000_FFFF,Rese ved,,
+0x001_0000,0x001_0FFF,ADC,,
+0x001_1000,0x00_1FFF,Rese ved,,
+0x00_000,0x00_FFF,AFIO,,
+0x00_3000,0x00_3FFF,Rese ved,,
+0x00_000,0x00_FFF,EXTI,,
+0x00_000,0x00_FFF,Rese ved,,
+0x00_6000,0x00_6FFF,IS,,
+0x00_7000,0x00_BFFF,Rese ved,,
+0x00_C000,0x00_CFFF,MCTM0,,
+0x00_D000,0x00_DFFF,MCTM1,,
+0x00_E000,0x003_FFFF,Rese ved,,
+0x00_0000,0x00_0FFF,USART1,,
+0x00_1000,0x00_1FFF,UART1,,
+0x00_000,0x00_FFF,Rese ved,,
+0x00_3000,0x00_3FFF,SCI,,
+0x00_000,0x00_FFF,SPI1,,
+0x00_000,0x00_7FFF,Rese ved,,
+0x00_8000,0x00_8FFF,I C0,,
+0x00_9000,0x00_9FFF,I C1,,
+0x00_A000,0x00_7FFF,Rese ved,,
+0x00_8000,0x00_8FFF,Compa ato,,
+0x00_9000,0x006_7FFF,Rese ved,,
+0x006_8000,0x006_8FFF,WDT,,
+0x006_9000,0x006_9FFF,Rese ved,,
+0x006_A000,0x006_AFFF,RTC/PWRCU,,
+0x006_B000,0x006_DFFF,Rese ved,,
+0x006_E000,0x006_EFFF,GPTM0,,
+0x006_F000,0x006_FFFF,GPTM1,,
+0x007_0000,0x007_FFF,Rese ved,,
+0x007_6000,0x007_6FFF,BFTM0,,
+0x007_7000,0x007_7FFF,BFTM1,,
+Start Address,End Address,Peripheral,Bus,Register map
+0x008_0000,0x008_1FFF,FMC,AHB,
+0x008_000,0x008_7FFF,Rese ved,,
+0x008_8000,0x008_9FFF,CKCU/RSTCU,,
+0x008_A000,0x008_BFFF,CRC,,
+0x008_C000,0x008_FFFF,Rese ved,,
+0x009_0000,0x009_1FFF,PDMA Cont ol Registe s,,
+0x009_000,0x009_7FFF,Rese ved,,
+0x009_8000,0x009_9FFF,EBI Cont ol Registe s,,
+0x009_A000,0x00A_7FFF,Rese ved,,
+0x00A_8000,0x00A_BFFF,USB,,
+0x00A_C000,0x00A_FFFF,Rese ved,,
+0x00B_0000,0x00B_1FFF,GPIOA,,
+0x00B_000,0x00B_3FFF,GPIOB,,
+0x00B_000,0x00B_FFF,GPIOC,,
+0x00B_6000,0x00B_7FFF,GPIOD,,
+0x00B_8000,0x00F_FFFF,Rese ved,,
+"",,,,,
+"",,,,,Cont ol Registe
+"",,,,,
+"",,,,,P e-fetch Bffe
+Cont ol Registe
+""
+"Wait StateCont ol"
+Add essing
+Data
+"P og ammingCont ol"
+""
+"",Rese ved
+"",Option Bte
+"",Rese ved
+"",Boot Loade  Block
+"",Rese ved
+"Main Flash BlockUse  Application",
+Block,Name,Address,Page Protection Bit,Size
+Main Flash,Page 0,0x0000_0000 ~ 0x0000_03FF,OB_PP [0],1 KB
+Page 1,0x0000_000 ~ 0x0000_07FF,OB_PP [1],1 KB,
+Page,0x0000_0800 ~ 0x0000_0BFF,OB_PP [],1 KB,
+Page 3,0x0000_0C00 ~ 0x0000_0FFF,OB_PP [3],1 KB,
+"",,,,
+Page 61,0x0000_F00 ~ 0x0000_F7FF,OB_PP [61],1 KB,
+Page 6,0x0000_F800 ~ 0x0000_FBFF,OB_PP [6],1 KB,
+Option Bte,0x1FF0_0000 ~ 0x1FF0_03FF,OB_CP [1],1 KB,
+Boot modes selection pins,,Descriptions,
+BOOT1,BOOT0,,
+0,0,SRAM,Vecto  soce is SBVT0 ~ 3
+0,1,Boot Loade,Vecto  soce is Boot Loade
+""
+Ha d Falt Handle
+NMI Handle
+P og am Conte
+Initial Stack Point
+""
+""
+""
+""
+""
+""
+""
+""
+""
+SBVT3
+SBVT
+SBVT1
+SBVT0
+Ha d Falt Handle
+NMI Handle
+P og am Conte
+Initial Stack Point
+""
+""
+""
+""
+""
+""
+""
+""
+""
+SBVT3
+SBVT
+SBVT1
+SBVT0
+"","0x0000x000x0080x00C","OB_PP [n]: Main Flash Page E ase/P og am P otection(n = 0 ~ 62 for page 0 ~ page 62)0: Main Flash Page n Ease/Pogam Potection isenabled1: Main Flash Page n Ease/Pogam Potection isdisabledOB_PP [17:63]: Rese ved","0xFFFF_FFFF0xFFFF_FFFF0xFFFF_FFFF0xFFFF_FFFF"
+OB_CP,0x010,"OB_CP [0]: Flash SecitP otection0: Flash Secitp otection is enabled1: Flash Secitp otection is disabledOB_CP [1]: Option Bte E ase/P og am P otection0: Option Bte p otection is enabled1: Option Bte p otection is disabledOB_CP [31:]: Rese ved",0xFFFF_FFFF
+0x00,"OB_CK [31:0]: Option Bte ChecksmOB_CK shold be set as the sm of thewo ds OptionBte content  of which the add ess offsetanges f om0x000 to 0x010 (0x000 + 0x004 + 0x008 + 0x00C +0x010), when the content of the OB_PP or OB_CP registeris not eqal to 0xFFFF_FFFF. Othe wise  both pagese ase/p og am p otection and secitp otection will beenabled.",0xFFFF_FFFF,
+"ModeOperation",ISP/IAP,ICP/Debug mode,Boot from SRAM
+DCODE Read,O,O,O
+P og am,X,X,X
+Page E ase,X,X,X
+Mass E ase,O,O,O
+"ModeOperation",User application (Note 1),ICP/Debug mode,Boot from SRAM
+DCODE Read,O,X(1),X(1)
+P og am,O(1),X,X
+Page E ase,O(1),X,X
+"",0x000,Flash Ta get Add ess Registe,0x0000_0000
+WRDR,0x00,Flash W ite Data Registe,0x0000_0000
+OCMR,0x00C,Flash Ope ation Command Registe,0x0000_0000
+OPCR,0x010,Flash Ope ation Cont ol Registe,0x0000_000C
+OIER,0x01,Flash Ope ation Intept Enable Registe,0x0000_0000
+OISR,0x018,Flash Ope ation Intept and Stats Registe,0x0001_0000
+PPSR,"0x000x00x080x0C",Flash Page E ase/P og am P otection Stats Registe,"0xXXXX_XXXX0xXXXX_XXXX0xXXXX_XXXX0xXXXX_XXXX"
+CPSR,0x030,Flash SecitP otection Stats Registe,0xXXXX_XXXX
+VMCR,0x100,Flash Vecto  Mapping Cont ol Registe,0x0000_000X
+CFCR,0x00,Flash Cache and P e-fetch Cont ol Registe,0x0000_13D1
+SBVT0,0x300,SRAM Booting Vector 0 (Stack Point),0x000_X000
+SBVT1,0x30,SRAM Booting Vector 1 (Program Counter),0x000_01
+SBVT,0x308,SRAM Booting Vector 2 (NMI Handler),0x0000_0000
+0x30C,SRAM Booting Vector 3 (Hard Fault Handler),0x0000_0000,
+TADB,
+"",
+TADB,
+"",
+TADB,
+"",
+TADB,
+WRDB,
+"",
+WRDB,
+"",
+WRDB,
+"",
+WRDB,
+Rese ved,
+Rese ved,
+Rese ved,
+Rese ved,CMD,
+CMD [3:0],Description
+0x0,Idle (default)
+0x,Wo d p og am
+0x8,Page e ase
+0xA,Mass e ase
+Othe s,Rese ved
+Rese ved,OPM,Rese ved
+OPM [3:0],Description
+0x6,Idle (default)
+0xA,Commit command to main Flash
+0xE,All operation finished on main Flash
+Othe s,Rese ved
+Rese ved,PPEF,RORFF,
+PPSBn,
+"",
+PPSBn,
+"",
+PPSBn,
+"",
+PPSBn,
+Rese ved,OBPSB,CPSB,
+"",,,
+Rese ved,,,
+"",,,
+Rese ved,,,
+"",,,
+Rese ved,,,
+"",,,
+Rese ved,VMCB,,
+BOOT1,BOOT0,VMCB [1:0],Descriptions,
+Low,Low,00,"SRAM booting modeThe vecto  mapping soce is SBVT0~3.",
+Low,High,01,"Boot Loade  modeThe vecto  mapping soce is the Boot Loade  a e",.
+High,Low,10,"Main Flash modeThe vectomapping soce is the main Flasmemoa ea.",
+High,High,11,,
+WAIT [2:0],Wait-state cycle,HCLK
+001,0,1 MHz < HCLK ≤ 24 MHz
+010,1,24 MHz < HCLK ≤ 48 MHz
+011,,48 MHz < HCLK ≤ 72 MHz
+SBVTn,
+"",
+SBVTn,
+"",
+SBVTn,
+"",
+SBVTn,
+Name,Address Offset,Purpose Descriptions,Reset Value
+SBVT0,0x300,Stack point,"16 KB SRAM: 0x000_0008 KB SRAM: 0x000_000"
+SBVT1,0x30,P og am conte,0x000_01
+SBVT,0x308,NMI handle  add ess,0x0000_0000
+Mode,Mode Entry,Mode Exit,,
+"","CortexTM-M3Instruction","CortexTM-M3SLEEPDEEP",LDOOFF,DMOSON
+Sleep,0,X,X,"WFI: AninteptWFE:Anwakep event (1)  oAny interrupt (NVIC on) orAnintept withSEVONPEND = 1 (NVIC off)"
+Deep-Sleep1,1,0,0,"AnEXTI in event mode oWDT timeot oCMP wakep oRTC wakep oLVD wakep (2) oWAKEUP pinising edgeUSBesme"
+Deep-Sleep,1,X,1,"RTC wakep oLVD wakep (2) oWAKEUP pinising edge"
+BAKPORF,PDF,PORSTF,Description
+1,0,1,"Power-up for the first time after the backup domain is reset:Powe  oneset when VBAK is applied for the first time or executinga softwa eeset command on the backp domain."
+0,0,1,"Resta t f omnexpected loss of the 1.8 V powe  o  otheeset(nRST, WDT,...)"
+0,1,1,Resta t f om the Powe -Down mode.
+"",0x100,Backp Domain Stats Registe,0x0000_0001
+BAKCR,0x10,Backp Domain Cont ol Registe,0x0000_0000
+BAKTEST,0x108,Backp Domain Test Registe,0x0000_007
+HSIRCR,0x10C,HSI ReadConte  Cont ol Registe,0x0000_0003
+LVDCSR,0x110,Low Voltage/B own Ot Detect Cont ol and Stats Registe,0x0000_0000
+BAKREG0,0x00,Backp Registe  0,0x0000_0000
+BAKREG1,0x0,Backp Registe  1,0x0000_0000
+BAKREG,0x08,Backp Registe,0x0000_0000
+BAKREG3,0x0C,Backp Registe  3,0x0000_0000
+BAKREG,0x10,Backp Registe,0x0000_0000
+BAKREG,0x1,Backp Registe,0x0000_0000
+BAKREG6,0x18,Backp Registe  6,0x0000_0000
+BAKREG7,0x1C,Backp Registe  7,0x0000_0000
+BAKREG8,0x0,Backp Registe  8,0x0000_0000
+"",,,
+Rese ved,,,
+"",,,
+Rese ved,,,
+"",,,
+Rese ved,WUPF,,
+"",,,
+Rese ved,PDF,BAKPORF,
+"",,
+Rese ved,,
+"",,
+Rese ved,,
+"",,
+Rese ved,,
+"",,
+BAKTEST,,
+"",,,
+Rese ved,,,
+"",,,
+Rese ved,,,
+"",,,
+Rese ved,,,
+"",,,
+Rese ved,HSIRCBL,,
+BAKREGn,
+"",
+BAKREGn,
+"",
+BAKREGn,
+"",
+BAKREGn,
+"",0x000,Global Clock Configuration Register,0x0000_010
+GCCR,0x00,Global Clock Cont ol Registe,0x0000_0803
+GCSR,0x008,Global Clock Stats Registe,0x0000_008
+GCIR,0x00C,Global Clock Intept Registe,0x0000_0000
+PLLCFGR,0x018,PLL Configuration Register,0x0000_0000
+PLLCR,0x01C,PLL Cont ol Registe,0x0000_0000
+AHBCFGR,0x00,AHB Configuration Register,0x0000_0000
+AHBCCR,0x0,AHB Clock Cont ol Registe,0x0000_000
+APBCFGR,0x08,APB Configuration Register,0x0000_0000
+APBCCR0,0x0C,APB Clock Cont ol Registe  0,0x0000_0000
+APBCCR1,0x030,APB Clock Cont ol Registe  1,0x0000_0000
+CKST,0x03,Clock Soce Stats Registe,0xC100_0000
+APBPCSR0,0x038,APB Pe iphe al Clock Selection Registe  0,0x0000_0000
+APBPCSR1,0x03C,APB Pe iphe al Clock Selection Registe  1,0x0000_0000
+HSICR,0x00,HSI Cont ol Registe,"0xXXXX_0000where X is undefined"
+HSIATCR,0x0,HSI Ato T imming Conte  Registe,0x0000_0000
+LPCR,0x300,Low Powe  Cont ol Registe,0x0000_0000
+0x30,MCU Debg Cont ol Registe,0x0000_0000,
+CKREFPRE,Rese ved,PLLSRC,
+Rese ved,PSRCEN,CKMEN,
+Rese ved,
+Rese ved,LSIRDYIE,LSERDYIE,HSIRDYIE,HSERDYIE,PLLRDYIE,Rese ved,CKSIE,
+Rese ved,LSIRDYIE,LSERDYIE,HSIRDYIE,HSERDYIE,PLLRDYIE,Rese ved,CKSIE,
+PFBD,POTD,Rese ved,
+PLLBPS,Rese ved,
+Rese ved,
+Rese ved,
+Rese ved,
+"",,,
+Rese ved,,,
+"",,,
+Rese ved,,,
+"",,,
+Rese ved,,,
+"",,,
+Rese ved,AHBPRE,,
+"",,
+Rese ved,,
+"",,
+Rese ved,ADCDIV,
+"",,
+Rese ved,,
+"",,
+Rese ved,,
+CKSWST,Rese ved,HSIST,
+Rese ved,HSEST,
+Rese ved,PLLST,
+Rese ved,
+BFTM1PCLK,BFTM0PCLK,Rese ved,
+"",,,
+Reserved,,,
+"",,,
+Reserved,,,
+"",,,
+Reserved,ATCNT,,
+"",,,
+ATCNT,,,
+"",,
+Rese ved,,
+"",,
+Rese ved,,
+"",,
+Rese ved,USBSLEE,
+"",,
+Rese ved,BKISO,
+"",0x100,Global Reset Stats Registe,0x0000_0008
+AHBPRSTR,0x10,AHB Pe iphe al Reset Registe,0x0000_0000
+APBPRSTR0,0x108,APB Pe iphe al Reset Registe  0,0x0000_0000
+Rese ved,
+Rese ved,
+Rese ved,PDRST,PCRST,PBRST,PARST,
+Rese ved,PDRST,PCRST,PBRST,PARST,
+Rese ved,ISRST,SCIRST,
+Rese ved,SPI1RST,SPI0RST,Rese ved,IC1RST,IC0RST,
+Rese ved,GPTM1RST,GPTM0RST,
+PxDVn,
+"",
+PxODn,
+PxPLn,
+"",
+PxPHn,
+""
+"",AFIO,GPIO,PAD,,,,,
+"",ADENAFIO,OENAFIO,IENAFIO,PxDIRn,PxINENn,ADEN,OEN,IEN
+GPIO Inpt (Note),1,1,1,0,1,1,1,0
+GPIO Otpt (Note),1,1,1,1,0 (1 if need),1,0,1 (0)
+AFIO Inpt,1,1,0,0,X,1,1,0
+AFIO Otpt,1,0,1,X,0 (1 if need),1,0,1 (0)
+ADC Inpt,0,1,1,0,0 (1 if need),0,1,1 (0)
+"",0x000,Po t A Data Di ection Cont ol Registe,0x0000_0000
+PAINER,0x00,Po t A Inpt Fnction Enable Cont ol Registe,0x0000_0300
+PAPUR,0x008,Po t A Pll-Up Selection Registe,0x0000_3300
+PAPDR,0x00C,Po t A Pll-Down Selection Registe,0x0000_0000
+PAODR,0x010,Po t A Open D ain Selection Registe,0x0000_0000
+PADRVR,0x01,Po t A D ive Cent Selection Registe,0x0000_0000
+PALOCKR,0x018,Po t A Lock Registe,0x0000_0000
+PADINR,0x01C,Po t A Data Inpt Registe,0x0000_3300
+PADOUTR,0x00,Po t A Data Otpt Registe,0x0000_0000
+PASRR,0x0,Po t A Otpt Set and Reset Cont ol Registe,0x0000_0000
+"",0x000,Po t B Data Di ection Cont ol Registe,0x0000_0000
+PBINER,0x00,Po t B Inpt Fnction Enable Cont ol Registe,0x0000_0000
+PBPUR,0x008,Po t B Pll-Up Selection Registe,0x0000_0000
+PBPDR,0x00C,Po t B Pll-Down Selection Registe,0x0000_0000
+PBODR,0x010,Po t B Open D ain Selection Registe,0x0000_0000
+PBDRVR,0x01,Po t B D ive Cent Selection Registe,0x0000_0000
+PBLOCKR,0x018,Po t B Lock Registe,0x0000_0000
+PBDINR,0x01C,Po t B Data Inpt Registe,0x0000_0000
+PBDOUTR,0x00,Po t B Data Otpt Registe,0x0000_0000
+PBSRR,0x0,Po t B Otpt Set and Reset Cont ol Registe,0x0000_0000
+0x08,Po t B Otpt Reset Cont ol Registe,0x0000_0000,
+"",0x000,Po t C Data Di ection Cont ol Registe,0x0000_0000
+PCINER,0x00,Po t C Inpt Fnction Enable Cont ol Registe,0x0000_0000
+PCPUR,0x008,Po t C Pll-Up Selection Registe,0x0000_0000
+PCPDR,0x00C,Po t C Pll-Down Selection Registe,0x0000_0000
+PCODR,0x010,Po t C Open D ain Selection Registe,0x0000_0000
+PCDRVR,0x01,Po t C D ive Cent Selection Registe,0x0000_0000
+PCLOCKR,0x018,Po t C Lock Registe,0x0000_0000
+0x01C,Po t C Data Inpt Registe,0x0000_0000,
+Register,Offset,Description,Reset Value
+PCDOUTR,0x00,Po t C Data Otpt Registe,0x0000_0000
+PCSRR,0x0,Po t C Otpt Set and Reset Cont ol Registe,0x0000_0000
+"",0x000,Po t D Data Di ection Cont ol Registe,0x0000_0000
+PDINER,0x00,Po t D Inpt Fnction Enable Cont ol Registe,0x0000_0000
+PDPUR,0x008,Po t D Pll-Up Selection Registe,0x0000_0000
+PDPDR,0x00C,Po t D Pll-Down Selection Registe,0x0000_0000
+PDODR,0x010,Po t D Open D ain Selection Registe,0x0000_0000
+PDLOCKR,0x018,Po t D Lock Registe,0x0000_0000
+PDDINR,0x01C,Po t D Data Inpt Registe,0x0000_0000
+PDDOUTR,0x00,Po t D Data Otpt Registe,0x0000_0000
+PDSRR,0x0,Po t D Otpt Set and Reset Cont ol Registe,0x0000_0000
+0x08,Po t D Otpt Reset Cont ol Registe,0x0000_0000,
+"",Rese ved
+"",Rese ved
+"",PADIR
+"",PADIR
+Rese ved,
+Rese ved,
+PAINEN,
+PAINEN,
+"",
+Rese ved,
+"",
+Rese ved,
+"",
+PAPU,
+PAPU,
+Rese ved,
+Rese ved,
+PAPD,
+PAPD,
+Rese ved,
+Rese ved,
+PAOD,
+PAOD,
+Rese ved,
+Rese ved,
+Rese ved,
+PADV,
+PALKEY,
+"",
+PALKEY,
+"",
+PALOCK,
+"",
+PALOCK,
+"",
+Rese ved,
+"",
+Rese ved,
+"",
+PADIN,
+PADIN,
+Rese ved,
+Rese ved,
+PADOUT,
+PADOUT,
+PARST,
+"",
+PARST,
+"",
+PASET,
+"",
+PASET,
+"",
+Reserved,
+"",
+Reserved,
+"",
+PARST,
+"",
+PARST,
+"",
+Rese ved,
+"",
+Rese ved,
+"",
+PBDIR,
+PBDIR,
+Rese ved,
+Rese ved,
+PBINEN,
+PBINEN,
+Rese ved,
+Rese ved,
+PBPU,
+PBPU,
+Rese ved,
+Rese ved,
+PBPD,
+PBPD,
+"",,
+Rese ved,,
+"",,
+Rese ved,,
+"",,
+PBOD,,
+"",,
+PBOD,,
+PBDV,Rese ved,PBDV,
+PBLKEY,
+"",
+PBLKEY,
+"",
+PBLOCK,
+"",
+PBLOCK,
+Rese ved,
+Rese ved,
+PBDIN,
+PBDIN,
+"",
+Rese ved,
+"",
+Rese ved,
+"",
+PBDOUT,
+"",
+PBDOUT,
+PBRST,
+"",
+PBRST,
+"",
+PBSET,
+"",
+PBSET,
+"",
+Rese ved,
+"",
+Rese ved,
+"",
+PBRST,
+"",
+PBRST,
+Rese ved,
+Rese ved,
+PCDIR,
+PCDIR,
+Rese ved,
+Rese ved,
+PCINEN,
+PCINEN,
+"",,
+Rese ved,,
+"",,
+Rese ved,,
+"",,
+PCPU,,
+PCPU,
+"",,
+Rese ved,,
+"",,
+Rese ved,,
+"",,
+PCPD,,
+"",,
+PCPD,,
+Rese ved,
+Rese ved,
+PCOD,
+PCOD,
+Rese ved,PCDV,Rese ved,
+PCLKEY,
+"",
+PCLKEY,
+"",
+PCLOCK,
+"",
+PCLOCK,
+"",,
+Rese ved,,
+"",,
+Rese ved,,
+"",,
+PCDIN,,
+"",,
+PCDIN,,
+"",,
+Rese ved,,
+"",,
+Rese ved,,
+"",,
+PCDOUT,,
+"",,
+PCDOUT,,
+PCRST,
+"",
+PCRST,
+"",
+PCSET,
+"",
+PCSET,
+Rese ved,
+"",
+Rese ved,
+"",
+PCRST,
+"",
+PCRST,
+"",,,
+Rese ved,,,
+"",,,
+Rese ved,,,
+"",,,
+Rese ved,,,
+"",,,
+Rese ved,PDDIR,,
+"",,
+Rese ved,,
+"",,
+Rese ved,,
+"",,
+Rese ved,,
+"",,
+Rese ved,PDINEN,
+"",,
+Rese ved,,
+"",,
+Rese ved,,
+"",,
+Rese ved,,
+"",,
+Rese ved,PDPU,
+Rese ved,
+Rese ved,
+Rese ved,
+Rese ved,PDPD,
+Rese ved,
+Rese ved,
+Rese ved,
+Rese ved,PDOD,
+"",,,
+PDLKEY,,,
+"",,,
+PDLKEY,,,
+"",,,
+Rese ved,,,
+"",,,
+Rese ved,PDLOCK,,
+"",,,
+Rese ved,,,
+"",,,
+Rese ved,,,
+"",,,
+Rese ved,,,
+"",,,
+Rese ved,PDDIN,,
+"",,,
+Rese ved,,,
+"",,,
+Rese ved,,,
+"",,,
+Rese ved,,,
+"",,,
+Rese ved,PDDOUT,,
+Rese ved,
+Rese ved,PDRST,
+Rese ved,
+Rese ved,PDSET,
+"",,
+Rese ved,,
+"",,
+Rese ved,,
+"",,
+Rese ved,,
+"",,
+Rese ved,PDRST,
+AF0,AF1,AF2,AF3,AF4,AF5,AF6,AF7,AF8,AF9,AF10,AF11,AF12,AF13,AF14,AF15
+"",0x000,EXTI Soce Selection Registe  0,0x0000_0000
+ESSR1,0x00,EXTI Soce Selection Registe  1,0x0000_0000
+GPACFGR0,0x00,GPIO Port A Alternate Function Configuration Register 0,0x0000_0000
+GPACFGR1,0x0,GPIO Port A Alternate Function Configuration Register 1,0x0000_0000
+GPBCFGR0,0x08,GPIO Port B Alternate Function Configuration Register 0,0x0000_0000
+GPBCFGR1,0x0C,GPIO Port B Alternate Function Configuration Register 1,0x0000_0000
+GPCCFGR0,0x030,GPIO Port C Alternate Function Configuration Register 0,0x0000_0000
+GPCCFGR1,0x03,GPIO Port C Alternate Function Configuration Register 1,0x0000_0000
+GPDCFGR0,0x038,GPIO Port D Alternate Function Configuration Register 0,0x0000_0000
+0x03C,GPIO Port D Alternate Function Configuration Register 1,0x0000_0000,
+EXTI7PIN,EXTI6PIN,
+"",,
+EXTIPIN,EXTIPIN,
+"",,
+EXTI3PIN,EXTIPIN,
+"",,
+EXTI1PIN,EXTI0PIN,
+"",,
+EXTI1PIN,EXTI1PIN,
+"",,
+EXTI13PIN,EXTI1PIN,
+"",,
+EXTI11PIN,EXTI10PIN,
+"",,
+EXTI9PIN,EXTI8PIN,
+PxCFG7,PxCFG6,
+"",,
+PxCFG,PxCFG,
+"",,
+PxCFG3,PxCFG,
+"",,
+PxCFG1,PxCFG0,
+PxCFGn[3:0],Alternate Function Selection
+0000,AF0
+0001,AF1
+0010,AF
+0011,AF3
+"....",....
+1100,AF1
+1101,AF13
+1110,AF1
+PxCFG1,PxCFG1,
+"",,
+PxCFG13,PxCFG1,
+"",,
+PxCFG11,PxCFG10,
+"",,
+PxCFG9,PxCFG8,
+PxCFGn[3:0],Alternate Function Selection
+0000,AF0
+0001,AF1
+0010,AF
+0011,AF3
+"....",....
+1100,AF1
+1101,AF13
+1110,AF1
+Exception type,Priority,"InterruptNumber","ExceptionNumber","VectorAddress",Description
+"—",—,—,0,0x000,Initial Stack Pointe  vale
+Reset,-3 (Highest),—,1,0x00,Reset
+NMI,-,—,,0x008,"Non-Maskable Intept. The clock stckinterrupt signal (clock monitor functionprovided by Clock Control Unit) isconnected to the NMI inpt"
+Ha d Falt,-1,—,3,0x00C,All falt classes
+"MemoManagement",Configurable(1),—,,0x010,"Memory Protection Unit (MPU) mismatch,inclding access violation and no match"
+Bs Falt,Configurable(1),—,,0x01,"P e-fetch falt  memoaccess falt  andothe  add ess/memoelated falt"
+Usage Falt,Configurable(1),—,6,0x018,"Usage fault, such as undefined executedinstction oillegal attempt of statet ansition"
+"—",—,—,7,0x01C,Rese ved
+"—",—,—,8,0x00,Rese ved
+"—",—,—,9,0x0,Rese ved
+"—",—,—,10,0x08,Rese ved
+SVCCall,Configurable(1),—,11,0x0C,SVC instction Sstem se vice call
+Debg Monito,Configurable(1),—,1,0x030,Debg monitowhen not halted
+"—",Configurable(1),—,13,0x03,Rese ved
+PendSV,Configurable(1),—,1,0x038,Sstem Se vice Pendableeqest
+SsTick,Configurable(1),—,1,0x03C,SsTick time  intept
+CKRDY,Configurable(2),0,16,0x00,"Clockeadintept(HSE, HSI, LSE, LSI, or PLL)"
+LVD,Configurable(2),1,17,0x0,Low voltage detection intept
+BOD,Configurable(2),,18,0x08,B own-ot detection intept
+Exception type,Priority,"InterruptNumber","ExceptionNumber","VectorAddress",Description
+RTC,Configurable(2),,0,0x00,RTC global intept
+FMC,Configurable(2),,1,0x0,FMC global intept
+EVWUP,Configurable(2),6,,0x08,EXTI event wakep intept
+LPWUP,Configurable(2),7,3,0x0C,WAKEUP pin intept
+EXTI0,Configurable(2),8,,0x060,EXTI Line 0 intept
+EXTI1,Configurable(2),9,,0x06,EXTI Line 1 intept
+EXTI,Configurable(2),10,6,0x068,EXTI Lineintept
+EXTI3,Configurable(2),11,7,0x06C,EXTI Line 3 intept
+EXTI,Configurable(2),1,8,0x070,EXTI Lineintept
+EXTI,Configurable(2),13,9,0x07,EXTI Lineintept
+EXTI6,Configurable(2),1,30,0x078,EXTI Line 6 intept
+EXTI7,Configurable(2),1,31,0x07C,EXTI Line 7 intept
+EXTI8,Configurable(2),16,3,0x080,EXTI Line 8 intept
+EXTI9,Configurable(2),17,33,0x08,EXTI Line 9 intept
+EXTI10,Configurable(2),18,3,0x088,EXTI Line 10 intept
+EXTI11,Configurable(2),19,3,0x08C,EXTI Line 11 intept
+EXTI1,Configurable(2),0,36,0x090,EXTI Line 1intept
+EXTI13,Configurable(2),1,37,0x09,EXTI Line 13 intept
+EXTI1,Configurable(2),,38,0x098,EXTI Line 1intept
+EXTI1,Configurable(2),3,39,0x09C,EXTI Line 1intept
+COMP,Configurable(2),,0,0x0A0,Compa ato  global intept
+ADC,Configurable(2),,1,0x0A,ADC global intept
+"—",—,6,,0x0A8,Rese ved
+MCTM0_BRK,Configurable(2),7,3,0x0AC,MCTM0 b eak intept
+MCTM0_UP,Configurable(2),8,,0x0B0,MCTM0pdate intept
+"MCTM0_TR_UP",Configurable(2),9,,0x0B,MCTM0 t igge /pdate eventintept
+MCTM0_CC,Configurable(2),30,6,0x0B8,MCTM0 capte/compa e intept
+MCTM1_BRK,Configurable(2),31,7,0x0BC,MCTM1 b eak intept
+MCTM1_UP,Configurable(2),3,8,0x0C0,MCTM1pdate intept
+"MCTM1_TR_UP",Configurable(2),33,9,0x0C,MCTM1 t igge /pdate eventintept
+MCTM1_CC,Configurable(2),3,0,0x0C8,MCTM1 capte/compa e intept
+GPTM0,Configurable(2),3,1,0x0CC,GPTM0 global intept
+GPTM1,Configurable(2),36,,0x0D0,GPTM1 global intept
+"—",—,37,3,0x0D,Rese ved
+"—",—,38,,0x0D8,Rese ved
+"—",—,39,,0x0DC,Rese ved
+"—",—,0,6,0x0E0,Rese ved
+BFTM0,Configurable(2),1,7,0x0E,BFTM0 global intept
+BFTM1,Configurable(2),,8,0x0E8,BFTM1 global intept
+I C0,Configurable(2),3,9,0x0EC,I C0 global intept
+I C1,Configurable(2),,60,0x0F0,I C1 global intept
+Exception type,Priority,"InterruptNumber","ExceptionNumber","VectorAddress",Description
+SPI1,Configurable(2),6,6,0x0F8,SPI1 global intept
+USART0,Configurable(2),7,63,0x0FC,USART0 global intept
+USART1,Configurable(2),8,6,0x100,USART1 global intept
+UART0,Configurable(2),9,6,0x10,UART0 global intept
+UART1,Configurable(2),0,66,0x108,UART1 global intept
+SCI,Configurable(2),1,67,0x10C,SCI global intept
+I S,Configurable(2),,68,0x110,I S global intept
+USB,Configurable(2),3,69,0x11,USB global intept
+"—",—,,70,0x118,Rese ved
+PDMA_CH0,Configurable(2),,71,0x11C,PDMA channel 0 global intept
+PDMA_CH1,Configurable(2),6,7,0x10,PDMA channel 1 global intept
+PDMA_CH,Configurable(2),7,73,0x1,PDMA channelglobal intept
+PDMA_CH3,Configurable(2),8,7,0x18,PDMA channel 3 global intept
+PDMA_CH,Configurable(2),9,7,0x1C,PDMA channelglobal intept
+PDMA_CH,Configurable(2),60,76,0x130,PDMA channelglobal intept
+PDMA_CH6,Configurable(2),61,77,0x13,PDMA channel 6 global intept
+PDMA_CH7,Configurable(2),6,78,0x138,PDMA channel 7 global intept
+"—",—,63,79,0x13C,Rese ved
+"—",—,6,80,0x10,Rese ved
+"—",—,6,81,0x1,Rese ved
+"—",—,66,8,0x18,Rese ved
+"—",—,67,83,0x1C,Rese ved
+"",0x00,Intept Cont ol Tpe Registe,0x0000_0001
+SCTRL,0x010,SsTick Cont ol and Stats Registe,0x0000_0000
+SLOAD,0x01,SsTick Reload Vale Registe,Unp edictable
+SVAL,0x018,SsTick Cent Vale Registe,Unp edictable
+SCALIB,0x01C,SsTick Calib ation Vale Registe,0x000_38
+ISER0_31,0x100,I q 0 to 31 Set Enable Registe,0x0000_0000
+ISER3_63,0x10,I q 3to 63 Set Enable Registe,0x0000_0000
+ISER6_9,0x108,I q 6to 9Set Enable Registe,0x0000_0000
+ICER0_31,0x180,I q 0 to 31 Clea  Enable Registe,0x0000_0000
+ICER3_63,0x18,I q 3to 63 Clea  Enable Registe,0x0000_0000
+ICER6_9,0x188,I q 6to 9Clea  Enable Registe,0x0000_0000
+ISPR0_31,0x00,I q 0 to 31 Set Pending Registe,0x0000_0000
+ISPR3_63,0x0,I q 3to 63 Set Pending Registe,0x0000_0000
+ISPR6_9,0x08,I q 6to 9Set Pending Registe,0x0000_0000
+ICPR0_31,0x80,I q 0 to 31 Clea  Pending Registe,0x0000_0000
+ICPR3_63,0x8,I q 3to 63 Clea  Pending Registe,0x0000_0000
+ICPR6_9,0x88,I q 6to 9Clea  Pending Registe,0x0000_0000
+IABR0_31,0x300,I q 0 to 31 Active Bit Registe,0x0000_0000
+IABR3_63,0x30,I q 3to 63 Active Bit Registe,0x0000_0000
+IABR6_9,0x308,I q 6to 9Active Bit Registe,0x0000_0000
+IRQ0_3,0x00,I q 0 to 3 P io itRegiste,0x0000_0000
+IRQ_7,0x0,I qto 7 P io itRegiste,0x0000_0000
+IRQ8_11,0x08,I q 8 to 11 P io itRegiste,0x0000_0000
+IRQ1_1,0x0C,I q 1to 1P io itRegiste,0x0000_0000
+IRQ16_19,0x10,I q 16 to 19 P io itRegiste,0x0000_0000
+IRQ0_3,0x1,I q0 to3 P io itRegiste,0x0000_0000
+IRQ_7,0x18,I qto7 P io itRegiste,0x0000_0000
+IRQ8_31,0x1C,I q8 to 31 P io itRegiste,0x0000_0000
+IRQ3_3,0x0,I q 3to 3P io itRegiste,0x0000_0000
+IRQ36_39,0x,I q 36 to 39 P io itRegiste,0x0000_0000
+IRQ0_3,0x8,I q0 to3 P io itRegiste,0x0000_0000
+Register,Offset,Description,Reset Value
+IRQ8_1,0x30,I q8 to1 P io itRegiste,0x0000_0000
+IRQ_,0x3,I qtoP io itRegiste,0x0000_0000
+IRQ6_9,0x38,I q6 to9 P io itRegiste,0x0000_0000
+IRQ60_63,0x3C,I q 60 to 63 P io itRegiste,0x0000_0000
+IRQ6_67,0x0,I q 6to 67 P io itRegiste,0x0000_0000
+ICSR,0xD0,Intept Cont ol State Registe,0x0000_0000
+VTOR,0xD08,Vecto  Table Offset Registe,0x0000_0000
+AIRCR,0xD0C,Application Intept/Reset Cont ol Registe,0xFA0_0000
+SCR,0xD10,Sstem Cont ol Registe,0x0000_0000
+CCR,0xD1,Configuration Control Register,0x0000_0000
+SHPR-7,0xD18,Sstem Handle s-7 P io itRegiste,0x0000_0000
+SHPR8_11,0xD1C,Sstem Handle s 8-11 P io itRegiste,0x0000_0000
+SHPR1_1,0xD0,Sstem Handle s 1-1P io itRegiste,0x0000_0000
+SHCSR,0xD,Sstem Handle  Cont ol and State Registe,0x0000_0000
+CFSR,0xD8,Configurable Fault Status Registers,0x0000_0000
+HFSR,0xDC,Ha d Falt Stats Registe,0x0000_0000
+DFSR,0xD30,Debg Falt Stats Registe,0x0000_0000
+MMFAR,0xD3,Mem Manage Add ess Registe,Unp edictable
+BFAR,0xD38,Bs Falt Add ess Registe,Unp edictable
+AFSR,0xD3C,AxiliaFalt Stats Registe,0x0000_0000
+""
+""
+"",0x000,EXTI Interrupt 0 Configuration Register,0x0000_0000
+EXTICFGR1,0x00,EXTI Interrupt 1 Configuration Register,0x0000_0000
+EXTICFGR,0x008,EXTI Interrupt 2 Configuration Register,0x0000_0000
+EXTICFGR3,0x00C,EXTI Interrupt 3 Configuration Register,0x0000_0000
+EXTICFGR,0x010,EXTI Interrupt 4 Configuration Register,0x0000_0000
+EXTICFGR,0x01,EXTI Interrupt 5 Configuration Register,0x0000_0000
+EXTICFGR6,0x018,EXTI Interrupt 6 Configuration Register,0x0000_0000
+EXTICFGR7,0x01C,EXTI Interrupt 7 Configuration Register,0x0000_0000
+EXTICFGR8,0x00,EXTI Interrupt 8 Configuration Register,0x0000_0000
+EXTICFGR9,0x0,EXTI Interrupt 9 Configuration Register,0x0000_0000
+EXTICFGR10,0x08,EXTI Interrupt 10 Configuration Register,0x0000_0000
+EXTICFGR11,0x0C,EXTI Interrupt 11 Configuration Register,0x0000_0000
+EXTICFGR1,0x030,EXTI Interrupt 12 Configuration Register,0x0000_0000
+EXTICFGR13,0x03,EXTI Interrupt 13 Configuration Register,0x0000_0000
+EXTICFGR1,0x038,EXTI Interrupt 14 Configuration Register,0x0000_0000
+EXTICFGR1,0x03C,EXTI Interrupt 15 Configuration Register,0x0000_0000
+EXTICR,0x00,EXTI Intept Cont ol Registe,0x0000_0000
+EXTIEDGEFLGR,0x0,EXTI Intept Edge Flag Registe,0x0000_0000
+EXTIEDGESR,0x08,EXTI Intept Edge Stats Registe,0x0000_0000
+EXTISCR,0x0C,EXTI Intept Softwa e Set Command Registe,0x0000_0000
+EXTIWAKUPCR,0x00,EXTI Intept Wakep Cont ol Registe,0x0000_0000
+EXTIWAKUPPOLR,0x0,EXTI Intept Wakep Pola itRegiste,0x0000_0000
+DBnEN,SRCnTYPE,Rese ved,
+SRCnTYPE [2:0],Interrupt Source Type,,
+0,0,0,Low-level Sensitive
+0,0,1,High-level Sensitive
+0,1,0,Negative-edge T igge ed
+0,1,1,Positive-edge T igge ed
+ADOFE,ADAL,Description,Data Format
+0,0,Right aligned andnsigned,"“0_0_0_0_d11_d10_d9_d8_d7_d6_d_d_d3_d_d1_d0”"
+0,1,Left aligned andnsigned,"“d11_d10_d9_d8_d7_d6_d_d_d3_d_d1_d0_0_0_0_0”"
+1,0,"Right aligned and signedafte  offset sbt action","“0_0_0_Sign bit_d11_d10_d9_d8_d7_d6_d_d_d3_d_d1_d0”"
+"",0x00,ADC Reset Registe,0x0000_0000
+ADCCONV,0x008,ADC Regla  Conve sion Mode Registe,0x0000_0000
+ADCHCONV,0x00C,ADC High P io itConve sion Mode Registe,0x0000_0000
+ADCLST0,0x010,ADC Regla  Conve sion List Registe  0,0x0000_0000
+ADCLST1,0x01,ADC Regla  Conve sion List Registe  1,0x0000_0000
+ADCLST,0x018,ADC Regla  Conve sion List Registe,0x0000_0000
+ADCLST3,0x01C,ADC Regla  Conve sion List Registe  3,0x0000_0000
+ADCHLST,0x00,ADC High P io itConve sion List Registe,0x0000_0000
+ADCOFR0,0x030,ADC Inpt 0 Offset Registe,0x0000_0000
+ADCOFR1,0x03,ADC Inpt 1 Offset Registe,0x0000_0000
+ADCOFR,0x038,ADC InptOffset Registe,0x0000_0000
+ADCOFR3,0x03C,ADC Inpt 3 Offset Registe,0x0000_0000
+ADCOFR,0x00,ADC InptOffset Registe,0x0000_0000
+ADCOFR,0x0,ADC InptOffset Registe,0x0000_0000
+ADCOFR6,0x08,ADC Inpt 6 Offset Registe,0x0000_0000
+ADCOFR7,0x0C,ADC Inpt 7 Offset Registe,0x0000_0000
+ADCOFR8,0x00,ADC Inpt 8 Offset Registe,0x0000_0000
+ADCOFR9,0x0,ADC Inpt 9 Offset Registe,0x0000_0000
+ADCOFR10,0x08,ADC Inpt 10 Offset Registe,0x0000_0000
+ADCOFR11,0x0C,ADC Inpt 11 Offset Registe,0x0000_0000
+ADCOFR1,0x060,ADC Inpt 1Offset Registe,0x0000_0000
+ADCOFR13,0x06,ADC Inpt 13 Offset Registe,0x0000_0000
+ADCOFR1,0x068,ADC Inpt 1Offset Registe,0x0000_0000
+ADCOFR1,0x06C,ADC Inpt 1Offset Registe,0x0000_0000
+ADCSTR0,0x070,ADC Inpt 0 Sampling Time Registe,0x0000_0000
+ADCSTR1,0x07,ADC Inpt 1 Sampling Time Registe,0x0000_0000
+ADCSTR,0x078,ADC InptSampling Time Registe,0x0000_0000
+ADCSTR3,0x07C,ADC Inpt 3 Sampling Time Registe,0x0000_0000
+ADCSTR,0x080,ADC InptSampling Time Registe,0x0000_0000
+ADCSTR,0x08,ADC InptSampling Time Registe,0x0000_0000
+0x088,ADC Inpt 6 Sampling Time Registe,0x0000_0000,
+Register,Offset,Description,Reset Value
+ADCSTR7,0x08C,ADC Inpt 7 Sampling Time Registe,0x0000_0000
+ADCSTR8,0x090,ADC Inpt 8 Sampling Time Registe,0x0000_0000
+ADCSTR9,0x09,ADC Inpt 9 Sampling Time Registe,0x0000_0000
+ADCSTR10,0x098,ADC Inpt 10 Sampling Time Registe,0x0000_0000
+ADCSTR11,0x09C,ADC Inpt 11 Sampling Time Registe,0x0000_0000
+ADCSTR1,0x0A0,ADC Inpt 1Sampling Time Registe,0x0000_0000
+ADCSTR13,0x0A,ADC Inpt 13 Sampling Time Registe,0x0000_0000
+ADCSTR1,0x0A8,ADC Inpt 1Sampling Time Registe,0x0000_0000
+ADCSTR1,0x0AC,ADC Inpt 1Sampling Time Registe,0x0000_0000
+ADCDR0,0x0B0,ADC Regla  Conve sion Data Registe  0,0x0000_0000
+ADCDR1,0x0B,ADC Regla  Conve sion Data Registe  1,0x0000_0000
+ADCDR,0x0B8,ADC Regla  Conve sion Data Registe,0x0000_0000
+ADCDR3,0x0BC,ADC Regla  Conve sion Data Registe  3,0x0000_0000
+ADCDR,0x0C0,ADC Regla  Conve sion Data Registe,0x0000_0000
+ADCDR,0x0C,ADC Regla  Conve sion Data Registe,0x0000_0000
+ADCDR6,0x0C8,ADC Regla  Conve sion Data Registe  6,0x0000_0000
+ADCDR7,0x0CC,ADC Regla  Conve sion Data Registe  7,0x0000_0000
+ADCDR8,0x0D0,ADC Regla  Conve sion Data Registe  8,0x0000_0000
+ADCDR9,0x0D,ADC Regla  Conve sion Data Registe  9,0x0000_0000
+ADCDR10,0x0D8,ADC Regla  Conve sion Data Registe  10,0x0000_0000
+ADCDR11,0x0DC,ADC Regla  Conve sion Data Registe  11,0x0000_0000
+ADCDR1,0x0E0,ADC Regla  Conve sion Data Registe  1,0x0000_0000
+ADCDR13,0x0E,ADC Regla  Conve sion Data Registe  13,0x0000_0000
+ADCDR1,0x0E8,ADC Regla  Conve sion Data Registe  1,0x0000_0000
+ADCDR1,0x0EC,ADC Regla  Conve sion Data Registe  1,0x0000_0000
+ADCHDR0,0x0F0,ADC High P io itConve sion Data Registe  0,0x0000_0000
+ADCHDR1,0x0F,ADC High P io itConve sion Data Registe  1,0x0000_0000
+ADCHDR,0x0F8,ADC High P io itConve sion Data Registe,0x0000_0000
+ADCHDR3,0x0FC,ADC High P io itConve sion Data Registe  3,0x0000_0000
+ADCTCR,0x100,ADC Regla  T igge  Cont ol Registe,0x0000_0000
+ADCTSR,0x10,ADC Regla  T igge  Soce Registe,0x0000_0000
+ADCHTCR,0x110,ADC High P io itT igge  Cont ol Registe,0x0000_0000
+ADCHTSR,0x11,ADC High P io itT igge  Soce Registe,0x0000_0000
+ADCWCR,0x10,ADC Watchdog Cont ol Registe,0x0000_0000
+ADCLTR,0x1,ADC Watchdog Lowe  Th eshold Registe,0x0000_0000
+ADCUTR,0x18,ADC Watchdog Uppe  Th eshold Registe,0x0000_0000
+ADCIER,0x130,ADC Intept Enable Registe,0x0000_0000
+ADCIRAW,0x13,ADC Intept Raw Stats Registe,0x0000_0000
+ADCISR,0x138,ADC Intept Stats Registe,0x0000_0000
+ADCICLR,0x13C,ADC Intept Clea  Registe,0x0000_0000
+Rese ved,
+Rese ved,
+Rese ved,
+Rese ved,ADRST,
+"",,,
+Rese ved,,,
+"",,,
+Rese ved,ADSUBL,,
+"",,,
+Rese ved,ADSEQL,,
+"",,,
+Rese ved,ADMOD,,
+"ADMODE[1:0]",Mode,Descriptions,
+00,One shot mode,"Afte  a sta t t iggethe conve sion will be execteon theegla  channels fo  the whole seqence once",
+01,Rese ved,,
+10,"Continosmode","Afte  a sta t t iggethe conve sion will be execteon theeglachannels fothe whole seqenccontinoslntil the conve sion mode is changed.",
+Rese ved,
+Rese ved,ADHSUB,
+Rese ved,ADHSEQ,
+Rese ved,ADHMOD,
+"ADHMODE[1:0]",Mode,Descriptions,
+00,One shot mode,"Afte  a sta t t iggethe conve sion will be exected othe whole seqence of the high p io itchannels onc",.
+01,Rese ved,,
+10,"Continosmode","Afte  a sta t t iggethe conve sion will be execteon the high p io itchannels fo  the whole seqenccontinoslntil the conve sion mode is changed.",
+Rese ved,ADSEQ3,
+"",,
+Rese ved,ADSEQ,
+"",,
+Rese ved,ADSEQ1,
+"",,
+Rese ved,ADSEQ0,
+Rese ved,ADSEQ7,
+"",,
+Rese ved,ADSEQ6,
+"",,
+Rese ved,ADSEQ,
+"",,
+Rese ved,ADSEQ,
+Rese ved,ADSEQ11,
+"",,
+Rese ved,ADSEQ10,
+"",,
+Rese ved,ADSEQ9,
+"",,
+Rese ved,ADSEQ8,
+Rese ved,ADSEQ1,
+"",,
+Rese ved,ADSEQ1,
+"",,
+Rese ved,ADSEQ13,
+"",,
+Rese ved,ADSEQ1,
+Rese ved,ADHSEQ3,
+"",,
+Rese ved,ADHSEQ,
+"",,
+Rese ved,ADHSEQ1,
+"",,
+Rese ved,ADHSEQ0,
+Rese ved,
+Rese ved,
+Rese ved,
+ADSTn,
+ADVLD,Rese ved,
+Rese ved,
+ADD,
+ADD,
+ADHVLD,Rese ved,
+Rese ved,
+ADHD,
+ADHD,
+"",,,
+Rese ved,HTME,,
+"",,,
+Rese ved,HBFTMS,HTMS,
+"",,,
+Rese ved,ADHEXTIS,,
+"",,,
+Rese ved,ADHSC,,
+Rese ved,
+Rese ved,
+Rese ved,ADLT,
+ADLT,
+"",,
+Rese ved,,
+"",,
+Rese ved,,
+"",,
+Rese ved,ADUT,
+"",,
+ADUT,,
+Rese ved,ADIEU,ADIEL,
+Rese ved,ADIRAWU,ADIRAWL,
+Rese ved,ADICLRHO,ADICLRO,
+Rese ved,ADICLRU,ADICLRL,
+Rese ved,ADICLRHC,ADICLRHG,ADICLRH,
+"",0x000,Compa ato  Cont ol Registe  0,0x0001_0000
+CVRVALR0,0x00,Compa ato  Voltage Refe ence Vale Registe  0,0x0000_0000
+CMPIER0,0x008,Compa ato  Intept Enable Registe  0,0x0000_0000
+CMPTFR0,0x00C,Compa ato  T ansition Flag Registe  0,0x0000_0000
+CMPCR1,0x100,Compa ato  Cont ol Registe  1,0x0001_0000
+CVRVALR1,0x10,Compa ato  Voltage Refe ence Vale Registe  1,0x0000_0000
+CMPIER1,0x108,Compa ato  Intept Enable Registe  1,0x0000_0000
+"",,,
+Rese ved,,,
+"",,,
+Rese ved,,,
+"",,,
+Rese ved,,,
+"",,,
+Rese ved,CVRVAL,,
+Rese ved,CMPRIEN,CMPFIE,
+Rese ved,CMPRDEN,CMPFDEN,
+TME
+UEVG
+""
+"Trigger Controllerfsampling",,
+"",,"SlaveControllerfCLKIN"
+"",STIED,
+"",,
+"ClockControllerfCLKIN",,
+"",,
+"QuadratureDecoderfCLKIN",,
+DOWN_C,T,
+"MasterControllerfCLKIN"
+"",,,
+"OROROROR","FFFF",
+""
+""
+""
+"",
+"",CH1CC
+""
+""
+""
+""
+"",0,0,1,0,1,0,1,0,1
+""
+""
+"",,,,,
+"",,,,,
+"",,,,,,,,,,,,,,,,,,,
+27,28,29,30,31,,0,1,2
+27,28,29,30,31
+""
+""
+"",,
+"",,
+"",XOR,TI0XOR
+"",,
+"EdgeDetection"
+"",,,,,
+"",,,,,
+"",,,,,
+"",,,,,
+"",,,,,
+"(1)",,(),(3),,
+"",,,,,
+"",,,,,
+""
+""
+""
+""
+0,1,,3,,,,3,,1,0,1
+Counting mode,Level,TI0S0,TI1S1,,
+"",,Rising,Falling,Rising,Falling
+"Conting on TI0 onl(SMSEL = 0x01)",TI1S1 = High,Down,Up,—,—
+"",TI1S1 = Low,Up,Down,—,—
+"Conting on TI1 onl(SMSEL = 0x02)",TI0S0 = High,—,—,Up,Down
+TI0S0 = Low,—,—,Down,Up,
+TI1S1 = High,Down,Up,X,X,
+TI1S1 = Low,Up,Down,X,X,
+TI0S0 = High,X,X,Up,Down,
+"",,,,,
+"",,,,,
+"",,,,,
+T igge  bS,I,T igge  bS,,,
+"","Clea ed bUpdate Event",,,,
+"deladela",,"deladela",,,
+"",,,,,
+"",,,,,
+min. dela,,,,,
+"","deladela",,,,
+"",,,,,
+"",,,,,,,
+"",,,,,,,
+"",,,,,,,
+33,,3,3,36,,00,01
+"",,,,,,,
+"",,,,,,,
+"",FB,FC,,FD,,,
+"",,,,,,,
+""
+"",,,,,,,,,,,,,,,,,
+"",,,,,,,,,,,,,,,,,
+1,1,,00,,01,0,03,,,,,,,,,,
+"",,,,,,,,,,,,,,,,,
+"",,,,,,,,,,,,,,,,,
+""
+""
+""
+""
+""
+""
+3,0,1,,3,
+110,0,1,,3,
+CHCCDS
+"",
+"",
+CH0CCDE
+CH1CCDE
+"",
+"",
+"",
+"",
+"",
+CH2CCDE
+CH3CCDE
+"",
+"",
+"",0x000,Timer Counter Configuration Register,0x0000_0000
+MDCFR,0x00,Timer Mode Configuration Register,0x0000_0000
+TRCFR,0x008,Timer Trigger Configuration Register,0x0000_0000
+CTR,0x010,Time  Cont ol Registe,0x0000_0000
+CH0ICFR,0x00,Channel 0 Input Configuration Register,0x0000_0000
+CH1ICFR,0x0,Channel 1 Input Configuration Register,0x0000_0000
+CHICFR,0x08,Channel 2 Input Configuration Register,0x0000_0000
+CH3ICFR,0x0C,Channel 3 Input Configuration Register,0x0000_0000
+CH0OCFR,0x00,Channel 0 Output Configuration Register,0x0000_0000
+CH1OCFR,0x0,Channel 1 Output Configuration Register,0x0000_0000
+CHOCFR,0x08,Channel 2 Output Configuration Register,0x0000_0000
+CH3OCFR,0x0C,Channel 3 Output Configuration Register,0x0000_0000
+CHCTR,0x00,Channel Cont ol Registe,0x0000_0000
+CHPOLR,0x0,Channel Polarity Configuration Register,0x0000_0000
+DICTR,0x07,Time  PDMA / Intept Cont ol Registe,0x0000_0000
+EVGR,0x078,Time  Event Gene ato  Registe,0x0000_0000
+INTSR,0x07C,Time  Intept Stats Registe,0x0000_0000
+CNTR,0x080,Time  Conte  Registe,0x0000_0000
+PSCR,0x08,Time  P escale  Registe,0x0000_0000
+CRR,0x088,Time  Conte  Reload Registe,0x0000_FFFF
+CH0CCR,0x090,Channel 0 Capte/Compa e Registe,0x0000_0000
+CH1CCR,0x09,Channel 1 Capte/Compa e Registe,0x0000_0000
+CHCCR,0x098,ChannelCapte/Compa e Registe,0x0000_0000
+CH3CCR,0x09C,Channel 3 Capte/Compa e Registe,0x0000_0000
+CH0ACR,0x0A0,Channel 0 Asmmet ic Compa e Registe,0x0000_0000
+CH1ACR,0x0A,Channel 1 Asmmet ic Compa e Registe,0x0000_0000
+CHACR,0x0A8,ChannelAsmmet ic Compa e Registe,0x0000_0000
+0x0AC,Channel 3 Asmmet ic Compa e Registe,0x0000_0000,
+Rese ved,SPMSET,
+"",,
+Rese ved,MMSEL,
+"",,
+Rese ved,SMSEL,
+"",,
+Rese ved,TSE,
+MMSEL [2:0],Mode,Descriptions,
+000,Reset Mode,"The MTO in the Reset mode is an otpt de ivef om one of the following cases:1. Softwa e setting UEVG bit. The STI t igge  inpt signal which will be otpon the MTO signal line when the Time  issein the slave Resta t mode",
+001,Enable Mode,"The Conte  Enable signal issed as the t iggeotpt.",
+010,Update Mode,"Thepdate event issed as the tigge  otpacco ding to one of the following cases when thUEVDIS bit is clea ed to 0:1. Counter overflow / underflow. Softwa e setting UEVG3. Slave t igge  inpt whensed in slaveestamode","tt"
+011,"Capte/Compa eMode","When a Channel 0 capte ocompa e matcevent occs  it will gene ate a positive plssed as the maste  t igge  otpt.",
+100,Compa e Mode 0,"The Channel 0 Otptefe ence signal nameCH0OREF issed as the t igge  otpt.",
+101,Compa e Mode 1,"The Channel 1 Otptefe ence signal nameCH1OREF issed as the t igge  otpt.",
+110,Compa e Mode,"The ChannelOtptefe ence signal nameCHOREF issed as the t igge  otpt.",
+SMSEL [2:0],Mode,Descriptions,
+000,Disable mode,"The p escale  is clocked di ectlbthe inte nclock.",l
+001,"Qad ate Decodemode 1","The conteses the clock plse gene atefom the inteaction between the TI0 anTI1 signals to dive the contep escale .t ansition of the TI0 edge issed in this moddependingpon the TI1 level.",
+010,"Qad ate Decodemode","The conteses the clock plse gene atefom the inteaction between the TI0 anTI1 signals to dive the contep escale .t ansition of the TI1 edge issed in this moddependingpon the TI0 level.",
+011,"Qad ate Decodemode 3","The conteses the clock plse gene atefom the inteaction between the TI0 anTI1 signals to dive the contep escale .t ansition of one channel edge issed in thqad ate decode  mode 3 dependingpothe othe  channel level.",
+100,Resta t Mode,"The conte  valeesta ts f om 0 o  the CRshadowegistevale dependingpon thcontemode on theising edge of the Ssignal. Theegiste s will also bepdated.",I
+101,Pase Mode,"The conte  sta ts to cont when the selectetiggeinpt STI is high. The contestopconting on the instant  not beingeset  whethe STI signal changes its state to a low leveBoth the contestat and stop contol adete mined bthe STI signal.",.
+110,T igge  Mode,"The conte  sta ts to cont f om the oiginvale in the conte  on theising edge of thselected t igge  inpt STI. Onlthe conte  stacont ol is dete mined bthe STI signal.","lt"
+Rese ved,ETIPSC,ETF,
+Slave Timing Module,ITI0,ITI1,ITI2,
+GPTM0,GPTM1,MCTM0,MCTM1,
+Rese ved,CRBE,TME,
+Rese ved,CH0PSC,CH0CCS,
+Rese ved,CH1PSC,CH1CCS,
+Rese ved,CHPSC,CHCCS,
+Rese ved,CH3PSC,CH3CCS,
+"",,
+Rese ved,,
+"",,
+Rese ved,,
+"",,
+CNTV,,
+CNTV,
+Rese ved,
+Rese ved,
+PSCV,
+PSCV,
+Rese ved,
+"",
+Rese ved,
+"",
+CRV,
+"",
+CRV,
+"",,
+Rese ved,,
+"",,
+Rese ved,,
+"",,
+CH0CCV,,
+CH0CCV,
+Rese ved,
+Rese ved,
+CH1CCV,
+CH1CCV,
+"",,
+Rese ved,,
+"",,
+Rese ved,,
+"",,
+CHCCV,,
+"",,
+CHCCV,,
+Rese ved,
+Rese ved,
+CH3CCV,
+CH3CCV,
+"",,
+Rese ved,,
+"",,
+Rese ved,,
+"",,
+CH0ACV,,
+"",,
+CH0ACV,,
+"",,
+Rese ved,,
+"",,
+Rese ved,,
+"",,
+CH1ACV,,
+"",,
+CH1ACV,,
+Rese ved,
+Rese ved,
+CHACV,
+CHACV,
+"",,
+Rese ved,,
+"",,
+Rese ved,,
+"",,
+CH3ACV,,
+"",,
+CH3ACV,,
+"",0x000,BFTM Cont ol Registe,0x0000_0000
+BFTMSR,0x00,BFTM Stats Registe,0x0000_0000
+BFTMCNTR,0x008,BFTM Conte  Vale Registe,0x0000_0000
+0x00C,BFTM Compa e Vale Registe,0xFFFF_FFFF,
+Rese ved,CEN,OSM,MIEN
+"",,
+Rese ved,,
+"",,
+Rese ved,,
+"",,
+Rese ved,,
+"",,
+Rese ved,MIF,
+CNT,
+"",
+CNT,
+"",
+CNT,
+"",
+CNT,
+CMP,
+"",
+CMP,
+"",
+CMP,
+"",
+CMP,
+TME
+UEV1G
+"Trigger Controllerfsampling",,
+"",,
+"","SlaveControllerfCLKIN",
+"",,
+"",STIED,
+"",,
+"ClockControllerfCLKIN",,
+"",,
+"QuadratureDecoderfCLKIN",,
+DOWN_CNT,,
+"Master ControllerfCLKIN"
+""
+""
+""
+""
+""
+""
+""
+"",
+"Input Stage Blockfsampling",
+"Input Stage Blockfsampling",
+"ClockControllerfCLKIN",,,,,
+"",,,"RERERE",,
+"ChannelControllerfCLKIN","Output StageBlockfDTS / fCLKIN",,,,
+"ChannelControllerfCLKIN",,"Output StageBlockfDTS / fCLKIN",,,
+"",,CH1CCR,,,
+"",,,,,
+"",,CH2CCR,,,
+"",,,,,
+"",CH3CC,,,,
+"",,,,,
+"",,,,,
+""
+""
+""
+""
+"",,,,,,,,,,,,,,,,,,,
+"",,6,7,8,9,30,31,3,33,3,3
+""
+""
+"",,
+"",,
+"",XOR,TI0XOR
+"",,
+"EdgeDetection"
+"OtptModeCont olle"
+""
+""
+"",
+"",
+"",
+"Otpt EnableCont olle"
+""
+DTG
+CHxE
+CHxP
+CHOSSI
+CHxOIS
+CHDTG
+""
+REFxCE
+CHxOM
+"Otpt EnableCont olle"
+CHxNE,CHxE
+CHxNE
+CHMOE
+CHOSSI
+CHOSSR
+CHxOISN
+""
+"OtptModeCont olleCH3PfCLKINREFCECH3OM"
+CH3P
+"OtptModeCont olleCH3PfCLKINREFCECH3OM"
+REFCE
+CH3OM
+"OtptModeCont olleCH3PfCLKINREFCECH3OM","Otpt EnableCont olleCH3ECHMOECH3OIS"
+"OtptModeCont olle","Otpt EnableCont olle"
+"",
+"",
+"",CH3E
+"",CH3P
+"",CH3OIS
+"",
+REFCE,
+CH3OM,
+"Otpt EnableCont olleCH3ECHMOECH3OIS"
+CH3E
+"Otpt EnableCont olleCH3ECHMOECH3OIS"
+CH3OIS
+"Otpt EnableCont olleCH3ECHMOECH3OIS"
+"Otpt EnableCont olle"
+""
+BKP0
+BKF0
+BKE0
+BRKG
+BRK0IF
+"Delaline"
+Filte
+BKP1
+BKF1
+BKE1
+"Delaline"
+Filte
+BRK1IF
+"",,,,,
+"",,,,,
+"",,,,,
+"",,,,,
+"",,,,,
+"(1)",,(),(3),,
+"",,,,,
+"",,,,,
+""
+""
+""
+""
+"",Control bit,Output status,,,,,
+"",CHMOE,CHOSSI,CHOSSR,CHxE,CHxNE,MT_CHx Pin output state,"MT_CHxN Pin outputstate"
+"1(Run)",x,0,0,0,"Otpt disabled - floating- not d iven bthe timeMT_CHx (Note 1) = floatingMT_CHx_OEN (Note 2) = 1","Otpt disabled - floating- not d iven bthe timeMT_CHxN = floatingMT_CHxN_OEN = 1",
+"",0,0,1,"Otpt disable - floating- not d iven bthe timeMT_CHx_OEN = 1","Otpt enbaledMT_CHxN=CHx_OREFxo  CHxNPMT_CHxN_OEN = 0",,
+"",0,1,0,"Otpt enabledMT_CHx = CHx_OREF xoCHxPMT_CHx_OEN = 0","Otpt disabled - floating-  not d iven bthe timeMT_CHxN = floatingMT_CHxN_OEN = 1",,
+"",0,1,1,"Otpt enabledMT_CHx = CHx_OREF xoCHxP + dead-timeMT_CHx_OEN = 0","Otpt enabledMT_CHxN=not CHx_OREFxo  CHxNP + dead-timeMT_CHxN_OEN = 0",,
+"",1,0,0,"Otpt disabled - floating- not d iven bthe timeMT_CHx = floatingMT_CHx_OEN = 1","Otpt disabled floating- not d iven bthe timeMT_CHxN = floatingMT_CHxN_OEN = 1",,
+"",1,0,1,"Off-StateMT_CHx= CHxPMT_CHx_OEN = 0","Otpt enabledMT_CHxN=CHx_OREFxo  CHxNPMT_CHxN_OEN = 0",,
+"",1,1,0,"Otpt enbaledMT_CHx = CHx_OCREFxo  CHxPMT_CHx_OEN = 0","Off-StateMT_CHxN = CHxNPMT_CHxN_OEN = 0",,
+"",1,1,1,"Otpt enabledMT_CHx = CHx_OREF xoCHxP + dead-timeMT_CHx_OEN = 0","Otpt enabledMT_CHxN=not CHx_OREFxo  CHxNP + dead-timeMT_CHxN_OEN = 0",,
+0,0,0,"Befo e dead-time: Otpt disabled - floatingMT_CHx = floating,  MT_CHxN = floatingMT_CHx_OEN = 1   MT_CHxN_OEN = 1",,,,
+0,0,1,,,,,
+0,1,0,,,,,
+0,1,1,,,,,
+1,0,0,,,,,
+1,0,1,,,,,
+1,1,0,,,,,
+Counting mode,Level,TI0S0,TI1S1,,
+"",,Rising,Falling,Rising,Falling
+"Conting on TI0 onl(SMSEL = 0x01)",TI1S1 = High,Down,Up,—,—
+"",TI1S1 = Low,Up,Down,—,—
+"Conting on TI1 onl(SMSEL = 0x02)",TI0S0 = High,—,—,Up,Down
+TI0S0 = Low,—,—,Down,Up,
+TI1S1 = High,Down,Up,X,X,
+TI1S1 = Low,Up,Down,X,X,
+TI0S0 = High,X,X,Up,Down,
+"",,,,,
+"",,,,,
+"",,,,,
+T igge  bS,I,T igge  bS,,,
+"","Clea ed bUpdate Event",,,,
+"deladela",,"deladela",,,
+"",,,,,
+"",,,,,
+min. dela,,,,,
+"","deladela",,,,
+"",,,,,
+0,1,2,3,4,5,6,7,8,7,6,5,4,3,2,1,0,1,2,3,4,5,6,7,8,7,6,5,4,3,2,1,0,1,2,3,4,5,6,7,8,7,6,5,4,3,2,1
+"",CC,= 8,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"PWM center align modeCRR = 8CCR = 3, ACR = X",CC,= 8,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+CCR = 3,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"PWM center align modeCRR = 8CCR = 3, ACR = X"
+CC,= 8
+CC,= 8
+CCR = 3
+""
+""
+"",,,,,,,,,,,,,,,,,
+"",,,,,,,,,,,,,,,,,
+"",,,,,,,,,,,,,,,,,
+33,,3,3,36,,00,01,,,,,,,,,,
+"",,,,,,,,,,,,,,,,,
+"",,,,,,,,,,,,,,,,,
+"",FB,FC,,FD,,,,,,,,,,,,,
+"",,,,,,,,,,,,,,,,,
+""
+""
+""
+3,0,1,,3,
+110,0,1,,3,
+Lock Configuration,Protected Bits,,,,,
+Lock Level 1 (LOCKLV=‘01’),CHDTG,CHxOIS,CHxOISN,BKE,BKP,CHAOE
+Lock Level 2 (LOCKLV=‘10’),CHDTG,CHxOIS,CHxOISN,BKE,BKP,CHAOE
+CHxP,CHxNP,CHOSSI,CHOSSR,MCTMEN(1),CKMEN(2),
+CHDTG,CHxOIS,CHxOISN,BKE,BKP,CHAOE,
+CHxP,CHxNP,CHOSSI,CHOSSR,MCTMEN(1),CKMEN(2),
+CHCCDS
+"",
+"",
+"",
+"",
+"",
+"",1
+"",
+CH0CCDE
+CH1CCDE
+CH2CCDE
+CH3CCDE
+"",0x000,Timer Counter Configuration Register,0x0000_0000
+MDCFR,0x00,Timer Mode Configuration Register,0x0000_0000
+TRCFR,0x008,Timer Trigger Configuration Register,0x0000_0000
+CTR,0x010,Time  Cont ol Registe,0x0000_0000
+CH0ICFR,0x00,Channel 0 Input Configuration Register,0x0000_0000
+CH1ICFR,0x0,Channel 1 Input Configuration Register,0x0000_0000
+CHICFR,0x08,Channel 2 Input Configuration Register,0x0000_0000
+CH3ICFR,0x0C,Channel 3 Input Configuration Register,0x0000_0000
+CH0OCFR,0x00,Channel 0 Output Configuration Register,0x0000_0000
+CH1OCFR,0x0,Channel 1 Output Configuration Register,0x0000_0000
+CHOCFR,0x08,Channel 2 Output Configuration Register,0x0000_0000
+CH3OCFR,0x0C,Channel 3 Output Configuration Register,0x0000_0000
+CHCTR,0x00,Channel Cont ol Registe,0x0000_0000
+CHPOLR,0x0,Channel Polarity Configuration Register,0x0000_0000
+CHBRKCFR,0x06C,Channel Break Configuration Register,0x0000_0000
+CHBRKCTR,0x070,Channel B eak Cont ol Registe,0x0000_000A
+DICTR,0x07,Time  PDMA/Intept Cont ol Registe,0x0000_0000
+EVGR,0x078,Time  Event Gene ato  Registe,0x0000_0000
+INTSR,0x07C,Time  Intept Stats Registe,0x0000_0000
+CNTR,0x080,Time  Conte  Registe,0x0000_0000
+PSCR,0x08,Time  P escale  Registe,0x0000_0000
+CRR,0x088,Time  Conte  Reload Registe,0x0000_FFFF
+REPR,0x08C,Time  Repetition Registe,0x0000_0000
+CH0CCR,0x090,Channel 0 Capte/Compa e Registe,0x0000_0000
+CH1CCR,0x09,Channel 1 Capte/Compa e Registe,0x0000_0000
+CHCCR,0x098,ChannelCapte/Compa e Registe,0x0000_0000
+CH3CCR,0x09C,Channel 3 Capte/Compa e Registe,0x0000_0000
+CH0ACR,0x0A0,Channel 0 Asmmet ic Compa e Registe,0x0000_0000
+CH1ACR,0x0A,Channel 1 Asmmet ic Compa e Registe,0x0000_0000
+CHACR,0x0A8,ChannelAsmmet ic Compa e Registe,0x0000_0000
+0x0AC,Channel 3 Asmmet ic Compa e Registe,0x0000_0000,
+"",,,
+Rese ved,SPMSET,,
+"",,,
+Rese ved,MMSEL,,
+"",,,
+Rese ved,SMSEL,,
+"",,,
+Rese ved,TSE,,
+MMSEL [2:0],Mode,Descriptions,
+000,Reset Mode,"The MTO in the Reset mode is an otpt de ivef om one of the following cases:1. Softwa e setting UEV1G bit. Slave has t igge  inpt whensed in slavesta t mode",
+001,Enable Mode,"The Conte  Enable signal issed as the t iggotpt.",
+010,Update Mode,"Thepdate event 1 issed as the t igge  otpacco ding to one of the following cases when thUEV1DIS bit is clea ed to 0:1. Counter overflow/underflow. Softwa e setting UEV1G3. Slave has t igge  inpt whensed in slavesta t mode",t
+011,"Capte/CompaeMode","When a Channel 0 capte o  compa e matcevent occs  it will gene ate a positive plswhich issed as the maste  t igge  otpt.",
+100,Compa e otpt 0,"The Channel 0 Otptefe ence signal nameCH0OREF issed as the t igge  otpt.",
+101,Compa e otpt 1,"The Channel 1 Otptefe ence signal nameCH1OREF issed as the t igge  otpt.",
+110,Compa e otpt,"The ChannelOtptefe ence signal nameCHOREF issed as the t igge  otpt.",
+SMSEL [2:0],Mode,Descriptions,
+000,Disable mode,"The p escale  is clocked di ectlbthe inte nclock.",l
+001,"Qad ate Decodemode 1","The conteses the clock plses gene atefom the inteaction between the TI0 anTI1 signals to dive the conte  p escale .t ansition of the TI0 edge issed in this moddependingpon the TI1 level.",
+010,"Qad ate Decodemode","The conteses the clock plse gene atefom the inteaction between the TI0 anTI1 signals to dive the conte  p escale .t ansition of the TI1 edge issed in this moddependingpon the TI0 level.",
+011,"Qad ate Decodemode 3","The conteses the clock plse gene atefom the inteaction between the TI0 anTI1 signals to dive the conte  p escale .t ansition of one channel edge issed in thqad ate decode  mode 3 dependingpothe othe  channel level.",
+100,Resta t Mode,"The conte  valeesta ts f om 0 o  the CRshadowegistevale dependingpon thcontemode on theising edge of the STsignal. Theegiste s will also bepdated.",I
+101,Pase Mode,"The conte  sta ts to cont when the selectetiggeinpt STI is high. The contestopconting on the instant  not beingeset  whethe STI signal changes its state to a low levelBoth the contestat and stop cont ol adete mined bthe STI signal.",
+110,T igge  Mode,"The conte  sta ts to cont f om the oiginvale in the conte  on theising edge of thselected tiggeinpt STI. Onlthe staoconte  is cont olled.","lf"
+Rese ved,ETIPSC,ETF,
+Slave Timing Module,ITI0,ITI1,ITI2
+MCTM0,MCTM1,GPTM0,GPTM1
+Rese ved,CRBE,TME,
+"",,,
+TI0SRC,Rese ved,,
+"",,,
+Rese ved,CH0PSC,CH0CCS,
+"",,,
+Rese ved,,,
+"",,,
+Rese ved,TI0F,,
+"",,,
+Rese ved,,,
+"",,,
+Rese ved,CH1PSC,CH1CCS,
+"",,,
+Rese ved,,,
+"",,,
+Rese ved,TI1F,,
+Rese ved,CHPSC,CHCCS,
+Rese ved,CH3PSC,CH3CCS
+"",,
+Rese ved,,
+"",,
+Rese ved,,
+"",,
+CNTV,,
+CNTV,
+"",,
+Rese ved,,
+"",,
+Rese ved,,
+"",,
+PSCV,,
+"",,
+PSCV,,
+Rese ved,
+Rese ved,
+CRV,
+CRV,
+"",,
+Rese ved,,
+"",,
+Rese ved,,
+"",,
+Rese ved,,
+"",,
+REPV,,
+"",,
+Rese ved,,
+"",,
+Rese ved,,
+"",,
+CH0CCV,,
+CH0CCV,
+"",,
+Rese ved,,
+"",,
+Rese ved,,
+"",,
+CH1CCV,,
+CH1CCV,
+"",,
+Rese ved,,
+"",,
+Rese ved,,
+"",,
+CHCCV,,
+CHCCV,
+"",,
+Rese ved,,
+"",,
+Rese ved,,
+"",,
+CH3CCV,,
+CH3CCV,
+"",,
+Rese ved,,
+"",,
+Rese ved,,
+"",,
+CH0ACV,,
+CH0ACV,
+"",,
+Rese ved,,
+"",,
+Rese ved,,
+"",,
+CH1ACV,,
+CH1ACV,
+"",,
+Rese ved,,
+"",,
+Rese ved,,
+"",,
+CHACV,,
+CHACV,
+"",,
+Rese ved,,
+"",,
+Rese ved,,
+"",,
+CH3ACV,,
+"",,
+CH3ACV,,
+Startup mode,"LSECM Settingin the RTCCR register",Operating Current,Startup time
+No mal sta tp,0,3 μA,Above00 ms
+ROWM,ROES,RTCOUT Output Waveform
+"0(Pulse mode)","0Compa e match","RTCCMPRTCCNT3TRRTCOUT (ROAP = 0)RTCOUT (ROAP = 1)ROLF"
+"",,
+"1Second clock","RTCCMPXRTCCNT3TRTRTRRTCOUT (ROAP = 0)RTCOUT (ROAP = 1)ROLF",
+"",,
+"0Compa e match","RTCCMPRTCCNT3RTCOUT (ROAP = 0)RTCOUT (ROAP = 1)ROLF→",
+"",,
+""
+"",0x000,RTC Conte  Registe,0x0000_0000
+RTCCMP,0x00,RTC Compa e Registe,0x0000_0000
+RTCCR,0x008,RTC Cont ol Registe,0x0000_0F0
+RTCSR,0x00C,RTC Stats Registe,0x0000_0000
+0x010,RTC Intept and Wakep Enable Registe,0x0000_0000,
+"",RTCCNTV
+"","O0RO0RO0RO0RO0RO0RO022212019181716"
+"",RTCCNTV
+"","O0RO0RO0RO0RO0RO0RO0141312111098"
+"",RTCCNTV
+"","O0RO0RO0RO0RO0RO0RO06543210"
+"",RTCCNTV
+RTCCMPV,
+"",
+RTCCMPV,
+"",
+RTCCMPV,
+"",
+RTCCMPV,
+Rese ved,LSESM,CMPCLR,LSEEN,LSIEN,RTCSRC,RTCEN,
+Rese ved,OVFLAG,CMFLAG,CSECFLA,
+Rese ved,OVIEN,CMIEN,CSECIEN,
+"",0x000,Watchdog Time  Cont ol Registe,0x0000_0000
+WDTMR0,0x00,Watchdog Time  Mode Registe  0,0x0000_0FFF
+WDTMR1,0x008,Watchdog Time  Mode Registe  1,0x0000_7FFF
+WDTSR,0x00C,Watchdog Time  Stats Registe,0x0000_0000
+WDTPR,0x010,Watchdog Time  P otection Registe,0x0000_0000
+WDTCNTR,0x01,Watchdog Time  Conte  Registe,0x0000_0FFF
+0x018,Watchdog Time  Clock Selection Registe,0x0000_0000,
+"",30292827262524,,
+"",RSKEY,,
+"","O0WO0WO0WO0WO0WO0WO022212019181716",,
+"",RSKEY,,
+"","O0WO0WO0WO0WO0WO0WO0141312111098",,
+"",Rese ved,,
+"",6543210,,
+"",Rese ved,WDTRS,
+Rese ved,WPSC,WDTD,
+"",,
+Rese ved,,
+"",,
+Rese ved,,
+"",,
+PROTECT,,
+"",,
+PROTECT,,
+"",,,
+Rese ved,,,
+"",,,
+Rese ved,,,
+"",,,
+Rese ved,WDTCNT,,
+"",,,
+WDTCNT,,,
+"",,
+Rese ved,,
+"",,
+Rese ved,,
+"",,
+Rese ved,,
+S,A6,A5,A4,A3,A2,A1,A0,R/W,ACK
+"",Add ess,A,,Data1,A,,Data,A
+STA,ADRS,TXDE,TXDE,TXDE,,,,
+DataN,A,,P
+TXDE,,,
+"",Heade,A,Add ess,A,,Data1,A,,Data,A
+STA,ADRS,TXDE,TXDE,TXDE,,,,,,
+DataN,A,,P
+TXDE,,,
+"",Header,A,Address,A,
+STA,ADRS #1,,,,
+S,Address,A,,Data1,A,,Data2,A
+ADRS,TXDE,TXDE,TXDE,,,,,
+BEH1,BEH2,BEH2,BEH2,,,,,
+DataN,NA,,P,
+RXNACK,STO,,,
+BEH3,BEH4,,,
+S,Header,A,Address,A,
+ADRS #1,,,,,
+Sr,Header,A,,Data1,A,,Data2,A
+ADRS #2,TXDE,TXDE,TXDE,,,,,
+BEH1,BEH2,BEH2,BEH2,,,,,
+DataN,NA,,P,
+RXNACK,STO,,,
+BEH3,BEH4,,,
+S,Address,A,,Data1,A,,Data2,A
+ADRS,RXDNE,RXDNE,,,,,,
+BEH1,BEH2,BEH2,,,,,,
+DataN,A,,P,
+RXDNE,STO,,,
+BEH2,BEH3,,,
+S,Header,A,Address,A,,Data1,A,,Data2,A
+ADRS,RXDNE,RXDNE,,,,,,,,
+DataN,A,,P,
+RXDNE,STO,,,
+Type,Condition,Description,Eliminated
+Flag,TXDE,"I C issed in t ansmitted mode and ICDRegisteneeds to have data to t ansmit.(Note: TXDE won’t be assert after receiving a NACK)","Maste  case:W iting data to ICDRegisteSet TARSet STOPSlave case:W iting data to ICDRegiste"
+"",GCS,I C is add essed as slave th ogh gene al call,Reading ICSRegiste
+"",ADRS,"Maste :I C is sent ove  add ess f ame and isetned an ACKf om slave(Note: Reference Fig.11 and Fig.12)Slave:I C is add essed as slave device(Note: Reference Fig.13 and Fig.14)",Reading ICSRegiste
+"",STA,Maste  send START signal,Reading ICSRegiste
+"",RXBF,"Received a complete new data and meanwhile theRXDNE flag has been set already before.",Reading ICDRegiste
+Event,"MasteeceivesNACK","No matte  in add ess o  data f ame  onceeceived aNACK signal will hold SCL line in maste  mode.","Set TARSet STOP"
+"Maste  sendNACKsedineceivedmode","Occed wheneceiving the last data bte in Masteeceived modeNote: Refe ence Fig.11  and RXNACK flag won’t beasse t at this case","Set TARSet STOP",
+"",0x000,I C Cont ol Registe,0x0000_000
+ICIER,0x00,I C Intept Enable Registe,0x0000_0000
+ICADDR,0x008,I C Add ess Registe,0x0000_0000
+ICSR,0x00C,I C Stats Registe,0x0000_0000
+ICSHPGR,0x010,I C SCL High Pe iod Gene ation Registe,0x0000_0000
+ICSLPGR,0x01,I C SCL Low Pe iod Gene ation Registe,0x0000_0000
+ICDR,0x018,I C Data Registe,0x0000_0000
+ICTAR,0x01C,I C Ta get Registe,0x0000_0000
+ICADDMR,0x00,I C Add ess Mask Registe,0x0000_0000
+ICADDSR,0x0,I C Add ess Snoop Registe,0x0000_0000
+0x08,I C Timeot Registe,0x0000_0000,
+"",,,
+Rese ved,,,
+"",,,
+Rese ved,,,
+"",,,
+Rese ved,ADDR,,
+"",,,
+ADDR,,,
+"",
+Rese ved,
+"",
+Rese ved,
+"",
+SHPG,
+"",
+SHPG,
+"",
+Rese ved,
+"",
+Rese ved,
+"",
+SLPG,
+SLPG,
+I2C Clock,"TSCL = TPCLK  × [ (SHPG + d) + (SLPG + d) ]  (where d = 6)SHPG + SLPG value at PCLK",,,
+"",8MHz,24MHz,48MHz,72MHz
+100 kHz (Standard Mode),68,8,68,708
+400 kHz (Fast Mode),8,8,108,168
+1 MHz (Fast Mode Plus),x,1,36,60
+Rese ved,RWD,TAR,
+"",,
+Rese ved,,
+"",,
+Rese ved,,
+"",,
+Rese ved,ADDMR,
+"",,
+ADDMR,,
+"",,,
+Rese ved,,,
+"",,,
+Rese ved,,,
+"",,,
+Rese ved,ADDSR,,
+"",,,
+ADDSR,,,
+Rese ved
+Rese ved,PSC
+TOUT
+TOUT
+"Transmit/ReceiveLogicShiftRegister",
+"",
+"","ShiftRegister"
+"",
+"Transmit/ReceiveLogicShiftRegister"
+"ShiftRegister"
+"SPIDRSPI_TXFIFOTX BufferRX BufferSPI_RXFIFO",,"StatusSPISRSPIFSR"
+SPI_TXFIFO,SPISR,
+"",SPIFSR,
+TX Buffer,,
+RX Buffer,,
+SPI_RXFIFO,,
+SPICR0,,
+SPICR1,,
+"SPIDRSPI_TXFIFOTX BufferRX BufferSPI_RXFIFO"
+SPI_RXFIFO
+"SPIDRSPI_TXFIFOTX BufferRX BufferSPI_RXFIFO"
+TX Buffer
+"SPIDRSPI_TXFIFOTX BufferRX BufferSPI_RXFIFO"
+RX Buffer
+"SPIDRSPI_TXFIFOTX BufferRX BufferSPI_RXFIFO"
+SPI_TXFIFO
+"StatusSPISRSPIFSR"
+SPIFSR
+"StatusSPISRSPIFSR"
+SPISR
+SPICR0
+SPICR1
+SPIFCR
+SPIIER
+SPICPR
+FORMAT [2:0],CPOL,CPHA
+001,0,0
+010,0,1
+110,1,0
+101,1,1
+Othe s,Rese ved,
+"SCKMOSISPIMasterMISOSEL","SCKMOSISPIMasterMISOSEL",,,
+"",,,,
+"",,,,
+"",,,,
+"",,,,
+"I/O 0I/O 1I/O 2","I/O 0I/O 1I/O 2",,,
+"",,,,
+"",,,,
+"",SEL as Input - SELOEN = 0,SEL as Output - SELOEN = 1,,
+Mlti-maste,Sppo t,Not sppo t,,
+SPI SEL cont ol signal,"Use Anothe  GPIO toeplace theSEL pin fnction","SEL pin in ha dwa e o  softwa e mode-sing SELM setting",,
+Continos t ansfe,Case 1,Case,Case 1,Case
+Not sppo ted,Sppo ted,Using ha dwa e cont ol,Ha dwa e o  softwa e cont ol,
+"",0x000,SPI Cont ol Registe  0,0x0000_0000
+SPICR1,0x00,SPI Cont ol Registe  1,0x0000_0000
+SPIIER,0x008,SPI Intept Enable Registe,0x0000_0000
+SPICPR,0x00C,SPI Clock P escale  Registe,0x0000_0000
+SPIDR,0x010,SPI Data Registe,0x0000_0000
+SPISR,0x01,SPI Stats Registe,0x0000_0003
+SPIFCR,0x018,SPI FIFO Cont ol Registe,0x0000_0000
+SPIFSR,0x01C,SPI FIFO Stats Registe,0x0000_0000
+FORMAT [2:0],CPOL,CPHA
+001,0,0
+010,0,1
+110,1,0
+101,1,1
+Rese ved,
+Rese ved,
+CP,
+CP,
+"",,
+Rese ved,,
+"",,
+Rese ved,,
+"",,
+DR,,
+DR,
+"",,,
+Rese ved,,,
+"",,,
+Rese ved,,,
+"",,,
+Rese ved,,,
+"",,,
+RXFS,TXFS,,
+Rese ved,
+"",
+Rese ved,
+"",
+TOC,
+"",
+TOC,
+Baud rate,CK_USART = 72 MHz,,,,
+No,Kbps,Actual,BRD/16,BRD,Error rate
+1,.,.,187,30000,0%
+"",9.6,9.6,68.7,700,0%
+3,19.,19.,3.37,370,0%
+"",7.6,7.6,78.1,10,0%
+"",11.,11.,39.06,6,0%
+6,30.,30.769,19.,31,0.16%
+7,60.8,61.38,9.7,16,0.16%
+8,91.6,93.076,.87,78,0.16%
+9,0,0,,3,0%
+Start
+1
+1
+3
+3
+5,,"66"
+5,,
+"",0x000,USART Receive  Bffe  Registe,0x0000_0000
+TBR,0x000,USART T ansmitte  Bffe  Registe,0x0000_0000
+IER,0x00,USART Intept Enable Registe,0x0000_0000
+IIR,0x008,USART Interrupt Identification Register,0x0000_0001
+FCR,0x00C,USART FIFO Cont ol Registe,0x0000_0001
+LCR,0x010,USART Line Cont ol Registe,0x0000_0000
+MODCR,0x01,USART Modem Cont ol Registe,0x0000_0000
+LSR,0x018,USART Line Stats Registe,0x0000_0060
+MODSR,0x01C,USART Modem Stats Registe,0x0000_0000
+TPR,0x00,USART Timing Pa amete  Registe,0x0000_0000
+MDR,0x0,USART Mode Registe,0x0000_0000
+I DACR,0x08,USART I DA Cont ol Registe,0x0000_0000
+RS8CR,0x0C,USART RS8Cont ol Registe,0x0000_0000
+SYNCR,0x030,USART Snch onos Cont ol Registe,0x0000_0000
+FSR,0x03,USART FIFO Stats Registe,0x0000_0000
+DLR,0x038,USART Divide  Latch Registe,0x0000_0010
+0x00,USART Debg/Test Registe,0x0000_0000,
+"",,,
+Rese ved,,,
+"",,,
+Rese ved,,,
+"",,,
+Rese ved,RD,,
+"",,,
+RD,,,
+"",,,
+"",,,
+Rese ved,,,
+"",,,
+Rese ved,,,
+"",,,
+Rese ved,TD,,
+"",,,
+TD,,,
+Rese ved,IID,NIP,
+IID & NIP,Priority,Interrupt Type,Interrupt Source,Interrupt Reset control
+xxx1,NA,None,None,NA
+0110,Highest,"Receive  Line StatsIntept(Irpt_RLSI)","USART occs oven eopa iteof aming eoob eak events.[note] In RS8mode  it canindicate the add ess detection.",Reading the LSRegiste .
+0100,Second,"Receive  FIFO Th esholdLevel Intept(Irpt_RFTLI)","Receive  FIFO th eshold level iseached","Read the RBRegiste  todec ease theeceive  FIFOlevel to less than the specifiedth eshold."
+1100,Second,"Receive  FIFO Time-otIntept(Irpt_RTOI)","Receive  FIFO is not emptandno activities have occed in theeceive  FIFO ding the RTOICtime-ot dation",Reading the RBRegiste
+0010,Thi d,"T ansmitte  FIFOTh eshold Level Intept(Irpt_TFTLI)","T ansmitte  FIFO level is lessthan the t ansmitte  FIFOth eshold level which is setby the TFTL field in the FIFOCont ol Registe  named FCR.","W iting data into the TBRegiste ."
+"",,
+Rese ved,,
+"",,
+Rese ved,,
+"",,
+Rese ved,,
+"",,,
+Rese ved,,,
+"",,,
+Rese ved,,,
+"",,,
+TG,,,
+"",,,
+RTOIE,RTOIC,,
+"",
+Rese ved,
+"",
+Rese ved,
+"",
+I DAPSC,
+I DAPSC,
+"",,
+Rese ved,,
+"",,
+Rese ved,,
+"",,
+ADDMATCH,,
+"",,
+Rese ved,,
+"",,
+Rese ved,,
+"",,
+BRD,,
+BRD,
+"",,,
+Rese ved,,,
+"",,,
+Rese ved,,,
+"",,,
+Rese ved,,,
+"",,,
+Rese ved,LBM,,
+Baud rate,CK_UART = 72 MHz,,,,
+No,Kbps,Actual,BRD/16,BRD,Error rate
+1,.,.,187,30000,0%
+"",9.6,9.6,68.7,700,0%
+3,19.,19.,3.37,370,0%
+"",7.6,7.6,78.1,10,0%
+"",11.,11.,39.06,6,0%
+6,30.,30.769,19.,31,0.16%
+7,60.8,61.38,9.7,16,0.16%
+8,91.6,93.076,.87,78,0.16%
+9,0,0,,3,0%
+"",0x000,UART Receive  Bffe  Registe,0x0000_0000
+TBR,0x000,UART T ansmitte  Bffe  Registe,0x0000_0000
+IER,0x00,UART Intept Enable Registe,0x0000_0000
+IIR,0x008,UART Interrupt Identification Register,0x0000_0001
+FCR,0x00C,UART FIFO Cont ol Registe,0x0000_0001
+LCR,0x010,UART Line Cont ol Registe,0x0000_0000
+LSR,0x018,UART Line Stats Registe,0x0000_0060
+TPR,0x00,UART Timing Pa amete  Registe,0x0000_0000
+MDR,0x0,UART Mode Registe,0x0000_0000
+FSR,0x03,UART FIFO Stats Registe,0x0000_0000
+DLR,0x038,UART Divide  Latch Registe,0x0000_0010
+"",,
+Rese ved,,
+"",,
+Rese ved,,
+"",,
+Rese ved,RD,
+"",,
+RD,,
+"",,,
+Rese ved,,,
+"",,,
+Rese ved,,,
+"",,,
+Rese ved,TD,,
+"",,,
+TD,,,
+"",,
+Rese ved,,
+"",,
+Rese ved,,
+"",,
+Rese ved,,
+"",,
+Rese ved,,
+"",,
+Rese ved,,
+"",,
+Rese ved,,
+Rese ved,IID,NIP,
+"IIR[3:1]& NIP[0]",Priority,Interrupt Type,Interrupt Source,Interrupt Reset control
+xxx1,NA,None,None,NA
+0110,Highest,"Receive  Line StatsIntept(Irpt_RLSI)","UART occs oven eopa iteof aming eoo  b eak events.[note] In RS8mode  it canindicate the add ess detection.",Reading the LSRegiste .
+0100,Second,"Receive  FIFO Th esholdLevel Intept(Irpt_RFTLI)","Receive  FIFO th eshold level iseached","Read the RBRegisteto dec ease theeceiveFIFO level to less than thespecified threshold."
+1100,Second,"Receive  FIFO Time-otIntept(Irpt_RTOI)","Receive  FIFO is not emptandno activities have occed in theeceive  FIFO ding the RTOICtime-ot dation",Reading the RBRegiste
+Rese ved,,
+"",,
+Rese ved,,
+"",,
+TG,,
+"",,
+RTOIE,RTOIC,
+"",,
+Rese ved,,
+"",,
+Rese ved,,
+"",,
+BRD,,
+BRD,
+"",,,
+Rese ved,,,
+"",,,
+Rese ved,,,
+"",,,
+Rese ved,,,
+"",,,
+Rese ved,LBM,,
+6-bit Prescaler
+"11-bit ElementaryTime Unit(ETU)"
+"9-bitGuard TimeCounter(GT)"
+""
+DI field,0001,0010,0011,0100,0101,0110,1000,1001
+FI field,0000,0001,0010,0011,0100,0101,0110,1001,1010,1011,1100,1101
+"FiDi",372,558,774,1116,1488,1860,512,768,1024,1536,2048
+1,37,8,7,1116,188,1860,1,768,10,136,08
+"",186,79,37,8,7,930,6,38,1,768,10
+"",93,139.,186,79,37,6,18,19,6,38,1
+8,6.,69.7,93,139.,186,3.,6,96,18,19,6
+16,3.,3.87,6.,69.7,93,116.,3,8,6,96,18
+3,11.6,17.3,3.,3.87,6.,8.13,16,,3,8,6
+1,31,6.,6,93,1,1,.66,6,8.33,18,170.6
+"Ca d Inse tion/RemovalReqest flag CPREF"
+"0CARDIRE1"
+"Ca d Inse tion/Removalpending flag CARDIRP"
+"T ansmit Bffe  Empteqest flag TXBEF"
+"0TXBEE1"
+"T ansmit Bffe  Emptpending flag TXBEP"
+"End of T ansmissionReqest flag TXCF"
+"0TXCE1"
+"End of T ansmissionpending flag TXCP"
+"End of ReceptionReqest flag RXCF"
+"0RXCE1"
+"End of Receptionpending flag RXCP",
+"Pa itEoReqest flag PARF"
+"0PARE1"
+"Pa itEopending flag PARP"
+"WTC Unde flowReqest flag WTF"
+"0WTE1"
+"WTC Unde flowpending flag WTP"
+"",0x000,SCI Cont ol Registe,0x0000_0000
+SR,0x00,SCI Stats Registe,0x0000_0080
+CCR,0x008,SCI Contact Cont ol Registe,0x0000_0008
+ETUR,0x00C,SCI ElementaTime Unit Registe,0x0000_017
+GTR,0x010,SCI Ga d Time Registe,0x0000_000C
+WTR,0x01,SCI Waiting Time Registe,0x0000_80
+IER,0x018,SCI Intept Enable Registe,0x0000_0000
+IPR,0x01C,SCI Intept Pending Registe,0x0000_0000
+TXB,0x00,SCI T ansmit Bffe,0x0000_0000
+RXB,0x0,SCI Receive Bffe,0x0000_0000
+"",,,,
+Rese ved,,,,
+"",,,,
+Rese ved,,,,
+"",,,,
+Rese ved,RXDMA,TXDMA,,
+Rese ved,RXDMA,TXDMA,
+Rese ved,RXDMA,TXDMA,
+DETCNT,SCI_DET pin,STATUS
+0,1,No ca d inse t
+0,0,Ca d inse t
+1,1,Ca d inse t
+"",,,
+Rese ved,,,
+"",,,
+Rese ved,,,
+"",,,
+Rese ved,GT,,
+"",,,
+GT,,,
+"",,
+Rese ved,,
+"",,
+WT,,
+"",,
+WT,,
+"",,
+WT,,
+"",,
+Rese ved,,
+"",,
+"",,
+"",,
+Rese ved,,
+"",,
+TB,,
+Rese ved,
+Rese ved,
+Rese ved,
+RB,
+Rese ved,
+Rese ved,
+Rese ved,
+Rese ved,PSC,
+"EndpointNumber","NumberAddress",Transfer Type,Direction,Buffer Type
+0,Fixed,Cont ol,IN and OUT,Single bffe ing
+1~3,Configurable,Intept/Blk,IN o  OUT,Single bffe ing
+"~7",Configurable,Intept/Blk/Isoch onos,IN o  OUT,Single o  Doble bffe ing
+"TransferType",Direction,Supported Buffer Size,Bandwidth,CRC,Retrying
+Cont ol,Bidi ectional,8  16  36,Not ga anteed,Yes,Atomatic
+Blk,Unidi ectional,8  16  36,Not ga anteed,Yes,Yes
+Intept,Unidi ectional,≤ 64,Not ga anteed,Yes,Yes
+Not used space:158 words
+Endpoint 5 buffer 1:64 bytes
+Endpoint 5 buffer 0:64 bytes
+Endpoint 4 buffer 1:64 bytes
+Endpoint 4 buffer 0:64 bytes
+Endpoint 0 OUT buffer:64 bytes
+Endpoint 0 IN buffer:64 bytes
+Reserved for Endpoint 0:8 bytes
+Endpoint 4
+Buf 0
+Endpoint 4
+Buf 1
+""
+Endpoint 4
+Buf 0
+"",0x000,USB Cont ol and Stats Registe,0x0000_00X6
+USBIER,0x00,USB Intept Enable Registe,0x0000_0000
+USBISR,0x008,USB Intept Stats Registe,0x0000_0000
+USBFCR,0x00C,USB F ame Cont Registe,0x0000_0000
+USBDEVAR,0x010,USB Device Add ess Registe,0x0000_0000
+USBEP0CSR,0x01,USB Endpoint 0 Cont ol and Stats Registe,0x0000_000
+USBEP0IER,0x018,USB Endpoint 0 Intept Enable Registe,0x0000_0000
+USBEP0ISR,0x01C,USB Endpoint 0 Intept Stats Registe,0x0000_0000
+USBEP0TCR,0x00,USB Endpoint 0 T ansfe  Cont Registe,0x0000_0000
+USBEP0CFGR,0x0,USB Endpoint 0 Configuration Register,0x8000_000
+USBEP1CSR,0x08,USB Endpoint 1 Cont ol and Stats Registe,0x0000_000
+USBEP1IER,0x0C,USB Endpoint 1 Intept Enable Registe,0x0000_0000
+USBEP1ISR,0x030,USB Endpoint 1 Intept Stats Registe,0x0000_0000
+USBEP1TCR,0x03,USB Endpoint 1 T ansfe  Cont Registe,0x0000_0000
+USBEP1CFGR,0x038,USB Endpoint 1 Configuration Register,0x1000_03FF
+USBEPCSR,0x03C,USB EndpointCont ol and Stats Registe,0x0000_000
+USBEPIER,0x00,USB EndpointIntept Enable Registe,0x0000_0000
+USBEPISR,0x0,USB EndpointIntept Stats Registe,0x0000_0000
+USBEPTCR,0x08,USB EndpointT ansfe  Cont Registe,0x0000_0000
+USBEPCFGR,0x0C,USB Endpoint 2 Configuration Register,0x1000_03FF
+Register,Offset,Description,Reset Value
+USBEP3IER,0x0,USB Endpoint 3 Intept Enable Registe,0x0000_0000
+USBEP3ISR,0x08,USB Endpoint 3 Intept Stats Registe,0x0000_0000
+USBEP3TCR,0x0C,USB Endpoint 3 T ansfe  Cont Registe,0x0000_0000
+USBEP3CFGR,0x060,USB Endpoint 3 Configuration Register,0x1000_03FF
+USBEPCSR,0x06,USB EndpointCont ol and Stats Registe,0x0000_000
+USBEPIER,0x068,USB EndpointIntept Enable Registe,0x0000_0000
+USBEPISR,0x06C,USB EndpointIntept Stats Registe,0x0000_0000
+USBEPTCR,0x070,USB EndpointT ansfe  Cont Registe,0x0000_0000
+USBEPCFGR,0x07,USB Endpoint 4 Configuration Register,0x1000_03FF
+USBEPCSR,0x078,USB EndpointCont ol and Stats Registe,0x0000_000
+USBEPIER,0x07C,USB EndpointIntept Enable Registe,0x0000_0000
+USBEPISR,0x080,USB EndpointIntept Stats Registe,0x0000_0000
+USBEPTCR,0x08,USB EndpointT ansfe  Cont Registe,0x0000_0000
+USBEPCFGR,0x088,USB Endpoint 5 Configuration Register,0x1000_03FF
+USBEP6CSR,0x08C,USB Endpoint 6 Cont ol and Stats Registe,0x0000_000
+USBEP6IER,0x090,USB Endpoint 6 Intept Enable Registe,0x0000_0000
+USBEP6ISR,0x09,USB Endpoint 6 Intept Stats Registe,0x0000_0000
+USBEP6TCR,0x098,USB Endpoint 6 T ansfe  Cont Registe,0x0000_0000
+USBEP6CFGR,0x09C,USB Endpoint 6 Configuration Register,0x1000_03FF
+USBEP7CSR,0x0A0,USB Endpoint 7 Cont ol and Stats Registe,0x0000_000
+USBEP7IER,0x0A,USB Endpoint 7 Intept Enable Registe,0x0000_0000
+USBEP7ISR,0x0A8,USB Endpoint 7 Intept Stats Registe,0x0000_0000
+USBEP7TCR,0x0AC,USB Endpoint 7 T ansfe  Cont Registe,0x0000_0000
+"[RXDP, RXDM] Status",Wakeup event,Required resume software action
+00,Rooteset,None
+10,None (noise on bus),Go back to sspend mode
+01,Rootesme,None
+11,Not allowed (noise on bus),Go back to sspend mode
+Rese ved,LSOF,SOFLCK,
+"",,,
+Rese ved,,,
+"",,,
+Rese ved,,,
+"",,,
+Rese ved,,,
+"",,,
+Rese ved,DEVA,,
+"",,,
+Rese ved,,,
+"",,,
+Rese ved,RXCNT,,
+"",,,
+Rese ved,,,
+"",,,
+Rese ved,TXCNT,,
+"",,,
+EPEN,Rese vedEPADR,,
+"",,,
+Rese ved,EPLEN,,
+"",,,
+EPLEN,EPBUFA,,
+"",,,
+EPBUFA,,,
+"",,,
+Rese ved,,,
+"",,,
+Rese ved,,,
+"",,,
+Rese ved,TCNT,,
+"",,,
+TCNT,,,
+Transaction Type,UDBTG,MDBTG,Buffer read by SIE,Buffer written by CP,
+0,0,None*,EP_BUF0,,
+0,1,EP_BUF0,EP_BUF1,,
+1,0,EP_BUF1,EP_BUF0,,
+Transaction Type,UDBTG,MDBTG,Buffer written by SIE,Buffer read by CPU
+OUT,0,0,None*,EP_BUF1
+0,1,EP_BUF0,EP_BUF1,
+1,0,EP_BUF1,EP_BUF0,
+1,1,None*,EP_BUF0,
+"",,
+Rese ved,,
+"",,
+Rese ved,,
+"",,
+"",,
+Rese ved,TCNT1,
+"",,
+TCNT1,,
+"",,
+Rese ved,TCNT0,
+"",,
+TCNT0,,
+SDBS,Rese ved,EPLEN,
+"IP(x=0,1)",PDMA Channel Number,,,,,,,
+"",CH0,CH1,CH2,CH3,CH4,CH5,CH6,CH7
+ADC,ADC,,,,,,,
+SPIx,SPI0_RX,SPI0_TX,,,SPI1_RX,SPI1_TX,,
+USARTx,,,USR0_RX,USR0_TX,,,USR1_TX,USR1_RX
+UARTx,UR0_RX,UR0_TX,,,UR1_RX,UR1_TX,,
+SCI,,,,,,,SCI_RX,SCI_TX
+ICx,,,IC0_RX,,IC0_TX,,IC1_RX,IC1_TX
+MCTMx,MT0_CH0,"MT1_CH0MT0_TRIG","MT0_CH1MT1_CH","MT0_CH3MT1_UEV1","MT0_CHMT1_CH1","MT0_UEV1MT1_CH3",MT1_UEV,"MT0_UEVMT1_TRIG"
+GPTMx,"GT0_CH1GT0_CH3",GT0_UEV,GT0_CH,"GT0_CH0GT0_TRIG",GT1_CH0,"GT1_CH1GT1_UEV","GT1_CHGT1_TRIG",GT1_CH3
+CH0,CH1,CH0,CH1,CH2,CH1,CH2,CH2
+"",0x000,PDMA Channel 0 Cont ol Registe,0x0000_0000
+PDMACH0SADR,0x00,PDMA Channel 0 Soce Add ess Registe,0x0000_0000
+PDMACH0DADR,0x008,PDMA Channel 0 Destination Add ess Registe,0x0000_0000
+PDMACH0CADR,0x00C,PDMA Channel 0 Cent Add ess Registe,0x0000_0000
+PDMACH0TSR,0x010,PDMA Channel 0 T ansfe  Size Registe,0x0000_0000
+"",0x018,PDMA Channel 1 Cont ol Registe,0x0000_0000
+PDMACH1SADR,0x01C,PDMA Channel 1 Soce Add ess Registe,0x0000_0000
+PDMACH1DADR,0x00,PDMA Channel 1 Destination Add ess Registe,0x0000_0000
+PDMACH1CADR,0x0,PDMA Channel 1 Cent Add ess Registe,0x0000_0000
+PDMACH1TSR,0x08,PDMA Channel 1 T ansfe  Size Registe,0x0000_0000
+"",0x030,PDMA ChannelCont ol Registe,0x0000_0000
+PDMACHSADR,0x03,PDMA ChannelSoce Add ess Registe,0x0000_0000
+PDMACHDADR,0x038,PDMA ChannelDestination Add ess Registe,0x0000_0000
+PDMACHCADR,0x03C,PDMA ChannelCent Add ess Registe,0x0000_0000
+PDMACHTSR,0x00,PDMA ChannelT ansfe  Size Registe,0x0000_0000
+0x0,PDMA ChannelCent T ansfe  Size Registe,0x0000_0000,
+"",0x08,PDMA Channel 3 Cont ol Registe,0x0000_0000
+PDMACH3SADR,0x0C,PDMA Channel 3 Soce Add ess Registe,0x0000_0000
+PDMACH3DADR,0x00,PDMA Channel 3 Destination Add ess Registe,0x0000_0000
+PDMACH3CADR,0x0,PDMA Channel 3 Cent Add ess Registe,0x0000_0000
+PDMACH3TSR,0x08,PDMA Channel 3 T ansfe  Size Registe,0x0000_0000
+"",0x060,PDMA ChannelCont ol Registe,0x0000_0000
+PDMACHSADR,0x06,PDMA ChannelSoce Add ess Registe,0x0000_0000
+PDMACHDADR,0x068,PDMA ChannelDestination Add ess Registe,0x0000_0000
+PDMACHCADR,0x06C,PDMA ChannelCent Add ess Registe,0x0000_0000
+PDMACHTSR,0x070,PDMA ChannelT ansfe  Size Registe,0x0000_0000
+"",0x078,PDMA ChannelCont ol Registe,0x0000_0000
+PDMACHSADR,0x07C,PDMA ChannelSoce Add ess Registe,0x0000_0000
+PDMACHDADR,0x080,PDMA ChannelDestination Add ess Registe,0x0000_0000
+PDMACHCADR,0x08,PDMA ChannelCent Add ess Registe,0x0000_0000
+PDMACHTSR,0x088,PDMA ChannelT ansfe  Size Registe,0x0000_0000
+"",0x090,PDMA Channel 6 Cont ol Registe,0x0000_0000
+PDMACH6SADR,0x09,PDMA Channel 6 Soce Add ess Registe,0x0000_0000
+PDMACH6DADR,0x098,PDMA Channel 6 Destination Add ess Registe,0x0000_0000
+PDMACH6CADR,0x09C,PDMA Channel 6 Cent Add ess Registe,0x0000_0000
+PDMACH6TSR,0x0A0,PDMA Channel 6 T ansfe  Size Registe,0x0000_0000
+"",0x0A8,PDMA Channel 7 Cont ol Registe,0x0000_0000
+PDMACH7SADR,0x0AC,PDMA Channel 7 Soce Add ess Registe,0x0000_0000
+PDMACH7DADR,0x0B0,PDMA Channel 7 Destination Add ess Registe,0x0000_0000
+PDMACH7CADR,0x0B,PDMA Channel 7 Cent Add ess Registe,0x0000_0000
+PDMACH7TSR,0x0B8,PDMA Channel 7 T ansfe  Size Registe,0x0000_0000
+0x0BC,PDMA Channel 7 Cent T ansfe  Size Registe,0x0000_0000,
+"",0x10,PDMA Intept Stats Registe  0,0x0000_0000
+PDMAISR1,0x1,PDMA Intept Stats Registe  1,0x0000_0000
+PDMAICLR0,0x18,PDMA Intept Stats Clea  Registe  0,0x0000_0000
+PDMAICLR1,0x1C,PDMA Intept Stats Clea  Registe  1,0x0000_0000
+PDMAIER0,0x130,PDMA Intept Enable Registe  0,0x0000_0000
+SADRn,
+"",
+SADRn,
+"",
+SADRn,
+"",
+SADRn,
+DADRn,
+"",
+DADRn,
+"",
+DADRn,
+"",
+DADRn,
+CSADRn[1:8],
+"",
+CSADRn[7:0],
+"",
+CDADRn[1:8],
+"",
+CDADRn[7:0],
+BLKCNTn[1:8],
+"",
+BLKCNTn[7:0],
+"",
+BLKLENn[1:8],
+"",
+BLKLENn[7:0],
+CBLKCNTn[1:8],
+"",
+CBLKCNTn[7:0],
+"",
+CBLKLENn[1:8],
+"",
+CBLKLENn[7:0],
+Rese ved,TEISTA7,TCISTA7,
+Rese ved,TEICLR7,TCICLR7,
+"AHBTransaction","8-bit ExternalDevice Transaction","16-bit External DeviceTransaction (with byte lanes)","16-bit External DeviceTransaction (without byte lanes)"
+8-bitead,1 × 8-bit read,"1 × 8-bit read(using byte lane)","1 × 16-bit read(EBI ignore the superfluous data)"
+16-bitead,2 × 8-bit read,1 × 16-bit read,1 × 16-bit read
+3-bitead,4 × 8-bit read,2 × 16-bit read,2 × 16-bit read
+8-bit w ite,1 × 8-bit write,1 × 8-bit write (using byte lane),"1 × 16-bit read;1 × 16-bit write(EBI read-modify-write)"
+16-bit w ite,2 × 8-bit write,1 × 16-bit write,1 × 16-bit write
+"ExternalBus Width",Access from AHB Master,Access to External Bus Interface (EBI),,,,
+"",Access type,"AddressHADDR[1:0]Note",Access split,"Outputvalue fromEBI_A[1:0]","Valid data atEBI_AD[15:0]","Outputvalue fromEBI_BL[1:0]"
+8-bit,Byte (8-bit),0b00,No split,0b00,EBI_AD[7:0],0b10
+"",0b01,No split,0b01,,,
+"",0b10,No split,0b10,,,
+"",0b11,No split,0b11,,,
+"Half-wo d(16-bit)",0b00,1/access,0b00,,,
+"",,/access,0b01,,,
+"Half-wo d(16-bit)",0b10,1/access,0b10,,,
+"",,/access,0b11,,,
+"Wo d(32-bit)",0b00,1/access,0b00,,,
+"",,/access,0b01,,,
+"",,3/access,0b10,,,
+"",,/access,0b11,,,
+Byte (8-bit),0b00,No split,0bx0,EBI_AD[7:0],0b10,
+"",0b01,No split,0bx0,EBI_AD[1:8],0b01,
+"",0b10,No split,0bx1,EBI_AD[7:0],0b10,
+"",0b11,No split,0bx1,EBI_AD[1:8],0b01,
+"Half-wo d(16-bit)",0b00,No split,0bx0,EBI_AD[1:0],0b00,
+0b10,No split,0bx1,EBI_AD[1:0],0b00,,
+1/access,0bx0,EBI_AD[1:0],0b00,,,
+""
+EBI Bank 3 (64MB)
+EBI Bank 2 (64MB)
+EBI Bank 1 (64MB)
+EBI Bank 0 (64MB)
+"",0x000,EBI Cont ol Registe,0x0000_0000
+EBIPCR,0x00,EBI Page Cont ol Registe,0x0000_0F00
+EBISR,0x008,EBI Stats Registe,0x0000_0010
+EBIATR0,0x010,EBI Add ess Timing Registe  0,0x0000_0F0F
+EBIRTR0,0x01,EBI Read Timing Registe  0,0x000F_3F0F
+EBIWTR0,0x018,EBI W ite Timing Registe  0,0x000F_3F0F
+EBIPR0,0x01C,EBI Pa itRegiste  0,0x0000_0000
+EBIATR1,0x00,EBI Add ess Timing Registe  1,0x0000_0F0F
+EBIRTR1,0x0,EBI Read Timing Registe  1,0x000F_3F0F
+EBIWTR1,0x08,EBI W ite Timing Registe  1,0x000F_3F0F
+EBIPR1,0x0C,EBI Pa itRegiste  1,0x0000_0000
+EBIATR,0x030,EBI Add ess Timing Registe,0x0000_0F0F
+EBIRTR,0x03,EBI Read Timing Registe,0x000F_3F0F
+EBIWTR,0x038,EBI W ite Timing Registe,0x000F_3F0F
+EBIPR,0x03C,EBI Pa itRegiste,0x0000_0000
+EBIATR3,0x00,EBI Add ess Timing Registe  3,0x0000_0F0F
+EBIRTR3,0x0,EBI Read Timing Registe  3,0x000F_3F0F
+EBIWTR3,0x08,EBI W ite Timing Registe  3,0x000F_3F0F
+EBIPR3,0x0C,EBI Pa itRegiste  3,0x0000_0000
+EBIIENR,0x00,EBI Intept Enable Registe,0x0000_0000
+EBIIFR,0x0,EBI Intept Flag Registe,0x0000_0000
+0x08,EBI Intept Clea  Registe,0x0000_0000,
+"",,
+Rese ved,,
+"",,
+Rese ved,,
+"",,
+Rese ved,ADDRHOLD,
+"",,
+Rese ved,ADDRSETUP,
+"",,
+Rese ved,PGEN,
+"",,
+Rese ved,RDHOLD,
+"",,
+Rese ved,RDSTRB,
+"",,
+Rese ved,RDSETUP,
+"",,
+Rese ved,,
+"",,
+Rese ved,WRHOLD,
+"",,
+Rese ved,WRSTRB,
+"",,
+Rese ved,WRSETUP,
+"",512 FS,384 FS,256 FS,192 FS,128 FS,64 FS,32 FS,16 FS,,,,,,,,
+Fs (Hz),X,Y,X,Y,X,Y,X,Y,X,Y,X,Y,X,Y,X,Y
+8 000,—,—,8,1,3,1,,1,16,1,8,1,,1,,1
+11 0,—,—,—,—,8,1,9,3,,,1,38,9,0,3,136
+1000,—,—,—,—,8,1,36,1,,1,1,1,6,1,3,1
+16 000,—,—,—,—,—,—,8,1,3,1,16,1,8,1,,1
+00,—,—,—,—,—,—,—,—,8,1,,,1,38,9,0
+000,—,—,—,—,—,—,—,—,8,1,,1,1,1,6,1
+3000,—,—,—,—,—,—,—,—,—,—,3,1,16,1,8,1
+100,—,—,—,—,—,—,—,—,—,—,8,1,,,1,38
+8 000,—,—,—,—,—,—,—,—,—,—,8,1,,1,1,1
+96 000,—,—,—,—,—,—,—,—,—,—,—,—,8,1,,1
+"",512 FS,384 FS,256 FS,192 FS,128 FS,64 FS,32 FS,16 FS,,,,,,,,
+Fs (Hz),X,Y,X,Y,X,Y,X,Y,X,Y,X,Y,X,Y,X,Y
+8 000,18,11,8,1,9,11,,1,,3,1,9,1,188,-,-
+11 0,,17,3,3,1,17,3,68,1,3,1,68,1,136,-,-
+1000,16,1,1,1,8,1,6,1,,1,,1,1,1,1,0
+16 000,3,,16,1,18,11,8,1,9,11,,3,1,9,1,188
+00,,17,3,17,,17,3,3,1,17,1,3,1,68,1,136
+000,3,1,,1,16,1,1,1,8,1,,1,,1,1,1
+3000,71,08,3,1,3,,16,1,18,11,9,11,,3,1,9
+100,119,3,8,1,,17,3,17,,17,1,17,1,3,1,68
+8 000,—,—,8,1,3,1,,1,16,1,8,1,,1,,1
+96 000,—,—,—,—,—,—,8,1,3,1,16,1,8,1,,1
+"",512 FS,384 FS,256 FS,192 FS,128 FS,64 FS,32 FS,16 FS,,,,,,,,
+Fs (Hz),X,Y,X,Y,X,Y,X,Y,X,Y,X,Y,X,Y,X,Y
+8 000,1,11,9,11,6,11,,3,3,11,1,11,—,—,—,—
+11 0,,1,1,17,,1,1,3,1,1,1,10,1,0,—,—
+1000,18,11,8,1,9,11,,1,,3,1,9,1,188,—,—
+16 000,19,167,18,11,1,11,9,11,6,11,3,11,1,11,—,—
+00,37,36,,17,,1,1,17,,1,1,1,1,10,1,0
+000,3,,16,1,18,11,8,1,9,11,,3,1,9,1,188
+3000,38,167,3,,19,167,18,11,1,11,6,11,3,11,1,11
+100,3,169,,17,37,36,,17,,1,,1,1,1,1,10
+8 000,71,08,3,1,3,,16,1,18,11,9,11,,3,1,9
+96 000,—,—,—,—,71,08,3,1,3,,18,11,9,11,,3
+"",0x000,I S Cont ol Registe,0x0000_0000
+ISIER,0x00,I S Intept Enable Registe,0x0000_0000
+ISCDR,0x008,I S Clock Divide  Registe,0x0000_0000
+ISTXDR,0x00C,I S Tx Data Registe,0x0000_0000
+ISRXDR,0x010,I S Rx Data Registe,0x0000_0000
+ISFCR,0x01,I S FIFO Cont ol Registe,0x0000_0000
+ISSR,0x018,I S Stats Registe,0x0000_0809
+"",,
+Rese ved,,
+"",,
+N_DIV,,
+"",,
+X_DIV,,
+"",,
+Y_DIV,,
+TXDR,
+"",
+TXDR,
+"",
+TXDR,
+"",
+TXDR,
+Rese ved,RXFRST,TXFRST,
+Rese ved,,
+"",,
+Rese ved,RCNTR,
+"",,
+RCNTR,,
+"",,
+RCNTR,,
+Byte 3,Byte 2,Byte 1,Byte 0,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+Byte 0,Byte 1,Byte 2,Byte 3,
+Byte 3,Byte 2,Byte 1,Byte 0,
+Byte 0,Byte 1,Byte 2,Byte 3,
+Byte 0,Byte 1,Byte 2,Byte 3,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+"",,,,,,,,,,,,,,,,,,,,,,,,,,,"BiBi","67",,,
+Byte 0,Byte 1,Byte 2,Byte 3
+"",0x000,CRC Cont ol Registe,0x0000_0000
+CRCSDR,0x00,CRC Seed Registe,0x0000_0000
+CRCCSR,0x008,CRC Checksm Registe,0x0000_0000
+"",,
+SEED,,
+"",,
+SEED,,
+"",,
+SEED,,
+"",,
+SEED,,
+"",,
+CHKSUM,
+"",
+CHKSUM,
+"",
+CHKSUM,
+"",
+CHKSUM,
+CRCDATA,
+"",
+CRCDATA,
+"",
+CRCDATA,
+"",
+CRCDATA,

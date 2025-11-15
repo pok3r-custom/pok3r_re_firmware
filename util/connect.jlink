@@ -1,4 +1,5 @@
 
+log jlink.log
 si SWD
 speed 4000
 connect
