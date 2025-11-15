@@ -1,10 +1,12 @@
 
-import sys
 import os
 import argparse
 import struct
 import binascii
 import string
+import logging
+
+log = logging.getLogger(__name__)
 
 
 pok3r_xor_key = [
@@ -150,13 +152,16 @@ class UpdateFirmware:
     def __init__(self, name, info, fw):
         self.name = name
         self.desc = ""
-        self.version = ""
+        self.version_str = ""
         self.info = info
         self.firmware = fw
         self.app_vid_pid = (0, 0)
         self.boot_vid_pid = (0, 0)
 
-    def show_info(self):
+    def version(self):
+        return tuple([ int(s) for s in self.version_str.upper().lstrip("V").split(".") ])
+
+    def show_info(self, indent=""):
         verlen, = struct.unpack("<I", self.info[:4])
         a, b, c, d, e, f, vid, pid = struct.unpack("<IIIIIIHH", self.info[120:120+28])
         h, = struct.unpack("<I", self.info[176:176+4])
@@ -165,29 +170,29 @@ class UpdateFirmware:
             verstr = "CLEARED"
         else:
             verstr = self.info[4:min(verlen, 60)].decode("utf-16").partition("\x00")[0]
-        print("Version String: %s" % verstr)
+        log.info(indent + "Version String: %s" % verstr)
 
-        print("a: %08x" % a)
-        print("Version: %08x" % b)
-        print("c: %08x" % c)
-        print("d: %08x" % d)
-        print("e: %08x" % e)
-        print("f: %08x" % f)
-        print("VID/PID: %04x:%04x" % (vid, pid))
-        print("h: %08x" % h)
+        log.info(indent + "a: %08x" % a)
+        log.info(indent + "Version: %08x" % b)
+        log.info(indent + "c: %08x" % c)
+        log.info(indent + "d: %08x" % d)
+        log.info(indent + "e: %08x" % e)
+        log.info(indent + "f: %08x" % f)
+        log.info(indent + "VID/PID: %04x:%04x" % (vid, pid))
+        log.info(indent + "h: %08x" % h)
 
-    def print_info(self):
-        print("Description: %s" % self.desc)
-        print("Version: %s" % self.version)
-        print("Layout: %s" % self.name)
-        print("App VID/PID: %04x:%04x" % self.app_vid_pid)
-        print("Boot VID/PID: %04x:%04x" % self.boot_vid_pid)
-        print("Firmware: %d bytes" % len(self.firmware))
+    def print_info(self, indent=""):
+        log.info(indent + "Description: %s" % self.desc)
+        log.info(indent + "Version: %s" % self.version_str)
+        log.info(indent + "Layout: %s" % self.name)
+        log.info(indent + "App VID/PID: %04x:%04x" % self.app_vid_pid)
+        log.info(indent + "Boot VID/PID: %04x:%04x" % self.boot_vid_pid)
+        log.info(indent + "Firmware: %d bytes" % len(self.firmware))
         if len(self.info):
-            print("Info - %d bytes" % len(self.info))
+            log.info(indent + "Info - %d bytes" % len(self.info))
             for i in range(0, len(self.info), 32):
-                print("    %s" % "".join(["%02x" % x for x in self.info[i:i+32]]))
-            self.show_info()
+                log.info(indent + "  %s" % "".join(["%02x" % x for x in self.info[i:i+32]]))
+            self.show_info(indent)
 
 
 class UpdatePackage:
@@ -303,7 +308,7 @@ class UpdatePackage:
             fsec = decode_pok3r_firmware(fsec)
 
             fw = UpdateFirmware(layout, bytes(), fsec)
-            fw.version = self.pkgver
+            fw.version_str = self.pkgver
             fw.app_vid_pid = (vid, pid)
             fw.boot_vid_pid = (bvid, bpid)
             self.firmware.append(fw)
@@ -361,7 +366,7 @@ class UpdatePackage:
                 ssec = decode_package_data(ssec)
 
                 fw = UpdateFirmware(layout, ssec, fsec)
-                fw.version = self.pkgver
+                fw.version_str = self.pkgver
                 self.firmware.append(fw)
 
                 start += 0x50
@@ -409,7 +414,7 @@ class UpdatePackage:
                 while int(strs[layout_start]):
                     layout = strs[layout_start:layout_start+60].decode("utf-16").partition("\x00")[0]
                     a1, a2, a3 = struct.unpack("<HHH", strs[layout_start+60:layout_start+60+6])
-                    print("Layout: %s %04x %04x %04x" % (layout, a1, a2, a3))
+                    log.info("Layout: %s %04x %04x %04x" % (layout, a1, a2, a3))
                     layout_start += 80
 
                 fwl, strl = struct.unpack("<II", strs[addr_pos:addr_pos+8])
@@ -428,7 +433,7 @@ class UpdatePackage:
 
                     fw = UpdateFirmware(layout, ssec, fsec)
                     fw.desc = desc
-                    fw.version = version
+                    fw.version_str = version
                     self.firmware.append(fw)
 
     def decode_kbp_cykb(self):
@@ -441,6 +446,7 @@ class UpdatePackage:
         header_len = 0x10
         header_start = strings_start - 0x10
         fw_start = 0x54000
+        offset_version = 0x28
         offset_sig = strings_len - 4
         sig_len = 4
 
@@ -450,7 +456,7 @@ class UpdatePackage:
 
             # calculate XOR key from first 4 bytes of header
             key = bytearray([ k ^ i for i, k in enumerate(strs0[:4]) ])
-            print("Key: %02x%02x%02x%02x" % tuple(key))
+            log.info("Key: %02x%02x%02x%02x" % tuple(key))
 
             strs0 = kbp_decode(strs0, key)
 
@@ -459,11 +465,13 @@ class UpdatePackage:
             strs1 = kbp_decode(strs1, key)
             dump_bytes(strs1)
 
+            self.pkgver = strs1[offset_version:offset_version+12].decode("ascii").partition("\x00")[0]
+
             self.sig = strs1[offset_sig:offset_sig+sig_len].partition(b"\x00")[0]
             assert self.sig == sig_expect
 
             fw_len, = struct.unpack("<I", strs0[4:4+4])
-            print("FW Len: %d" % fw_len)
+            log.info("FW Len: %d" % fw_len)
 
             f.seek(fw_start)
             fsec = f.read(fw_len)
@@ -471,7 +479,7 @@ class UpdatePackage:
             fsec = decode_pok3r_firmware(fsec)
 
             fw = UpdateFirmware("", bytes(), fsec)
-            fw.version = self.pkgver
+            fw.version_str = self.pkgver
             self.firmware.append(fw)
 
     def decode_coolermaster(self):
@@ -500,7 +508,7 @@ class UpdatePackage:
             f.seek(name_start)
             str0 = f.read(name_len)
             name = str0.decode("ascii")
-            print(name)
+            log.info(name)
 
             size_start = name_start - 4
             f.seek(size_start)
@@ -518,16 +526,28 @@ class UpdatePackage:
 
 
     def print_info(self):
-        print("Description: %s" % self.pkgdesc)
-        print("Company: %s" % self.company)
-        print("Product: %s" % self.product)
-        print("Version: %s" % self.pkgver)
-        print("Signature: %s" % self.sig)
+        log.info("Description: %s" % self.pkgdesc)
+        log.info("Company: %s" % self.company)
+        log.info("Product: %s" % self.product)
+        log.info("Version: %s" % self.pkgver)
+        log.info("Signature: %s" % self.sig)
         self.print_section_info()
 
     def print_section_info(self):
-        for f in self.firmware:
-            f.print_info()
+        for i, f in enumerate(self.firmware):
+            log.info("")
+            log.info("Section %d:" % i)
+            f.print_info("  ")
+
+    def dump_firmware(self, prefix=""):
+        for i, fw in enumerate(self.firmware):
+            if len(self.firmware) > 1:
+                fname = "%s_v%s_fw%d.bin" % (self.name, "".join([ str(n) for n in self.version ]), i)
+            else:
+                fname = "%s_v%s.bin" % (self.name, "".join([ str(n) for n in self.version ]))
+            log.info("Firmware Out: %s" % fname)
+            with open(os.path.join(prefix, fname), "wb") as f:
+                f.write(fw.firmware)
 
 
 if __name__ == "__main__":
@@ -545,4 +565,4 @@ if __name__ == "__main__":
         ofile = os.path.join(os.path.dirname(args.exe), "fw_%d.bin" % i)
         with open(ofile, "wb") as w:
             w.write(f.firmware)
-        print("Firmware %d Written to %s" % (i, ofile))
+        log.info("Firmware %d Written to %s" % (i, ofile))

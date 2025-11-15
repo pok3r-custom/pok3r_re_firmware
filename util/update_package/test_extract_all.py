@@ -1,10 +1,17 @@
 
+import sys
 import os
 import re
 import unittest
+import logging
+
 from updatepackage import UpdatePackage
 
+logging.basicConfig(level=logging.INFO, stream=sys.stdout, format="%(name)-15s %(levelname)-5s - %(message)s")
+log = logging.getLogger(__name__)
+
 pkg_dir = os.path.join(os.path.dirname(__file__), "../../vendor")
+dump_dir = "dump"
 
 pkg = lambda n: os.path.join(pkg_dir, n)
 
@@ -15,11 +22,11 @@ updaters = [
     UpdatePackage(pkg("vortex/POK3R_V115.exe"), name="pok3r", version=(1,1,5)),
     UpdatePackage(pkg("vortex/POK3R_V116.exe"), name="pok3r", version=(1,1,6)),
     UpdatePackage(pkg("vortex/POK3R_V117.exe"), name="pok3r", version=(1,1,7)),
-    UpdatePackage(pkg("vortex/POK3R2_V110.exe"), name="pok3r2", version=(1,1,0)),
+    UpdatePackage(pkg("vortex/POK3R2_V110.exe"), name="pok3r_v2", version=(1,1,0)),
     UpdatePackage(pkg("vortex/POK3R_RGB_V124.exe"), name="pok3r_rgb", version=(1,2,4)),
     UpdatePackage(pkg("vortex/POK3R_RGB_V130.exe"), name="pok3r_rgb", version=(1,3,0)),
     UpdatePackage(pkg("vortex/POK3R_RGB_V140.exe"), name="pok3r_rgb", version=(1,4,0)),
-    UpdatePackage(pkg("vortex/POK3R_RGB2_V105.exe"), name="pok3r_rgb2", version=(1,0,5)),
+    UpdatePackage(pkg("vortex/POK3R_RGB2_V105.exe"), name="pok3r_rgb_v2", version=(1,0,5)),
     UpdatePackage(pkg("vortex/CORE_V141.exe"), name="core", version=(1,4,1)),
     UpdatePackage(pkg("vortex/CORE_V143.exe"), name="core", version=(1,4,3)),
     UpdatePackage(pkg("vortex/CORE_V145.exe"), name="core", version=(1,4,5)),
@@ -30,7 +37,7 @@ updaters = [
     UpdatePackage(pkg("vortex/RACE_V125.exe"), name="race", version=(1,2,5)),
     UpdatePackage(pkg("vortex/VIBE_V113.exe"), name="vibe", version=(1,1,3)),
     UpdatePackage(pkg("vortex/CYPHER_V136.exe"), name="cypher", version=(1,3,6)),
-    UpdatePackage(pkg("vortex/TAB_60_V1113.exe"), name="tab60"),
+    UpdatePackage(pkg("vortex/TAB_60_V1113.exe"), name="tab60", version=(1,1,13)),
     UpdatePackage(pkg("vortex/TAB_75_V100.exe"), name="tab75", version=(1,0,4)),
     UpdatePackage(pkg("vortex/TAB_90_V100.exe"), name="tab90", version=(1,0,4)),
     # TEX
@@ -55,13 +62,18 @@ updaters = [
 
 
 class TestExtract(unittest.TestCase):
-    pass
+    def setUp(self):
+        try:
+            os.mkdir(dump_dir)
+        except FileExistsError:
+            pass
 
 
 def test_generator(u):
     def test(self):
         u.decode()
         u.print_info()
+        u.dump_firmware(dump_dir)
     return test
 
 
@@ -69,7 +81,6 @@ for u in updaters:
     name = os.path.splitext(os.path.basename(u.exe))[0]
     name = "test_" + re.sub('[^0-9a-zA-Z_]', '_', name)
     setattr(TestExtract, name, test_generator(u))
-
 
 if __name__ == "__main__":
     unittest.main()
